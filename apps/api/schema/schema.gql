@@ -1,0 +1,40 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+directive @cacheControl(inheritMaxAge: Boolean, maxAge: Int, scope: CacheControlScope) on FIELD_DEFINITION | INTERFACE | OBJECT | UNION
+
+enum CacheControlScope {
+  PRIVATE
+  PUBLIC
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Identity {
+  id: ID!
+  provider: String!
+  subject: String!
+  type: String!
+}
+
+type Query {
+  getUser(id: ID!): User!
+}
+
+type User {
+  created_at: DateTime!
+  family_name: String
+  given_name: String
+  id: ID!
+  identities: [Identity!]!
+  updated_at: DateTime!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
