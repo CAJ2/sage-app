@@ -1,0 +1,11 @@
+<template>
+	<div>
+		<ion-header>
+			<ion-toolbar>
+				<ion-title>Home</ion-title>
+			</ion-toolbar>
+		</ion-header>
+		<slot>
+		</slot>
+	</div>
+</template>
