@@ -1,6 +1,6 @@
 {
   "appId": "io.ionic.starter",
-  "appName": "nuxt-app",
+  "appName": "sage-frontend",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"
