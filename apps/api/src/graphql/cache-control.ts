@@ -1,23 +1,23 @@
-import { registerEnumType } from "@nestjs/graphql";
-import { GraphQLEnumType } from "graphql";
+import { registerEnumType } from '@nestjs/graphql'
+import { GraphQLEnumType } from 'graphql'
 
 export enum CacheControlScope {
-	PUBLIC,
-	PRIVATE,
+  PUBLIC,
+  PRIVATE,
 }
 
 registerEnumType(CacheControlScope, {
-	name: "CacheControlScope",
-});
+  name: 'CacheControlScope'
+})
 
 export const CacheControlScopeEnum = new GraphQLEnumType({
-	name: 'CacheControlScope',
-	values: {
-		PRIVATE: {
-			value: CacheControlScope.PRIVATE,
-		},
-		PUBLIC: {
-			value: CacheControlScope.PUBLIC,
-		},
-	}
-});
+  name: 'CacheControlScope',
+  values: {
+    PRIVATE: {
+      value: CacheControlScope.PRIVATE
+    },
+    PUBLIC: {
+      value: CacheControlScope.PUBLIC
+    }
+  }
+})
