@@ -21,26 +21,11 @@ const identitySelect = Prisma.validator<Prisma.IdentitySelect>()({
   updated_at: true
 })
 
-const userWithIdentities = Prisma.validator<Prisma.UserDefaultArgs>()({
-  select: {
-    identities: {
-      select: identitySelect
-    }
-  }
-})
-export type UserWithIdentities = Prisma.UserGetPayload<typeof userWithIdentities>
-const userWithIdentitiesAuth = Prisma.validator<Prisma.UserDefaultArgs>()({
-  include: {
-    identities: true
-  }
-})
-export type UserWithIdentitiesAuth = Prisma.UserGetPayload<typeof userWithIdentitiesAuth>
-
 @Injectable()
 export class UsersService {
   constructor (private readonly db: DB) {}
 
-  async findOneByID (id: string): Promise<UserWithIdentities | null> {
+  async findOneByID (id: string) {
     return await this.db.user.findUnique({
       select: {
         identities: {
@@ -54,7 +39,7 @@ export class UsersService {
   }
 
   async findByUsernameOrEmail (usernameOrEmail: string) {
-    let user: UserWithIdentities | null = await this.db.user.findUnique({
+    let user = await this.db.user.findUnique({
       include: {
         identities: {
           select: identitySelect
@@ -80,7 +65,7 @@ export class UsersService {
   }
 
   async findByUsernameOrEmailAuth (usernameOrEmail: string) {
-    let user: UserWithIdentitiesAuth | null = await this.db.user.findUnique({
+    let user = await this.db.user.findUnique({
       include: {
         identities: true
       },
@@ -102,7 +87,7 @@ export class UsersService {
   }
 
   async findIdentities (id: string): Promise<IdentityFields[] | null> {
-    const identities: IdentityFields[] | null = await this.db.user.findUnique({
+    const identities = await this.db.user.findUnique({
       where: {
         id
       }

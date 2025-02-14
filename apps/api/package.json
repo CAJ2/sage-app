@@ -8,12 +8,10 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "npx prisma generate && nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"config/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "ts-standard --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -34,7 +32,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-fastify": "^11.0.1",
     "@prisma/client": "^6.3.1",
-    "@zenstackhq/runtime": "2.11.4",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -62,10 +59,7 @@
     "@types/node": "^22.10.7",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.20.0",
-    "@typescript-eslint/parser": "^8.20.0",
     "jest": "^29.7.0",
-    "prettier": "^3.4.2",
     "prisma": "^6.2.1",
     "prisma-markdown": "^1.0.9",
     "source-map-support": "^0.5.21",
@@ -73,10 +67,8 @@
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "ts-standard": "^12.0.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
-    "zenstack": "^2.11.6"
+    "typescript": "^5.7.3"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -84,6 +76,10 @@
       "json",
       "ts"
     ],
+    "moduleNameMapper": {
+      "@src/(.*)$": "<rootDir>/$1",
+      "@config/(.*)$": "<rootDir>/../config/$1"
+    },
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {

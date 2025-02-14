@@ -8,14 +8,14 @@ export const Types = {
 @ObjectType()
 export class Identity extends CreatedUpdated {
   @Field(() => ID)
-    id: string
+  id: string
 
   @Field()
-    type: string
+  type: string
 
   @Field()
-    provider: string
+  provider: string
 
   @Field()
-    subject: string
+  subject: string
 }

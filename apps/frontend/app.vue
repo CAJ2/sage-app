@@ -5,3 +5,7 @@
     </ion-app>
   </NuxtLayout>
 </template>
+
+<style>
+@import "tailwindcss";
+</style>
