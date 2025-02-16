@@ -5,8 +5,8 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxtjs/ionic',
-    '@nuxtjs/eslint-module',
     '@nuxtjs/color-mode',
+    '@nuxtjs/i18n',
     'nuxt-icon',
     '@pinia/nuxt',
   ],
@@ -18,6 +18,14 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
+
+  i18n: {
+    defaultLocale: 'en',
+    locales: [
+      { code: 'en', iso: 'en-US', name: 'English' },
+      { code: 'sv', iso: 'sv-SE', name: 'Svenska' },
+    ],
+  },
 
   colorMode: {
     classSuffix: '',

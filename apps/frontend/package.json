@@ -12,17 +12,17 @@
   "devDependencies": {
     "@capacitor/cli": "5.5.1",
     "@nuxt/devtools": "latest",
-    "@nuxtjs/color-mode": "^3.3.0",
-    "@nuxtjs/eslint-module": "^4.1.0",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/i18n": "9.2.0",
     "@nuxtjs/ionic": "^0.12.1",
     "daisyui": "^3.9.4",
-    "nuxt": "^3.8.1",
-    "nuxt-icon": "^0.6.5",
-    "vue": "^3.3.8",
-    "vue-router": "^4.2.5"
+    "nuxt": "^3.15.4",
+    "nuxt-icon": "^0.6.10",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.7",
+    "@apollo/client": "^3.13.1",
     "@capacitor/android": "5.5.1",
     "@capacitor/app": "5.0.6",
     "@capacitor/core": "5.5.1",
@@ -30,13 +30,13 @@
     "@capacitor/ios": "5.5.1",
     "@capacitor/keyboard": "5.0.6",
     "@capacitor/status-bar": "5.0.6",
-    "@formkit/auto-animate": "^0.8.1",
-    "@pinia/nuxt": "^0.5.1",
+    "@formkit/auto-animate": "^0.8.2",
+    "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/vite": "^4.0.6",
-    "graphql": "^16.8.1",
+    "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
-    "pinia": "^2.1.7",
+    "pinia": "^3.0.1",
     "tailwindcss": "^4.0.6",
-    "vue-i18n": "9"
+    "vue-i18n": "^11.1.1"
   }
 }

@@ -1,11 +1,5 @@
 <template>
-  <NuxtLayout>
-    <ion-app>
-      <NuxtPage />
-    </ion-app>
-  </NuxtLayout>
+  <ion-app>
+    <ion-router-outlet />
+  </ion-app>
 </template>
-
-<style>
-@import "tailwindcss";
-</style>
