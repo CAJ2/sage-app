@@ -11,13 +11,10 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@src/*": [
-        "src/*"
-      ],
-      "@config/*": [
-        "config/*"
-      ],
+      "@src/*": ["src/*"],
+      "@config/*": ["config/*"]
     },
+    "strict": true,
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

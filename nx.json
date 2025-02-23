@@ -50,12 +50,6 @@
         "serveStaticTargetName": "serve-static",
         "buildStaticTargetName": "build-static"
       }
-    },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "eslint:lint"
-      }
     }
   ]
 }

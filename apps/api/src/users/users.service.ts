@@ -18,7 +18,7 @@ const identitySelect = Prisma.validator<Prisma.IdentitySelect>()({
   provider: true,
   subject: true,
   type: true,
-  updated_at: true
+  updated_at: true,
 })
 
 @Injectable()
@@ -29,12 +29,12 @@ export class UsersService {
     return await this.db.user.findUnique({
       select: {
         identities: {
-          select: identitySelect
-        }
+          select: identitySelect,
+        },
       },
       where: {
-        id
-      }
+        id,
+      },
     })
   }
 
@@ -42,23 +42,23 @@ export class UsersService {
     let user = await this.db.user.findUnique({
       include: {
         identities: {
-          select: identitySelect
-        }
+          select: identitySelect,
+        },
       },
       where: {
-        email: usernameOrEmail
-      }
+        email: usernameOrEmail,
+      },
     })
     if (!user) {
       user = await this.db.user.findUnique({
         include: {
           identities: {
-            select: identitySelect
-          }
+            select: identitySelect,
+          },
         },
         where: {
-          username: usernameOrEmail
-        }
+          username: usernameOrEmail,
+        },
       })
     }
     return user
@@ -67,40 +67,42 @@ export class UsersService {
   async findByUsernameOrEmailAuth (usernameOrEmail: string) {
     let user = await this.db.user.findUnique({
       include: {
-        identities: true
+        identities: true,
       },
       where: {
-        email: usernameOrEmail
-      }
+        email: usernameOrEmail,
+      },
     })
     if (!user) {
       user = await this.db.user.findUnique({
         include: {
-          identities: true
+          identities: true,
         },
         where: {
-          username: usernameOrEmail
-        }
+          username: usernameOrEmail,
+        },
       })
     }
     return user
   }
 
   async findIdentities (id: string): Promise<IdentityFields[] | null> {
-    const identities = await this.db.user.findUnique({
-      where: {
-        id
-      }
-    }).identities({
-      select: {
-        created_at: true,
-        id: true,
-        provider: true,
-        subject: true,
-        type: true,
-        updated_at: true
-      }
-    })
+    const identities = await this.db.user
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .identities({
+        select: {
+          created_at: true,
+          id: true,
+          provider: true,
+          subject: true,
+          type: true,
+          updated_at: true,
+        },
+      })
     return identities
   }
 }

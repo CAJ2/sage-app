@@ -16,7 +16,7 @@ generator markdown {
 }
 
 model User {
-  id                  String             @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id                  String             @id() @default(nanoid())
   created_at          DateTime           @default(now())
   updated_at          DateTime           @updatedAt()
   email               String             @unique() @db.String(1024)
@@ -48,7 +48,7 @@ model User {
 }
 
 model Identity {
-  id            String   @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id            String   @id() @default(nanoid())
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt()
   type          String   @db.String(64)
@@ -60,14 +60,14 @@ model Identity {
   profile_data  Json?
   multifactor   Json?
   user          User?    @relation(fields: [user_id], references: [id])
-  user_id       String?  @db.Uuid()
+  user_id       String?
 
   @@unique([user_id, provider])
   @@schema("auth")
 }
 
 model Org {
-  id           String        @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id           String        @id() @default(nanoid())
   created_at   DateTime      @default(now())
   updated_at   DateTime      @updatedAt()
   name         Json?
@@ -78,6 +78,8 @@ model Org {
   users        OrgsUsers[]
   items        ItemsOrgs[]
   variant_orgs VariantOrgs[]
+  places       Place[]
+  processes    Process[]
   changes      OrgHistory[]
 
   @@schema("public")
@@ -85,9 +87,9 @@ model Org {
 
 model OrgsUsers {
   user       User     @relation(fields: [user_id], references: [id])
-  user_id    String   @db.Uuid()
+  user_id    String
   org        Org      @relation(fields: [org_id], references: [id])
-  org_id     String   @db.Uuid()
+  org_id     String
   created_at DateTime @default(now())
 
   @@id([user_id, org_id])
@@ -96,9 +98,9 @@ model OrgsUsers {
 }
 
 model OrgHistory {
-  org_id   String   @db.Uuid()
+  org_id   String
   datetime DateTime @default(now())
-  user_id  String   @db.Uuid()
+  user_id  String
   original Json?
   changes  Json?
   org      Org      @relation(fields: [org_id], references: [id])
@@ -109,7 +111,7 @@ model OrgHistory {
 }
 
 model Region {
-  id         String                    @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id         String                    @id() @default(nanoid())
   created_at DateTime                  @default(now())
   updated_at DateTime                  @updatedAt()
   name       Json?
@@ -124,9 +126,9 @@ model Region {
 }
 
 model RegionHistory {
-  region_id String   @db.Uuid()
+  region_id String
   datetime  DateTime @default(now())
-  user_id   String   @db.Uuid()
+  user_id   String
   original  Json?
   changes   Json?
   region    Region   @relation(fields: [region_id], references: [id])
@@ -137,7 +139,7 @@ model RegionHistory {
 }
 
 model Place {
-  id         String                    @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id         String                    @id() @default(nanoid())
   created_at DateTime                  @default(now())
   updated_at DateTime                  @updatedAt()
   name       Json?
@@ -145,6 +147,9 @@ model Place {
   desc       Json?
   geo        Unsupported("geography")?
   tags       PlaceTag[]
+  org        Org?                       @relation(fields: [org_id], references: [id])
+  org_id     String?
+  processes  Process[]
   changes    PlaceHistory[]
 
   @@schema("public")
@@ -152,8 +157,8 @@ model Place {
 
 model PlaceTag {
   place      Place    @relation(fields: [place_id], references: [id])
-  place_id   String   @db.Uuid()
-  tag_name   String   @db.Uuid()
+  place_id   String
+  tag_name   String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt()
 
@@ -162,9 +167,9 @@ model PlaceTag {
 }
 
 model PlaceHistory {
-  place_id String   @db.Uuid()
+  place_id String
   datetime DateTime @default(now())
-  user_id  String   @db.Uuid()
+  user_id  String
   original Json?
   changes  Json?
   place    Place    @relation(fields: [place_id], references: [id])
@@ -175,7 +180,7 @@ model PlaceHistory {
 }
 
 model Category {
-  id          String            @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id          String            @id() @default(nanoid())
   created_at  DateTime          @default(now())
   updated_at  DateTime          @updatedAt()
   name        Json?
@@ -192,9 +197,9 @@ model Category {
 
 model CategoryTree {
   ancestor      Category @relation("ancestor", fields: [ancestor_id], references: [id])
-  ancestor_id   String   @db.Uuid()
+  ancestor_id   String
   descendant    Category @relation("descendant", fields: [descendant_id], references: [id])
-  descendant_id String   @db.Uuid()
+  descendant_id String
   length        Int      @default(0)
 
   @@id([ancestor_id, descendant_id])
@@ -204,9 +209,9 @@ model CategoryTree {
 }
 
 model CategoryHistory {
-  category_id String   @db.Uuid()
+  category_id String
   datetime    DateTime @default(now())
-  user_id     String   @db.Uuid()
+  user_id     String
   original    Json?
   changes     Json?
   category    Category @relation(fields: [category_id], references: [id])
@@ -217,7 +222,7 @@ model CategoryHistory {
 }
 
 model Item {
-  id             String            @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id             String            @id() @default(nanoid())
   created_at     DateTime          @default(now())
   updated_at     DateTime          @updatedAt()
   name           Json?
@@ -228,7 +233,7 @@ model Item {
   links          Json?
   certifications Json?
   region         Region?           @relation(fields: [region_id], references: [id])
-  region_id      String?           @db.Uuid()
+  region_id      String?
   variants       Variant[]
   categories     ItemsCategories[]
   orgs           ItemsOrgs[]
@@ -239,9 +244,9 @@ model Item {
 
 model ItemsCategories {
   item        Item     @relation(fields: [item_id], references: [id])
-  item_id     String   @db.Uuid()
+  item_id     String
   category    Category @relation(fields: [category_id], references: [id])
-  category_id String   @db.Uuid()
+  category_id String
   created_at  DateTime @default(now())
 
   @@id([item_id, category_id])
@@ -251,9 +256,9 @@ model ItemsCategories {
 
 model ItemsOrgs {
   item       Item     @relation(fields: [item_id], references: [id])
-  item_id    String   @db.Uuid()
+  item_id    String
   org        Org      @relation(fields: [org_id], references: [id])
-  org_id     String   @db.Uuid()
+  org_id     String
   created_at DateTime @default(now())
 
   @@id([item_id, org_id])
@@ -262,9 +267,9 @@ model ItemsOrgs {
 }
 
 model ItemHistory {
-  item_id  String   @db.Uuid()
+  item_id  String
   datetime DateTime @default(now())
-  user_id  String   @db.Uuid()
+  user_id  String
   original Json?
   changes  Json?
   item     Item     @relation(fields: [item_id], references: [id])
@@ -275,7 +280,7 @@ model ItemHistory {
 }
 
 model Variant {
-  id         String               @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id         String               @id() @default(nanoid())
   created_at DateTime             @default(now())
   updated_at DateTime             @updatedAt()
   name       Json?
@@ -283,9 +288,9 @@ model Variant {
   source     Json?
   tags       Json?
   item       Item                 @relation(fields: [item_id], references: [id])
-  item_id    String               @db.Uuid()
+  item_id    String
   region     Region?              @relation(fields: [region_id], references: [id])
-  region_id  String?              @db.Uuid()
+  region_id  String?
   orgs       VariantOrgs[]
   components VariantsComponents[]
   changes    VariantHistory[]
@@ -295,9 +300,9 @@ model Variant {
 
 model VariantOrgs {
   variant    Variant  @relation(fields: [variant_id], references: [id])
-  variant_id String   @db.Uuid()
+  variant_id String
   org        Org      @relation(fields: [org_id], references: [id])
-  org_id     String   @db.Uuid()
+  org_id     String
   created_at DateTime @default(now())
 
   @@id([variant_id, org_id])
@@ -307,9 +312,9 @@ model VariantOrgs {
 
 model VariantsComponents {
   variant      Variant   @relation(fields: [variant_id], references: [id])
-  variant_id   String    @db.Uuid()
+  variant_id   String
   component    Component @relation(fields: [component_id], references: [id])
-  component_id String    @db.Uuid()
+  component_id String
   created_at   DateTime  @default(now())
 
   @@id([variant_id, component_id])
@@ -318,9 +323,9 @@ model VariantsComponents {
 }
 
 model VariantHistory {
-  variant_id String   @db.Uuid()
+  variant_id String
   datetime   DateTime @default(now())
-  user_id    String   @db.Uuid()
+  user_id    String
   original   Json?
   changes    Json?
   variant    Variant  @relation(fields: [variant_id], references: [id])
@@ -331,7 +336,7 @@ model VariantHistory {
 }
 
 model Component {
-  id                 String                @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id                 String                @id() @default(nanoid())
   created_at         DateTime              @default(now())
   updated_at         DateTime              @updatedAt()
   name               Json?
@@ -343,45 +348,33 @@ model Component {
   hazardous          Boolean
   hazardous_info     Json?
   region             Region?               @relation(fields: [region_id], references: [id])
-  region_id          String?               @db.Uuid()
+  region_id          String?
   primary_material   Material              @relation(fields: [material_id], references: [id])
-  material_id        String                @db.Uuid()
+  material_id        String
   materials          ComponentsMaterials[]
   variants           VariantsComponents[]
-  processes          ComponentsProcesses[]
   changes            ComponentHistory[]
 
   @@schema("public")
 }
 
 model ComponentsMaterials {
-  component    Component @relation(fields: [component_id], references: [id])
-  component_id String    @db.Uuid()
-  material     Material  @relation(fields: [material_id], references: [id])
-  material_id  String    @db.Uuid()
-  created_at   DateTime  @default(now())
+  component         Component @relation(fields: [component_id], references: [id])
+  component_id      String
+  material          Material  @relation(fields: [material_id], references: [id])
+  material_id       String
+  created_at        DateTime  @default(now())
+  material_fraction Float?
 
   @@id([component_id, material_id])
   @@index([material_id, component_id])
   @@schema("public")
 }
 
-model ComponentsProcesses {
-  component    Component @relation(fields: [component_id], references: [id])
-  component_id String    @db.Uuid()
-  process      Process   @relation(fields: [process_id], references: [id])
-  process_id   String    @db.Uuid()
-  created_at   DateTime  @default(now())
-
-  @@id([component_id, process_id])
-  @@index([process_id, component_id])
-  @@schema("public")
-}
-
 model ComponentHistory {
-  component_id String    @db.Uuid()
+  component_id String
   datetime     DateTime  @default(now())
-  user_id      String    @db.Uuid()
+  user_id      String
   original     Json?
   changes      Json?
   component    Component @relation(fields: [component_id], references: [id])
@@ -392,13 +385,15 @@ model ComponentHistory {
 }
 
 model Material {
-  id                 String                @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id                 String                @id() @default(nanoid())
   created_at         DateTime              @default(now())
   updated_at         DateTime              @updatedAt()
   name               Json?
   desc               Json?
   source             Json?
   technical          Boolean
+  ancestors          MaterialTree[]        @relation("ancestor")
+  descendants        MaterialTree[]        @relation("descendant")
   primary_components Component[]
   components         ComponentsMaterials[]
   processes          Process[]
@@ -407,10 +402,23 @@ model Material {
   @@schema("public")
 }
 
+model MaterialTree {
+  ancestor      Material @relation("ancestor", fields: [ancestor_id], references: [id])
+  ancestor_id   String
+  descendant    Material @relation("descendant", fields: [descendant_id], references: [id])
+  descendant_id String
+  length        Int      @default(0)
+
+  @@id([ancestor_id, descendant_id])
+  @@index([ancestor_id, descendant_id, length])
+  @@index([descendant_id, length])
+  @@schema("public")
+}
+
 model MaterialHistory {
-  material_id String   @db.Uuid()
+  material_id String
   datetime    DateTime @default(now())
-  user_id     String   @db.Uuid()
+  user_id     String
   original    Json?
   changes     Json?
   material    Material @relation(fields: [material_id], references: [id])
@@ -420,27 +428,41 @@ model MaterialHistory {
   @@schema("public")
 }
 
+enum ProcessIntent {
+  COLLECTION
+  SORTATION
+  RECYCLE
+  REFURBISH
+  REUSE
+
+  @@schema("public")
+}
+
 model Process {
-  id          String                @id() @default(dbgenerated("gen_random_uuid()")) @db.Uuid()
+  id          String                @id() @default(nanoid())
   created_at  DateTime              @default(now())
   updated_at  DateTime              @updatedAt()
+  intent      ProcessIntent         @default(COLLECTION)
   name        Json?
   desc        Json?
   source      Json?
   material    Material              @relation(fields: [material_id], references: [id])
-  material_id String                @db.Uuid()
+  material_id String
+  org         Org                  @relation(fields: [org_id], references: [id])
+  org_id      String
   region      Region?               @relation(fields: [region_id], references: [id])
-  region_id   String?               @db.Uuid()
-  components  ComponentsProcesses[]
+  region_id   String?
+  place       Place?                @relation(fields: [place_id], references: [id])
+  place_id    String?
   changes     ProcessHistory[]
 
   @@schema("public")
 }
 
 model ProcessHistory {
-  process_id String   @db.Uuid()
+  process_id String
   datetime   DateTime @default(now())
-  user_id    String   @db.Uuid()
+  user_id    String
   original   Json?
   changes    Json?
   process    Process  @relation(fields: [process_id], references: [id])

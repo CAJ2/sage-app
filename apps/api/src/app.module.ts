@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import config from '@config/config'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
@@ -5,8 +6,6 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule, Int } from '@nestjs/graphql'
 import { DirectiveLocation, GraphQLBoolean, GraphQLDirective } from 'graphql'
-import { join } from 'path'
-
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
@@ -25,38 +24,38 @@ import { UsersModule } from './users/users.module'
           new GraphQLDirective({
             args: {
               inheritMaxAge: {
-                type: GraphQLBoolean
+                type: GraphQLBoolean,
               },
               maxAge: {
-                type: Int
+                type: Int,
               },
               scope: {
-                type: CacheControlScopeEnum
-              }
+                type: CacheControlScopeEnum,
+              },
             },
             locations: [
               DirectiveLocation.FIELD_DEFINITION,
               DirectiveLocation.OBJECT,
               DirectiveLocation.INTERFACE,
-              DirectiveLocation.UNION
+              DirectiveLocation.UNION,
             ],
-            name: 'cacheControl'
-          })
-        ]
+            name: 'cacheControl',
+          }),
+        ],
       },
       driver: ApolloDriver,
       include: [AuthModule, UsersModule],
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
-      sortSchema: true
+      sortSchema: true,
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [config]
+      load: [config],
     }),
     AuthModule,
-    UsersModule
+    UsersModule,
   ],
-  providers: [AppService, DB]
+  providers: [AppService, DB],
 })
 export class AppModule {}

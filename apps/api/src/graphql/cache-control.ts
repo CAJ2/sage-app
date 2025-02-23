@@ -7,17 +7,17 @@ export enum CacheControlScope {
 }
 
 registerEnumType(CacheControlScope, {
-  name: 'CacheControlScope'
+  name: 'CacheControlScope',
 })
 
 export const CacheControlScopeEnum = new GraphQLEnumType({
   name: 'CacheControlScope',
   values: {
     PRIVATE: {
-      value: CacheControlScope.PRIVATE
+      value: CacheControlScope.PRIVATE,
     },
     PUBLIC: {
-      value: CacheControlScope.PUBLIC
-    }
-  }
+      value: CacheControlScope.PUBLIC,
+    },
+  },
 })
