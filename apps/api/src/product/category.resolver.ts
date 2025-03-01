@@ -19,9 +19,6 @@ export class CategoryResolver {
     const model = new Category()
     model.id = entity.id
     model.name = entity.name.default?.text
-    model.desc_short = entity.desc_short.default?.text
-    model.desc = entity.desc.default?.text
-    model.image_url = entity.image_url
     return model
   }
 }
