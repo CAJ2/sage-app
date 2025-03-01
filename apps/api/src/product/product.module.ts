@@ -23,4 +23,4 @@ import { VariantResolver } from './variant.resolver'
   providers: [CategoryResolver, ItemResolver, VariantResolver],
   exports: [CategoryResolver, ItemResolver, VariantResolver],
 })
-export class ProductModule { }
+export class ProductModule {}

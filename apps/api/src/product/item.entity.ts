@@ -12,7 +12,6 @@ import {
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
-import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { Category } from './category.entity'
 import { Variant } from './variant.entity'

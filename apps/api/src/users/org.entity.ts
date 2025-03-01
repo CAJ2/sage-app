@@ -11,10 +11,9 @@ import {
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
-import { Item } from '@src/product/item.entity'
+import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from './users.entity'
-import { Process } from '@src/process/process.entity'
 
 @Entity({ tableName: 'orgs', schema: 'public' })
 export class Org extends IDCreatedUpdated {
