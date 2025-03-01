@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "npx prettier . --write && npx eslint --fix"
+    "lint": "npx eslint --fix",
+    "lint:ci": "npx eslint . --max-warnings 0"
   },
   "devDependencies": {
     "@capacitor/cli": "5.5.1",

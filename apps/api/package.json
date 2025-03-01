@@ -17,7 +17,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "lint": "npx prettier . --write && npx eslint --fix"
+    "lint": "npx eslint --fix",
+    "lint:ci": "npx eslint . --max-warnings 0"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
