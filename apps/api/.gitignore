@@ -1,9 +1,11 @@
 # Secrets
-.env
+.env*
+.local
 
 # compiled output
 /dist
 /node_modules
+/temp
 
 # Logs
 logs

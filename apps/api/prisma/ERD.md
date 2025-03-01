@@ -67,6 +67,7 @@ erDiagram
   DateTime created_at
   DateTime updated_at
   Json name "nullable"
+  Int admin_level
 }
 "RegionHistory" {
   String region_id FK
@@ -370,6 +371,7 @@ erDiagram
 - `created_at`:
 - `updated_at`:
 - `name`:
+- `admin_level`:
 
 ### `RegionHistory`
 

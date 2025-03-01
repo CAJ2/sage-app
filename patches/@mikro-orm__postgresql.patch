@@ -1,0 +1,20 @@
+diff --git a/PostgreSqlSchemaHelper.js b/PostgreSqlSchemaHelper.js
+index e3d236651dd8e8c434dbe20214a8f8d7582ed837..90e345b1e43d74eaa11e151f987405c945409d03 100644
+--- a/PostgreSqlSchemaHelper.js
++++ b/PostgreSqlSchemaHelper.js
+@@ -253,10 +253,14 @@ class PostgreSqlSchemaHelper extends knex_1.SchemaHelper {
+             if (row.schema_name && row.schema_name !== this.platform.getDefaultSchemaName()) {
+                 name = row.schema_name + '.' + name;
+             }
++            let items = row.enum_value;
++            if (!Array.isArray(items)) {
++                items = this.platform.unmarshallArray(items);
++            }
+             o[name] = {
+                 name: row.enum_name,
+                 schema: row.schema_name,
+-                items: this.platform.unmarshallArray(row.enum_value),
++                items,
+             };
+             return o;
+         }, {});

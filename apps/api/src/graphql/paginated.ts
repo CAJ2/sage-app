@@ -7,9 +7,9 @@ interface IEdgeType<T> {
 }
 
 export interface IPaginatedType<T> {
-  edges: Array<IEdgeType<T>>
+  edges?: Array<IEdgeType<T>>
   hasNextPage: boolean
-  nodes: T[]
+  nodes?: T[]
   totalCount: number
 }
 
@@ -26,10 +26,10 @@ export function Paginated<T> (classRef: Type<T>): Type<IPaginatedType<T>> {
   @ObjectType({ isAbstract: true })
   abstract class PaginatedType implements IPaginatedType<T> {
     @Field(() => [EdgeType], { nullable: true })
-    edges: EdgeType[] = []
+    edges?: EdgeType[]
 
     @Field(() => [classRef], { nullable: true })
-    nodes: T[] = []
+    nodes?: T[]
 
     @Field(() => Int)
     totalCount: number = 0

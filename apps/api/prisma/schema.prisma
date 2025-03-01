@@ -111,17 +111,19 @@ model OrgHistory {
 }
 
 model Region {
-  id         String                    @id() @default(nanoid())
-  created_at DateTime                  @default(now())
-  updated_at DateTime                  @updatedAt()
-  name       Json?
-  geo        Unsupported("geography")?
-  items      Item[]
-  variants   Variant[]
-  components Component[]
-  processes  Process[]
-  changes    RegionHistory[]
+  id          String                    @id()
+  created_at  DateTime                  @default(now())
+  updated_at  DateTime                  @updatedAt()
+  name        Json?
+  admin_level Int
+  geo         Unsupported("MULTIPOLYGON")?
+  items       Item[]
+  variants    Variant[]
+  components  Component[]
+  processes   Process[]
+  changes     RegionHistory[]
 
+  // @@index(fields: [geo], type: Gist)
   @@schema("public")
 }
 
@@ -145,13 +147,14 @@ model Place {
   name       Json?
   address    Json?
   desc       Json?
-  geo        Unsupported("geography")?
+  location   Unsupported("POINT")?
   tags       PlaceTag[]
   org        Org?                       @relation(fields: [org_id], references: [id])
   org_id     String?
   processes  Process[]
   changes    PlaceHistory[]
 
+  // @@index(fields: [location], type: Gist)
   @@schema("public")
 }
 

@@ -18,6 +18,36 @@
       "{workspaceRoot}/.github/workflows/ci.yml"
     ]
   },
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "cwd": "apps/api"
+      },
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js"
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "executor": "@nx/jest:jest"
+    }
+  },
   "nxCloudId": "67acadc6cdcfda5eba4a88e1",
   "plugins": [
     {
