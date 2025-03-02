@@ -1,10 +1,10 @@
 import importPlugin from 'eslint-plugin-import'
+import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 import unusedImports from 'eslint-plugin-unused-imports'
 import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 import tseslint from 'typescript-eslint'
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 
 const baseConfig = [
   { files: ['**/*.{js,jsx,ts,tsx,vue}'] },
@@ -56,32 +56,38 @@ const standardConfig = [
       // Enforce consistent import ordering by grouping imports into categories:
       // Node built-ins first, followed by external packages, internal modules,
       // relative imports, and finally type imports
-      'import/order': ['error', {
-        'newlines-between': 'never',
-        alphabetize: {
-          order: 'asc',
-          caseInsensitive: true,
-          orderImportKind: 'asc',
+      'import/order': [
+        'error',
+        {
+          'newlines-between': 'never',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+            orderImportKind: 'asc',
+          },
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'object',
+            'type',
+          ],
         },
-        groups: [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index',
-          'object',
-          'type',
-        ],
-      }],
+      ],
 
       // Sort named imports within each import declaration
       // e.g. import { aaa, bbb, ccc } from 'module'
-      'sort-imports': ['error', {
-        ignoreDeclarationSort: true, // Let import/order handle declaration sorting
-        allowSeparatedGroups: false,
-        ignoreCase: true,
-      }],
+      'sort-imports': [
+        'error',
+        {
+          ignoreDeclarationSort: true, // Let import/order handle declaration sorting
+          allowSeparatedGroups: false,
+          ignoreCase: true,
+        },
+      ],
     },
   },
 ]
@@ -89,12 +95,15 @@ const standardConfig = [
 const prettier = [
   {
     rules: {
-      'prettier/prettier': ['error', {
-        semi: false,
-        singleQuote: true,
-      }],
-    }
-  }
+      'prettier/prettier': [
+        'error',
+        {
+          semi: false,
+          singleQuote: true,
+        },
+      ],
+    },
+  },
 ]
 
 export default [

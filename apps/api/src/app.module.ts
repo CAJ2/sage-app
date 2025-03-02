@@ -1,6 +1,7 @@
-import config from '@config/config'
+import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import config from '@src/config/config'
 import { nanoid } from 'nanoid'
 import { ClsModule } from 'nestjs-cls'
 import { AppController } from './app.controller'
@@ -35,6 +36,7 @@ import { UsersModule } from './users/users.module'
         },
       },
     }),
+    MikroOrmModule.forRoot(),
     GraphQLModule.register(),
     AuthModule,
     UsersModule,

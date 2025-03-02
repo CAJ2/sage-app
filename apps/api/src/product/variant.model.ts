@@ -1,4 +1,5 @@
 import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
 import { DateTime } from 'luxon'
 import { z } from 'zod'
@@ -51,7 +52,7 @@ export class VariantHistory {
   @Field(() => String)
   variant_id!: string
 
-  @Field(() => DateTime)
+  @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
 
   @Field(() => String, { nullable: true })

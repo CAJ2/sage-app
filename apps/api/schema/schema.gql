@@ -2,43 +2,177 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-directive @cacheControl(
-  inheritMaxAge: Boolean
-  maxAge: Int
-  scope: CacheControlScope
-) on FIELD_DEFINITION | INTERFACE | OBJECT | UNION
+directive @cacheControl(inheritMaxAge: Boolean, maxAge: Int, scope: CacheControlScope) on FIELD_DEFINITION | INTERFACE | OBJECT | UNION
 
 enum CacheControlScope {
   PRIVATE
   PUBLIC
 }
 
+type Category {
+  created_at: DateTime!
+  desc: String
+  desc_short: String
+  history: [CategoryHistory!]!
+  id: ID!
+  image_url: String
+  items: [Item!]!
+  name: String
+  updated_at: DateTime!
+}
+
+type CategoryHistory {
+  category_id: String!
+  changes: String
+  datetime: DateTime!
+  original: String
+}
+
 """
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.
 """
 scalar DateTime
 
 type Identity {
+  created_at: DateTime!
   id: ID!
   provider: String!
   subject: String!
   type: String!
+  updated_at: DateTime!
+}
+
+type Item {
+  categories: [Category!]!
+  created_at: DateTime!
+  desc: String
+  desc_short: String
+  history: [ItemHistory!]!
+  id: ID!
+  image_url: String
+  name: String
+  updated_at: DateTime!
+  variants: [Variant!]!
+}
+
+type ItemHistory {
+  changes: String
+  datetime: DateTime!
+  item_id: String!
+  original: String
+}
+
+type Place {
+  address: String
+  created_at: DateTime!
+  desc: String
+  history: [PlaceHistory!]!
+  id: ID!
+  name: String
+  tags: [PlaceTag!]!
+  updated_at: DateTime!
+}
+
+type PlaceEdge {
+  cursor: String!
+  node: Place!
+}
+
+type PlaceHistory {
+  changes: String
+  datetime: DateTime!
+  original: String
+  place_id: String!
+  user_id: String!
+}
+
+type PlacePage {
+  edges: [PlaceEdge!]
+  hasNextPage: Boolean!
+  nodes: [Place!]
+  totalCount: Int!
+}
+
+type PlaceTag {
+  tag_name: String!
 }
 
 type Query {
+  category(id: String!): Category
   getUser(id: ID!): User!
+  item(id: String!): Item
+  place(id: String!): Place
+  places(page: Float = 1, perPage: Float = 10): PlacePage!
+  region(id: String!): Region
+  regions(page: Float = 1, perPage: Float = 10): RegionPage!
+  variant(id: String!): Variant
+}
+
+type Region {
+  admin_level: Float!
+  created_at: DateTime!
+  id: ID!
+  name: String
+  updated_at: DateTime!
+}
+
+type RegionEdge {
+  cursor: String!
+  node: Region!
+}
+
+type RegionPage {
+  edges: [RegionEdge!]
+  hasNextPage: Boolean!
+  nodes: [Region!]
+  totalCount: Int!
 }
 
 type User {
+  avatar_url: String
+  bio: String
+  blocked: Boolean
+  blocked_for: [String!]
   created_at: DateTime!
+  email: String
+  email_verified: Boolean
   family_name: String
   given_name: String
   id: ID!
   identities: [Identity!]!
+  last_ip: String
+  last_login: DateTime
+  last_password_reset: DateTime
+  login_count: Float
   updated_at: DateTime!
+  username: String
 }
 
 type UserEdge {
   cursor: String!
   node: User!
+}
+
+type Variant {
+  created_at: DateTime!
+  desc: String
+  desc_short: String
+  history: [VariantHistory!]!
+  id: ID!
+  image_url: String
+  items: [Item!]!
+  name: String
+  tags: [VariantTag!]!
+  updated_at: DateTime!
+}
+
+type VariantHistory {
+  changes: String
+  datetime: DateTime!
+  original: String
+  variant_id: String!
+}
+
+type VariantTag {
+  tag_name: String!
 }

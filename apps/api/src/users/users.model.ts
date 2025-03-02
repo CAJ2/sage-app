@@ -1,7 +1,9 @@
 import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
 import { Paginated } from '@src/graphql/paginated'
 import { Identity } from '@src/users/identity.model'
+import { DateTime } from 'luxon'
 import { z } from 'zod'
 
 @ObjectType()
@@ -42,17 +44,17 @@ export class User extends CreatedUpdated {
   @Extensions({ z: z.string().ip().optional().nullable() })
   last_ip?: string
 
-  @Field({ nullable: true })
+  @Field(() => LuxonDateTimeResolver, { nullable: true })
   @Extensions({ z: z.date().optional().nullable() })
-  last_login?: Date
+  last_login?: DateTime
 
   @Field({ nullable: true })
   @Extensions({ z: z.number().int().min(0).default(0) })
   login_count?: number
 
-  @Field({ nullable: true })
+  @Field(() => LuxonDateTimeResolver, { nullable: true })
   @Extensions({ z: z.date().optional().nullable() })
-  last_password_reset?: Date
+  last_password_reset?: DateTime
 
   @Field({ nullable: true })
   @Extensions({ z: z.boolean().default(false) })
@@ -63,8 +65,8 @@ export class User extends CreatedUpdated {
   blocked_for?: string[]
 
   @Field({ nullable: true })
-  @Extensions({ z: z.any().optional().nullable() })
-  profile?: any
+  @Extensions({ z: z.string().optional().nullable() })
+  bio?: string
 }
 
 @ObjectType()

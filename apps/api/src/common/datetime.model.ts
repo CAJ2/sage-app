@@ -9,7 +9,7 @@ export const GraphQLDateTimeConfig: GraphQLScalarTypeConfig<
 > = {
   name: 'DateTime',
   description:
-    'An ISO8601 date-time string represented by a Luxon DateTime instance.',
+    'A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.',
 
   serialize(value) {
     if (value instanceof DateTime) {

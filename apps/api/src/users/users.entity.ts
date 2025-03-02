@@ -9,6 +9,10 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Identity } from './identity.entity'
 import { Org } from './org.entity'
 
+export interface ProfileField {
+  bio?: string
+}
+
 @Entity({ tableName: 'users', schema: 'public' })
 export class User extends IDCreatedUpdated {
   @Property({ unique: true, length: 1024 })
@@ -48,7 +52,7 @@ export class User extends IDCreatedUpdated {
   blocked_for?: string
 
   @Property({ type: 'json' })
-  profile?: {}
+  profile?: ProfileField
 
   @OneToMany({ mappedBy: 'user' })
   identities = new Collection<Identity>(this)

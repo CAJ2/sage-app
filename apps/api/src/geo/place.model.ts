@@ -1,4 +1,5 @@
 import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
 import { Paginated } from '@src/graphql/paginated'
 import { DateTime } from 'luxon'
@@ -47,17 +48,17 @@ export class PlaceHistory {
   @Field(() => String)
   place_id!: string
 
-  @Field(() => DateTime)
+  @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
 
   @Field(() => String)
   user_id!: string
 
-  @Field(() => JSON, { nullable: true })
-  original?: any
+  @Field(() => String, { nullable: true })
+  original?: string
 
-  @Field(() => JSON, { nullable: true })
-  changes?: any
+  @Field(() => String, { nullable: true })
+  changes?: string
 }
 
 @ObjectType()

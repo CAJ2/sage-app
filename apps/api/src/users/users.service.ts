@@ -1,5 +1,4 @@
-import { InjectRepository } from '@mikro-orm/nestjs'
-import { EntityRepository } from '@mikro-orm/postgresql'
+import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { User } from './users.entity'
 
@@ -17,25 +16,25 @@ const identityInclude = [
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private readonly users: EntityRepository<User>,
-  ) {}
+  constructor(private readonly em: EntityManager) {}
 
   async findOneByID(id: string) {
-    return await this.users.findOne(
+    return await this.em.findOne(
+      User,
       { id },
       { populate: ['identities'], fields: identityInclude },
     )
   }
 
   async findByUsernameOrEmail(usernameOrEmail: string) {
-    let user = await this.users.findOne(
+    let user = await this.em.findOne(
+      User,
       { email: usernameOrEmail },
       { populate: ['identities'], fields: identityInclude },
     )
     if (!user) {
-      user = await this.users.findOne(
+      user = await this.em.findOne(
+        User,
         { username: usernameOrEmail },
         { populate: ['identities'], fields: identityInclude },
       )
@@ -44,12 +43,14 @@ export class UsersService {
   }
 
   async findByUsernameOrEmailAuth(usernameOrEmail: string) {
-    let user = await this.users.findOne(
+    let user = await this.em.findOne(
+      User,
       { email: usernameOrEmail },
       { populate: ['identities'] },
     )
     if (!user) {
-      user = await this.users.findOne(
+      user = await this.em.findOne(
+        User,
         { username: usernameOrEmail },
         { populate: ['identities'] },
       )
@@ -58,7 +59,8 @@ export class UsersService {
   }
 
   async findIdentities(id: string) {
-    const user = await this.users.findOne(
+    const user = await this.em.findOne(
+      User,
       { id },
       { populate: ['identities'], fields: identityInclude },
     )

@@ -1,10 +1,12 @@
-import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql'
+import { Field, ObjectType } from '@nestjs/graphql'
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { DateTime } from 'luxon'
 
 @ObjectType()
 export class CreatedUpdated {
-  @Field(() => GraphQLISODateTime)
-  created_at: string = ''
+  @Field(() => LuxonDateTimeResolver)
+  created_at!: DateTime
 
-  @Field(() => GraphQLISODateTime)
-  updated_at: string = ''
+  @Field(() => LuxonDateTimeResolver)
+  updated_at!: DateTime
 }

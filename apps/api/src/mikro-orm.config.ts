@@ -6,7 +6,9 @@ import { join } from 'path'
 import dotenv from 'dotenv-flow'
 import { CustomMigrationGenerator } from './db/migration.gen'
 
-dotenv.config()
+if (dotenv) {
+  dotenv.config()
+}
 
 const highlighter = new SqlHighlighter()
 

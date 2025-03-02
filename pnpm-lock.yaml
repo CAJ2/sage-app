@@ -173,8 +173,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0
       nanoid:
-        specifier: ^5.1.2
-        version: 5.1.2
+        specifier: ^3.0.0
+        version: 3.3.8
       nestjs-cls:
         specifier: ^5.4.0
         version: 5.4.0(@nestjs/common@11.0.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.0.9)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -7084,11 +7084,6 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.0:
-    resolution: {integrity: sha512-zDAl/llz8Ue/EblwSYwdxGBYfj46IM1dhjVi8dyp9LQffoIGxJEAHj2oeZ4uNcgycSRcQ83CnfcZqEJzVDLcDw==}
-    engines: {node: ^18 || >=20}
-    hasBin: true
-
   nanoid@5.1.2:
     resolution: {integrity: sha512-b+CiXQCNMUGe0Ri64S9SXFcP9hogjAJ2Rd6GdVxhPLRm7mhGaM7VgOvCAJ1ZshfHbqVDI3uqTI5C8/GaKuLI7g==}
     engines: {node: ^18 || >=20}
@@ -13938,7 +13933,7 @@ snapshots:
       '@vue/devtools-kit': 7.7.2
       '@vue/devtools-shared': 7.7.2
       mitt: 3.0.1
-      nanoid: 5.1.0
+      nanoid: 5.1.2
       pathe: 1.1.2
       vite-hot-client: 0.2.4(vite@6.1.0(@types/node@22.13.4)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.38.2)(yaml@2.7.0))
       vue: 3.5.13(typescript@5.7.3)
@@ -13950,7 +13945,7 @@ snapshots:
       '@vue/devtools-kit': 7.7.2
       '@vue/devtools-shared': 7.7.2
       mitt: 3.0.1
-      nanoid: 5.1.0
+      nanoid: 5.1.2
       pathe: 2.0.3
       vite-hot-client: 0.2.4(vite@6.1.0(@types/node@22.13.4)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.38.2)(yaml@2.7.0))
       vue: 3.5.13(typescript@5.7.3)
@@ -18071,8 +18066,6 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.8: {}
-
-  nanoid@5.1.0: {}
 
   nanoid@5.1.2: {}
 

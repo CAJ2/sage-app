@@ -1,5 +1,7 @@
+import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
 import { DB } from '@src/db.service'
+import { UsersModule } from './users.module'
 import { UsersService } from './users.service'
 
 describe('UsersService', () => {
@@ -7,6 +9,7 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [UsersModule, MikroOrmModule.forRoot()],
       providers: [UsersService, DB],
     }).compile()
 
