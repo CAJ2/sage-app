@@ -6,13 +6,13 @@ import { Variant } from './variant.model'
 
 @Resolver(() => Variant)
 export class VariantResolver {
-  constructor (
+  constructor(
     @InjectRepository(VariantEntity)
-    private readonly variantRepository: EntityRepository<VariantEntity>
+    private readonly variantRepository: EntityRepository<VariantEntity>,
   ) {}
 
   @Query(() => Variant, { nullable: true })
-  async variant (@Args('id') id: string): Promise<Variant | null> {
+  async variant(@Args('id') id: string): Promise<Variant | null> {
     const entity = await this.variantRepository.findOne({ id })
     if (!entity) return null
 

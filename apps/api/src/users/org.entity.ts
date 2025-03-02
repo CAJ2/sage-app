@@ -32,10 +32,10 @@ export class Org extends IDCreatedUpdated {
   @Property()
   website_url?: string
 
-  @ManyToMany(() => User, user => user.orgs)
+  @ManyToMany(() => User, (user) => user.orgs)
   users = new Collection<User>(this)
 
-  @ManyToMany(() => Variant, variant => variant.orgs)
+  @ManyToMany(() => Variant, (variant) => variant.orgs)
   variants = new Collection<Variant>(this)
 
   @OneToMany({ mappedBy: 'org' })

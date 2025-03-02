@@ -2,7 +2,7 @@ import { BaseEntity, PrimaryKey, Property } from '@mikro-orm/core'
 import { nanoid } from 'nanoid'
 
 export abstract class IDCreatedUpdated extends BaseEntity {
-  constructor () {
+  constructor() {
     super()
     this.id = nanoid()
     this.created_at = new Date()
@@ -20,7 +20,7 @@ export abstract class IDCreatedUpdated extends BaseEntity {
 }
 
 export abstract class CreatedUpdated extends BaseEntity {
-  constructor () {
+  constructor() {
     super()
     this.created_at = new Date()
     this.updated_at = new Date()

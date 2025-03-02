@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class DB extends PrismaClient implements OnModuleInit {
-  async onModuleInit () {
+  async onModuleInit() {
     await this.$connect()
   }
 }

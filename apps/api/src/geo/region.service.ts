@@ -4,13 +4,13 @@ import { DB } from '@src/db.service'
 
 @Injectable()
 export class RegionService {
-  constructor (private readonly db: DB) {}
+  constructor(private readonly db: DB) {}
 
-  async findAll (cursor: Prisma.RegionWhereUniqueInput, perPage: number) {
+  async findAll(cursor: Prisma.RegionWhereUniqueInput, perPage: number) {
     return null
   }
 
-  async findById (id: string) {
+  async findById(id: string) {
     return this.db.region.findUnique({
       where: { id },
     })

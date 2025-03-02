@@ -10,12 +10,12 @@ import { Request } from 'express'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor (
+  constructor(
     private readonly jwtService: JwtService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
   ) {}
 
-  async canActivate (context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>()
     const token = this.extractTokenFromHeader(request)
     if (!token) {
@@ -32,7 +32,7 @@ export class AuthGuard implements CanActivate {
     return true
   }
 
-  private extractTokenFromHeader (request: Request): string | undefined {
+  private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? []
     return type === 'Bearer' ? token : undefined
   }

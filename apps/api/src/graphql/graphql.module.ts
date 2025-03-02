@@ -18,7 +18,7 @@ import type { GraphQLFormattedError } from 'graphql'
 
 @Module({})
 export class GraphQLModule {
-  static register (): DynamicModule {
+  static register(): DynamicModule {
     const graphQL = NestGraphQLModule.forRootAsync({
       driver: ApolloDriver,
       imports: [ConfigModule],
@@ -80,9 +80,9 @@ export class GraphQLModule {
     }
   }
 
-  private static formatError (
+  private static formatError(
     error: GraphQLError,
-    ctx: Context
+    ctx: Context,
   ): GraphQLFormattedError {
     const msg = ctx.req as IncomingMessageWithAuthCode
     if (msg.authCode) {

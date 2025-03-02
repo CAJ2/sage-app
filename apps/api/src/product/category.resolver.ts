@@ -6,13 +6,13 @@ import { Category } from './category.model'
 
 @Resolver(() => Category)
 export class CategoryResolver {
-  constructor (
+  constructor(
     @InjectRepository(CategoryEntity)
-    private readonly categoryRepository: EntityRepository<CategoryEntity>
+    private readonly categoryRepository: EntityRepository<CategoryEntity>,
   ) {}
 
   @Query(() => Category, { nullable: true })
-  async category (@Args('id') id: string): Promise<Category | null> {
+  async category(@Args('id') id: string): Promise<Category | null> {
     const entity = await this.categoryRepository.findOne({ id })
     if (!entity) return null
 

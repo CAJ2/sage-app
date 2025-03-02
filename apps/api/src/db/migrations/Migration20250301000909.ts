@@ -3,7 +3,7 @@
 import { Migration } from '@mikro-orm/migrations'
 
 export class Migration20250301000909 extends Migration {
-  override async up (): Promise<void> {
+  override async up(): Promise<void> {
     this.addSql('create schema if not exists "auth";')
     this.addSql(`create table "categories" (
                    "id" varchar(255) not null,
@@ -23,10 +23,10 @@ export class Migration20250301000909 extends Migration {
                    constraint "category_tree_pkey" primary key ("ancestor_id", "descendant_id")
                  );`)
     this.addSql(
-      'create index "category_tree_descendant_id_length_index" on "category_tree" ("descendant_id", "length");'
+      'create index "category_tree_descendant_id_length_index" on "category_tree" ("descendant_id", "length");',
     )
     this.addSql(
-      'create index "category_tree_ancestor_id_descendant_id_length_index" on "category_tree" ("ancestor_id", "descendant_id", "length");'
+      'create index "category_tree_ancestor_id_descendant_id_length_index" on "category_tree" ("ancestor_id", "descendant_id", "length");',
     )
 
     this.addSql(`create table "items" (
@@ -67,10 +67,10 @@ export class Migration20250301000909 extends Migration {
                    constraint "material_tree_pkey" primary key ("ancestor_id", "descendant_id")
                  );`)
     this.addSql(
-      'create index "material_tree_descendant_id_length_index" on "material_tree" ("descendant_id", "length");'
+      'create index "material_tree_descendant_id_length_index" on "material_tree" ("descendant_id", "length");',
     )
     this.addSql(
-      'create index "material_tree_ancestor_id_descendant_id_length_index" on "material_tree" ("ancestor_id", "descendant_id", "length");'
+      'create index "material_tree_ancestor_id_descendant_id_length_index" on "material_tree" ("ancestor_id", "descendant_id", "length");',
     )
 
     this.addSql(`create table "orgs" (
@@ -99,7 +99,7 @@ export class Migration20250301000909 extends Migration {
                    constraint "places_pkey" primary key ("id")
                  );`)
     this.addSql(
-      'create index "places_location_index" on "places" using gist ("location");'
+      'create index "places_location_index" on "places" using gist ("location");',
     )
 
     this.addSql(`create table "place_tags" (
@@ -120,7 +120,7 @@ export class Migration20250301000909 extends Migration {
                    constraint "regions_pkey" primary key ("id")
                  );`)
     this.addSql(
-      'create index "regions_geo_index" on "regions" using gist ("geo");'
+      'create index "regions_geo_index" on "regions" using gist ("geo");',
     )
 
     this.addSql(`create table "processes" (
@@ -442,7 +442,7 @@ export class Migration20250301000909 extends Migration {
                  add constraint "variant_tags_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade;`)
   }
 
-  override async down (): Promise<void> {
+  override async down(): Promise<void> {
     this.addSql(`alter table "category_tree"
                  drop constraint "category_tree_ancestor_id_foreign";`)
 

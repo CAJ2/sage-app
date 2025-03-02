@@ -13,7 +13,7 @@ export interface IPaginatedType<T> {
   totalCount: number
 }
 
-export function Paginated<T> (classRef: Type<T>): Type<IPaginatedType<T>> {
+export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
   @ObjectType(`${classRef.name}Edge`)
   abstract class EdgeType {
     @Field(() => String)

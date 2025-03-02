@@ -4,13 +4,13 @@ import { PlacePage } from './place.model'
 
 @Injectable()
 export class PlaceService {
-  constructor (private readonly db: DB) {}
+  constructor(private readonly db: DB) {}
 
-  async findAll (page: number, perPage: number): Promise<PlacePage | null> {
+  async findAll(page: number, perPage: number): Promise<PlacePage | null> {
     return null
   }
 
-  async findById (id: string) {
+  async findById(id: string) {
     return this.db.place.findUnique({
       where: { id },
       include: {

@@ -6,13 +6,13 @@ import { Item } from './item.model'
 
 @Resolver(() => Item)
 export class ItemResolver {
-  constructor (
+  constructor(
     @InjectRepository(ItemEntity)
-    private readonly itemRepository: EntityRepository<ItemEntity>
+    private readonly itemRepository: EntityRepository<ItemEntity>,
   ) {}
 
   @Query(() => Item, { nullable: true })
-  async item (@Args('id') id: string): Promise<Item | null> {
+  async item(@Args('id') id: string): Promise<Item | null> {
     const entity = await this.itemRepository.findOne({ id })
     if (!entity) return null
 

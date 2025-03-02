@@ -7,11 +7,11 @@ import {
 import helmet from 'helmet'
 import { AppModule } from './app.module'
 
-async function bootstrap () {
+async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
     new ExpressAdapter(),
-    { cors: true }
+    { cors: true },
   )
   app.useGlobalPipes(
     new ValidationPipe({
@@ -19,7 +19,7 @@ async function bootstrap () {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   )
   app.use(
     helmet({
@@ -44,7 +44,7 @@ async function bootstrap () {
           ],
         },
       },
-    })
+    }),
   )
   await app.listen(process.env.PORT || 4444)
 }

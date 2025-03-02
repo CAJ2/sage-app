@@ -11,7 +11,7 @@ export const GraphQLDateTimeConfig: GraphQLScalarTypeConfig<
   description:
     'An ISO8601 date-time string represented by a Luxon DateTime instance.',
 
-  serialize (value) {
+  serialize(value) {
     if (value instanceof DateTime) {
       return value
     }
@@ -20,7 +20,7 @@ export const GraphQLDateTimeConfig: GraphQLScalarTypeConfig<
     return DateTime.fromJSDate(date)
   },
 
-  parseValue (value) {
+  parseValue(value) {
     if (value instanceof DateTime) {
       return value
     }
@@ -29,7 +29,7 @@ export const GraphQLDateTimeConfig: GraphQLScalarTypeConfig<
     return DateTime.fromJSDate(date)
   },
 
-  parseLiteral (ast) {
+  parseLiteral(ast) {
     const date: Date = DateTimeResolver.parseLiteral(ast, null)
     return DateTime.fromJSDate(date)
   },
@@ -40,5 +40,5 @@ export const GraphQLDateTimeConfig: GraphQLScalarTypeConfig<
 }
 
 export const LuxonDateTimeResolver = new GraphQLScalarType(
-  GraphQLDateTimeConfig
+  GraphQLDateTimeConfig,
 )

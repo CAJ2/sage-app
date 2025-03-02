@@ -46,10 +46,10 @@ export class Component extends IDCreatedUpdated {
   })
   materials = new Collection<Material>(this)
 
-  @ManyToMany(() => Variant, variant => variant.components)
+  @ManyToMany(() => Variant, (variant) => variant.components)
   variants = new Collection<Variant>(this)
 
-  @OneToMany(() => ComponentHistory, history => history.component)
+  @OneToMany(() => ComponentHistory, (history) => history.component)
   history = new Collection<ComponentHistory>(this)
 }
 

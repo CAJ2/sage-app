@@ -53,7 +53,7 @@ export class Variant extends IDCreatedUpdated {
   @ManyToMany()
   components = new Collection<Component>(this)
 
-  @OneToMany(() => VariantHistory, history => history.variant)
+  @OneToMany(() => VariantHistory, (history) => history.variant)
   history = new Collection<VariantHistory>(this)
 }
 

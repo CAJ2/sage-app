@@ -1,9 +1,9 @@
 import { GraphQLError } from 'graphql'
 import type { GraphQLFormattedError } from 'graphql'
 
-export function formatError (
+export function formatError(
   error: GraphQLError,
-  ctx: any
+  ctx: any,
 ): GraphQLFormattedError {
   const msg = ctx.req as any
   if (msg.authCode) {

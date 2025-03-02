@@ -1,4 +1,4 @@
-import { defineConfig } from '@mikro-orm/postgresql'
+import { DataloaderType, defineConfig } from '@mikro-orm/postgresql'
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
 import { Migrator } from '@mikro-orm/migrations'
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
@@ -38,4 +38,5 @@ export default defineConfig({
   metadataProvider: TsMorphMetadataProvider,
   highlighter: process.env.NODE_ENV !== 'production' ? highlighter : undefined,
   extensions: [Migrator],
+  dataloader: DataloaderType.ALL,
 })

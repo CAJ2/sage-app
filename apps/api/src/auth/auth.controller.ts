@@ -15,17 +15,17 @@ import { AuthService } from './auth.service'
 
 @Controller('auth')
 export class AuthController {
-  constructor (
+  constructor(
     private readonly authService: AuthService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn (@Body() signInDto: Record<string, any>) {
+  async signIn(@Body() signInDto: Record<string, any>) {
     const user = await this.authService.validateUser(
       signInDto.username,
-      signInDto.password
+      signInDto.password,
     )
     if (user == null) {
       throw new Error('Invalid credentials')
@@ -42,7 +42,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile (@Request() req: Req) {
+  getProfile(@Request() req: Req) {
     return req.user
   }
 }

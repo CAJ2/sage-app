@@ -7,7 +7,7 @@ import { ClsService } from 'nestjs-cls'
 
 @Module({})
 export class DBModule {
-  static register (): DynamicModule {
+  static register(): DynamicModule {
     const mikroORM = MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ClsService],

@@ -6,9 +6,9 @@ import _ from 'lodash'
 
 @Injectable()
 export class AuthService {
-  constructor (private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  async validateUser (username: string, pass: string) {
+  async validateUser(username: string, pass: string) {
     const user = await this.usersService.findByUsernameOrEmailAuth(username)
     if (!user) {
       return null

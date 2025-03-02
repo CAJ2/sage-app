@@ -34,7 +34,7 @@ export class Material extends IDCreatedUpdated {
   @OneToMany({ mappedBy: 'primary_material' })
   primary_components = new Collection<Component>(this)
 
-  @ManyToMany({ entity: () => Component, mappedBy: c => c.materials })
+  @ManyToMany({ entity: () => Component, mappedBy: (c) => c.materials })
   components = new Collection<Component>(this)
 
   @OneToMany({ mappedBy: 'material' })

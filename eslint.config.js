@@ -4,6 +4,7 @@ import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 import tseslint from 'typescript-eslint'
+import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 
 const baseConfig = [
   { files: ['**/*.{js,jsx,ts,tsx,vue}'] },
@@ -35,7 +36,7 @@ const vueConfig = [
 const standardConfig = [
   ...neostandard({
     ts: true,
-    ignores: [...resolveIgnoresFromGitignore(), '**/.nx/**', '**/*.config.ts']
+    ignores: [...resolveIgnoresFromGitignore(), '**/.nx/**', '**/*.config.ts'],
   }),
   importPlugin.flatConfigs.recommended,
   {
@@ -85,8 +86,21 @@ const standardConfig = [
   },
 ]
 
+const prettier = [
+  {
+    rules: {
+      'prettier/prettier': ['error', {
+        semi: false,
+        singleQuote: true,
+      }],
+    }
+  }
+]
+
 export default [
   ...baseConfig,
   ...vueConfig,
   ...standardConfig,
+  eslintPluginPrettier,
+  ...prettier,
 ]

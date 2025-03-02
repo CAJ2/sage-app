@@ -11,15 +11,15 @@ import { UsersService } from './users.service'
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor (private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Query(() => User, { name: 'getUser' })
-  async user (@Args('id', { type: () => ID }) id: string) {
+  async user(@Args('id', { type: () => ID }) id: string) {
     return await this.usersService.findOneByID(id)
   }
 
   @ResolveField()
-  async identities (@Parent() user: User) {
+  async identities(@Parent() user: User) {
     const { id } = user
     return await this.usersService.findIdentities(id)
   }
