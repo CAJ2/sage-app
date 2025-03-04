@@ -17,6 +17,7 @@ export default defineConfig({
   entitiesTs: [join(process.cwd(), 'src/**/*.entity.ts')],
   strict: true,
   clientUrl: process.env.DATABASE_URL,
+  dbName: process.env.NODE_ENV === 'test' ? ':memory:' : undefined,
   driverOptions: {
     client: 'cockroachdb',
     connection: {

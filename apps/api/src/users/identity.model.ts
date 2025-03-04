@@ -1,9 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
-
-export const Types = {
-  PASSWORD: 'password',
-}
+import { IdentityType } from './identity.entity'
 
 @ObjectType()
 export class Identity extends CreatedUpdated {
@@ -11,7 +8,7 @@ export class Identity extends CreatedUpdated {
   id!: string
 
   @Field()
-  type!: string
+  type!: IdentityType
 
   @Field()
   provider!: string

@@ -7,7 +7,6 @@ import { ClsModule } from 'nestjs-cls'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
-import { DB } from './db.service'
 import { GeoModule } from './geo/geo.module'
 import { GraphQLModule } from './graphql/graphql.module'
 import { ProcessModule } from './process/process.module'
@@ -16,7 +15,7 @@ import { UsersModule } from './users/users.module'
 
 @Module({
   controllers: [AppController],
-  exports: [DB],
+  exports: [],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -44,6 +43,6 @@ import { UsersModule } from './users/users.module'
     ProductModule,
     ProcessModule,
   ],
-  providers: [AppService, DB],
+  providers: [AppService],
 })
 export class AppModule {}

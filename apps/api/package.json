@@ -40,7 +40,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-fastify": "^11.0.1",
     "@prisma/client": "^6.3.1",
-    "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv-flow": "^4.1.0",

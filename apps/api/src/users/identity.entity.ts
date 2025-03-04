@@ -2,11 +2,15 @@ import { Entity, ManyToOne, Property, Ref, Unique } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from './users.entity'
 
+export enum IdentityType {
+  PASSWORD = 'PASSWORD',
+}
+
 @Entity({ tableName: 'identities', schema: 'auth' })
 @Unique({ properties: ['user', 'provider'] })
 export class Identity extends IDCreatedUpdated {
   @Property({ length: 64 })
-  type!: string
+  type!: IdentityType
 
   @Property({ length: 64 })
   provider!: string

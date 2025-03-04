@@ -6,6 +6,8 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
+import { plainToInstance } from 'class-transformer'
+import { validateOrReject } from 'class-validator'
 import { User } from './users.model'
 import { UsersService } from './users.service'
 
@@ -15,7 +17,13 @@ export class UsersResolver {
 
   @Query(() => User, { name: 'getUser' })
   async user(@Args('id', { type: () => ID }) id: string) {
-    return await this.usersService.findOneByID(id)
+    const user = await this.usersService.findOneByID(id)
+    if (!user) {
+      throw new Error('User not found')
+    }
+    const result = plainToInstance(User, user)
+    await validateOrReject(result)
+    return result
   }
 
   @ResolveField()

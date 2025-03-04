@@ -23,7 +23,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async signIn(@Body() signInDto: Record<string, any>) {
-    const user = await this.authService.validateUser(
+    const user = await this.authService.validateUserPassword(
       signInDto.username,
       signInDto.password,
     )

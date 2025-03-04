@@ -1,71 +1,80 @@
-import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ID, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { IsDateTime, IsNanoID } from '@src/common/validator.model'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
 import { Paginated } from '@src/graphql/paginated'
 import { Identity } from '@src/users/identity.model'
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsIP,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+  Validate,
+} from 'class-validator'
 import { DateTime } from 'luxon'
-import { z } from 'zod'
 
 @ObjectType()
 export class User extends CreatedUpdated {
   @Field(() => ID)
-  @Extensions({ z: z.string().nanoid() })
+  @IsString()
+  @Validate(IsNanoID)
   id: string = ''
 
   @Field({ nullable: true })
-  @Extensions({ z: z.string().max(64).optional() })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
   given_name?: string
 
   @Field({ nullable: true })
-  @Extensions({ z: z.string().max(64).optional() })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
   family_name?: string
 
   @Field(() => [Identity])
-  @Extensions({ z: z.array(z.any()).default([]) })
+  @IsArray()
   identities: Identity[] = []
 
   @Field({ nullable: true })
-  @Extensions({ z: z.string().email().max(1024).optional() })
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(1024)
   email?: string
 
   @Field({ nullable: true })
-  @Extensions({ z: z.boolean().default(false) })
+  @IsOptional()
+  @IsBoolean()
   email_verified?: boolean
 
   @Field({ nullable: true })
-  @Extensions({ z: z.string().max(64).optional() })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
   username?: string
 
   @Field({ nullable: true })
-  @Extensions({ z: z.string().url().optional() })
+  @IsOptional()
+  @IsUrl()
   avatar_url?: string
 
   @Field({ nullable: true })
-  @Extensions({ z: z.string().ip().optional().nullable() })
+  @IsOptional()
+  @IsIP()
   last_ip?: string
 
   @Field(() => LuxonDateTimeResolver, { nullable: true })
-  @Extensions({ z: z.date().optional().nullable() })
+  @IsOptional()
+  @Validate(IsDateTime)
   last_login?: DateTime
 
   @Field({ nullable: true })
-  @Extensions({ z: z.number().int().min(0).default(0) })
-  login_count?: number
-
-  @Field(() => LuxonDateTimeResolver, { nullable: true })
-  @Extensions({ z: z.date().optional().nullable() })
-  last_password_reset?: DateTime
-
-  @Field({ nullable: true })
-  @Extensions({ z: z.boolean().default(false) })
-  blocked?: boolean
-
-  @Field(() => [String], { nullable: true })
-  @Extensions({ z: z.array(z.string()).default([]) })
-  blocked_for?: string[]
-
-  @Field({ nullable: true })
-  @Extensions({ z: z.string().optional().nullable() })
+  @IsOptional()
+  @IsString()
   bio?: string
 }
 

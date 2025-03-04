@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
-import { DB } from '@src/db.service'
 import { UsersModule } from '@src/users/users.module'
 import { UsersService } from '@src/users/users.service'
 import { AuthService } from './auth.service'
@@ -14,6 +13,6 @@ import { AuthService } from './auth.service'
       signOptions: { expiresIn: '300s' },
     }),
   ],
-  providers: [AuthService, DB, UsersService],
+  providers: [AuthService, UsersService],
 })
 export class AuthModule {}
