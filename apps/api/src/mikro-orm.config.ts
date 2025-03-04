@@ -11,17 +11,24 @@ if (dotenv) {
 }
 
 const highlighter = new SqlHighlighter()
+const url = process.env.DATABASE_URL
+let ssl: any = true
+if (url?.includes('sslmode=disable')) {
+  ssl = false
+} else if (url?.includes('sslmode=no-verify')) {
+  ssl = { rejectUnauthorized: false }
+}
 
 export default defineConfig({
   entities: [join(process.cwd(), 'dist/**/*.entity.js')],
   entitiesTs: [join(process.cwd(), 'src/**/*.entity.ts')],
   strict: true,
-  clientUrl: process.env.DATABASE_URL,
+  clientUrl: url,
   dbName: process.env.NODE_ENV === 'test' ? ':memory:' : undefined,
   driverOptions: {
     client: 'cockroachdb',
     connection: {
-      ssl: process.env.DB_SSL || { rejectUnauthorized: false },
+      ssl,
     },
   },
   forceUtcTimezone: true,

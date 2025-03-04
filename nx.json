@@ -43,7 +43,7 @@
       "cache": true,
       "inputs": [
         "default",
-        "^production",
+        "^default",
         "{workspaceRoot}/jest.preset.js"
       ],
       "outputs": [
