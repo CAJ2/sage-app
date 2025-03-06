@@ -1,5 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { BadRequestErr } from '@src/common/exceptions'
 import { User } from './users.entity'
 
 const identityInclude = [
@@ -65,5 +66,17 @@ export class UsersService {
       { populate: ['identities'], fields: identityInclude },
     )
     return user?.identities
+  }
+
+  async create(user: User) {
+    let existing = await this.em.findOne(User, { email: user.email })
+    if (!existing) {
+      existing = await this.em.findOne(User, { username: user.username })
+    }
+    if (existing) {
+      throw BadRequestErr('User already exists')
+    }
+    await this.em.persistAndFlush(user)
+    return user
   }
 }

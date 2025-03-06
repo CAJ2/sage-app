@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-express'
 import helmet from 'helmet'
 import { AppModule } from './app.module'
+import { HttpExceptionFilter } from './common/http-exception.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
@@ -46,6 +47,7 @@ async function bootstrap() {
       },
     }),
   )
+  app.useGlobalFilters(new HttpExceptionFilter())
   app.enableShutdownHooks()
   await app.listen(process.env.PORT || 4444)
 }

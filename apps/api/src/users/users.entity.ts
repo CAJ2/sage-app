@@ -8,6 +8,7 @@ import {
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Identity } from './identity.entity'
 import { Org } from './org.entity'
+import type { Opt } from '@mikro-orm/core'
 
 export interface ProfileField {
   bio?: string
@@ -15,20 +16,33 @@ export interface ProfileField {
 
 @Entity({ tableName: 'users', schema: 'public' })
 export class User extends IDCreatedUpdated {
-  @Property({ unique: true, length: 1024 })
-  email!: string
+  constructor(
+    email: string,
+    username: string,
+    givenName: string,
+    familyName: string,
+  ) {
+    super()
+    this.email = email
+    this.username = username
+    this.given_name = givenName
+    this.family_name = familyName
+  }
 
-  @Property({ default: false })
-  email_verified!: boolean
+  @Property({ unique: true, length: 1024 })
+  email: string
+
+  @Property()
+  email_verified: boolean & Opt = false
 
   @Property({ unique: true, length: 64 })
-  username!: string
+  username: string
 
   @Property()
-  given_name!: string
+  given_name: string
 
   @Property()
-  family_name!: string
+  family_name: string
 
   @Property()
   avatar_url?: string
@@ -39,14 +53,14 @@ export class User extends IDCreatedUpdated {
   @Property()
   last_login?: Date
 
-  @Property({ default: 0 })
-  login_count!: number
+  @Property()
+  login_count: number & Opt = 0
 
   @Property()
   last_password_reset?: Date
 
   @Property()
-  blocked!: boolean
+  blocked: boolean & Opt = false
 
   @Property()
   blocked_for?: string

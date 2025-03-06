@@ -1,5 +1,6 @@
-import { BaseEntity, PrimaryKey, Property } from '@mikro-orm/core'
+import { BaseEntity, Config, PrimaryKey, Property } from '@mikro-orm/core'
 import { nanoid } from 'nanoid'
+import type { DefineConfig } from '@mikro-orm/core'
 
 export abstract class IDCreatedUpdated extends BaseEntity {
   constructor() {
@@ -9,14 +10,16 @@ export abstract class IDCreatedUpdated extends BaseEntity {
     this.updated_at = new Date()
   }
 
+  [Config]?: DefineConfig<{ forceObject: true }>
+
   @PrimaryKey()
-  id!: string
+  id: string
 
   @Property({ defaultRaw: 'current_timestamp()' })
-  created_at!: Date
+  created_at: Date
 
   @Property({ defaultRaw: 'current_timestamp()', onUpdate: () => new Date() })
-  updated_at!: Date
+  updated_at: Date
 }
 
 export abstract class CreatedUpdated extends BaseEntity {
@@ -27,8 +30,8 @@ export abstract class CreatedUpdated extends BaseEntity {
   }
 
   @Property({ defaultRaw: 'current_timestamp()' })
-  created_at!: Date
+  created_at: Date
 
   @Property({ defaultRaw: 'current_timestamp()', onUpdate: () => new Date() })
-  updated_at!: Date
+  updated_at: Date
 }

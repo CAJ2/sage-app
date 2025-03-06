@@ -2,9 +2,9 @@
 
 import { Migration } from '@mikro-orm/migrations'
 
-export class Migration20250301000909 extends Migration {
+export class Migration20250306155029 extends Migration {
   override async up(): Promise<void> {
-    this.addSql('create schema if not exists "auth";')
+    this.addSql(`create schema if not exists "auth";`)
     this.addSql(`create table "categories" (
                    "id" varchar(255) not null,
                    "created_at" timestamptz not null default current_timestamp(),
@@ -23,10 +23,10 @@ export class Migration20250301000909 extends Migration {
                    constraint "category_tree_pkey" primary key ("ancestor_id", "descendant_id")
                  );`)
     this.addSql(
-      'create index "category_tree_descendant_id_length_index" on "category_tree" ("descendant_id", "length");',
+      `create index "category_tree_descendant_id_length_index" on "category_tree" ("descendant_id", "length");`,
     )
     this.addSql(
-      'create index "category_tree_ancestor_id_descendant_id_length_index" on "category_tree" ("ancestor_id", "descendant_id", "length");',
+      `create index "category_tree_ancestor_id_descendant_id_length_index" on "category_tree" ("ancestor_id", "descendant_id", "length");`,
     )
 
     this.addSql(`create table "items" (
@@ -67,10 +67,10 @@ export class Migration20250301000909 extends Migration {
                    constraint "material_tree_pkey" primary key ("ancestor_id", "descendant_id")
                  );`)
     this.addSql(
-      'create index "material_tree_descendant_id_length_index" on "material_tree" ("descendant_id", "length");',
+      `create index "material_tree_descendant_id_length_index" on "material_tree" ("descendant_id", "length");`,
     )
     this.addSql(
-      'create index "material_tree_ancestor_id_descendant_id_length_index" on "material_tree" ("ancestor_id", "descendant_id", "length");',
+      `create index "material_tree_ancestor_id_descendant_id_length_index" on "material_tree" ("ancestor_id", "descendant_id", "length");`,
     )
 
     this.addSql(`create table "orgs" (
@@ -99,7 +99,7 @@ export class Migration20250301000909 extends Migration {
                    constraint "places_pkey" primary key ("id")
                  );`)
     this.addSql(
-      'create index "places_location_index" on "places" using gist ("location");',
+      `create index "places_location_index" on "places" using gist ("location");`,
     )
 
     this.addSql(`create table "place_tags" (
@@ -120,7 +120,7 @@ export class Migration20250301000909 extends Migration {
                    constraint "regions_pkey" primary key ("id")
                  );`)
     this.addSql(
-      'create index "regions_geo_index" on "regions" using gist ("geo");',
+      `create index "regions_geo_index" on "regions" using gist ("geo");`,
     )
 
     this.addSql(`create table "processes" (
@@ -181,7 +181,7 @@ export class Migration20250301000909 extends Migration {
                    "last_login" timestamptz null,
                    "login_count" int not null default 0,
                    "last_password_reset" timestamptz null,
-                   "blocked" boolean not null,
+                   "blocked" boolean not null default false,
                    "blocked_for" varchar(255) null,
                    "profile" jsonb null,
                    constraint "users_pkey" primary key ("id")
@@ -251,7 +251,7 @@ export class Migration20250301000909 extends Migration {
                    "updated_at" timestamptz not null default current_timestamp(),
                    "type" varchar(64) not null,
                    "provider" varchar(64) not null,
-                   "subject" varchar(128) not null,
+                   "subject" varchar(128) null,
                    "password_hash" varchar(255) null,
                    "access_token" varchar(255) null,
                    "refresh_token" varchar(255) null,
@@ -575,64 +575,64 @@ export class Migration20250301000909 extends Migration {
     this.addSql(`alter table "variant_tags"
                  drop constraint "variant_tags_variant_id_foreign";`)
 
-    this.addSql('drop table if exists "categories" cascade;')
+    this.addSql(`drop table if exists "categories" cascade;`)
 
-    this.addSql('drop table if exists "category_tree" cascade;')
+    this.addSql(`drop table if exists "category_tree" cascade;`)
 
-    this.addSql('drop table if exists "items" cascade;')
+    this.addSql(`drop table if exists "items" cascade;`)
 
-    this.addSql('drop table if exists "items_categories" cascade;')
+    this.addSql(`drop table if exists "items_categories" cascade;`)
 
-    this.addSql('drop table if exists "materials" cascade;')
+    this.addSql(`drop table if exists "materials" cascade;`)
 
-    this.addSql('drop table if exists "material_tree" cascade;')
+    this.addSql(`drop table if exists "material_tree" cascade;`)
 
-    this.addSql('drop table if exists "orgs" cascade;')
+    this.addSql(`drop table if exists "orgs" cascade;`)
 
-    this.addSql('drop table if exists "places" cascade;')
+    this.addSql(`drop table if exists "places" cascade;`)
 
-    this.addSql('drop table if exists "place_tags" cascade;')
+    this.addSql(`drop table if exists "place_tags" cascade;`)
 
-    this.addSql('drop table if exists "regions" cascade;')
+    this.addSql(`drop table if exists "regions" cascade;`)
 
-    this.addSql('drop table if exists "processes" cascade;')
+    this.addSql(`drop table if exists "processes" cascade;`)
 
-    this.addSql('drop table if exists "components" cascade;')
+    this.addSql(`drop table if exists "components" cascade;`)
 
-    this.addSql('drop table if exists "components_materials" cascade;')
+    this.addSql(`drop table if exists "components_materials" cascade;`)
 
-    this.addSql('drop table if exists "users" cascade;')
+    this.addSql(`drop table if exists "users" cascade;`)
 
-    this.addSql('drop table if exists "region_history" cascade;')
+    this.addSql(`drop table if exists "region_history" cascade;`)
 
-    this.addSql('drop table if exists "process_history" cascade;')
+    this.addSql(`drop table if exists "process_history" cascade;`)
 
-    this.addSql('drop table if exists "place_history" cascade;')
+    this.addSql(`drop table if exists "place_history" cascade;`)
 
-    this.addSql('drop table if exists "org_history" cascade;')
+    this.addSql(`drop table if exists "org_history" cascade;`)
 
-    this.addSql('drop table if exists "material_history" cascade;')
+    this.addSql(`drop table if exists "material_history" cascade;`)
 
-    this.addSql('drop table if exists "item_history" cascade;')
+    this.addSql(`drop table if exists "item_history" cascade;`)
 
-    this.addSql('drop table if exists "auth"."identities" cascade;')
+    this.addSql(`drop table if exists "auth"."identities" cascade;`)
 
-    this.addSql('drop table if exists "component_history" cascade;')
+    this.addSql(`drop table if exists "component_history" cascade;`)
 
-    this.addSql('drop table if exists "category_history" cascade;')
+    this.addSql(`drop table if exists "category_history" cascade;`)
 
-    this.addSql('drop table if exists "users_orgs" cascade;')
+    this.addSql(`drop table if exists "users_orgs" cascade;`)
 
-    this.addSql('drop table if exists "variants" cascade;')
+    this.addSql(`drop table if exists "variants" cascade;`)
 
-    this.addSql('drop table if exists "variant_history" cascade;')
+    this.addSql(`drop table if exists "variant_history" cascade;`)
 
-    this.addSql('drop table if exists "variants_components" cascade;')
+    this.addSql(`drop table if exists "variants_components" cascade;`)
 
-    this.addSql('drop table if exists "variants_orgs" cascade;')
+    this.addSql(`drop table if exists "variants_orgs" cascade;`)
 
-    this.addSql('drop table if exists "variant_tags" cascade;')
+    this.addSql(`drop table if exists "variant_tags" cascade;`)
 
-    this.addSql('drop schema if exists "auth";')
+    this.addSql(`drop schema if exists "auth";`)
   }
 }

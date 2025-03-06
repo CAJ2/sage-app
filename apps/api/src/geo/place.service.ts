@@ -1,21 +1,17 @@
+import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { DB } from '@src/db.service'
+import { Place } from './place.entity'
 import { PlacePage } from './place.model'
 
 @Injectable()
 export class PlaceService {
-  constructor(private readonly db: DB) {}
+  constructor(private readonly em: EntityManager) {}
 
   async findAll(page: number, perPage: number): Promise<PlacePage | null> {
     return null
   }
 
   async findById(id: string) {
-    return this.db.place.findUnique({
-      where: { id },
-      include: {
-        tags: true,
-      },
-    })
+    return this.em.findOne(Place, { id }, { populate: ['tags'] })
   }
 }

@@ -9,14 +9,21 @@ export enum IdentityType {
 @Entity({ tableName: 'identities', schema: 'auth' })
 @Unique({ properties: ['user', 'provider'] })
 export class Identity extends IDCreatedUpdated {
-  @Property({ length: 64 })
-  type!: IdentityType
+  constructor(type: IdentityType, provider: string, user: Ref<User>) {
+    super()
+    this.type = type
+    this.provider = provider
+    this.user = user
+  }
+
+  @Property({ type: 'varchar', length: 64 })
+  type: IdentityType
 
   @Property({ length: 64 })
-  provider!: string
+  provider: string
 
   @Property({ length: 128 })
-  subject!: string
+  subject?: string
 
   @Property()
   password_hash?: string
@@ -34,5 +41,5 @@ export class Identity extends IDCreatedUpdated {
   multifactor?: {}
 
   @ManyToOne()
-  user!: Ref<User>
+  user: Ref<User>
 }

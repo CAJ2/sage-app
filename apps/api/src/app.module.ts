@@ -2,6 +2,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import config from '@src/config/config'
+import { Request } from 'express'
 import { nanoid } from 'nanoid'
 import { ClsModule } from 'nestjs-cls'
 import { AppController } from './app.controller'
@@ -27,7 +28,7 @@ import { UsersModule } from './users/users.module'
         mount: true,
         generateId: true,
         idGenerator: (req: Request) => {
-          const existingId = req.headers.get('X-Request-Id')
+          const existingId = req.headers['X-Request-Id']
           if (Array.isArray(existingId) || !existingId) {
             return nanoid()
           }

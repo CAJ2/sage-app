@@ -1,5 +1,6 @@
 import { IncomingMessage } from 'http'
 import { join } from 'path'
+import {} from '@apollo/server'
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloDriver } from '@nestjs/apollo'
 import { DynamicModule, Module } from '@nestjs/common'
@@ -66,6 +67,7 @@ export class GraphQLModule {
           resolvers: {
             DateTime: LuxonDateTimeResolver,
           },
+          status400ForVariableCoercionErrors: true,
           formatError: (err: GraphQLError) => this.formatError(err, context),
           bodyParserConfig: false,
         }

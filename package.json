@@ -1,7 +1,7 @@
 {
   "name": "@sage-app/source",
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "prepare": "husky"
   },
@@ -37,16 +37,11 @@
       "@apollo/protobufjs",
       "@nestjs/core",
       "@parcel/watcher",
-      "@prisma/client",
-      "@prisma/engines",
       "@swc/core",
-      "bcrypt",
       "esbuild",
       "nx",
-      "prisma",
       "sharp",
-      "vue-demi",
-      "zenstack"
+      "vue-demi"
     ],
     "patchedDependencies": {
       "@mikro-orm/postgresql": "patches/@mikro-orm__postgresql.patch"

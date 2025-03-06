@@ -40,6 +40,9 @@ export default defineConfig({
     allOrNothing: true,
     generator: CustomMigrationGenerator,
   },
+  serialization: {
+    forceObject: true,
+  },
   pool: {
     min: 5,
     max: 20,

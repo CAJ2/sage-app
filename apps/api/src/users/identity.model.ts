@@ -7,7 +7,7 @@ export class Identity extends CreatedUpdated {
   @Field(() => ID)
   id!: string
 
-  @Field()
+  @Field(() => String)
   type!: IdentityType
 
   @Field()

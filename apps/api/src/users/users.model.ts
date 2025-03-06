@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsDateTime, IsNanoID } from '@src/common/validator.model'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
@@ -16,6 +16,12 @@ import {
   Validate,
 } from 'class-validator'
 import { DateTime } from 'luxon'
+
+@ObjectType()
+export class UserProfile {
+  @Field({ nullable: true })
+  bio?: string
+}
 
 @ObjectType()
 export class User extends CreatedUpdated {
@@ -74,9 +80,32 @@ export class User extends CreatedUpdated {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsString()
-  bio?: string
+  profile?: UserProfile
 }
 
 @ObjectType()
 export class UserPage extends Paginated(User) {}
+
+@InputType()
+export class CreateUserWithPasswordInput {
+  @Field()
+  @MaxLength(64)
+  given_name!: string
+
+  @Field()
+  @MaxLength(64)
+  family_name!: string
+
+  @Field()
+  @IsEmail()
+  @MaxLength(1024)
+  email!: string
+
+  @Field()
+  @MaxLength(64)
+  username!: string
+
+  @Field()
+  @MaxLength(256)
+  password!: string
+}

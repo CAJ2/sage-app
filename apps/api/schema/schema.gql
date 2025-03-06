@@ -28,6 +28,14 @@ type CategoryHistory {
   original: String
 }
 
+input CreateUserWithPasswordInput {
+  email: String!
+  family_name: String!
+  given_name: String!
+  password: String!
+  username: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.
 """
@@ -60,6 +68,10 @@ type ItemHistory {
   datetime: DateTime!
   item_id: String!
   original: String
+}
+
+type Mutation {
+  createUserWithPassword(input: CreateUserWithPasswordInput!): User!
 }
 
 type Place {
@@ -130,9 +142,6 @@ type RegionPage {
 
 type User {
   avatar_url: String
-  bio: String
-  blocked: Boolean
-  blocked_for: [String!]
   created_at: DateTime!
   email: String
   email_verified: Boolean
@@ -142,8 +151,7 @@ type User {
   identities: [Identity!]!
   last_ip: String
   last_login: DateTime
-  last_password_reset: DateTime
-  login_count: Float
+  profile: UserProfile
   updated_at: DateTime!
   username: String
 }
@@ -151,6 +159,10 @@ type User {
 type UserEdge {
   cursor: String!
   node: User!
+}
+
+type UserProfile {
+  bio: String
 }
 
 type Variant {

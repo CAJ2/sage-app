@@ -35,6 +35,9 @@ export class Place extends IDCreatedUpdated {
   org?: Ref<Org>
 
   @OneToMany({ mappedBy: 'place' })
+  tags = new Collection<PlaceTag>(this)
+
+  @OneToMany({ mappedBy: 'place' })
   processes = new Collection<Process>(this)
 
   @OneToMany({ mappedBy: 'place' })

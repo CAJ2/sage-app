@@ -15,8 +15,8 @@ export class AuthService {
     private readonly em: EntityManager,
   ) {}
 
-  async addUserIdentityPassword(username: string, pass: string) {
-    const user = await this.usersService.findByUsernameOrEmailAuth(username)
+  async addUserIdentityPassword(email: string, pass: string) {
+    const user = await this.usersService.findByUsernameOrEmailAuth(email)
     if (!user) {
       return null
     }
@@ -29,11 +29,12 @@ export class AuthService {
       salt,
       64,
     )) as Buffer<ArrayBufferLike>
-    const passwordIdentity = new Identity()
-    passwordIdentity.user = ref(user)
-    passwordIdentity.type = IdentityType.PASSWORD
-    passwordIdentity.provider = 'local'
-    passwordIdentity.subject = username
+    const passwordIdentity = new Identity(
+      IdentityType.PASSWORD,
+      'local',
+      ref(user),
+    )
+    passwordIdentity.subject = email
     passwordIdentity.password_hash = `${salt}:${derivedKey.toString('hex')}`
     await this.em.persistAndFlush(passwordIdentity)
   }
