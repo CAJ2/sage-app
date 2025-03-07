@@ -40,7 +40,7 @@
       ]
     },
     "test": {
-      "cache": true,
+      "cache": false,
       "inputs": [
         "default",
         "^default",

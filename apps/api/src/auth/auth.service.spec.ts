@@ -4,15 +4,20 @@ import { UsersService } from '@src/users/users.service'
 import { AuthService } from './auth.service'
 
 describe('AuthService', () => {
+  let module: TestingModule
   let service: AuthService
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       imports: [MikroOrmModule.forRoot()],
       providers: [AuthService, UsersService],
     }).compile()
 
     service = module.get<AuthService>(AuthService)
+  })
+
+  afterEach(async () => {
+    await module.close()
   })
 
   it('should be defined', () => {
