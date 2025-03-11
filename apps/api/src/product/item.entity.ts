@@ -39,7 +39,7 @@ export class Item extends IDCreatedUpdated {
   @Property({ type: 'json' })
   certifications?: {}
 
-  @ManyToMany()
+  @ManyToMany({ entity: () => Category, pivotEntity: () => ItemsCategories })
   categories = new Collection<Category>(this)
 
   @OneToMany(() => Variant, (variant) => variant.items)
@@ -47,6 +47,15 @@ export class Item extends IDCreatedUpdated {
 
   @OneToMany({ mappedBy: 'item' })
   history = new Collection<ItemHistory>(this)
+}
+
+@Entity({ tableName: 'items_categories', schema: 'public' })
+export class ItemsCategories {
+  @ManyToOne({ primary: true })
+  item!: Item
+
+  @ManyToOne({ primary: true })
+  category!: Category
 }
 
 @Entity({ tableName: 'item_history', schema: 'public' })

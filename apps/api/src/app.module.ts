@@ -38,7 +38,7 @@ import { UsersModule } from './users/users.module'
     }),
     MikroOrmModule.forRoot(),
     GraphQLModule.register(),
-    AuthModule,
+    AuthModule.registerAsync(),
     UsersModule,
     GeoModule,
     ProductModule,

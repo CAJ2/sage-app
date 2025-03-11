@@ -2,7 +2,7 @@
 
 import { Migration } from '@mikro-orm/migrations'
 
-export class Migration20250306155029 extends Migration {
+export class Migration20250311153204 extends Migration {
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "auth";`)
     this.addSql(`create table "categories" (
@@ -77,11 +77,12 @@ export class Migration20250306155029 extends Migration {
                    "id" varchar(255) not null,
                    "created_at" timestamptz not null default current_timestamp(),
                    "updated_at" timestamptz not null default current_timestamp(),
-                   "name" jsonb not null,
+                   "name" varchar(128) not null,
                    "slug" varchar(128) not null,
                    "desc" jsonb not null,
                    "avatar_url" varchar(255) null,
                    "website_url" varchar(255) null,
+                   "metadata" varchar(255) not null,
                    constraint "orgs_pkey" primary key ("id")
                  );`)
     this.addSql(`alter table "orgs"
@@ -174,22 +175,39 @@ export class Migration20250306155029 extends Migration {
                    "email" varchar(1024) not null,
                    "email_verified" boolean not null default false,
                    "username" varchar(64) not null,
-                   "given_name" varchar(255) not null,
-                   "family_name" varchar(255) not null,
+                   "display_username" varchar(64) not null,
+                   "name" varchar(255) not null,
                    "avatar_url" varchar(255) null,
-                   "last_ip" varchar(255) null,
-                   "last_login" timestamptz null,
-                   "login_count" int not null default 0,
-                   "last_password_reset" timestamptz null,
-                   "blocked" boolean not null default false,
-                   "blocked_for" varchar(255) null,
+                   "lang" varchar(255) null,
                    "profile" jsonb null,
+                   "banned" boolean not null default false,
+                   "ban_reason" varchar(255) null,
+                   "ban_expires" timestamptz null,
                    constraint "users_pkey" primary key ("id")
                  );`)
     this.addSql(`alter table "users"
                  add constraint "users_email_unique" unique ("email");`)
     this.addSql(`alter table "users"
                  add constraint "users_username_unique" unique ("username");`)
+
+    this.addSql(`create table "auth"."sessions" (
+                   "id" varchar(255) not null,
+                   "created_at" timestamptz not null default current_timestamp(),
+                   "updated_at" timestamptz not null default current_timestamp(),
+                   "token" varchar(255) not null,
+                   "expires_at" timestamptz not null,
+                   "ip_address" varchar(255) null,
+                   "user_agent" varchar(255) null,
+                   "active_organization_id" varchar(255) null,
+                   "user_id" varchar(255) not null,
+                   constraint "sessions_pkey" primary key ("id")
+                 );`)
+    this.addSql(
+      `create index "sessions_token_index" on "auth"."sessions" ("token");`,
+    )
+    this.addSql(
+      `create index "sessions_user_id_index" on "auth"."sessions" ("user_id");`,
+    )
 
     this.addSql(`create table "region_history" (
                    "region_id" varchar(255) not null,
@@ -245,23 +263,24 @@ export class Migration20250306155029 extends Migration {
                    constraint "item_history_pkey" primary key ("item_id", "datetime")
                  );`)
 
-    this.addSql(`create table "auth"."identities" (
+    this.addSql(`create table "invitations" (
                    "id" varchar(255) not null,
                    "created_at" timestamptz not null default current_timestamp(),
                    "updated_at" timestamptz not null default current_timestamp(),
-                   "type" varchar(64) not null,
-                   "provider" varchar(64) not null,
-                   "subject" varchar(128) null,
-                   "password_hash" varchar(255) null,
-                   "access_token" varchar(255) null,
-                   "refresh_token" varchar(255) null,
-                   "profile_data" jsonb null,
-                   "multifactor" jsonb null,
-                   "user_id" varchar(255) not null,
-                   constraint "identities_pkey" primary key ("id")
+                   "inviter_id" varchar(255) not null,
+                   "org_id" varchar(255) not null,
+                   "email" varchar(255) not null,
+                   "role" varchar(255) not null,
+                   "status" varchar(255) not null,
+                   "expires_at" timestamptz not null,
+                   constraint "invitations_pkey" primary key ("id")
                  );`)
-    this.addSql(`alter table "auth"."identities"
-                 add constraint "identities_user_id_provider_unique" unique ("user_id", "provider");`)
+    this.addSql(
+      `create index "invitations_inviter_id_index" on "invitations" ("inviter_id");`,
+    )
+    this.addSql(
+      `create index "invitations_org_id_index" on "invitations" ("org_id");`,
+    )
 
     this.addSql(`create table "component_history" (
                    "component_id" varchar(255) not null,
@@ -281,10 +300,34 @@ export class Migration20250306155029 extends Migration {
                    constraint "category_history_pkey" primary key ("category_id", "datetime")
                  );`)
 
+    this.addSql(`create table "auth"."accounts" (
+                   "id" varchar(255) not null,
+                   "created_at" timestamptz not null default current_timestamp(),
+                   "updated_at" timestamptz not null default current_timestamp(),
+                   "account_id" varchar(255) not null,
+                   "provider_id" varchar(255) not null,
+                   "access_token" varchar(255) null,
+                   "refresh_token" varchar(255) null,
+                   "access_token_expires_at" timestamptz null,
+                   "refresh_token_expires_at" timestamptz null,
+                   "scope" varchar(255) null,
+                   "id_token" varchar(255) null,
+                   "password" varchar(255) null,
+                   "user_id" varchar(255) not null,
+                   constraint "accounts_pkey" primary key ("id")
+                 );`)
+    this.addSql(
+      `create index "accounts_user_id_index" on "auth"."accounts" ("user_id");`,
+    )
+
     this.addSql(`create table "users_orgs" (
+                   "id" varchar(255) not null,
+                   "created_at" timestamptz not null default current_timestamp(),
+                   "updated_at" timestamptz not null default current_timestamp(),
                    "user_id" varchar(255) not null,
                    "org_id" varchar(255) not null,
-                   constraint "users_orgs_pkey" primary key ("user_id", "org_id")
+                   "role" varchar(255) not null default 'member',
+                   constraint "users_orgs_pkey" primary key ("id")
                  );`)
 
     this.addSql(`create table "variants" (
@@ -312,16 +355,17 @@ export class Migration20250306155029 extends Migration {
                    constraint "variant_history_pkey" primary key ("variant_id", "datetime")
                  );`)
 
-    this.addSql(`create table "variants_components" (
-                   "variant_id" varchar(255) not null,
-                   "component_id" varchar(255) not null,
-                   constraint "variants_components_pkey" primary key ("variant_id", "component_id")
-                 );`)
-
     this.addSql(`create table "variants_orgs" (
                    "variant_id" varchar(255) not null,
                    "org_id" varchar(255) not null,
                    constraint "variants_orgs_pkey" primary key ("variant_id", "org_id")
+                 );`)
+
+    this.addSql(`create table "variants_components" (
+                   "variant_id" varchar(255) not null,
+                   "component_id" varchar(255) not null,
+                   "quantity" int not null default 1,
+                   constraint "variants_components_pkey" primary key ("variant_id", "component_id")
                  );`)
 
     this.addSql(`create table "variant_tags" (
@@ -330,15 +374,28 @@ export class Migration20250306155029 extends Migration {
                    constraint "variant_tags_pkey" primary key ("variant_id", "tag_name")
                  );`)
 
+    this.addSql(`create table "auth"."verifications" (
+                   "id" varchar(255) not null,
+                   "created_at" timestamptz not null default current_timestamp(),
+                   "updated_at" timestamptz not null default current_timestamp(),
+                   "identifier" varchar(255) not null,
+                   "value" varchar(255) not null,
+                   "expires_at" timestamptz not null,
+                   constraint "verifications_pkey" primary key ("id")
+                 );`)
+    this.addSql(
+      `create index "verifications_identifier_index" on "auth"."verifications" ("identifier");`,
+    )
+
     this.addSql(`alter table "category_tree"
                  add constraint "category_tree_ancestor_id_foreign" foreign key ("ancestor_id") references "categories" ("id") on update cascade;`)
     this.addSql(`alter table "category_tree"
                  add constraint "category_tree_descendant_id_foreign" foreign key ("descendant_id") references "categories" ("id") on update cascade;`)
 
     this.addSql(`alter table "items_categories"
-                 add constraint "items_categories_item_id_foreign" foreign key ("item_id") references "items" ("id") on update cascade on delete cascade;`)
+                 add constraint "items_categories_item_id_foreign" foreign key ("item_id") references "items" ("id") on update cascade;`)
     this.addSql(`alter table "items_categories"
-                 add constraint "items_categories_category_id_foreign" foreign key ("category_id") references "categories" ("id") on update cascade on delete cascade;`)
+                 add constraint "items_categories_category_id_foreign" foreign key ("category_id") references "categories" ("id") on update cascade;`)
 
     this.addSql(`alter table "material_tree"
                  add constraint "material_tree_ancestor_id_foreign" foreign key ("ancestor_id") references "materials" ("id") on update cascade;`)
@@ -370,6 +427,9 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "components_materials"
                  add constraint "components_materials_material_id_foreign" foreign key ("material_id") references "materials" ("id") on update cascade;`)
 
+    this.addSql(`alter table "auth"."sessions"
+                 add constraint "sessions_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
+
     this.addSql(`alter table "region_history"
                  add constraint "region_history_region_id_foreign" foreign key ("region_id") references "regions" ("id") on update cascade;`)
     this.addSql(`alter table "region_history"
@@ -400,8 +460,10 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "item_history"
                  add constraint "item_history_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
 
-    this.addSql(`alter table "auth"."identities"
-                 add constraint "identities_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
+    this.addSql(`alter table "invitations"
+                 add constraint "invitations_inviter_id_foreign" foreign key ("inviter_id") references "users" ("id") on update cascade;`)
+    this.addSql(`alter table "invitations"
+                 add constraint "invitations_org_id_foreign" foreign key ("org_id") references "orgs" ("id") on update cascade;`)
 
     this.addSql(`alter table "component_history"
                  add constraint "component_history_component_id_foreign" foreign key ("component_id") references "components" ("id") on update cascade;`)
@@ -413,10 +475,13 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "category_history"
                  add constraint "category_history_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
 
+    this.addSql(`alter table "auth"."accounts"
+                 add constraint "accounts_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
+
     this.addSql(`alter table "users_orgs"
-                 add constraint "users_orgs_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade on delete cascade;`)
+                 add constraint "users_orgs_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
     this.addSql(`alter table "users_orgs"
-                 add constraint "users_orgs_org_id_foreign" foreign key ("org_id") references "orgs" ("id") on update cascade on delete cascade;`)
+                 add constraint "users_orgs_org_id_foreign" foreign key ("org_id") references "orgs" ("id") on update cascade;`)
 
     this.addSql(`alter table "variants"
                  add constraint "variants_items_id_foreign" foreign key ("items_id") references "items" ("id") on update cascade;`)
@@ -428,15 +493,15 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "variant_history"
                  add constraint "variant_history_user_id_foreign" foreign key ("user_id") references "users" ("id") on update cascade;`)
 
-    this.addSql(`alter table "variants_components"
-                 add constraint "variants_components_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade on delete cascade;`)
-    this.addSql(`alter table "variants_components"
-                 add constraint "variants_components_component_id_foreign" foreign key ("component_id") references "components" ("id") on update cascade on delete cascade;`)
-
     this.addSql(`alter table "variants_orgs"
                  add constraint "variants_orgs_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade on delete cascade;`)
     this.addSql(`alter table "variants_orgs"
                  add constraint "variants_orgs_org_id_foreign" foreign key ("org_id") references "orgs" ("id") on update cascade on delete cascade;`)
+
+    this.addSql(`alter table "variants_components"
+                 add constraint "variants_components_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade;`)
+    this.addSql(`alter table "variants_components"
+                 add constraint "variants_components_component_id_foreign" foreign key ("component_id") references "components" ("id") on update cascade;`)
 
     this.addSql(`alter table "variant_tags"
                  add constraint "variant_tags_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade;`)
@@ -491,6 +556,9 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "org_history"
                  drop constraint "org_history_org_id_foreign";`)
 
+    this.addSql(`alter table "invitations"
+                 drop constraint "invitations_org_id_foreign";`)
+
     this.addSql(`alter table "users_orgs"
                  drop constraint "users_orgs_org_id_foreign";`)
 
@@ -530,6 +598,9 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "variants_components"
                  drop constraint "variants_components_component_id_foreign";`)
 
+    this.addSql(`alter table "auth"."sessions"
+                 drop constraint "sessions_user_id_foreign";`)
+
     this.addSql(`alter table "region_history"
                  drop constraint "region_history_user_id_foreign";`)
 
@@ -548,14 +619,17 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "item_history"
                  drop constraint "item_history_user_id_foreign";`)
 
-    this.addSql(`alter table "auth"."identities"
-                 drop constraint "identities_user_id_foreign";`)
+    this.addSql(`alter table "invitations"
+                 drop constraint "invitations_inviter_id_foreign";`)
 
     this.addSql(`alter table "component_history"
                  drop constraint "component_history_user_id_foreign";`)
 
     this.addSql(`alter table "category_history"
                  drop constraint "category_history_user_id_foreign";`)
+
+    this.addSql(`alter table "auth"."accounts"
+                 drop constraint "accounts_user_id_foreign";`)
 
     this.addSql(`alter table "users_orgs"
                  drop constraint "users_orgs_user_id_foreign";`)
@@ -566,11 +640,11 @@ export class Migration20250306155029 extends Migration {
     this.addSql(`alter table "variant_history"
                  drop constraint "variant_history_variant_id_foreign";`)
 
-    this.addSql(`alter table "variants_components"
-                 drop constraint "variants_components_variant_id_foreign";`)
-
     this.addSql(`alter table "variants_orgs"
                  drop constraint "variants_orgs_variant_id_foreign";`)
+
+    this.addSql(`alter table "variants_components"
+                 drop constraint "variants_components_variant_id_foreign";`)
 
     this.addSql(`alter table "variant_tags"
                  drop constraint "variant_tags_variant_id_foreign";`)
@@ -603,6 +677,8 @@ export class Migration20250306155029 extends Migration {
 
     this.addSql(`drop table if exists "users" cascade;`)
 
+    this.addSql(`drop table if exists "auth"."sessions" cascade;`)
+
     this.addSql(`drop table if exists "region_history" cascade;`)
 
     this.addSql(`drop table if exists "process_history" cascade;`)
@@ -615,11 +691,13 @@ export class Migration20250306155029 extends Migration {
 
     this.addSql(`drop table if exists "item_history" cascade;`)
 
-    this.addSql(`drop table if exists "auth"."identities" cascade;`)
+    this.addSql(`drop table if exists "invitations" cascade;`)
 
     this.addSql(`drop table if exists "component_history" cascade;`)
 
     this.addSql(`drop table if exists "category_history" cascade;`)
+
+    this.addSql(`drop table if exists "auth"."accounts" cascade;`)
 
     this.addSql(`drop table if exists "users_orgs" cascade;`)
 
@@ -627,11 +705,13 @@ export class Migration20250306155029 extends Migration {
 
     this.addSql(`drop table if exists "variant_history" cascade;`)
 
-    this.addSql(`drop table if exists "variants_components" cascade;`)
-
     this.addSql(`drop table if exists "variants_orgs" cascade;`)
 
+    this.addSql(`drop table if exists "variants_components" cascade;`)
+
     this.addSql(`drop table if exists "variant_tags" cascade;`)
+
+    this.addSql(`drop table if exists "auth"."verifications" cascade;`)
 
     this.addSql(`drop schema if exists "auth";`)
   }

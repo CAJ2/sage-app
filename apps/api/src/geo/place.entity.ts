@@ -11,6 +11,7 @@ import {
   Ref,
 } from '@mikro-orm/core'
 import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
+import { Point, PointType } from '@src/db/custom.types'
 import { TranslatedField } from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
 import { Org } from '@src/users/org.entity'
@@ -28,8 +29,8 @@ export class Place extends IDCreatedUpdated {
   @Property({ type: 'json' })
   desc?: TranslatedField
 
-  @Property({ type: 'geography(point)' })
-  location!: string
+  @Property({ type: PointType })
+  location!: Point
 
   @ManyToOne()
   org?: Ref<Org>

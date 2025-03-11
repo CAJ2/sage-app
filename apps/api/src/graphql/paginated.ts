@@ -39,3 +39,21 @@ export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
   }
   return PaginatedType as Type<IPaginatedType<T>>
 }
+
+export function PaginationArgs(): any {
+  @ObjectType()
+  abstract class PaginationArgsType {
+    @Field(() => Int, { nullable: true })
+    first?: number
+
+    @Field(() => String, { nullable: true })
+    after?: string
+
+    @Field(() => Int, { nullable: true })
+    last?: number
+
+    @Field(() => String, { nullable: true })
+    before?: string
+  }
+  return PaginationArgsType
+}

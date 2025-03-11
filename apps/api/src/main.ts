@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
     new ExpressAdapter(),
-    { cors: true },
+    { bodyParser: false, cors: true },
   )
   app.useGlobalPipes(
     new ValidationPipe({

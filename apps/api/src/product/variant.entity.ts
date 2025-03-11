@@ -17,6 +17,7 @@ import { Component } from '@src/process/component.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { Item } from './item.entity'
+import type { Opt } from '@mikro-orm/core'
 
 @Entity({ tableName: 'variants', schema: 'public' })
 export class Variant extends IDCreatedUpdated {
@@ -50,7 +51,10 @@ export class Variant extends IDCreatedUpdated {
   @ManyToMany()
   orgs = new Collection<Org>(this)
 
-  @ManyToMany()
+  @ManyToMany({
+    entity: () => Component,
+    pivotEntity: () => VariantsComponents,
+  })
   components = new Collection<Component>(this)
 
   @OneToMany(() => VariantHistory, (history) => history.variant)
@@ -64,6 +68,18 @@ export class VariantTag extends BaseEntity {
 
   @PrimaryKey()
   tag_name!: string
+}
+
+@Entity({ tableName: 'variants_components', schema: 'public' })
+export class VariantsComponents extends BaseEntity {
+  @ManyToOne({ primary: true })
+  variant!: Variant
+
+  @ManyToOne({ primary: true })
+  component!: Component
+
+  @Property()
+  quantity: number & Opt = 1
 }
 
 @Entity({ tableName: 'variant_history', schema: 'public' })

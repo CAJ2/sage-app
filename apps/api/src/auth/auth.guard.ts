@@ -1,39 +1,61 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { JwtService } from '@nestjs/jwt'
-import { Request } from 'express'
+import { Inject, Injectable } from '@nestjs/common'
+import { Reflector } from '@nestjs/core'
+import { APIError, type getSession } from 'better-auth/api'
+import { fromNodeHeaders } from 'better-auth/node'
+import { AUTH_INSTANCE_KEY } from './symbols'
+import type { CanActivate, ExecutionContext } from '@nestjs/common'
+import type { Auth } from 'better-auth'
 
+/**
+ * Type representing a valid user session after authentication
+ * Excludes null and undefined values from the session return type
+ */
+export type UserSession = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getSession>>>
+>
+
+/**
+ * NestJS guard that handles authentication for protected routes
+ * Can be configured with @Public() or @Optional() decorators to modify authentication behavior
+ */
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly config: ConfigService,
+    @Inject(Reflector)
+    private readonly reflector: Reflector,
+    @Inject(AUTH_INSTANCE_KEY)
+    private readonly auth: Auth,
   ) {}
 
+  /**
+   * Validates if the current request is authenticated
+   * Attaches session and user information to the request object
+   * @param context - The execution context of the current request
+   * @returns True if the request is authorized to proceed, throws an error otherwise
+   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>()
-    const token = this.extractTokenFromHeader(request)
-    if (!token) {
-      throw new UnauthorizedException()
-    }
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.config.get<string>('auth.jwt.secret'),
-      })
-      ;(request as any).user = payload
-    } catch {
-      throw new UnauthorizedException()
-    }
-    return true
-  }
+    const request = context.switchToHttp().getRequest()
+    const session = await this.auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    })
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? []
-    return type === 'Bearer' ? token : undefined
+    request.session = session
+    request.user = session?.user ?? null // useful for observability tools like Sentry
+
+    const isPublic = this.reflector.get('PUBLIC', context.getHandler())
+
+    if (isPublic) return true
+
+    const isOptional = this.reflector.get('OPTIONAL', context.getHandler())
+
+    if (isOptional && !session) return true
+
+    if (!session)
+      throw new APIError(401, {
+        code: 'UNAUTHORIZED',
+        message: 'Unauthorized',
+      })
+
+    return true
   }
 }

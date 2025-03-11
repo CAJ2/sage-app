@@ -28,27 +28,10 @@ type CategoryHistory {
   original: String
 }
 
-input CreateUserWithPasswordInput {
-  email: String!
-  family_name: String!
-  given_name: String!
-  password: String!
-  username: String!
-}
-
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.
 """
 scalar DateTime
-
-type Identity {
-  created_at: DateTime!
-  id: ID!
-  provider: String!
-  subject: String!
-  type: String!
-  updated_at: DateTime!
-}
 
 type Item {
   categories: [Category!]!
@@ -70,8 +53,61 @@ type ItemHistory {
   original: String
 }
 
-type Mutation {
-  createUserWithPassword(input: CreateUserWithPasswordInput!): User!
+type Material {
+  ancestors: [Material!]!
+  created_at: DateTime!
+  desc: String
+  descendants: [Material!]!
+  history: [MaterialHistory!]!
+  id: ID!
+  name: String
+  source: String
+  technical: Boolean!
+  updated_at: DateTime!
+}
+
+type MaterialHistory {
+  changes: String
+  datetime: DateTime!
+  material_id: String!
+  original: String
+}
+
+type Org {
+  avatar_url: String
+  desc: String
+  history: [OrgHistory!]!
+  id: ID!
+  name: String!
+  processes: ProcessPage!
+  slug: String!
+  users(filter: OrgUsersFilter!): UserPage!
+  variants: VariantPage!
+  website_url: String
+}
+
+type OrgEdge {
+  cursor: String!
+  node: Org!
+}
+
+type OrgHistory {
+  changes: String
+  datetime: DateTime!
+  org: Org!
+  original: String
+  user: User!
+}
+
+input OrgUsersFilter {
+  email: String
+}
+
+type OrgsPage {
+  edges: [OrgEdge!]
+  hasNextPage: Boolean!
+  nodes: [Org!]
+  totalCount: Int!
 }
 
 type Place {
@@ -109,8 +145,42 @@ type PlaceTag {
   tag_name: String!
 }
 
+type Process {
+  desc: String
+  history: [ProcessHistory!]!
+  id: ID!
+  intent: String!
+  material: Material!
+  name: String!
+  org: Org
+  place: Place
+  region: Region
+  source: String!
+}
+
+type ProcessEdge {
+  cursor: String!
+  node: Process!
+}
+
+type ProcessHistory {
+  changes: String
+  datetime: DateTime!
+  original: String
+  process: Process!
+  user: User!
+}
+
+type ProcessPage {
+  edges: [ProcessEdge!]
+  hasNextPage: Boolean!
+  nodes: [Process!]
+  totalCount: Int!
+}
+
 type Query {
   category(id: String!): Category
+  getOrg(id: ID!): Org!
   getUser(id: ID!): User!
   item(id: String!): Item
   place(id: String!): Place
@@ -145,12 +215,10 @@ type User {
   created_at: DateTime!
   email: String
   email_verified: Boolean
-  family_name: String
-  given_name: String
   id: ID!
-  identities: [Identity!]!
-  last_ip: String
-  last_login: DateTime
+  lang: String
+  name: String
+  orgs(filter: UsersOrgsFilter!): OrgsPage!
   profile: UserProfile
   updated_at: DateTime!
   username: String
@@ -161,8 +229,19 @@ type UserEdge {
   node: User!
 }
 
+type UserPage {
+  edges: [UserEdge!]
+  hasNextPage: Boolean!
+  nodes: [User!]
+  totalCount: Int!
+}
+
 type UserProfile {
   bio: String
+}
+
+input UsersOrgsFilter {
+  test: String
 }
 
 type Variant {
@@ -178,11 +257,23 @@ type Variant {
   updated_at: DateTime!
 }
 
+type VariantEdge {
+  cursor: String!
+  node: Variant!
+}
+
 type VariantHistory {
   changes: String
   datetime: DateTime!
   original: String
   variant_id: String!
+}
+
+type VariantPage {
+  edges: [VariantEdge!]
+  hasNextPage: Boolean!
+  nodes: [Variant!]
+  totalCount: Int!
 }
 
 type VariantTag {

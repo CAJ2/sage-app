@@ -361,7 +361,6 @@
             "id"
           ],
           "referencedTableName": "public.items",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "items_categories_category_id_foreign": {
@@ -374,7 +373,6 @@
             "id"
           ],
           "referencedTableName": "public.categories",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -604,12 +602,13 @@
         },
         "name": {
           "name": "name",
-          "type": "jsonb",
+          "type": "varchar(128)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "json"
+          "length": 128,
+          "mappedType": "string"
         },
         "slug": {
           "name": "slug",
@@ -647,6 +646,16 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
           "length": 255,
           "mappedType": "string"
         }
@@ -1447,18 +1456,18 @@
           "length": 64,
           "mappedType": "string"
         },
-        "given_name": {
-          "name": "given_name",
-          "type": "varchar(255)",
+        "display_username": {
+          "name": "display_username",
+          "type": "varchar(64)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
+          "length": 64,
           "mappedType": "string"
         },
-        "family_name": {
-          "name": "family_name",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -1477,58 +1486,8 @@
           "length": 255,
           "mappedType": "string"
         },
-        "last_ip": {
-          "name": "last_ip",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "last_login": {
-          "name": "last_login",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "login_count": {
-          "name": "login_count",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "0",
-          "mappedType": "integer"
-        },
-        "last_password_reset": {
-          "name": "last_password_reset",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "blocked": {
-          "name": "blocked",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "false",
-          "mappedType": "boolean"
-        },
-        "blocked_for": {
-          "name": "blocked_for",
+        "lang": {
+          "name": "lang",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -1545,6 +1504,36 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "banned": {
+          "name": "banned",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "ban_reason": {
+          "name": "ban_reason",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "ban_expires": {
+          "name": "ban_expires",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "users",
@@ -1583,6 +1572,154 @@
       ],
       "checks": [],
       "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "token": {
+          "name": "token",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "default": "null",
+          "mappedType": "string"
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "default": "null",
+          "mappedType": "string"
+        },
+        "active_organization_id": {
+          "name": "active_organization_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "sessions",
+      "schema": "auth",
+      "indexes": [
+        {
+          "columnNames": [
+            "token"
+          ],
+          "composite": false,
+          "keyName": "sessions_token_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "sessions_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "sessions_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "sessions_user_id_foreign": {
+          "constraintName": "sessions_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "auth.sessions",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -2189,86 +2326,8 @@
           "default": "current_timestamp()",
           "mappedType": "datetime"
         },
-        "type": {
-          "name": "type",
-          "type": "varchar(64)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "string"
-        },
-        "provider": {
-          "name": "provider",
-          "type": "varchar(64)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "string"
-        },
-        "subject": {
-          "name": "subject",
-          "type": "varchar(128)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 128,
-          "mappedType": "string"
-        },
-        "password_hash": {
-          "name": "password_hash",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "access_token": {
-          "name": "access_token",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "refresh_token": {
-          "name": "refresh_token",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "profile_data": {
-          "name": "profile_data",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "multifactor": {
-          "name": "multifactor",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "user_id": {
-          "name": "user_id",
+        "inviter_id": {
+          "name": "inviter_id",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -2276,24 +2335,83 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
-      "name": "identities",
-      "schema": "auth",
+      "name": "invitations",
+      "schema": "public",
       "indexes": [
         {
-          "keyName": "identities_user_id_provider_unique",
           "columnNames": [
-            "user_id",
-            "provider"
+            "inviter_id"
           ],
-          "composite": true,
-          "constraint": true,
+          "composite": false,
+          "keyName": "invitations_inviter_id_index",
+          "constraint": false,
           "primary": false,
-          "unique": true
+          "unique": false
         },
         {
-          "keyName": "identities_pkey",
+          "columnNames": [
+            "org_id"
+          ],
+          "composite": false,
+          "keyName": "invitations_org_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "invitations_pkey",
           "columnNames": [
             "id"
           ],
@@ -2305,16 +2423,28 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "identities_user_id_foreign": {
-          "constraintName": "identities_user_id_foreign",
+        "invitations_inviter_id_foreign": {
+          "constraintName": "invitations_inviter_id_foreign",
           "columnNames": [
-            "user_id"
+            "inviter_id"
           ],
-          "localTableName": "auth.identities",
+          "localTableName": "public.invitations",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.users",
+          "updateRule": "cascade"
+        },
+        "invitations_org_id_foreign": {
+          "constraintName": "invitations_org_id_foreign",
+          "columnNames": [
+            "org_id"
+          ],
+          "localTableName": "public.invitations",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.orgs",
           "updateRule": "cascade"
         }
       },
@@ -2512,6 +2642,214 @@
     },
     {
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "scope": {
+          "name": "scope",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "accounts",
+      "schema": "auth",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "accounts_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "accounts_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "accounts_user_id_foreign": {
+          "constraintName": "accounts_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "auth.accounts",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
         "user_id": {
           "name": "user_id",
           "type": "varchar(255)",
@@ -2531,18 +2869,68 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "default": "'member'",
+          "mappedType": "string"
         }
       },
       "name": "users_orgs",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "users_orgs_pkey",
           "columnNames": [
-            "user_id",
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "users_orgs_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "org_id"
           ],
-          "composite": true,
+          "composite": false,
+          "keyName": "users_orgs_org_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "users_orgs_user_id_index",
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "users_orgs_org_id_index",
+          "columnNames": [
+            "org_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "users_orgs_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
           "constraint": true,
           "primary": true,
           "unique": true
@@ -2560,7 +2948,6 @@
             "id"
           ],
           "referencedTableName": "public.users",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "users_orgs_org_id_foreign": {
@@ -2573,7 +2960,6 @@
             "id"
           ],
           "referencedTableName": "public.orgs",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -2848,75 +3234,6 @@
           "length": 255,
           "mappedType": "string"
         },
-        "component_id": {
-          "name": "component_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        }
-      },
-      "name": "variants_components",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "variants_components_pkey",
-          "columnNames": [
-            "variant_id",
-            "component_id"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "variants_components_variant_id_foreign": {
-          "constraintName": "variants_components_variant_id_foreign",
-          "columnNames": [
-            "variant_id"
-          ],
-          "localTableName": "public.variants_components",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.variants",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
-        "variants_components_component_id_foreign": {
-          "constraintName": "variants_components_component_id_foreign",
-          "columnNames": [
-            "component_id"
-          ],
-          "localTableName": "public.variants_components",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.components",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "variant_id": {
-          "name": "variant_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
         "org_id": {
           "name": "org_id",
           "type": "varchar(255)",
@@ -2986,6 +3303,83 @@
           "length": 255,
           "mappedType": "string"
         },
+        "component_id": {
+          "name": "component_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "1",
+          "mappedType": "integer"
+        }
+      },
+      "name": "variants_components",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "variants_components_pkey",
+          "columnNames": [
+            "variant_id",
+            "component_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "variants_components_variant_id_foreign": {
+          "constraintName": "variants_components_variant_id_foreign",
+          "columnNames": [
+            "variant_id"
+          ],
+          "localTableName": "public.variants_components",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.variants",
+          "updateRule": "cascade"
+        },
+        "variants_components_component_id_foreign": {
+          "constraintName": "variants_components_component_id_foreign",
+          "columnNames": [
+            "component_id"
+          ],
+          "localTableName": "public.variants_components",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.components",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "variant_id": {
+          "name": "variant_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
         "tag_name": {
           "name": "tag_name",
           "type": "varchar(255)",
@@ -3027,6 +3421,99 @@
           "updateRule": "cascade"
         }
       },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "value": {
+          "name": "value",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "verifications",
+      "schema": "auth",
+      "indexes": [
+        {
+          "columnNames": [
+            "identifier"
+          ],
+          "composite": false,
+          "keyName": "verifications_identifier_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "verifications_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
       "nativeEnums": {}
     }
   ],

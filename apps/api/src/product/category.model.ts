@@ -1,38 +1,36 @@
-import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ID, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { IsNanoID } from '@src/common/validator.model'
 import { CreatedUpdated } from '@src/graphql/created-updated.model'
+import { IsUrl, MaxLength, Validate } from 'class-validator'
 import { DateTime } from 'luxon'
-import { z } from 'zod'
 import { Item } from './item.model'
 
 @ObjectType()
 export class Category extends CreatedUpdated {
   @Field(() => ID)
-  @Extensions({ z: z.string().nanoid() })
+  @Validate(IsNanoID)
   id: string = ''
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().max(1024).optional() })
+  @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().max(1024).optional() })
+  @MaxLength(1024)
   desc_short?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().optional() })
   desc?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().url().optional() })
+  @IsUrl()
   image_url?: string
 
   @Field(() => [Item])
-  @Extensions({ z: z.array(z.any()).default([]) })
   items: Item[] = []
 
   @Field(() => [CategoryHistory])
-  @Extensions({ z: z.array(z.any()).default([]) })
   history: CategoryHistory[] = []
 }
 

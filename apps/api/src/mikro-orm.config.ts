@@ -1,14 +1,17 @@
-import { DataloaderType, defineConfig } from '@mikro-orm/postgresql'
+import { DataloaderType, defineConfig, EntityManager } from '@mikro-orm/postgresql'
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
 import { Migrator } from '@mikro-orm/migrations'
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
 import { join } from 'path'
 import dotenv from 'dotenv-flow'
 import { CustomMigrationGenerator } from './db/migration.gen'
+import { AsyncLocalStorage } from 'async_hooks'
 
 if (dotenv) {
   dotenv.config()
 }
+
+const storage = new AsyncLocalStorage<EntityManager>()
 
 const highlighter = new SqlHighlighter()
 const url = process.env.DATABASE_URL

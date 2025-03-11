@@ -30,7 +30,10 @@ export class Category extends IDCreatedUpdated {
   @Property({ nullable: true })
   image_url?: string
 
-  @ManyToMany(() => Item, (item) => item.categories)
+  @ManyToMany({
+    entity: () => 'Item',
+    mappedBy: (item: Item) => item.categories,
+  })
   items = new Collection<Item>(this)
 
   @OneToMany(() => CategoryHistory, (history) => history.category)

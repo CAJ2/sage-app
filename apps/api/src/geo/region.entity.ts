@@ -10,6 +10,7 @@ import {
   Property,
   Ref,
 } from '@mikro-orm/core'
+import { MultiPolygon, MultiPolygonType } from '@src/db/custom.types'
 import { TranslatedField } from '@src/db/i18n'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
@@ -34,8 +35,8 @@ export class Region extends BaseEntity {
   @Property({ type: 'int2' })
   admin_level!: number
 
-  @Property({ type: 'geography(multipolygon)' })
-  geo!: string
+  @Property({ type: MultiPolygonType })
+  geo!: MultiPolygon
 
   @OneToMany({ mappedBy: 'region' })
   variants = new Collection<Variant>(this)

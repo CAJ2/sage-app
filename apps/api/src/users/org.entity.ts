@@ -1,6 +1,7 @@
 import {
   Collection,
   Entity,
+  Index,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -17,8 +18,8 @@ import { User } from './users.entity'
 
 @Entity({ tableName: 'orgs', schema: 'public' })
 export class Org extends IDCreatedUpdated {
-  @Property({ type: 'json' })
-  name!: TranslatedField
+  @Property({ length: 128 })
+  name!: string
 
   @Property({ unique: true, length: 128 })
   slug!: string
@@ -31,6 +32,9 @@ export class Org extends IDCreatedUpdated {
 
   @Property()
   website_url?: string
+
+  @Property()
+  metadata!: string
 
   @ManyToMany(() => User, (user) => user.orgs)
   users = new Collection<User>(this)
@@ -63,4 +67,27 @@ export class OrgHistory {
 
   @Property({ type: 'json' })
   changes?: Record<string, any>
+}
+
+@Entity({ tableName: 'invitations', schema: 'public' })
+export class Invitation extends IDCreatedUpdated {
+  @ManyToOne()
+  @Index()
+  inviter!: User
+
+  @ManyToOne()
+  @Index()
+  org!: Org
+
+  @Property()
+  email!: string
+
+  @Property()
+  role!: string
+
+  @Property()
+  status!: string
+
+  @Property()
+  expires_at!: Date
 }
