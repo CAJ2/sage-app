@@ -10,7 +10,8 @@ import type { Adapter, BetterAuthOptions } from 'better-auth'
 
 export const configureAuth = (orm: MikroORM) => {
   return betterAuth({
-    trustedOrigins: ['http://localhost:4400'],
+    basePath: '/auth',
+    trustedOrigins: ['http://127.0.0.1:4444'],
     database: dbAdapter(orm),
     plugins: [
       username({
@@ -34,12 +35,6 @@ export const configureAuth = (orm: MikroORM) => {
       }),
       organization({
         schema: {
-          session: {
-            modelName: 'Session',
-            fields: {
-              activeOrganizationId: 'active_organization_id',
-            },
-          },
           organization: {
             modelName: 'Org',
             fields: {
@@ -72,8 +67,10 @@ export const configureAuth = (orm: MikroORM) => {
       fields: {
         emailVerified: 'email_verified',
         image: 'avatar_url',
+        displayUsername: 'display_username',
         createdAt: 'created_at',
         updatedAt: 'updated_at',
+        organizations: 'orgs',
       },
       additionalFields: {
         lang: {
@@ -90,6 +87,7 @@ export const configureAuth = (orm: MikroORM) => {
         expiresAt: 'expires_at',
         ipAddress: 'ip_address',
         userAgent: 'user_agent',
+        activeOrganizationId: 'active_organization_id',
         createdAt: 'created_at',
         updatedAt: 'updated_at',
       },
@@ -102,7 +100,7 @@ export const configureAuth = (orm: MikroORM) => {
       modelName: 'Account',
       fields: {
         userId: 'user',
-        accountId: 'account',
+        accountId: 'account_id',
         providerId: 'provider_id',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
@@ -148,15 +146,16 @@ export const configureAuth = (orm: MikroORM) => {
 }
 
 const dbAdapter = (orm: MikroORM) => {
-  const {
-    getEntityMetadata,
-    getFieldPath,
-    normalizeInput,
-    normalizeOutput,
-    normalizeWhereClauses,
-  } = createAdapterUtils(orm)
-
   return (options: BetterAuthOptions = {}): Adapter => {
+    const {
+      getEntityMetadata,
+      transformFieldPath,
+      getFieldPath,
+      normalizeInput,
+      normalizeOutput,
+      normalizeWhereClauses,
+    } = createAdapterUtils(orm, options)
+
     return {
       id: 'mikro-orm',
       async create({ model, data, select }) {
@@ -193,6 +192,7 @@ const dbAdapter = (orm: MikroORM) => {
         }
 
         if (sortBy) {
+          sortBy.field = transformFieldPath(metadata, sortBy.field)
           const path = getFieldPath(metadata, sortBy.field)
           dset(options, ['orderBy', ...path], sortBy.direction)
         }

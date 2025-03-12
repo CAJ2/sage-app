@@ -6,7 +6,7 @@ import type { NextFunction, Request, Response } from 'express'
 export class SkipBodyParsingMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // skip body parsing for better-auth routes
-    if (req.baseUrl.startsWith('/api/auth')) {
+    if (req.baseUrl.startsWith('/auth')) {
       next()
       return
     }

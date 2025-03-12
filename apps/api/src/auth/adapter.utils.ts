@@ -1,8 +1,9 @@
 import { ReferenceKind, serialize } from '@mikro-orm/core'
 import { dset } from 'dset'
+import _ from 'lodash'
 import { createAdapterError } from './adapter.error'
 import type { EntityMetadata, EntityProperty, MikroORM } from '@mikro-orm/core'
-import type { Where } from 'better-auth'
+import type { BetterAuthOptions, Where } from 'better-auth'
 
 export interface AdapterUtils {
   /**
@@ -20,6 +21,14 @@ export interface AdapterUtils {
    * @throws BetterAuthError when no metadata found
    */
   getEntityMetadata(name: string): EntityMetadata
+
+  /**
+   * Transforms the fieldName if configured in the options
+   *
+   * @param metadata - Entity metadata
+   * @param fieldName - The field's name
+   */
+  transformFieldPath(metadata: EntityMetadata, fieldName: string): string
 
   /**
    * Returns a path to a `field` reference.
@@ -80,12 +89,52 @@ const ownReferences = [ReferenceKind.SCALAR, ReferenceKind.ONE_TO_MANY]
  *
  * @param orm - Mikro ORM instance
  */
-export function createAdapterUtils(orm: MikroORM): AdapterUtils {
+export function createAdapterUtils(
+  orm: MikroORM,
+  options: BetterAuthOptions,
+): AdapterUtils {
   const naming = orm.config.getNamingStrategy()
   const metadata = orm.getMetadata()
 
-  const normalizeEntityName: AdapterUtils['normalizeEntityName'] = (name) =>
-    naming.getEntityName(naming.classToTableName(name))
+  const fieldNameMap: Record<string, Record<string, string>> = {}
+  const assignEntity = ([entity, v]: [string, any]) => {
+    if (v.modelName) {
+      if (!fieldNameMap[v.modelName]) {
+        fieldNameMap[v.modelName] = {}
+      }
+      const fields: Record<string, string> = {}
+      _.forIn(v.fields, (f, k) => {
+        if (typeof f === 'string') {
+          fields[k] = f
+        } else if (f.fieldName) {
+          fields[k] = f.fieldName
+        } else {
+          fields[k] = k
+        }
+      })
+      fieldNameMap[v.modelName] = _.merge(
+        fieldNameMap[v.modelName],
+        fields,
+        _.invert(fields),
+      )
+    }
+  }
+  assignEntity(['User', options.user])
+  assignEntity(['Session', options.session])
+  assignEntity(['Account', options.account])
+  assignEntity(['Verification', options.verification])
+  options.plugins?.forEach((plugin) => {
+    if (plugin.schema) {
+      Object.entries(plugin.schema).forEach(assignEntity)
+    }
+  })
+
+  const normalizeEntityName: AdapterUtils['normalizeEntityName'] = (name) => {
+    if (_.has(options, name) && _.has(options, name + '.modelName')) {
+      name = _.get(options, name + '.modelName')
+    }
+    return naming.getEntityName(naming.classToTableName(name))
+  }
 
   const getEntityMetadata: AdapterUtils['getEntityMetadata'] = (
     entityName: string,
@@ -121,6 +170,10 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
         (prop.name === fieldName ||
           prop.fieldNames.includes(naming.propertyToColumnName(fieldName)))
       ) {
+        return true
+      }
+
+      if (prop.kind === ReferenceKind.MANY_TO_MANY && prop.name === fieldName) {
         return true
       }
 
@@ -170,6 +223,17 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
       getReferencedColumnName(metadata.className, prop),
     )
 
+  const transformFieldPath: AdapterUtils['transformFieldPath'] = (
+    metadata,
+    fieldName,
+  ) => {
+    return _.get(
+      fieldNameMap,
+      metadata.className + '.' + fieldName,
+      fieldName,
+    ) as string
+  }
+
   const getFieldPath: AdapterUtils['getFieldPath'] = (
     metadata,
     fieldName,
@@ -205,6 +269,7 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
   const normalizeInput: AdapterUtils['normalizeInput'] = (metadata, input) => {
     const fields: Record<string, any> = {}
     Object.entries(input).forEach(([key, value]) => {
+      key = transformFieldPath(metadata, key)
       const path = getFieldPath(metadata, key)
       dset(fields, path, value)
     })
@@ -221,13 +286,18 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
 
     const result: Record<string, any> = {}
     Object.entries(output)
-      .map(([key, value]) => ({
-        path: getReferencedPropertyName(
-          metadata,
-          getPropertyMetadata(metadata, key),
-        ),
-        value,
-      }))
+      .map(([key, value]) => {
+        const propMeta = getPropertyMetadata(metadata, key)
+        if (propMeta.kind === ReferenceKind.MANY_TO_MANY) {
+          return { path: key, value }
+        }
+        let path = getReferencedPropertyName(metadata, propMeta)
+        path = transformFieldPath(metadata, path)
+        return {
+          path,
+          value,
+        }
+      })
       .filter(({ path }) => (select ? select.includes(path) : true))
       .forEach(({ path, value }) => dset(result, path, value))
 
@@ -291,7 +361,7 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
       if (!w) {
         return {}
       }
-
+      w.field = transformFieldPath(metadata, w.field)
       const path = getFieldPath(metadata, w.field, true)
 
       switch (w.operator) {
@@ -343,6 +413,7 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
   return {
     getEntityMetadata,
     normalizeEntityName,
+    transformFieldPath,
     getFieldPath,
     normalizeInput,
     normalizeOutput,
