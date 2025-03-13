@@ -1,6 +1,6 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "sage-frontend",
+  "appId": "eco.sageleaf.app",
+  "appName": "Sage",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

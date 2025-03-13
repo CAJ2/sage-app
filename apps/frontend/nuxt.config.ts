@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from 'nuxt/config'
 import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -7,9 +8,14 @@ export default defineNuxtConfig({
     '@nuxtjs/ionic',
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
-    'nuxt-icon',
+    '@nuxt/icon',
     '@pinia/nuxt',
+    'reka-ui/nuxt',
   ],
+
+  typescript: {
+    typeCheck: true,
+  },
 
   css: ['@/assets/css/main.css'],
 

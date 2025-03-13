@@ -14,6 +14,7 @@ const baseConfig = [
         // Add browser environment globals (window, document, etc.) to prevent
         // ESLint from flagging them as undefined
         ...globals.browser,
+        useHead: 'readonly',
       },
     },
   },
@@ -36,7 +37,13 @@ const vueConfig = [
 const standardConfig = [
   ...neostandard({
     ts: true,
-    ignores: [...resolveIgnoresFromGitignore(), '**/.nx/**', '**/*.config.ts'],
+    ignores: [
+      ...resolveIgnoresFromGitignore(),
+      '**/.nx/**',
+      '**/*.config.ts',
+      '**/ios/**',
+      '**/android/**',
+    ],
   }),
   importPlugin.flatConfigs.recommended,
   {
