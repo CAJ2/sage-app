@@ -4,10 +4,11 @@ import { ConfigModule } from '@nestjs/config'
 import config from '@src/config/config'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
-import { ClsModule } from 'nestjs-cls'
+import { ClsModule, ClsService } from 'nestjs-cls'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
+import { parseLanguageHeader } from './db/i18n'
 import { GeoModule } from './geo/geo.module'
 import { GraphQLModule } from './graphql/graphql.module'
 import { ProcessModule } from './process/process.module'
@@ -26,9 +27,14 @@ import { UsersModule } from './users/users.module'
       global: true,
       middleware: {
         mount: true,
+        setup: (cls: ClsService, req: Request) => {
+          if (req.headers['accept-language']) {
+            cls.set('lang', parseLanguageHeader(req.headers['accept-language']))
+          }
+        },
         generateId: true,
         idGenerator: (req: Request) => {
-          const existingId = req.headers['X-Request-Id']
+          const existingId = req.headers['x-request-id']
           if (Array.isArray(existingId) || !existingId) {
             return nanoid()
           }

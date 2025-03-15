@@ -1,17 +1,13 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { IsNanoID } from '@src/common/validator.model'
-import { CreatedUpdated } from '@src/graphql/created-updated.model'
-import { IsUrl, MaxLength, Validate } from 'class-validator'
+import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IsUrl, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
+import { Category as CategoryEntity } from './category.entity'
 import { Item } from './item.model'
 
 @ObjectType()
-export class Category extends CreatedUpdated {
-  @Field(() => ID)
-  @Validate(IsNanoID)
-  id: string = ''
-
+export class Category extends IDCreatedUpdated<CategoryEntity> {
   @Field(() => String, { nullable: true })
   @MaxLength(1024)
   name?: string

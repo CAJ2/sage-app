@@ -1,22 +1,16 @@
-import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ID, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { CreatedUpdated } from '@src/graphql/created-updated.model'
+import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated } from '@src/graphql/paginated'
 import { DateTime } from 'luxon'
-import { z } from 'zod'
+import { Region as RegionEntity } from './region.entity'
 
 @ObjectType()
-export class Region extends CreatedUpdated {
-  @Field(() => ID)
-  @Extensions({ z: z.string() })
-  id!: string
-
+export class Region extends IDCreatedUpdated<RegionEntity> {
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().optional() })
   name?: string
 
   @Field(() => Number)
-  @Extensions({ z: z.number().int() })
   admin_level!: number
 }
 

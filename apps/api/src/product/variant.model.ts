@@ -1,9 +1,10 @@
 import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { CreatedUpdated } from '@src/graphql/created-updated.model'
+import { CreatedUpdated } from '@src/graphql/base.model'
 import { DateTime } from 'luxon'
 import { z } from 'zod'
 import { Item } from './item.model'
+import { Variant as VariantEntity } from './variant.entity'
 
 @ObjectType()
 export class VariantTag {
@@ -13,7 +14,7 @@ export class VariantTag {
 }
 
 @ObjectType()
-export class Variant extends CreatedUpdated {
+export class Variant extends CreatedUpdated<VariantEntity> {
   @Field(() => ID)
   @Extensions({ z: z.string().nanoid() })
   id: string = ''

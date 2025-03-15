@@ -75,12 +75,14 @@ type MaterialHistory {
 
 type Org {
   avatar_url: String
+  created_at: DateTime!
   desc: String
   history: [OrgHistory!]!
   id: ID!
   name: String!
   processes: ProcessPage!
   slug: String!
+  updated_at: DateTime!
   users(filter: OrgUsersFilter!): UserPage!
   variants: VariantPage!
   website_url: String
@@ -105,9 +107,16 @@ input OrgUsersFilter {
 
 type OrgsPage {
   edges: [OrgEdge!]
-  hasNextPage: Boolean!
   nodes: [Org!]
+  pageInfo: PageInfo!
   totalCount: Int!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
 }
 
 type Place {
@@ -117,6 +126,7 @@ type Place {
   history: [PlaceHistory!]!
   id: ID!
   name: String
+  org: Org
   tags: [PlaceTag!]!
   updated_at: DateTime!
 }
@@ -136,8 +146,8 @@ type PlaceHistory {
 
 type PlacePage {
   edges: [PlaceEdge!]
-  hasNextPage: Boolean!
   nodes: [Place!]
+  pageInfo: PageInfo!
   totalCount: Int!
 }
 
@@ -146,6 +156,7 @@ type PlaceTag {
 }
 
 type Process {
+  created_at: DateTime!
   desc: String
   history: [ProcessHistory!]!
   id: ID!
@@ -156,6 +167,7 @@ type Process {
   place: Place
   region: Region
   source: String!
+  updated_at: DateTime!
 }
 
 type ProcessEdge {
@@ -173,8 +185,8 @@ type ProcessHistory {
 
 type ProcessPage {
   edges: [ProcessEdge!]
-  hasNextPage: Boolean!
   nodes: [Process!]
+  pageInfo: PageInfo!
   totalCount: Int!
 }
 
@@ -205,23 +217,23 @@ type RegionEdge {
 
 type RegionPage {
   edges: [RegionEdge!]
-  hasNextPage: Boolean!
   nodes: [Region!]
+  pageInfo: PageInfo!
   totalCount: Int!
 }
 
 type User {
   avatar_url: String
   created_at: DateTime!
-  email: String
-  email_verified: Boolean
+  email: String!
+  email_verified: Boolean!
   id: ID!
   lang: String
   name: String
-  orgs(filter: UsersOrgsFilter!): OrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
   profile: UserProfile
   updated_at: DateTime!
-  username: String
+  username: String!
 }
 
 type UserEdge {
@@ -231,17 +243,13 @@ type UserEdge {
 
 type UserPage {
   edges: [UserEdge!]
-  hasNextPage: Boolean!
   nodes: [User!]
+  pageInfo: PageInfo!
   totalCount: Int!
 }
 
 type UserProfile {
   bio: String
-}
-
-input UsersOrgsFilter {
-  test: String
 }
 
 type Variant {
@@ -271,8 +279,8 @@ type VariantHistory {
 
 type VariantPage {
   edges: [VariantEdge!]
-  hasNextPage: Boolean!
   nodes: [Variant!]
+  pageInfo: PageInfo!
   totalCount: Int!
 }
 

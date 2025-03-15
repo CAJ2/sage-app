@@ -1,5 +1,6 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
+import { CommonModule } from '@src/common/common.module'
 import { UsersService } from '@src/users/users.service'
 import { AuthModule } from './auth.module'
 import { AuthService } from './auth.service'
@@ -10,7 +11,11 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      imports: [MikroOrmModule.forRoot(), AuthModule.registerAsync()],
+      imports: [
+        MikroOrmModule.forRoot(),
+        AuthModule.registerAsync(),
+        CommonModule,
+      ],
       providers: [AuthService, UsersService],
     }).compile()
 

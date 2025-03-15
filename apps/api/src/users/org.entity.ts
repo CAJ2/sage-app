@@ -11,7 +11,7 @@ import {
   Ref,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { TranslatedField } from '@src/db/i18n'
+import { defaultTranslatedField, TranslatedField } from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from './users.entity'
@@ -25,7 +25,7 @@ export class Org extends IDCreatedUpdated {
   slug!: string
 
   @Property({ type: 'json' })
-  desc!: TranslatedField
+  desc: TranslatedField = defaultTranslatedField()
 
   @Property()
   avatar_url?: string

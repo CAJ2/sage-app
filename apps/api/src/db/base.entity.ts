@@ -1,6 +1,5 @@
-import { BaseEntity, Config, PrimaryKey, Property } from '@mikro-orm/core'
+import { BaseEntity, PrimaryKey, Property } from '@mikro-orm/core'
 import { nanoid } from 'nanoid'
-import type { DefineConfig } from '@mikro-orm/core'
 
 export abstract class IDCreatedUpdated extends BaseEntity {
   constructor() {
@@ -9,8 +8,6 @@ export abstract class IDCreatedUpdated extends BaseEntity {
     this.created_at = new Date()
     this.updated_at = new Date()
   }
-
-  [Config]?: DefineConfig<{ forceObject: true }>
 
   @PrimaryKey()
   id: string

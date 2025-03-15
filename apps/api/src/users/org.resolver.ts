@@ -7,13 +7,16 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { NotFoundErr } from '@src/common/exceptions'
-import { entityToModel } from '@src/db/transform'
+import { TransformService } from '@src/common/transform'
 import { Org, OrgUsersFilter } from './org.model'
 import { OrgService } from './org.service'
 
 @Resolver(() => Org)
 export class OrgResolver {
-  constructor(private readonly orgService: OrgService) {}
+  constructor(
+    private readonly orgService: OrgService,
+    private readonly transform: TransformService,
+  ) {}
 
   @Query(() => Org, { name: 'getOrg' })
   async getOrg(@Args('id', { type: () => ID }) id: string) {
@@ -21,7 +24,7 @@ export class OrgResolver {
     if (!org) {
       throw NotFoundErr('Org not found')
     }
-    const result = await entityToModel(org, Org)
+    const result = await this.transform.entityToModel(org, Org)
     return result
   }
 

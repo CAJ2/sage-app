@@ -1,26 +1,23 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { TranslatedField } from '@src/db/i18n'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
+import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
 import { Material } from './material.model'
-import { ProcessIntent } from './process.entity'
+import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
 @ObjectType()
-export class Process {
-  @Field(() => ID)
-  id!: string
-
+export class Process extends IDCreatedUpdated<ProcessEntity> {
   @Field(() => String)
   intent!: ProcessIntent
 
   @Field(() => String)
-  name!: TranslatedField
+  name!: string
 
   @Field(() => String, { nullable: true })
-  desc?: TranslatedField
+  desc?: string
 
   @Field(() => String)
   source!: string

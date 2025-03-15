@@ -1,16 +1,67 @@
+import { BaseEntity } from '@mikro-orm/core'
 import { Type } from '@nestjs/common'
-import { Field, Int, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, Int, ObjectType } from '@nestjs/graphql'
+import {
+  IsBase64,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Validate,
+  validateSync,
+} from 'class-validator'
+import { GraphQLError } from 'graphql'
+import { BaseModel } from './base.model'
+
+export const DEFAULT_PAGE_SIZE = 20
 
 interface IEdgeType<T> {
   cursor: string
   node: T
 }
 
+interface IPageInfoType {
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  startCursor?: string
+  endCursor?: string
+}
+
 export interface IPaginatedType<T> {
   edges?: Array<IEdgeType<T>>
-  hasNextPage: boolean
   nodes?: T[]
   totalCount: number
+  pageInfo: IPageInfoType
+}
+
+export class EdgeType<T extends BaseModel<S>, S extends BaseEntity>
+  implements IEdgeType<T>
+{
+  cursor: string = ''
+  node!: T
+}
+
+export class PaginatedType<T extends BaseModel<S>, S extends BaseEntity>
+  implements IPaginatedType<T>
+{
+  edges?: IEdgeType<T>[]
+  nodes?: T[]
+  totalCount: number = 0
+  pageInfo: PageInfo = { hasNextPage: false, hasPreviousPage: false }
+}
+
+@ObjectType()
+export abstract class PageInfo implements IPageInfoType {
+  @Field()
+  hasNextPage!: boolean
+
+  @Field()
+  hasPreviousPage!: boolean
+
+  @Field(() => String, { nullable: true })
+  startCursor?: string
+
+  @Field(() => String, { nullable: true })
+  endCursor?: string
 }
 
 export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
@@ -34,26 +85,65 @@ export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
     @Field(() => Int)
     totalCount: number = 0
 
-    @Field()
-    hasNextPage: boolean = false
+    @Field(() => PageInfo)
+    pageInfo: PageInfo = { hasNextPage: false, hasPreviousPage: false }
   }
   return PaginatedType as Type<IPaginatedType<T>>
 }
 
-export function PaginationArgs(): any {
-  @ObjectType()
-  abstract class PaginationArgsType {
-    @Field(() => Int, { nullable: true })
-    first?: number
+export interface PaginationArgsType {
+  first?: number
+  after?: string
+  last?: number
+  before?: string
+  orderBy?: string
+  orderByDirection?: 'ASC' | 'DESC'
 
-    @Field(() => String, { nullable: true })
-    after?: string
+  validate(): void
+}
 
-    @Field(() => Int, { nullable: true })
-    last?: number
+@ArgsType()
+export class PaginationBasicArgs implements PaginationArgsType {
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsPositive()
+  first?: number
 
-    @Field(() => String, { nullable: true })
-    before?: string
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @Validate(IsBase64)
+  after?: string
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsPositive()
+  last?: number
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @Validate(IsBase64)
+  before?: string
+
+  validate() {
+    if (this.first && this.last) {
+      throw new GraphQLError('Cannot use both `first` and `last`')
+    } else if (this.after && this.before) {
+      throw new GraphQLError('Cannot use both `after` and `before`')
+    }
+    const errs = validateSync(this, { skipMissingProperties: true })
+    if (errs.length > 0) {
+      throw new GraphQLError(errs.toString())
+    }
   }
-  return PaginationArgsType
+}
+
+export function emptyPage(): IPaginatedType<any> {
+  return {
+    edges: [],
+    nodes: [],
+    totalCount: 0,
+    pageInfo: { hasNextPage: false, hasPreviousPage: false },
+  }
 }

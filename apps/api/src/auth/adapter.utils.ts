@@ -97,10 +97,13 @@ export function createAdapterUtils(
   const metadata = orm.getMetadata()
 
   const fieldNameMap: Record<string, Record<string, string>> = {}
+  const entityNameMap: Record<string, string> = {}
   const assignEntity = ([entity, v]: [string, any]) => {
     if (v.modelName) {
       if (!fieldNameMap[v.modelName]) {
         fieldNameMap[v.modelName] = {}
+        entityNameMap[v.modelName] = entity
+        entityNameMap[entity] = v.modelName
       }
       const fields: Record<string, string> = {}
       _.forIn(v.fields, (f, k) => {
@@ -130,8 +133,8 @@ export function createAdapterUtils(
   })
 
   const normalizeEntityName: AdapterUtils['normalizeEntityName'] = (name) => {
-    if (_.has(options, name) && _.has(options, name + '.modelName')) {
-      name = _.get(options, name + '.modelName')
+    if (_.has(entityNameMap, name)) {
+      name = _.get(entityNameMap, name)
     }
     return naming.getEntityName(naming.classToTableName(name))
   }
@@ -282,7 +285,7 @@ export function createAdapterUtils(
     output,
     select,
   ) => {
-    output = serialize(output)
+    output = serialize(output, { forceObject: false })
 
     const result: Record<string, any> = {}
     Object.entries(output)
@@ -291,8 +294,15 @@ export function createAdapterUtils(
         if (propMeta.kind === ReferenceKind.MANY_TO_MANY) {
           return { path: key, value }
         }
-        let path = getReferencedPropertyName(metadata, propMeta)
-        path = transformFieldPath(metadata, path)
+        if (
+          propMeta.kind === ReferenceKind.MANY_TO_ONE &&
+          _.isObject(value) &&
+          _.keys(value).length === 1 &&
+          _.has(value, 'id')
+        ) {
+          value = value.id
+        }
+        const path = getReferencedPropertyName(metadata, propMeta)
         return {
           path,
           value,

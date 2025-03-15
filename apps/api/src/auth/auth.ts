@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql'
 import { betterAuth } from 'better-auth'
-import { organization, username } from 'better-auth/plugins'
+import { openAPI, organization, username } from 'better-auth/plugins'
 import { dset } from 'dset'
 import { nanoid } from 'nanoid'
 import { createAdapterUtils } from './adapter.utils'
@@ -61,6 +61,7 @@ export const configureAuth = (orm: MikroORM) => {
           },
         },
       }),
+      openAPI(),
     ],
     user: {
       modelName: 'User',

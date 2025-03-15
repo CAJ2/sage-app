@@ -1,9 +1,12 @@
-import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { Extensions, Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { CreatedUpdated } from '@src/graphql/created-updated.model'
+import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated } from '@src/graphql/paginated'
+import { Org } from '@src/users/org.model'
+import { MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { z } from 'zod'
+import { Place as PlaceEntity } from './place.entity'
 
 @ObjectType()
 export class PlaceTag {
@@ -13,33 +16,25 @@ export class PlaceTag {
 }
 
 @ObjectType()
-export class Place extends CreatedUpdated {
-  @Field(() => ID)
-  @Extensions({ z: z.string().nanoid() })
-  id: string = ''
-
+export class Place extends IDCreatedUpdated<PlaceEntity> {
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().max(1024).optional() })
+  @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().max(1024).optional() })
+  @MaxLength(1024)
   address?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().optional() })
   desc?: string
 
   @Field(() => [PlaceTag])
-  @Extensions({ z: z.array(z.any()).default([]) })
   tags: PlaceTag[] = []
 
-  // @Field(() => Org, { nullable: true })
-  // @Extensions({ z: z.any().optional() })
-  // org?: Org
+  @Field(() => Org, { nullable: true })
+  org?: Org & {}
 
   @Field(() => [PlaceHistory])
-  @Extensions({ z: z.array(z.any()).default([]) })
   history: PlaceHistory[] = []
 }
 
