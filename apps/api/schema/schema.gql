@@ -17,7 +17,7 @@ type CategoriesPage {
 }
 
 type Category {
-  ancestors: CategoriesPage!
+  ancestors(after: String, before: String, first: Int, last: Int): CategoriesPage!
   created_at: DateTime!
   desc: String
   desc_short: String
@@ -85,6 +85,11 @@ type Component {
   updated_at: DateTime!
 }
 
+type ComponentEdge {
+  cursor: String!
+  node: Component!
+}
+
 type ComponentHistory {
   changes: String
   component_id: String!
@@ -95,6 +100,13 @@ type ComponentHistory {
 type ComponentMaterial {
   material: Material!
   material_fraction: Float
+}
+
+type ComponentsPage {
+  edges: [ComponentEdge!]
+  nodes: [Component!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 input CreateCategoryInput {
@@ -111,6 +123,24 @@ input CreateChangeInput {
   sources: [ID!]! = []
   status: ChangeStatus
   title: String
+}
+
+input CreateMaterialInput {
+  add_sources: [ID!]
+  ancestors: [ID!]
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  descendants: [ID!]
+  lang: String
+  name: String!
+  remove_sources: [ID!]
+  technical: Boolean! = false
+}
+
+type CreateMaterialOutput {
+  change: Change
+  material: Material
 }
 
 input CreateSourceInput {
@@ -165,33 +195,35 @@ The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](
 scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 type Material {
-  ancestors: [Material!]!
+  ancestors(after: String, before: String, first: Int, last: Int): [Material!]!
+  components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   created_at: DateTime!
   desc: String
-  descendants: [Material!]!
-  history: [MaterialHistory!]!
+  descendants(after: String, before: String, first: Int, last: Int): [Material!]!
   id: ID!
   name: String
+  primary_components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  processes(after: String, before: String, first: Int, last: Int): ProcessPage!
   source: JSONObject
   technical: Boolean!
   updated_at: DateTime!
 }
 
-type MaterialHistory {
-  changes: String
-  datetime: DateTime!
-  material_id: String!
-  original: String
+type MaterialEdge {
+  cursor: String!
+  node: Material!
 }
 
 type Mutation {
   createCategory(input: CreateCategoryInput!): Category!
   createChange(input: CreateChangeInput!): Change!
+  createMaterial(input: CreateMaterialInput!): CreateMaterialOutput!
   createSource(input: CreateSourceInput!): Source!
   deleteChange(id: ID!): Boolean!
   deleteSource(id: ID!): Boolean!
   markSourceProcessed(id: ID!): Source!
   updateChange(input: UpdateChangeInput!): Change!
+  updateMaterial(input: UpdateMaterialInput!): UpdateMaterialOutput!
   updateSource(input: UpdateSourceInput!): Source!
 }
 
@@ -317,6 +349,7 @@ type Query {
   getChange(id: ID!): Change!
   getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
   getItem(id: ID!): Item!
+  getMaterial(id: ID!): Material!
   getOrg(id: ID!): Org!
   getSource(id: ID!): Source!
   getSources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
@@ -394,8 +427,27 @@ input UpdateChangeInput {
   title: String
 }
 
+input UpdateMaterialInput {
+  add_sources: [ID!]
+  ancestors: [ID!]
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  descendants: [ID!]
+  id: ID!
+  lang: String
+  name: String
+  remove_sources: [ID!]
+  technical: Boolean
+}
+
+type UpdateMaterialOutput {
+  change: Change
+  material: Material
+}
+
 input UpdateSourceInput {
-  content: String
+  content: JSONObject
   id: ID!
   location: String
   metadata: JSONObject

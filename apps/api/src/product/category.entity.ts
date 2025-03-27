@@ -16,6 +16,8 @@ import { TranslatedField } from '@src/db/i18n'
 import { User } from '@src/users/users.entity'
 import { Item } from './item.entity'
 
+export const CATEGORY_ROOT = 'CATEGORY_ROOT'
+
 @Entity({ tableName: 'categories', schema: 'public' })
 export class Category extends IDCreatedUpdated {
   @Property({ type: 'json' })

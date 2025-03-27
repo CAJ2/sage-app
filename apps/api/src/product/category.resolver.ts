@@ -47,6 +47,21 @@ export class CategoryResolver {
   }
 
   @ResolveField()
+  async ancestors(@Parent() category: Category, @Args() args: CategoriesArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.categoryService.findDirectAncestors(
+      category.id,
+      filter,
+    )
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Category,
+      CategoriesPage,
+    )
+  }
+
+  @ResolveField()
   async descendants(
     @Parent() category: Category,
     @Args() args: CategoriesArgs,

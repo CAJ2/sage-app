@@ -11,7 +11,7 @@ import { SourcesPage } from '@src/changes/source.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated, InputWithLang } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Component } from '@src/process/component.model'
 import { Material } from '@src/process/material.model'
@@ -151,4 +151,27 @@ export class UpdateChangeInput {
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()
   metadata?: Record<string, any>
+}
+
+@InputType()
+export class ChangeInputWithLang extends InputWithLang {
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @Validate(IsNanoID)
+  change_id?: string
+
+  @Field(() => CreateChangeInput, { nullable: true })
+  change?: CreateChangeInput
+
+  @Field(() => [ID], { nullable: true })
+  add_sources?: string[]
+
+  @Field(() => [ID], { nullable: true })
+  remove_sources?: string[]
+}
+
+@ObjectType()
+export class ChangeOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change
 }

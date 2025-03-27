@@ -18,6 +18,8 @@ import { JsonLdDocument } from 'jsonld'
 import { Component } from './component.entity'
 import { Process } from './process.entity'
 
+export const MATERIAL_ROOT = 'MATERIAL_ROOT'
+
 @Entity({ tableName: 'materials', schema: 'public' })
 export class Material extends IDCreatedUpdated {
   @Property({ type: 'json' })
@@ -31,6 +33,12 @@ export class Material extends IDCreatedUpdated {
 
   @Property()
   technical!: boolean
+
+  @OneToMany(() => MaterialTree, (tree) => tree.ancestor)
+  ancestors = new Collection<MaterialTree>(this)
+
+  @OneToMany(() => MaterialTree, (tree) => tree.descendant)
+  descendants = new Collection<MaterialTree>(this)
 
   @OneToMany({ mappedBy: 'primary_material' })
   primary_components = new Collection<Component>(this)

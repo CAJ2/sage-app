@@ -94,9 +94,9 @@ export class UpdateSourceInput {
   @MaxLength(2048)
   location?: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()
-  content?: string
+  content?: Record<string, any>
 
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()

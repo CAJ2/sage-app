@@ -1,6 +1,7 @@
-import { Field, Float, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, Float, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -10,7 +11,7 @@ import { Material } from './material.model'
 @ObjectType()
 export class ComponentMaterial {
   @Field(() => Material)
-  material!: Material
+  material!: Material & {}
 
   @Field(() => Float, { nullable: true })
   material_fraction?: number
@@ -44,7 +45,7 @@ export class Component extends IDCreatedUpdated<ComponentEntity> {
   hazardous_info?: string
 
   @Field(() => Material)
-  primary_material!: Material
+  primary_material!: Material & {}
 
   @Field(() => [ComponentMaterial])
   materials: ComponentMaterial[] = []
@@ -67,3 +68,9 @@ export class ComponentHistory {
   @Field(() => String, { nullable: true })
   changes?: string
 }
+
+@ObjectType()
+export class ComponentsPage extends Paginated(Component) {}
+
+@ArgsType()
+export class ComponentsArgs extends PaginationBasicArgs {}

@@ -6,6 +6,7 @@ import { join } from 'path'
 import dotenv from 'dotenv-flow'
 import { CustomMigrationGenerator } from './db/migration.gen'
 import { AsyncLocalStorage } from 'async_hooks'
+import { SeedManager } from '@mikro-orm/seeder'
 
 if (dotenv) {
   dotenv.config()
@@ -43,6 +44,13 @@ export default defineConfig({
     allOrNothing: true,
     generator: CustomMigrationGenerator,
   },
+  seeder: {
+    path: 'dist/db/seeds/',
+    pathTs: 'src/db/seeds/',
+    defaultSeeder: 'DatabaseSeeder',
+    glob: '!(*.d).{ts,js}',
+    emit: 'ts',
+  },
   serialization: {
     forceObject: true,
   },
@@ -53,6 +61,6 @@ export default defineConfig({
   },
   metadataProvider: TsMorphMetadataProvider,
   highlighter: process.env.NODE_ENV !== 'production' ? highlighter : undefined,
-  extensions: [Migrator],
+  extensions: [Migrator, SeedManager],
   dataloader: DataloaderType.ALL,
 })

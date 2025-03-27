@@ -73,7 +73,7 @@ export class OrgHistory {
 export class Invitation extends IDCreatedUpdated {
   @ManyToOne()
   @Index()
-  inviter!: User
+  inviter!: User & {}
 
   @ManyToOne()
   @Index()

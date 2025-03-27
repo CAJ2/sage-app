@@ -1,6 +1,6 @@
-import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { IDCreatedUpdated, InputWithLang } from '@src/graphql/base.model'
+import { CreatedUpdated, InputWithLang } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { IsOptional, IsUrl, MaxLength } from 'class-validator'
@@ -9,7 +9,10 @@ import { Category as CategoryEntity } from './category.entity'
 import { Item } from './item.model'
 
 @ObjectType()
-export class Category extends IDCreatedUpdated<CategoryEntity> {
+export class Category extends CreatedUpdated<CategoryEntity> {
+  @Field(() => ID)
+  id!: string
+
   @Field(() => String)
   @MaxLength(1024)
   name!: string
