@@ -1,6 +1,7 @@
-import { Field, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { IsUrl, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { Category } from './category.model'
@@ -48,3 +49,9 @@ export class ItemHistory {
   @Field(() => String, { nullable: true })
   changes?: string
 }
+
+@ObjectType()
+export class ItemPage extends Paginated(Item) {}
+
+@ArgsType()
+export class ItemsCategoriesArgs extends PaginationBasicArgs {}

@@ -9,23 +9,115 @@ enum CacheControlScope {
   PUBLIC
 }
 
+type CategoriesPage {
+  edges: [CategoryEdge!]
+  nodes: [Category!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type Category {
+  ancestors: CategoriesPage!
   created_at: DateTime!
   desc: String
   desc_short: String
-  history: [CategoryHistory!]!
+  descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
   id: ID!
   image_url: String
   items: [Item!]!
-  name: String
+  name: String!
   updated_at: DateTime!
 }
 
-type CategoryHistory {
-  category_id: String!
+type CategoryEdge {
+  cursor: String!
+  node: Category!
+}
+
+type Change {
+  created_at: DateTime!
+  description: String
+  edits: [Edit!]!
+  id: ID!
+  metadata: JSONObject
+  sources(after: String, before: String, first: Int, last: Int): SourcesPage!
+  status: ChangeStatus!
+  title: String
+  updated_at: DateTime!
+  user: User!
+}
+
+type ChangeEdge {
+  cursor: String!
+  node: Change!
+}
+
+"""Status of a change"""
+enum ChangeStatus {
+  APPROVED
+  DRAFT
+  MERGED
+  PROPOSED
+  REJECTED
+}
+
+type ChangesPage {
+  edges: [ChangeEdge!]
+  nodes: [Change!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type Component {
+  commercial_stream: String
+  created_at: DateTime!
+  desc: String
+  hazardous: Boolean!
+  hazardous_info: String
+  history: [ComponentHistory!]!
+  id: ID!
+  local_stream: String
+  materials: [ComponentMaterial!]!
+  name: String
+  primary_material: Material!
+  residential_stream: String
+  source: JSONObject
+  updated_at: DateTime!
+}
+
+type ComponentHistory {
   changes: String
+  component_id: String!
   datetime: DateTime!
   original: String
+}
+
+type ComponentMaterial {
+  material: Material!
+  material_fraction: Float
+}
+
+input CreateCategoryInput {
+  desc: String
+  desc_short: String
+  image_url: String
+  lang: String
+  name: String!
+}
+
+input CreateChangeInput {
+  description: String
+  metadata: JSONObject
+  sources: [ID!]! = []
+  status: ChangeStatus
+  title: String
+}
+
+input CreateSourceInput {
+  content: JSONObject
+  location: String!
+  metadata: JSONObject
+  type: SourceType!
 }
 
 """
@@ -33,8 +125,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339
 """
 scalar DateTime
 
+type Edit {
+  changes: EditModel
+  id: ID
+  model: String!
+  original: EditModel
+}
+
+union EditModel = Category | Component | Item | Material | Place | Process | Region | Variant
+
 type Item {
-  categories: [Category!]!
+  categories(after: String, before: String, first: Int, last: Int): [Category!]!
   created_at: DateTime!
   desc: String
   desc_short: String
@@ -46,12 +147,22 @@ type Item {
   variants: [Variant!]!
 }
 
+type ItemEdge {
+  cursor: String!
+  node: Item!
+}
+
 type ItemHistory {
   changes: String
   datetime: DateTime!
   item_id: String!
   original: String
 }
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 type Material {
   ancestors: [Material!]!
@@ -61,7 +172,7 @@ type Material {
   history: [MaterialHistory!]!
   id: ID!
   name: String
-  source: String
+  source: JSONObject
   technical: Boolean!
   updated_at: DateTime!
 }
@@ -71,6 +182,17 @@ type MaterialHistory {
   datetime: DateTime!
   material_id: String!
   original: String
+}
+
+type Mutation {
+  createCategory(input: CreateCategoryInput!): Category!
+  createChange(input: CreateChangeInput!): Change!
+  createSource(input: CreateSourceInput!): Source!
+  deleteChange(id: ID!): Boolean!
+  deleteSource(id: ID!): Boolean!
+  markSourceProcessed(id: ID!): Source!
+  updateChange(input: UpdateChangeInput!): Change!
+  updateSource(input: UpdateSourceInput!): Source!
 }
 
 type Org {
@@ -166,7 +288,7 @@ type Process {
   org: Org
   place: Place
   region: Region
-  source: String!
+  source: JSONObject!
   updated_at: DateTime!
 }
 
@@ -191,14 +313,19 @@ type ProcessPage {
 }
 
 type Query {
-  category(id: String!): Category
+  getCategory(id: ID!): Category!
+  getChange(id: ID!): Change!
+  getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
+  getItem(id: ID!): Item!
   getOrg(id: ID!): Org!
+  getSource(id: ID!): Source!
+  getSources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
   getUser(id: ID!): User!
-  item(id: String!): Item
   place(id: String!): Place
   places(page: Float = 1, perPage: Float = 10): PlacePage!
   region(id: String!): Region
   regions(page: Float = 1, perPage: Float = 10): RegionPage!
+  rootCategory: Category!
   variant(id: String!): Variant
 }
 
@@ -220,6 +347,59 @@ type RegionPage {
   nodes: [Region!]
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+type Source {
+  changes: ChangesPage!
+  content: JSONObject
+  content_url: String
+  created_at: DateTime!
+  id: ID!
+  location: String
+  metadata: JSONObject
+  processed_at: DateTime
+  type: SourceType!
+  updated_at: DateTime!
+  user: User!
+}
+
+type SourceEdge {
+  cursor: String!
+  node: Source!
+}
+
+"""Type of source data"""
+enum SourceType {
+  IMAGE
+  OTHER
+  PDF
+  TEXT
+  URL
+  VIDEO
+}
+
+type SourcesPage {
+  edges: [SourceEdge!]
+  nodes: [Source!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input UpdateChangeInput {
+  description: String
+  id: ID!
+  metadata: JSONObject
+  sources: [ID!]
+  status: ChangeStatus
+  title: String
+}
+
+input UpdateSourceInput {
+  content: String
+  id: ID!
+  location: String
+  metadata: JSONObject
+  type: SourceType
 }
 
 type User {

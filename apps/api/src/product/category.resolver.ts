@@ -1,19 +1,75 @@
-import { EntityManager } from '@mikro-orm/postgresql'
-import { Args, Query, Resolver } from '@nestjs/graphql'
-import { Category as CategoryEntity } from './category.entity'
-import { Category } from './category.model'
+import {
+  Args,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql'
+import { NotFoundErr } from '@src/common/exceptions'
+import { TransformService } from '@src/common/transform'
+import {
+  CategoriesArgs,
+  CategoriesPage,
+  Category,
+  CreateCategoryInput,
+} from './category.model'
+import { CategoryService } from './category.service'
 
 @Resolver(() => Category)
 export class CategoryResolver {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly transform: TransformService,
+  ) {}
 
-  @Query(() => Category, { nullable: true })
-  async category(@Args('id') id: string): Promise<Category | null> {
-    const entity = await this.em.findOne(CategoryEntity, { id })
-    if (!entity) return null
+  @Query(() => Category, { name: 'getCategory' })
+  async getCategory(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<Category> {
+    const category = await this.categoryService.findOneByID(id)
+    if (!category) {
+      throw NotFoundErr('Category not found')
+    }
+    const model = await this.transform.entityToModel(category, Category)
+    return model
+  }
 
-    const model = new Category()
-    model.id = entity.id
+  @Query(() => Category, { name: 'rootCategory' })
+  async rootCategory(): Promise<Category> {
+    const category = await this.categoryService.findRoot()
+    if (!category) {
+      throw NotFoundErr('Root category not found')
+    }
+    const model = await this.transform.entityToModel(category, Category)
+    return model
+  }
+
+  @ResolveField()
+  async descendants(
+    @Parent() category: Category,
+    @Args() args: CategoriesArgs,
+  ) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.categoryService.findDirectDescendants(
+      category.id,
+      filter,
+    )
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Category,
+      CategoriesPage,
+    )
+  }
+
+  @Mutation(() => Category, { name: 'createCategory' })
+  async createCategory(
+    @Args('input') input: CreateCategoryInput,
+  ): Promise<Category> {
+    const category = await this.categoryService.create(input)
+    const model = await this.transform.entityToModel(category, Category)
     return model
   }
 }

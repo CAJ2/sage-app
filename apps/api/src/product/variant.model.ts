@@ -1,50 +1,46 @@
-import { Extensions, Field, ID, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { CreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { IsOptional, IsUrl, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
-import { z } from 'zod'
 import { Item } from './item.model'
 import { Variant as VariantEntity } from './variant.entity'
 
 @ObjectType()
 export class VariantTag {
   @Field(() => String)
-  @Extensions({ z: z.string() })
   tag_name: string = ''
 }
 
 @ObjectType()
-export class Variant extends CreatedUpdated<VariantEntity> {
-  @Field(() => ID)
-  @Extensions({ z: z.string().nanoid() })
-  id: string = ''
-
+export class Variant extends IDCreatedUpdated<VariantEntity> {
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().max(1024).optional() })
+  @IsOptional()
+  @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().max(1024).optional() })
+  @IsOptional()
+  @MaxLength(1024)
   desc_short?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().optional() })
+  @IsOptional()
   desc?: string
 
   @Field(() => String, { nullable: true })
-  @Extensions({ z: z.string().url().optional() })
+  @IsOptional()
+  @IsUrl({ protocols: ['https'] })
   image_url?: string
 
   @Field(() => [Item])
-  @Extensions({ z: z.array(z.any()).default([]) })
   items: Item[] = []
 
   @Field(() => [VariantTag])
-  @Extensions({ z: z.array(z.any()).default([]) })
   tags: VariantTag[] = []
 
   @Field(() => [VariantHistory])
-  @Extensions({ z: z.array(z.any()).default([]) })
   history: VariantHistory[] = []
 }
 
@@ -62,3 +58,9 @@ export class VariantHistory {
   @Field(() => String, { nullable: true })
   changes?: string
 }
+
+@ObjectType()
+export class VariantPage extends Paginated(Variant) {}
+
+@ArgsType()
+export class VariantsComponentsArgs extends PaginationBasicArgs {}

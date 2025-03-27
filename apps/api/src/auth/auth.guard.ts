@@ -1,7 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { createParamDecorator, Inject, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { APIError, type getSession } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
+import { ClsService } from 'nestjs-cls'
 import { AUTH_INSTANCE_KEY } from './symbols'
 import type { CanActivate, ExecutionContext } from '@nestjs/common'
 import type { Auth } from 'better-auth'
@@ -14,6 +15,8 @@ export type UserSession = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getSession>>>
 >
 
+export type ReqUser = UserSession['user']
+
 /**
  * NestJS guard that handles authentication for protected routes
  * Can be configured with @Public() or @Optional() decorators to modify authentication behavior
@@ -25,6 +28,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     @Inject(AUTH_INSTANCE_KEY)
     private readonly auth: Auth,
+    private readonly cls: ClsService,
   ) {}
 
   /**
@@ -59,3 +63,12 @@ export class AuthGuard implements CanActivate {
     return true
   }
 }
+
+export const User = createParamDecorator(
+  (data: keyof ReqUser | undefined, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest()
+    const session = request.session as UserSession
+
+    return data ? session?.user[data] : session?.user
+  },
+)

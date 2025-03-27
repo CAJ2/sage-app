@@ -9,6 +9,7 @@ import { ClsService } from 'nestjs-cls'
 import {
   DEFAULT_PAGE_SIZE,
   EdgeType,
+  OrderDirection,
   PaginatedType,
   PaginationArgsType,
 } from '../graphql/paginated'
@@ -57,7 +58,7 @@ export class TransformService {
   paginationArgs(args: PaginationArgsType) {
     args.validate()
     const where: ObjectQuery<any> = {}
-    const orderByField = args.orderBy || 'id'
+    const orderByField = args.orderBy()[0] || 'id'
     let decoded = ''
     if (args.after || args.before) {
       try {
@@ -69,7 +70,7 @@ export class TransformService {
         throw new GraphQLError('Invalid cursor')
       }
     }
-    let orderDirection = args.orderByDirection || 'ASC'
+    let orderDirection = args.orderDir()[0] || 'ASC'
     if (
       (args.after && orderDirection === 'ASC') ||
       (args.before && orderDirection === 'DESC')
@@ -80,7 +81,10 @@ export class TransformService {
     }
     if (args.before || args.last) {
       // Need to flip order direction, then reverse the results
-      orderDirection = orderDirection === 'DESC' ? 'ASC' : 'DESC'
+      orderDirection =
+        orderDirection === OrderDirection.DESC
+          ? OrderDirection.ASC
+          : OrderDirection.DESC
     }
     const options: CursorOptions<any> = {
       where,
@@ -112,9 +116,9 @@ export class TransformService {
     for (const item of cursor.items) {
       const cls = await this.entityToModel(item, model)
       nodes.push(cls)
-      const cid = Buffer.from((item as any)[options.orderBy || 'id']).toString(
-        'base64',
-      )
+      const cid = Buffer.from(
+        (item as any)[options.orderBy()[0] || 'id'],
+      ).toString('base64')
       edges.push({ cursor: cid, node: cls })
     }
     const pageSize = options.first || options.last || DEFAULT_PAGE_SIZE
@@ -184,5 +188,10 @@ export class TransformService {
       items,
       count: totalCount,
     }
+  }
+
+  getCurrentLang() {
+    const lang: string[] | undefined = this.cls.get('lang')
+    return lang ? lang[0] : undefined
   }
 }

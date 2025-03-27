@@ -16,6 +16,7 @@ import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
+import { JsonLdDocument } from 'jsonld'
 import { Item } from './item.entity'
 import type { Opt } from '@mikro-orm/core'
 
@@ -28,7 +29,7 @@ export class Variant extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  source!: {}
+  source!: JsonLdDocument
 
   @Property({ type: 'json' })
   tags?: {}
@@ -43,7 +44,7 @@ export class Variant extends IDCreatedUpdated {
   certifications?: {}
 
   @ManyToOne()
-  items = new Collection<Item>(this)
+  item?: Ref<Item>
 
   @ManyToOne()
   region?: Ref<Region>
@@ -57,17 +58,11 @@ export class Variant extends IDCreatedUpdated {
   })
   components = new Collection<Component>(this)
 
+  @OneToMany(() => VariantsComponents, (vc) => vc.variant)
+  variants_components = new Collection<VariantsComponents>(this)
+
   @OneToMany(() => VariantHistory, (history) => history.variant)
   history = new Collection<VariantHistory>(this)
-}
-
-@Entity({ tableName: 'variant_tags', schema: 'public' })
-export class VariantTag extends BaseEntity {
-  @ManyToOne({ primary: true })
-  variant!: Variant
-
-  @PrimaryKey()
-  tag_name!: string
 }
 
 @Entity({ tableName: 'variants_components', schema: 'public' })

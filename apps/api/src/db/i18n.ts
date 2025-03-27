@@ -57,6 +57,30 @@ export function transformTranslatedField(
   return field.default?.text
 }
 
+export function setTranslatedField(
+  obj: TranslatedField | undefined,
+  lang: string | undefined,
+  value: string,
+  isAuto = false,
+): void {
+  if (!lang) {
+    lang = 'default'
+  }
+  const bits = lang.split('-')
+  if (bits.length >= 2) {
+    lang = bits[0]
+  }
+  if (!obj) obj = {}
+  if (!obj[lang]) {
+    obj[lang] = {
+      text: value,
+    }
+    obj[lang].auto = isAuto || undefined
+  }
+  obj[lang].text = value
+  obj[lang].auto = isAuto || undefined
+}
+
 const supported = Locales.map((support) => {
   const bits = support.split('-')
   const hasScript = bits.length === 3

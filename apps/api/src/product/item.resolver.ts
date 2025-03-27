@@ -1,19 +1,43 @@
-import { EntityManager } from '@mikro-orm/postgresql'
-import { Args, Query, Resolver } from '@nestjs/graphql'
-import { Item as ItemEntity } from './item.entity'
-import { Item } from './item.model'
+import {
+  Args,
+  ID,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql'
+import { NotFoundErr } from '@src/common/exceptions'
+import { TransformService } from '@src/common/transform'
+import { CategoriesPage, Category } from './category.model'
+import { Item, ItemsCategoriesArgs } from './item.model'
+import { ItemService } from './item.service'
 
 @Resolver(() => Item)
 export class ItemResolver {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly itemService: ItemService,
+    private readonly transform: TransformService,
+  ) {}
 
-  @Query(() => Item, { nullable: true })
-  async item(@Args('id') id: string): Promise<Item | null> {
-    const entity = await this.em.findOne(ItemEntity, { id })
-    if (!entity) return null
+  @Query(() => Item, { name: 'getItem' })
+  async getItem(@Args('id', { type: () => ID }) id: string): Promise<Item> {
+    const item = await this.itemService.findOneByID(id)
+    if (!item) {
+      throw NotFoundErr('Item not found')
+    }
+    const result = this.transform.entityToModel(item, Item)
+    return result
+  }
 
-    const model = new Item()
-    model.id = entity.id
-    return model
+  @ResolveField()
+  async categories(@Parent() item: Item, @Args() args: ItemsCategoriesArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.itemService.categories(item.id, filter)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Category,
+      CategoriesPage,
+    )
   }
 }

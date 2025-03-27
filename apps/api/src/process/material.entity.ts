@@ -14,6 +14,7 @@ import {
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
 import { User } from '@src/users/users.entity'
+import { JsonLdDocument } from 'jsonld'
 import { Component } from './component.entity'
 import { Process } from './process.entity'
 
@@ -26,7 +27,7 @@ export class Material extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  source!: {}
+  source!: JsonLdDocument
 
   @Property()
   technical!: boolean
@@ -45,8 +46,8 @@ export class Material extends IDCreatedUpdated {
 }
 
 @Entity({ tableName: 'material_tree', schema: 'public' })
-@Index({ properties: ['ancestor', 'descendant', 'length'] })
-@Index({ properties: ['descendant', 'length'] })
+@Index({ properties: ['ancestor', 'descendant', 'depth'] })
+@Index({ properties: ['descendant', 'depth'] })
 export class MaterialTree extends BaseEntity {
   @ManyToOne({ primary: true })
   ancestor!: Material
@@ -55,7 +56,7 @@ export class MaterialTree extends BaseEntity {
   descendant!: Material
 
   @Property()
-  length!: number
+  depth!: number
 }
 
 @Entity({ tableName: 'material_history', schema: 'public' })

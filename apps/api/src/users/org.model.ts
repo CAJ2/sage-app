@@ -3,17 +3,11 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { transformTranslatedField } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated } from '@src/graphql/paginated'
-import { Process } from '@src/process/process.model'
-import { Variant } from '@src/product/variant.model'
+import { ProcessPage } from '@src/process/process.model'
+import { VariantPage } from '@src/product/variant.model'
 import { Transform } from 'class-transformer'
 import { Org as OrgEntity } from './org.entity'
 import { User, UserPage } from './users.model'
-
-@ObjectType()
-export class VariantPage extends Paginated(Variant) {}
-
-@ObjectType()
-export class ProcessPage extends Paginated(Process) {}
 
 @ObjectType()
 export class Org extends IDCreatedUpdated<OrgEntity> {
@@ -37,10 +31,10 @@ export class Org extends IDCreatedUpdated<OrgEntity> {
   users: User[] = []
 
   @Field(() => VariantPage)
-  variants: Variant[] = []
+  variants!: VariantPage & {}
 
   @Field(() => ProcessPage)
-  processes: Process[] = []
+  processes!: ProcessPage & {}
 
   @Field(() => [OrgHistory])
   history: OrgHistory[] = []

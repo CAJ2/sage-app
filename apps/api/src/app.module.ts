@@ -8,6 +8,7 @@ import { ClsModule, ClsService } from 'nestjs-cls'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
+import { ChangesModule } from './changes/changes.module'
 import { parseLanguageHeader } from './db/i18n'
 import { GeoModule } from './geo/geo.module'
 import { GraphQLModule } from './graphql/graphql.module'
@@ -49,6 +50,7 @@ import { UsersModule } from './users/users.module'
     GeoModule,
     ProductModule,
     ProcessModule,
+    ChangesModule,
   ],
   providers: [AppService],
 })

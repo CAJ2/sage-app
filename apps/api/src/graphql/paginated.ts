@@ -1,6 +1,14 @@
 import { BaseEntity } from '@mikro-orm/core'
 import { Type } from '@nestjs/common'
-import { ArgsType, Field, Int, ObjectType } from '@nestjs/graphql'
+import {
+  ArgsType,
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  PickType,
+  registerEnumType,
+} from '@nestjs/graphql'
 import {
   IsBase64,
   IsOptional,
@@ -91,15 +99,28 @@ export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
   return PaginatedType as Type<IPaginatedType<T>>
 }
 
+export enum OrderDirection {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+registerEnumType(OrderDirection, { name: 'OrderDirection' })
+
+@InputType({ isAbstract: true })
+export class OrderFieldType {
+  @Field(() => OrderDirection)
+  id!: OrderDirection
+}
+
 export interface PaginationArgsType {
   first?: number
   after?: string
   last?: number
   before?: string
-  orderBy?: string
-  orderByDirection?: 'ASC' | 'DESC'
+  order?: Record<string, OrderDirection>[] | Record<string, OrderDirection>
 
   validate(): void
+  orderBy(): string[]
+  orderDir(): OrderDirection[]
 }
 
 @ArgsType()
@@ -137,6 +158,30 @@ export class PaginationBasicArgs implements PaginationArgsType {
       throw new GraphQLError(errs.toString())
     }
   }
+
+  orderBy(): string[] {
+    return ['id']
+  }
+
+  orderDir(): OrderDirection[] {
+    return [OrderDirection.ASC]
+  }
+}
+
+export function PaginationOrderArgs(
+  name: string,
+  fields: readonly string[],
+): Type<PaginationArgsType> {
+  @InputType(`${name}Order`)
+  class OrderType extends PickType(OrderFieldType, fields as any) {}
+
+  @ArgsType()
+  class PaginationOrderArgs extends PaginationBasicArgs {
+    @Field(() => [OrderType], { nullable: true })
+    @IsOptional()
+    order?: Record<string, OrderDirection>[] | Record<string, OrderDirection>
+  }
+  return PaginationOrderArgs as Type<PaginationArgsType>
 }
 
 export function emptyPage(): IPaginatedType<any> {

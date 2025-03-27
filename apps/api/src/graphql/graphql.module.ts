@@ -13,6 +13,7 @@ import {
   GraphQLDirective,
   GraphQLError,
 } from 'graphql'
+import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
 import { CacheControlScopeEnum } from './cache-control'
 import { Context, IncomingMessageWithAuthCode } from './graphql.context'
 import type { GraphQLFormattedError } from 'graphql'
@@ -56,6 +57,9 @@ export class GraphQLModule {
                 name: 'cacheControl',
               }),
             ],
+            scalarsMap: [
+              { type: () => JSONObjectDefinition, scalar: JSONObjectResolver },
+            ],
           },
           sortSchema: true,
           playground: false,
@@ -66,6 +70,7 @@ export class GraphQLModule {
           ],
           resolvers: {
             DateTime: LuxonDateTimeResolver,
+            JSONObject: JSONObjectResolver,
           },
           status400ForVariableCoercionErrors: true,
           formatError: (err: GraphQLError) => this.formatError(err, context),

@@ -15,6 +15,7 @@ import { TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
+import { JsonLdDocument } from 'jsonld'
 import { Material } from './material.entity'
 
 @Entity({ tableName: 'components', schema: 'public' })
@@ -26,7 +27,7 @@ export class Component extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  source!: {}
+  source!: JsonLdDocument
 
   @Property()
   hazardous!: boolean

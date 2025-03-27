@@ -30,6 +30,12 @@ export class Category extends IDCreatedUpdated {
   @Property({ nullable: true })
   image_url?: string
 
+  @OneToMany(() => CategoryTree, (tree) => tree.ancestor)
+  ancestors = new Collection<CategoryTree>(this)
+
+  @OneToMany(() => CategoryTree, (tree) => tree.descendant)
+  descendants = new Collection<CategoryTree>(this)
+
   @ManyToMany({
     entity: () => 'Item',
     mappedBy: (item: Item) => item.categories,
@@ -40,9 +46,12 @@ export class Category extends IDCreatedUpdated {
   history = new Collection<CategoryHistory>(this)
 }
 
-@Entity({ tableName: 'category_tree', schema: 'public' })
-@Index({ properties: ['ancestor', 'descendant', 'length'] })
-@Index({ properties: ['descendant', 'length'] })
+@Entity({
+  tableName: 'category_tree',
+  schema: 'public',
+})
+@Index({ properties: ['ancestor', 'descendant', 'depth'] })
+@Index({ properties: ['descendant', 'depth'] })
 export class CategoryTree extends BaseEntity {
   @ManyToOne({ primary: true })
   ancestor!: Category
@@ -51,7 +60,7 @@ export class CategoryTree extends BaseEntity {
   descendant!: Category
 
   @Property({ default: 0 })
-  length!: number
+  depth!: number
 }
 
 @Entity({ tableName: 'category_history', schema: 'public' })

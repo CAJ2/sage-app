@@ -2,6 +2,7 @@ import { Field, Float, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { MaxLength } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { Component as ComponentEntity } from './component.entity'
 import { Material } from './material.model'
@@ -24,8 +25,8 @@ export class Component extends IDCreatedUpdated<ComponentEntity> {
   @Field(() => String, { nullable: true })
   desc?: string
 
-  @Field(() => String, { nullable: true })
-  source?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  source?: object
 
   @Field(() => String, { nullable: true })
   residential_stream?: string

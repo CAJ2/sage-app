@@ -1,10 +1,12 @@
-import { Field, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
+import { JSONObjectResolver } from 'graphql-scalars'
 import { Material } from './material.model'
 import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
@@ -19,7 +21,7 @@ export class Process extends IDCreatedUpdated<ProcessEntity> {
   @Field(() => String, { nullable: true })
   desc?: string
 
-  @Field(() => String)
+  @Field(() => JSONObjectResolver)
   source!: string
 
   @Field(() => Material)
@@ -55,3 +57,9 @@ export class ProcessHistory {
   @Field(() => String, { nullable: true })
   changes?: string
 }
+
+@ObjectType()
+export class ProcessPage extends Paginated(Process) {}
+
+@ArgsType()
+export class ProcessArgs extends PaginationBasicArgs {}

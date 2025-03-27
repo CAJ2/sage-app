@@ -2,7 +2,7 @@
 
 import { Migration } from '@mikro-orm/migrations'
 
-export class Migration20250311153204 extends Migration {
+export class Migration20250320130239 extends Migration {
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "auth";`)
     this.addSql(`create table "categories" (
@@ -19,14 +19,14 @@ export class Migration20250311153204 extends Migration {
     this.addSql(`create table "category_tree" (
                    "ancestor_id" varchar(255) not null,
                    "descendant_id" varchar(255) not null,
-                   "length" int not null default 0,
+                   "depth" int not null default 0,
                    constraint "category_tree_pkey" primary key ("ancestor_id", "descendant_id")
                  );`)
     this.addSql(
-      `create index "category_tree_descendant_id_length_index" on "category_tree" ("descendant_id", "length");`,
+      `create index "category_tree_descendant_id_depth_index" on "category_tree" ("descendant_id", "depth");`,
     )
     this.addSql(
-      `create index "category_tree_ancestor_id_descendant_id_length_index" on "category_tree" ("ancestor_id", "descendant_id", "length");`,
+      `create index "category_tree_ancestor_id_descendant_id_depth_index" on "category_tree" ("ancestor_id", "descendant_id", "depth");`,
     )
 
     this.addSql(`create table "items" (
@@ -39,7 +39,6 @@ export class Migration20250311153204 extends Migration {
                    "tags" jsonb null,
                    "files" jsonb null,
                    "links" jsonb null,
-                   "certifications" jsonb null,
                    constraint "items_pkey" primary key ("id")
                  );`)
 
@@ -63,14 +62,14 @@ export class Migration20250311153204 extends Migration {
     this.addSql(`create table "material_tree" (
                    "ancestor_id" varchar(255) not null,
                    "descendant_id" varchar(255) not null,
-                   "length" int not null,
+                   "depth" int not null,
                    constraint "material_tree_pkey" primary key ("ancestor_id", "descendant_id")
                  );`)
     this.addSql(
-      `create index "material_tree_descendant_id_length_index" on "material_tree" ("descendant_id", "length");`,
+      `create index "material_tree_descendant_id_depth_index" on "material_tree" ("descendant_id", "depth");`,
     )
     this.addSql(
-      `create index "material_tree_ancestor_id_descendant_id_length_index" on "material_tree" ("ancestor_id", "descendant_id", "length");`,
+      `create index "material_tree_ancestor_id_descendant_id_depth_index" on "material_tree" ("ancestor_id", "descendant_id", "depth");`,
     )
 
     this.addSql(`create table "orgs" (
@@ -329,6 +328,12 @@ export class Migration20250311153204 extends Migration {
                    "role" varchar(255) not null default 'member',
                    constraint "users_orgs_pkey" primary key ("id")
                  );`)
+    this.addSql(
+      `create index "users_orgs_user_id_index" on "users_orgs" ("user_id");`,
+    )
+    this.addSql(
+      `create index "users_orgs_org_id_index" on "users_orgs" ("org_id");`,
+    )
 
     this.addSql(`create table "variants" (
                    "id" varchar(255) not null,
@@ -341,7 +346,7 @@ export class Migration20250311153204 extends Migration {
                    "files" jsonb null,
                    "links" jsonb null,
                    "certifications" jsonb null,
-                   "items_id" varchar(255) not null,
+                   "item_id" varchar(255) null,
                    "region_id" varchar(255) null,
                    constraint "variants_pkey" primary key ("id")
                  );`)
@@ -366,12 +371,6 @@ export class Migration20250311153204 extends Migration {
                    "component_id" varchar(255) not null,
                    "quantity" int not null default 1,
                    constraint "variants_components_pkey" primary key ("variant_id", "component_id")
-                 );`)
-
-    this.addSql(`create table "variant_tags" (
-                   "variant_id" varchar(255) not null,
-                   "tag_name" varchar(255) not null,
-                   constraint "variant_tags_pkey" primary key ("variant_id", "tag_name")
                  );`)
 
     this.addSql(`create table "auth"."verifications" (
@@ -484,7 +483,7 @@ export class Migration20250311153204 extends Migration {
                  add constraint "users_orgs_org_id_foreign" foreign key ("org_id") references "orgs" ("id") on update cascade;`)
 
     this.addSql(`alter table "variants"
-                 add constraint "variants_items_id_foreign" foreign key ("items_id") references "items" ("id") on update cascade;`)
+                 add constraint "variants_item_id_foreign" foreign key ("item_id") references "items" ("id") on update cascade on delete set null;`)
     this.addSql(`alter table "variants"
                  add constraint "variants_region_id_foreign" foreign key ("region_id") references "regions" ("id") on update cascade on delete set null;`)
 
@@ -502,9 +501,6 @@ export class Migration20250311153204 extends Migration {
                  add constraint "variants_components_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade;`)
     this.addSql(`alter table "variants_components"
                  add constraint "variants_components_component_id_foreign" foreign key ("component_id") references "components" ("id") on update cascade;`)
-
-    this.addSql(`alter table "variant_tags"
-                 add constraint "variant_tags_variant_id_foreign" foreign key ("variant_id") references "variants" ("id") on update cascade;`)
   }
 
   override async down(): Promise<void> {
@@ -527,7 +523,7 @@ export class Migration20250311153204 extends Migration {
                  drop constraint "item_history_item_id_foreign";`)
 
     this.addSql(`alter table "variants"
-                 drop constraint "variants_items_id_foreign";`)
+                 drop constraint "variants_item_id_foreign";`)
 
     this.addSql(`alter table "material_tree"
                  drop constraint "material_tree_ancestor_id_foreign";`)
@@ -646,9 +642,6 @@ export class Migration20250311153204 extends Migration {
     this.addSql(`alter table "variants_components"
                  drop constraint "variants_components_variant_id_foreign";`)
 
-    this.addSql(`alter table "variant_tags"
-                 drop constraint "variant_tags_variant_id_foreign";`)
-
     this.addSql(`drop table if exists "categories" cascade;`)
 
     this.addSql(`drop table if exists "category_tree" cascade;`)
@@ -708,8 +701,6 @@ export class Migration20250311153204 extends Migration {
     this.addSql(`drop table if exists "variants_orgs" cascade;`)
 
     this.addSql(`drop table if exists "variants_components" cascade;`)
-
-    this.addSql(`drop table if exists "variant_tags" cascade;`)
 
     this.addSql(`drop table if exists "auth"."verifications" cascade;`)
 

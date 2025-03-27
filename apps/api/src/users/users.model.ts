@@ -2,7 +2,7 @@ import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { IsEmail, IsOptional, IsUrl, MaxLength } from 'class-validator'
-import { Org, OrgsPage } from './org.model'
+import { OrgsPage } from './org.model'
 import { User as UserEntity } from './users.entity'
 
 @ObjectType()
@@ -40,7 +40,7 @@ export class User extends IDCreatedUpdated<UserEntity> {
   profile?: UserProfile
 
   @Field(() => OrgsPage)
-  orgs: Org[] = []
+  orgs!: OrgsPage & {}
 }
 
 @ObjectType()

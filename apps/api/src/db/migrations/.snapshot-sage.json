@@ -117,8 +117,8 @@
           "length": 255,
           "mappedType": "string"
         },
-        "length": {
-          "name": "length",
+        "depth": {
+          "name": "depth",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -132,10 +132,10 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "category_tree_descendant_id_length_index",
+          "keyName": "category_tree_descendant_id_depth_index",
           "columnNames": [
             "descendant_id",
-            "length"
+            "depth"
           ],
           "composite": true,
           "constraint": false,
@@ -143,11 +143,11 @@
           "unique": false
         },
         {
-          "keyName": "category_tree_ancestor_id_descendant_id_length_index",
+          "keyName": "category_tree_ancestor_id_descendant_id_depth_index",
           "columnNames": [
             "ancestor_id",
             "descendant_id",
-            "length"
+            "depth"
           ],
           "composite": true,
           "constraint": false,
@@ -276,15 +276,6 @@
         },
         "links": {
           "name": "links",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "certifications": {
-          "name": "certifications",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
@@ -489,8 +480,8 @@
           "length": 255,
           "mappedType": "string"
         },
-        "length": {
-          "name": "length",
+        "depth": {
+          "name": "depth",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -503,10 +494,10 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "material_tree_descendant_id_length_index",
+          "keyName": "material_tree_descendant_id_depth_index",
           "columnNames": [
             "descendant_id",
-            "length"
+            "depth"
           ],
           "composite": true,
           "constraint": false,
@@ -514,11 +505,11 @@
           "unique": false
         },
         {
-          "keyName": "material_tree_ancestor_id_descendant_id_length_index",
+          "keyName": "material_tree_ancestor_id_descendant_id_depth_index",
           "columnNames": [
             "ancestor_id",
             "descendant_id",
-            "length"
+            "depth"
           ],
           "composite": true,
           "constraint": false,
@@ -3062,13 +3053,13 @@
           "nullable": true,
           "mappedType": "json"
         },
-        "items_id": {
-          "name": "items_id",
+        "item_id": {
+          "name": "item_id",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 255,
           "mappedType": "string"
         },
@@ -3099,16 +3090,17 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "variants_items_id_foreign": {
-          "constraintName": "variants_items_id_foreign",
+        "variants_item_id_foreign": {
+          "constraintName": "variants_item_id_foreign",
           "columnNames": [
-            "items_id"
+            "item_id"
           ],
           "localTableName": "public.variants",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.items",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         },
         "variants_region_id_foreign": {
@@ -3363,61 +3355,6 @@
             "id"
           ],
           "referencedTableName": "public.components",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "variant_id": {
-          "name": "variant_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "tag_name": {
-          "name": "tag_name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        }
-      },
-      "name": "variant_tags",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "variant_tags_pkey",
-          "columnNames": [
-            "variant_id",
-            "tag_name"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "variant_tags_variant_id_foreign": {
-          "constraintName": "variant_tags_variant_id_foreign",
-          "columnNames": [
-            "variant_id"
-          ],
-          "localTableName": "public.variant_tags",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.variants",
           "updateRule": "cascade"
         }
       },

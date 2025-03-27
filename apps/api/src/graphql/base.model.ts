@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql'
+import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { Validate } from 'class-validator'
@@ -29,4 +29,10 @@ export class CreatedUpdated<T> extends BaseModel<T> {
 
   @Field(() => LuxonDateTimeResolver)
   updated_at!: DateTime
+}
+
+@InputType()
+export class InputWithLang {
+  @Field(() => String, { nullable: true })
+  lang?: string
 }

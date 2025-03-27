@@ -16,6 +16,7 @@ import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
+import { JsonLdDocument } from 'jsonld'
 import { Material } from './material.entity'
 
 export enum ProcessIntent {
@@ -38,7 +39,7 @@ export class Process extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  source!: {}
+  source!: JsonLdDocument
 
   @ManyToOne()
   material!: Ref<Material>
