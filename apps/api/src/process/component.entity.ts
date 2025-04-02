@@ -17,6 +17,7 @@ import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
 import { JsonLdDocument } from 'jsonld'
 import { Material } from './material.entity'
+import { Tag } from './tag.entity'
 
 @Entity({ tableName: 'components', schema: 'public' })
 export class Component extends IDCreatedUpdated {
@@ -29,11 +30,11 @@ export class Component extends IDCreatedUpdated {
   @Property({ type: 'json' })
   source!: JsonLdDocument
 
-  @Property()
-  hazardous!: boolean
+  @ManyToMany({ entity: () => Tag, pivotEntity: () => ComponentsTags })
+  tags = new Collection<Tag>(this)
 
-  @Property({ type: 'json' })
-  hazardous_info!: {}
+  @OneToMany(() => ComponentsTags, (ct) => ct.component)
+  component_tags = new Collection<ComponentsTags>(this)
 
   @ManyToOne()
   region?: Ref<Region>
@@ -47,11 +48,26 @@ export class Component extends IDCreatedUpdated {
   })
   materials = new Collection<Material>(this)
 
+  @OneToMany(() => ComponentsMaterials, (cm) => cm.component)
+  component_materials = new Collection<ComponentsMaterials>(this)
+
   @ManyToMany(() => Variant, (variant) => variant.components)
   variants = new Collection<Variant>(this)
 
   @OneToMany(() => ComponentHistory, (history) => history.component)
   history = new Collection<ComponentHistory>(this)
+}
+
+@Entity({ tableName: 'components_tags', schema: 'public' })
+export class ComponentsTags extends BaseEntity {
+  @ManyToOne({ primary: true })
+  component!: Component
+
+  @ManyToOne({ primary: true })
+  tag!: Tag
+
+  @Property({ type: 'json' })
+  meta?: Record<string, any>
 }
 
 @Entity({ tableName: 'components_materials', schema: 'public' })

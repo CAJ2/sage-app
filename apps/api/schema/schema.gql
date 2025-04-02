@@ -110,11 +110,20 @@ type ComponentsPage {
 }
 
 input CreateCategoryInput {
+  add_sources: [ID!]
+  change: CreateChangeInput
+  change_id: ID
   desc: String
   desc_short: String
   image_url: String
   lang: String
   name: String!
+  remove_sources: [ID!]
+}
+
+type CreateCategoryOutput {
+  category: Category
+  change: Change
 }
 
 input CreateChangeInput {
@@ -123,6 +132,19 @@ input CreateChangeInput {
   sources: [ID!]! = []
   status: ChangeStatus
   title: String
+}
+
+input CreateComponentInput {
+  add_sources: [ID!]
+  change: CreateChangeInput
+  change_id: ID
+  lang: String
+  remove_sources: [ID!]
+}
+
+type CreateComponentOutput {
+  change: Change
+  component: Component
 }
 
 input CreateMaterialInput {
@@ -143,11 +165,33 @@ type CreateMaterialOutput {
   material: Material
 }
 
+input CreateProcessInput {
+  add_sources: [ID!]
+  change: CreateChangeInput
+  change_id: ID
+  lang: String
+  remove_sources: [ID!]
+}
+
+type CreateProcessOutput {
+  change: Change
+  process: Process
+}
+
 input CreateSourceInput {
   content: JSONObject
   location: String!
   metadata: JSONObject
   type: SourceType!
+}
+
+input CreateTagInput {
+  bg_color: String
+  desc: String
+  image: String
+  meta_template: JSONObject
+  name: String!
+  type: TagType!
 }
 
 """
@@ -169,7 +213,6 @@ type Item {
   created_at: DateTime!
   desc: String
   desc_short: String
-  history: [ItemHistory!]!
   id: ID!
   image_url: String
   name: String
@@ -182,11 +225,11 @@ type ItemEdge {
   node: Item!
 }
 
-type ItemHistory {
-  changes: String
-  datetime: DateTime!
-  item_id: String!
-  original: String
+type ItemsPage {
+  edges: [ItemEdge!]
+  nodes: [Item!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 """
@@ -214,49 +257,47 @@ type MaterialEdge {
   node: Material!
 }
 
+type MaterialsPage {
+  edges: [MaterialEdge!]
+  nodes: [Material!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type Mutation {
-  createCategory(input: CreateCategoryInput!): Category!
+  createCategory(input: CreateCategoryInput!): CreateCategoryOutput!
   createChange(input: CreateChangeInput!): Change!
+  createComponent(input: CreateComponentInput!): CreateComponentOutput!
   createMaterial(input: CreateMaterialInput!): CreateMaterialOutput!
+  createProcess(input: CreateProcessInput!): CreateProcessOutput!
   createSource(input: CreateSourceInput!): Source!
+  createTag(input: CreateTagInput!): Tag!
   deleteChange(id: ID!): Boolean!
   deleteSource(id: ID!): Boolean!
   markSourceProcessed(id: ID!): Source!
   updateChange(input: UpdateChangeInput!): Change!
+  updateComponent(input: UpdateComponentInput!): UpdateComponentOutput!
   updateMaterial(input: UpdateMaterialInput!): UpdateMaterialOutput!
+  updateProcess(input: UpdateProcessInput!): UpdateProcessOutput!
   updateSource(input: UpdateSourceInput!): Source!
+  updateTag(input: UpdateTagInput!): Tag!
 }
 
 type Org {
   avatar_url: String
   created_at: DateTime!
   desc: String
-  history: [OrgHistory!]!
   id: ID!
   name: String!
-  processes: ProcessPage!
   slug: String!
   updated_at: DateTime!
-  users(filter: OrgUsersFilter!): UserPage!
-  variants: VariantPage!
+  users(after: String, before: String, first: Int, last: Int): UserPage!
   website_url: String
 }
 
 type OrgEdge {
   cursor: String!
   node: Org!
-}
-
-type OrgHistory {
-  changes: String
-  datetime: DateTime!
-  org: Org!
-  original: String
-  user: User!
-}
-
-input OrgUsersFilter {
-  email: String
 }
 
 type OrgsPage {
@@ -345,20 +386,30 @@ type ProcessPage {
 }
 
 type Query {
+  getCategories(after: String, before: String, first: Int, last: Int): CategoriesPage!
   getCategory(id: ID!): Category!
   getChange(id: ID!): Change!
   getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
+  getComponent(id: ID!): Component!
+  getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
   getItem(id: ID!): Item!
+  getItems(after: String, before: String, first: Int, last: Int): ItemsPage!
   getMaterial(id: ID!): Material!
+  getMaterials(after: String, before: String, first: Int, last: Int): MaterialsPage!
   getOrg(id: ID!): Org!
+  getProcess(id: ID!): Process!
+  getProcesses(after: String, before: String, first: Int, last: Int): ProcessPage!
   getSource(id: ID!): Source!
   getSources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
+  getTag(id: ID!): Tag!
+  getTags(after: String, before: String, first: Int, last: Int): TagPage!
   getUser(id: ID!): User!
   place(id: String!): Place
   places(page: Float = 1, perPage: Float = 10): PlacePage!
   region(id: String!): Region
   regions(page: Float = 1, perPage: Float = 10): RegionPage!
   rootCategory: Category!
+  rootMaterial: Material!
   variant(id: String!): Variant
 }
 
@@ -418,6 +469,37 @@ type SourcesPage {
   totalCount: Int!
 }
 
+type Tag {
+  bg_color: String
+  created_at: DateTime!
+  desc: String
+  id: ID!
+  image: String
+  meta_template: JSONObject
+  name: String!
+  type: TagType!
+  updated_at: DateTime!
+}
+
+type TagEdge {
+  cursor: String!
+  node: Tag!
+}
+
+type TagPage {
+  edges: [TagEdge!]
+  nodes: [Tag!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"""The model type of the tag"""
+enum TagType {
+  COMPONENT
+  PLACE
+  VARIANT
+}
+
 input UpdateChangeInput {
   description: String
   id: ID!
@@ -425,6 +507,19 @@ input UpdateChangeInput {
   sources: [ID!]
   status: ChangeStatus
   title: String
+}
+
+input UpdateComponentInput {
+  add_sources: [ID!]
+  change: CreateChangeInput
+  change_id: ID
+  lang: String
+  remove_sources: [ID!]
+}
+
+type UpdateComponentOutput {
+  change: Change
+  component: Component
 }
 
 input UpdateMaterialInput {
@@ -446,12 +541,35 @@ type UpdateMaterialOutput {
   material: Material
 }
 
+input UpdateProcessInput {
+  add_sources: [ID!]
+  change: CreateChangeInput
+  change_id: ID
+  lang: String
+  remove_sources: [ID!]
+}
+
+type UpdateProcessOutput {
+  change: Change
+  process: Process
+}
+
 input UpdateSourceInput {
   content: JSONObject
   id: ID!
   location: String
   metadata: JSONObject
   type: SourceType
+}
+
+input UpdateTagInput {
+  bg_color: String
+  desc: String
+  id: String!
+  image: String
+  meta_template: JSONObject
+  name: String
+  type: TagType
 }
 
 type User {
@@ -507,13 +625,6 @@ type VariantHistory {
   datetime: DateTime!
   original: String
   variant_id: String!
-}
-
-type VariantPage {
-  edges: [VariantEdge!]
-  nodes: [Variant!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 type VariantTag {

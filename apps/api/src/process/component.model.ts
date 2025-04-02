@@ -1,4 +1,5 @@
-import { ArgsType, Field, Float, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, Float, InputType, ObjectType } from '@nestjs/graphql'
+import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -74,3 +75,27 @@ export class ComponentsPage extends Paginated(Component) {}
 
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {}
+
+@InputType()
+export class CreateComponentInput extends ChangeInputWithLang() {}
+
+@InputType()
+export class UpdateComponentInput extends ChangeInputWithLang() {}
+
+@ObjectType()
+export class CreateComponentOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Component, { nullable: true })
+  component?: Component
+}
+
+@ObjectType()
+export class UpdateComponentOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Component, { nullable: true })
+  component?: Component
+}

@@ -1,10 +1,8 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { transformTranslatedField } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
-import { Paginated } from '@src/graphql/paginated'
-import { ProcessPage } from '@src/process/process.model'
-import { VariantPage } from '@src/product/variant.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { Org as OrgEntity } from './org.entity'
 import { User, UserPage } from './users.model'
@@ -29,15 +27,6 @@ export class Org extends IDCreatedUpdated<OrgEntity> {
 
   @Field(() => UserPage)
   users: User[] = []
-
-  @Field(() => VariantPage)
-  variants!: VariantPage & {}
-
-  @Field(() => ProcessPage)
-  processes!: ProcessPage & {}
-
-  @Field(() => [OrgHistory])
-  history: OrgHistory[] = []
 }
 
 @ObjectType()
@@ -61,8 +50,5 @@ export class OrgHistory {
   changes?: string
 }
 
-@InputType()
-export class OrgUsersFilter {
-  @Field({ nullable: true })
-  email?: string
-}
+@ArgsType()
+export class OrgUsersArgs extends PaginationBasicArgs {}

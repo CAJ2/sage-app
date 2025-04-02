@@ -3,6 +3,7 @@ import {
   Collection,
   Entity,
   Index,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryKey,
@@ -10,10 +11,11 @@ import {
   Property,
   Ref,
 } from '@mikro-orm/core'
-import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
+import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Point, PointType } from '@src/db/custom.types'
 import { TranslatedField } from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
+import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 
@@ -35,8 +37,11 @@ export class Place extends IDCreatedUpdated {
   @ManyToOne()
   org?: Ref<Org>
 
-  @OneToMany({ mappedBy: 'place' })
-  tags = new Collection<PlaceTag>(this)
+  @ManyToMany({ entity: () => Tag, pivotEntity: () => PlacesTag })
+  tags = new Collection<Tag>(this)
+
+  @OneToMany(() => PlacesTag, (pt) => pt.place)
+  place_tags = new Collection<PlacesTag>(this)
 
   @OneToMany({ mappedBy: 'place' })
   processes = new Collection<Process>(this)
@@ -45,15 +50,16 @@ export class Place extends IDCreatedUpdated {
   history = new Collection<PlaceHistory>(this)
 }
 
-@Entity({ tableName: 'place_tags', schema: 'public' })
-export class PlaceTag extends CreatedUpdated {
+@Entity({ tableName: 'places_tags', schema: 'public' })
+export class PlacesTag extends BaseEntity {
   @ManyToOne({ primary: true })
   place!: Place
 
-  @PrimaryKey()
-  tag_name!: string;
+  @ManyToOne({ primary: true })
+  tag!: Tag & {}
 
-  [PrimaryKeyProp]?: ['place', 'tag_name']
+  @Property({ type: 'json' })
+  meta?: Record<string, any>
 }
 
 @Entity({ tableName: 'place_history', schema: 'public' })

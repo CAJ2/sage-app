@@ -1,6 +1,7 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { CreatedUpdated, InputWithLang } from '@src/graphql/base.model'
+import { CreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { IsOptional, IsUrl, MaxLength } from 'class-validator'
@@ -65,7 +66,7 @@ export class CategoriesPage extends Paginated(Category) {}
 export class CategoriesArgs extends PaginationBasicArgs {}
 
 @InputType()
-export class CreateCategoryInput extends InputWithLang {
+export class CreateCategoryInput extends ChangeInputWithLang() {
   @Field(() => String)
   @MaxLength(1024)
   name!: string
@@ -82,4 +83,41 @@ export class CreateCategoryInput extends InputWithLang {
   @IsOptional()
   @IsUrl({ protocols: ['https', 'icon'] })
   image_url?: string
+}
+
+@InputType()
+export class UpdateCategoryInput extends ChangeInputWithLang() {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(1024)
+  name?: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUrl({ protocols: ['https', 'icon'] })
+  image_url?: string
+}
+
+@ObjectType()
+export class CreateCategoryOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Category, { nullable: true })
+  category?: Category
+}
+
+@ObjectType()
+export class UpdateCategoryOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Category, { nullable: true })
+  category?: Category
 }

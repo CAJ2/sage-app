@@ -12,8 +12,29 @@ import { Process } from './process.entity'
 export class MaterialService {
   constructor(private readonly em: EntityManager) {}
 
+  async find(opts: CursorOptions<Material>) {
+    const materials = await this.em.find(Material, opts.where, opts.options)
+    const count = await this.em.count(Material, opts.where)
+    return {
+      items: materials,
+      count,
+    }
+  }
+
   async findOneByID(id: string) {
     return await this.em.findOne(Material, { id })
+  }
+
+  async findRoot() {
+    const root = await this.em.findOne(
+      MaterialTree,
+      { ancestor: 'MATERIAL_ROOT', depth: 0 },
+      { populate: ['ancestor'] },
+    )
+    if (!root) {
+      return null
+    }
+    return root.ancestor as Material
   }
 
   async findDirectAncestors(materialID: string, opts: CursorOptions<Material>) {

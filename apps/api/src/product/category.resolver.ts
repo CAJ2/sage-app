@@ -7,6 +7,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
+import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import {
@@ -14,6 +15,7 @@ import {
   CategoriesPage,
   Category,
   CreateCategoryInput,
+  CreateCategoryOutput,
 } from './category.model'
 import { CategoryService } from './category.service'
 
@@ -23,6 +25,18 @@ export class CategoryResolver {
     private readonly categoryService: CategoryService,
     private readonly transform: TransformService,
   ) {}
+
+  @Query(() => CategoriesPage, { name: 'getCategories' })
+  async getCategories(@Args() args: CategoriesArgs): Promise<CategoriesPage> {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.categoryService.find(filter)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Category,
+      CategoriesPage,
+    )
+  }
 
   @Query(() => Category, { name: 'getCategory' })
   async getCategory(
@@ -79,12 +93,13 @@ export class CategoryResolver {
     )
   }
 
-  @Mutation(() => Category, { name: 'createCategory' })
+  @Mutation(() => CreateCategoryOutput, { name: 'createCategory' })
   async createCategory(
     @Args('input') input: CreateCategoryInput,
-  ): Promise<Category> {
-    const category = await this.categoryService.create(input)
-    const model = await this.transform.entityToModel(category, Category)
-    return model
+  ): Promise<CreateCategoryOutput> {
+    const created = await this.categoryService.create(input)
+    const model = await this.transform.entityToModel(created.category, Category)
+    const change = await this.transform.entityToModel(created.change, Change)
+    return { category: model, change }
   }
 }

@@ -9,6 +9,15 @@ import { Variant } from './variant.entity'
 export class ItemService {
   constructor(private readonly em: EntityManager) {}
 
+  async find(opts: CursorOptions<Item>) {
+    const items = await this.em.find(Item, opts.where, opts.options)
+    const count = await this.em.count(Item, opts.where)
+    return {
+      items,
+      count,
+    }
+  }
+
   async findOneByID(id: string) {
     return await this.em.findOne(Item, { id })
   }

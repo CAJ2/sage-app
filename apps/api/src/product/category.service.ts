@@ -1,5 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { Change } from '@src/changes/change.entity'
 import { CursorOptions } from '@src/common/transform'
 import { setTranslatedField } from '@src/db/i18n'
 import { Category, CategoryTree } from './category.entity'
@@ -8,6 +9,15 @@ import { CreateCategoryInput } from './category.model'
 @Injectable()
 export class CategoryService {
   constructor(private readonly em: EntityManager) {}
+
+  async find(opts: CursorOptions<Category>) {
+    const categories = await this.em.find(Category, opts.where, opts.options)
+    const count = await this.em.count(Category, opts.where)
+    return {
+      items: categories,
+      count,
+    }
+  }
 
   async findOneByID(id: string) {
     return await this.em.findOne(Category, { id })
@@ -78,7 +88,11 @@ export class CategoryService {
       setTranslatedField(category.desc, input.lang, input.desc)
     }
     category.image_url = input.image_url
-    await this.em.persistAndFlush(category)
-    return category
+    const change = new Change()
+    await this.em.persistAndFlush(change)
+    return {
+      change,
+      category,
+    }
   }
 }

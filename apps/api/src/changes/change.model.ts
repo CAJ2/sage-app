@@ -1,48 +1,13 @@
-import {
-  ArgsType,
-  createUnionType,
-  Field,
-  ID,
-  InputType,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql'
+import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { SourcesPage } from '@src/changes/source.model'
 import { IsNanoID } from '@src/common/validator.model'
-import { Place } from '@src/geo/place.model'
-import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated, InputWithLang } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Component } from '@src/process/component.model'
-import { Material } from '@src/process/material.model'
-import { Process } from '@src/process/process.model'
-import { Category } from '@src/product/category.model'
-import { Item } from '@src/product/item.model'
-import { Variant } from '@src/product/variant.model'
 import { User } from '@src/users/users.model'
 import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { Change as ChangeEntity, ChangeStatus } from './change.entity'
-
-registerEnumType(ChangeStatus, {
-  name: 'ChangeStatus',
-  description: 'Status of a change',
-})
-
-export const EditModel = createUnionType({
-  name: 'EditModel',
-  types: () =>
-    [
-      Place,
-      Region,
-      Component,
-      Material,
-      Process,
-      Category,
-      Item,
-      Variant,
-    ] as const,
-})
+import { EditModel } from './change.enum'
 
 @ObjectType()
 export class Edit {
@@ -69,7 +34,7 @@ export class Change extends IDCreatedUpdated<ChangeEntity> {
   description?: string
 
   @Field(() => ChangeStatus)
-  status!: ChangeStatus
+  status!: ChangeStatus & {}
 
   @Field(() => User)
   user!: User
@@ -115,7 +80,7 @@ export class CreateChangeInput {
   description?: string
 
   @Field(() => ChangeStatus, { nullable: true })
-  status?: ChangeStatus
+  status?: ChangeStatus & {}
 
   @Field(() => [ID])
   sources: string[] = []
@@ -142,7 +107,7 @@ export class UpdateChangeInput {
 
   @Field(() => ChangeStatus, { nullable: true })
   @IsOptional()
-  status?: ChangeStatus
+  status?: ChangeStatus & {}
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
@@ -153,25 +118,22 @@ export class UpdateChangeInput {
   metadata?: Record<string, any>
 }
 
-@InputType()
-export class ChangeInputWithLang extends InputWithLang {
-  @Field(() => ID, { nullable: true })
-  @IsOptional()
-  @Validate(IsNanoID)
-  change_id?: string
+export function ChangeInputWithLang() {
+  @InputType()
+  class ChangeInputWithLangCls extends InputWithLang {
+    @Field(() => ID, { nullable: true })
+    @IsOptional()
+    @Validate(IsNanoID)
+    change_id?: string
 
-  @Field(() => CreateChangeInput, { nullable: true })
-  change?: CreateChangeInput
+    @Field(() => CreateChangeInput, { nullable: true })
+    change?: CreateChangeInput & {}
 
-  @Field(() => [ID], { nullable: true })
-  add_sources?: string[]
+    @Field(() => [ID], { nullable: true })
+    add_sources?: string[]
 
-  @Field(() => [ID], { nullable: true })
-  remove_sources?: string[]
-}
-
-@ObjectType()
-export class ChangeOutput {
-  @Field(() => Change, { nullable: true })
-  change?: Change
+    @Field(() => [ID], { nullable: true })
+    remove_sources?: string[]
+  }
+  return ChangeInputWithLangCls
 }

@@ -1,4 +1,5 @@
-import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
+import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -30,9 +31,6 @@ export class Item extends IDCreatedUpdated<ItemEntity> {
 
   @Field(() => [Variant])
   variants: Variant[] = []
-
-  @Field(() => [ItemHistory])
-  history: ItemHistory[] = []
 }
 
 @ObjectType()
@@ -51,7 +49,34 @@ export class ItemHistory {
 }
 
 @ObjectType()
-export class ItemPage extends Paginated(Item) {}
+export class ItemsPage extends Paginated(Item) {}
 
 @ArgsType()
-export class ItemsCategoriesArgs extends PaginationBasicArgs {}
+export class ItemsArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class ItemCategoriesArgs extends PaginationBasicArgs {}
+
+@InputType()
+export class CreateItemInput extends ChangeInputWithLang() {}
+
+@InputType()
+export class UpdateItemInput extends ChangeInputWithLang() {}
+
+@ObjectType()
+export class CreateItemOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Item, { nullable: true })
+  item?: Item
+}
+
+@ObjectType()
+export class UpdateItemOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Item, { nullable: true })
+  item?: Item
+}

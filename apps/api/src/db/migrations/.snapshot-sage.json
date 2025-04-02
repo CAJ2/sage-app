@@ -611,6 +611,15 @@
           "length": 128,
           "mappedType": "string"
         },
+        "name_translations": {
+          "name": "name_translations",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
         "desc": {
           "name": "desc",
           "type": "jsonb",
@@ -798,83 +807,6 @@
           ],
           "referencedTableName": "public.orgs",
           "deleteRule": "set null",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "place_id": {
-          "name": "place_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "tag_name": {
-          "name": "tag_name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "current_timestamp()",
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "current_timestamp()",
-          "mappedType": "datetime"
-        }
-      },
-      "name": "place_tags",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "place_tags_pkey",
-          "columnNames": [
-            "place_id",
-            "tag_name"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "place_tags_place_id_foreign": {
-          "constraintName": "place_tags_place_id_foreign",
-          "columnNames": [
-            "place_id"
-          ],
-          "localTableName": "public.place_tags",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.places",
           "updateRule": "cascade"
         }
       },
@@ -1221,24 +1153,6 @@
           "nullable": false,
           "mappedType": "json"
         },
-        "hazardous": {
-          "name": "hazardous",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "boolean"
-        },
-        "hazardous_info": {
-          "name": "hazardous_info",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "region_id": {
           "name": "region_id",
           "type": "varchar(255)",
@@ -1378,6 +1292,272 @@
             "id"
           ],
           "referencedTableName": "public.materials",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "name": {
+          "name": "name",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "PLACE",
+            "VARIANT",
+            "COMPONENT"
+          ],
+          "mappedType": "enum"
+        },
+        "desc": {
+          "name": "desc",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "meta_template": {
+          "name": "meta_template",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "bg_color": {
+          "name": "bg_color",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "tags",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "tags_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "place_id": {
+          "name": "place_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "places_tags",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "places_tags_pkey",
+          "columnNames": [
+            "place_id",
+            "tag_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "places_tags_place_id_foreign": {
+          "constraintName": "places_tags_place_id_foreign",
+          "columnNames": [
+            "place_id"
+          ],
+          "localTableName": "public.places_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.places",
+          "updateRule": "cascade"
+        },
+        "places_tags_tag_id_foreign": {
+          "constraintName": "places_tags_tag_id_foreign",
+          "columnNames": [
+            "tag_id"
+          ],
+          "localTableName": "public.places_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.tags",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "component_id": {
+          "name": "component_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "components_tags",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "components_tags_pkey",
+          "columnNames": [
+            "component_id",
+            "tag_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "components_tags_component_id_foreign": {
+          "constraintName": "components_tags_component_id_foreign",
+          "columnNames": [
+            "component_id"
+          ],
+          "localTableName": "public.components_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.components",
+          "updateRule": "cascade"
+        },
+        "components_tags_tag_id_foreign": {
+          "constraintName": "components_tags_tag_id_foreign",
+          "columnNames": [
+            "tag_id"
+          ],
+          "localTableName": "public.components_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.tags",
           "updateRule": "cascade"
         }
       },
@@ -3356,15 +3536,6 @@
           "nullable": false,
           "mappedType": "json"
         },
-        "tags": {
-          "name": "tags",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "files": {
           "name": "files",
           "type": "jsonb",
@@ -3376,15 +3547,6 @@
         },
         "links": {
           "name": "links",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "certifications": {
-          "name": "certifications",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
@@ -3694,6 +3856,82 @@
             "id"
           ],
           "referencedTableName": "public.components",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "variant_id": {
+          "name": "variant_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "variants_tags",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "variants_tags_pkey",
+          "columnNames": [
+            "variant_id",
+            "tag_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "variants_tags_variant_id_foreign": {
+          "constraintName": "variants_tags_variant_id_foreign",
+          "columnNames": [
+            "variant_id"
+          ],
+          "localTableName": "public.variants_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.variants",
+          "updateRule": "cascade"
+        },
+        "variants_tags_tag_id_foreign": {
+          "constraintName": "variants_tags_tag_id_foreign",
+          "columnNames": [
+            "tag_id"
+          ],
+          "localTableName": "public.variants_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.tags",
           "updateRule": "cascade"
         }
       },

@@ -1,5 +1,5 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { ChangeInputWithLang, ChangeOutput } from '@src/changes/change.model'
+import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -75,7 +75,7 @@ export class ComponentsArgs extends PaginationBasicArgs {}
 export class ProcessesArgs extends PaginationBasicArgs {}
 
 @InputType()
-export class CreateMaterialInput extends ChangeInputWithLang {
+export class CreateMaterialInput extends ChangeInputWithLang() {
   @Field(() => String)
   @MaxLength(1024)
   name!: string
@@ -94,7 +94,7 @@ export class CreateMaterialInput extends ChangeInputWithLang {
 }
 
 @InputType()
-export class UpdateMaterialInput extends ChangeInputWithLang {
+export class UpdateMaterialInput extends ChangeInputWithLang() {
   @Field(() => ID)
   id!: string
 
@@ -116,13 +116,19 @@ export class UpdateMaterialInput extends ChangeInputWithLang {
 }
 
 @ObjectType()
-export class CreateMaterialOutput extends ChangeOutput {
+export class CreateMaterialOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
   @Field(() => Material, { nullable: true })
   material?: Material
 }
 
 @ObjectType()
-export class UpdateMaterialOutput extends ChangeOutput {
+export class UpdateMaterialOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
   @Field(() => Material, { nullable: true })
   material?: Material
 }

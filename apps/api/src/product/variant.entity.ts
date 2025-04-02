@@ -14,6 +14,7 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
+import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { JsonLdDocument } from 'jsonld'
@@ -32,16 +33,10 @@ export class Variant extends IDCreatedUpdated {
   source!: JsonLdDocument
 
   @Property({ type: 'json' })
-  tags?: {}
-
-  @Property({ type: 'json' })
   files?: {}
 
   @Property({ type: 'json' })
   links?: {}
-
-  @Property({ type: 'json' })
-  certifications?: {}
 
   @ManyToOne()
   item?: Ref<Item>
@@ -51,6 +46,12 @@ export class Variant extends IDCreatedUpdated {
 
   @ManyToMany()
   orgs = new Collection<Org>(this)
+
+  @ManyToMany({ entity: () => Tag, pivotEntity: () => VariantsTags })
+  tags = new Collection<Tag>(this)
+
+  @OneToMany(() => VariantsTags, (vt) => vt.variant)
+  variant_tags = new Collection<VariantsTags>(this)
 
   @ManyToMany({
     entity: () => Component,
@@ -63,6 +64,18 @@ export class Variant extends IDCreatedUpdated {
 
   @OneToMany(() => VariantHistory, (history) => history.variant)
   history = new Collection<VariantHistory>(this)
+}
+
+@Entity({ tableName: 'variants_tags', schema: 'public' })
+export class VariantsTags extends BaseEntity {
+  @ManyToOne({ primary: true })
+  variant!: Variant
+
+  @ManyToOne({ primary: true })
+  tag!: Tag
+
+  @Property({ type: 'json' })
+  meta?: Record<string, any>
 }
 
 @Entity({ tableName: 'variants_components', schema: 'public' })
