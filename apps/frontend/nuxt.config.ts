@@ -5,10 +5,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    '@nuxtjs/ionic',
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
     '@nuxt/icon',
+    '@nuxt/eslint',
     '@pinia/nuxt',
     'reka-ui/nuxt',
   ],
@@ -17,10 +17,10 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  css: ['@/assets/css/main.css'],
+  css: ['@/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
 
   vite: {
-    plugins: [tailwindcss() as any],
+    plugins: [tailwindcss()],
   },
 
   ssr: false,

@@ -1,2 +1,2 @@
-pnpm exec nx affected -t lint
+pnpm exec nx affected -t lint build test
 git update-index --again

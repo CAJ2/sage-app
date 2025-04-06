@@ -1,7 +1,7 @@
 {
   "appId": "eco.sageleaf.app",
   "appName": "Sage",
-  "webDir": "dist",
+  "webDir": ".output/public",
   "server": {
     "androidScheme": "https"
   }

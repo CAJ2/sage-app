@@ -1,10 +1,8 @@
 import importPlugin from 'eslint-plugin-import'
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 import unusedImports from 'eslint-plugin-unused-imports'
-import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
-import tseslint from 'typescript-eslint'
 
 const baseConfig = [
   { files: ['**/*.{js,jsx,ts,tsx,vue}'] },
@@ -14,22 +12,7 @@ const baseConfig = [
         // Add browser environment globals (window, document, etc.) to prevent
         // ESLint from flagging them as undefined
         ...globals.browser,
-        useHead: 'readonly',
       },
-    },
-  },
-]
-
-const vueConfig = [
-  ...pluginVue.configs['flat/recommended'],
-  {
-    files: ['**/*.vue'],
-    languageOptions: { parserOptions: { parser: tseslint.parser } },
-  },
-  {
-    rules: {
-      'vue/multi-word-component-names': 0,
-      'vue/html-quotes': ['error', 'single', { avoidEscape: true }],
     },
   },
 ]
@@ -37,13 +20,7 @@ const vueConfig = [
 const standardConfig = [
   ...neostandard({
     ts: true,
-    ignores: [
-      ...resolveIgnoresFromGitignore(),
-      '**/.nx/**',
-      '**/*.config.ts',
-      '**/ios/**',
-      '**/android/**',
-    ],
+    ignores: [...resolveIgnoresFromGitignore(), '**/.nx/**', '**/*.config.ts'],
   }),
   importPlugin.flatConfigs.recommended,
   {
@@ -115,7 +92,6 @@ const prettier = [
 
 export default [
   ...baseConfig,
-  ...vueConfig,
   ...standardConfig,
   eslintPluginPrettier,
   ...prettier,

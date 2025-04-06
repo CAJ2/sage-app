@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">sage-frontend</string>
-    <string name="title_activity_main">sage-frontend</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="app_name">Sage Leaf</string>
+    <string name="title_activity_main">Sage Leaf</string>
+    <string name="package_name">eco.sageleaf.app</string>
+    <string name="custom_url_scheme">eco.sageleaf.app</string>
 </resources>

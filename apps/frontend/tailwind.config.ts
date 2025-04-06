@@ -6,5 +6,6 @@ export default <Partial<Config>>{
   theme: {
     extend: {},
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   plugins: [require('daisyui')],
 }

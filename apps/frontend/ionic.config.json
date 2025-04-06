@@ -1,7 +1,0 @@
-{
-  "name": "sage-frontend",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue"
-}
