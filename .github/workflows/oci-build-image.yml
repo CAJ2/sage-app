@@ -3,11 +3,6 @@ name: Build Image
 on:
   workflow_call:
     inputs:
-      platforms:
-        type: 'string'
-        required: false
-        default: 'linux/amd64,linux/arm64'
-        description: 'A csv list of platforms/archs to create images for'
       runs-on:
         type: 'string'
         required: false
@@ -139,8 +134,7 @@ jobs:
         uses: docker/build-push-action@548776e8d0d44ea63feed0c8a944e6235fc63eee
         with:
           context: ${{ inputs.context }}
-          load: true
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
@@ -153,19 +147,3 @@ jobs:
           echo "sha_short=$SHORT_SHA" >> $GITHUB_OUTPUT
           echo "build_tag=$SHORT_SHA_TAG_ONLY" >> $GITHUB_OUTPUT
           echo "sha_tag=${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}:sha-$SHORT_SHA" >> $GITHUB_OUTPUT
-
-      - name: Push image
-        if: ${{ github.event_name != 'pull_request' || inputs.push_in_pr }}
-        id: push
-        timeout-minutes: 60
-        uses: docker/build-push-action@548776e8d0d44ea63feed0c8a944e6235fc63eee
-        with:
-          context: ${{ inputs.context }}
-          builder: ${{ steps.buildx.outputs.name }}
-          load: false
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
-          platforms: ${{ inputs.platforms}}
