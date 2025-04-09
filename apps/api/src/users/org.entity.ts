@@ -42,6 +42,9 @@ export class Org extends IDCreatedUpdated {
   @ManyToMany(() => User, (user) => user.orgs)
   users = new Collection<User>(this)
 
+  @OneToMany(() => Invitation, (invitation) => invitation.org)
+  invitations = new Collection<Invitation>(this)
+
   @ManyToMany(() => Variant, (variant) => variant.orgs)
   variants = new Collection<Variant>(this)
 

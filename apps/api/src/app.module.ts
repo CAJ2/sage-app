@@ -12,6 +12,7 @@ import { ChangesModule } from './changes/changes.module'
 import { parseLanguageHeader } from './db/i18n'
 import { GeoModule } from './geo/geo.module'
 import { GraphQLModule } from './graphql/graphql.module'
+import { HealthModule } from './health/health.module'
 import { ProcessModule } from './process/process.module'
 import { ProductModule } from './product/product.module'
 import { UsersModule } from './users/users.module'
@@ -45,6 +46,7 @@ import { UsersModule } from './users/users.module'
     }),
     MikroOrmModule.forRoot(),
     GraphQLModule.register(),
+    HealthModule,
     AuthModule.registerAsync(),
     UsersModule,
     GeoModule,
