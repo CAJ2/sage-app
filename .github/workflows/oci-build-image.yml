@@ -1,0 +1,198 @@
+name: Build Image
+
+on:
+  workflow_call:
+    inputs:
+      platforms:
+        type: 'string'
+        required: false
+        default: 'linux/amd64,linux/arm64'
+        description: 'A csv list of platforms/archs to create images for'
+      runs-on:
+        type: 'string'
+        required: false
+        default: '["ubuntu-latest"]'
+        description: string of a JSON array describing the run target.
+      context:
+        type: string
+        required: false
+        default: '.'
+        description: 'The image build context path'
+      codeql_enabled:
+        type: boolean
+        required: false
+        default: true
+        description: |
+          If CodeQL is enabled or not, when enabled it will upload the sarif scan results and
+           make any findings available in the security tab
+      download_artifact:
+        type: string
+        required: false
+        default: ''
+        description: |
+          If provided, the name of a artifact that will be downloaded prior to building the dockerfile
+      download_artifact_path:
+        type: string
+        required: false
+        description: |
+          If provided, the path to where the artifact will be downloaded
+      image_name:
+        type: string
+        required: true
+        description: The image name, typically the repository name
+      registry:
+        type: string
+        required: false
+        default: 'ghcr.io/curium-rocks'
+      push_in_pr:
+        type: boolean
+        required: false
+        default: false
+        description: |
+          If true, images will be pushed in PRs
+    outputs:
+      sha_tag:
+        description: "SHA tag for the image built, this includes the registry and image repository"
+        value: ${{ jobs.build-image.outputs.sha_tag }}
+      build_tag:
+        description: "Build tag, this is unique tag for this build, it does not include the registry and image repository"
+        value: ${{ jobs.build-image.outputs.build_tag }}
+    secrets:
+      clone_token:
+        required: false
+        description: PAT to use to clone
+
+jobs:
+  build-image:
+    name: Build
+    env:
+      REGISTRY: ${{ inputs.registry }}
+      IMAGE_NAME: ${{ inputs.image_name }}
+      CODEQL_ENABLED: ${{ inputs.codeql_enabled }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+    outputs:
+      sha_tag: ${{ steps.short-sha.outputs.sha_tag }}
+      build_tag: ${{ steps.short-sha.outputs.build_tag }}
+    runs-on: ${{ fromJSON(inputs.runs-on) }}
+    steps:
+      - name: Checkout repository
+        if: env.GH_TOKEN
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.clone_token }}
+        env:
+          GH_TOKEN: ${{ secrets.clone_token }}
+      - name: Checkout repository
+        if: ${{ !env.GH_TOKEN }}
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+        env:
+          GH_TOKEN: ${{ secrets.clone_token }}
+      - name: Install cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@b6ee8f83b9a8b8ef7f46b5a8ff326f488b386693
+        with:
+          cosign-release: 'v1.13.6'
+      # for multi arch container builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@master
+        with:
+          platforms: all
+      - name: Setup Docker buildx
+        id: buildx
+        timeout-minutes: 4
+        uses: docker/setup-buildx-action@941183f0a080fa6be59a9e3d3f4108c19a528204
+      - name: Log into registry
+        timeout-minutes: 5
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get Default Branch Name
+        id: default-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "name=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name) >> $GITHUB_OUTPUT"
+      - name: Extract Docker metadata
+        id: meta
+        timeout-minutes: 5
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=schedule
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', steps.default-branch.outputs.name) }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+            type=raw,value={{date 'YYYYMMDD'}}-{{sha}}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.download_artifact != '' }}
+        with:
+          name: ${{ inputs.download_artifact }}
+          path: ${{ inputs.download_artifact_path }}
+      - name: Display structure before build
+        run: ls -R
+      - name: Build Docker image
+        id: build
+        timeout-minutes: 25
+        uses: docker/build-push-action@548776e8d0d44ea63feed0c8a944e6235fc63eee
+        with:
+          context: ${{ inputs.context }}
+          load: true
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+      - name: Get Short SHA
+        id: short-sha
+        run: |
+          export SHORT_SHA=$(git rev-parse --short HEAD)
+          export SHORT_SHA_TAG_ONLY=sha-$SHORT_SHA
+          echo "sha_short=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "build_tag=$SHORT_SHA_TAG_ONLY" >> $GITHUB_OUTPUT
+          echo "sha_tag=${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}:sha-$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Scan image
+        id: scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.short-sha.outputs.sha_tag }}
+          format: 'sarif'
+          output: 'scan-results.sarif'
+      - name: Upload Container Scan SARIF report
+        if: ${{ inputs.codeql_enabled }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'scan-results.sarif'
+      - name: Push image
+        if: ${{ github.event_name != 'pull_request' || inputs.push_in_pr }}
+        id: push
+        timeout-minutes: 60
+        uses: docker/build-push-action@548776e8d0d44ea63feed0c8a944e6235fc63eee
+        with:
+          context: ${{ inputs.context }}
+          builder: ${{ steps.buildx.outputs.name }}
+          load: false
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          platforms: ${{ inputs.platforms}}
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign --force --recursive ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
