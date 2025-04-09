@@ -43,7 +43,7 @@ on:
       registry:
         type: string
         required: false
-        default: 'ghcr.io/curium-rocks'
+        default: 'ghcr.io/caj2'
       push_in_pr:
         type: boolean
         required: false
@@ -94,16 +94,6 @@ jobs:
           submodules: recursive
         env:
           GH_TOKEN: ${{ secrets.clone_token }}
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@b6ee8f83b9a8b8ef7f46b5a8ff326f488b386693
-        with:
-          cosign-release: 'v1.13.6'
-      # for multi arch container builds
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@master
-        with:
-          platforms: all
       - name: Setup Docker buildx
         id: buildx
         timeout-minutes: 4
@@ -164,18 +154,6 @@ jobs:
           echo "build_tag=$SHORT_SHA_TAG_ONLY" >> $GITHUB_OUTPUT
           echo "sha_tag=${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}:sha-$SHORT_SHA" >> $GITHUB_OUTPUT
 
-      - name: Scan image
-        id: scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ steps.short-sha.outputs.sha_tag }}
-          format: 'sarif'
-          output: 'scan-results.sarif'
-      - name: Upload Container Scan SARIF report
-        if: ${{ inputs.codeql_enabled }}
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'scan-results.sarif'
       - name: Push image
         if: ${{ github.event_name != 'pull_request' || inputs.push_in_pr }}
         id: push
@@ -191,8 +169,3 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           platforms: ${{ inputs.platforms}}
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        run: cosign sign --force --recursive ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
