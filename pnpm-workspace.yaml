@@ -2,3 +2,5 @@ packages:
   - "packages/*"
   - apps/api
   - apps/frontend
+syncInjectedDepsAfterScripts:
+  - build
