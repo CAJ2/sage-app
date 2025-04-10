@@ -54,7 +54,7 @@ jobs:
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
   build-image:
-    name: 'Build container image'
+    name: 'Build images'
     uses: ./.github/workflows/oci-build-image.yml
     if: github.event_name != 'pull_request'
     needs: test
@@ -63,6 +63,14 @@ jobs:
       packages: write
       security-events: write
       id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image_name: sageleaf-api
+            target: api
+          - image_name: sageleaf-frontend
+            target: frontend
     with:
       registry: ghcr.io/caj2
-      image_name: sageleaf-api
+      image_name: sageleaf
