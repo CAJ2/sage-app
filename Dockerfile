@@ -3,7 +3,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS build
-RUN corepack enable && corepack install --global pnpm@10.4.0
+RUN corepack enable && corepack install --global pnpm@10.8.0
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN pnpm add -g nx@latest
 COPY package.json pnpm-*.yaml nx.json /usr/src/app/

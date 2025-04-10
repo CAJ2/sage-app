@@ -22,15 +22,21 @@ if (url?.includes('sslmode=disable')) {
 } else if (url?.includes('sslmode=no-verify')) {
   ssl = { rejectUnauthorized: false }
 }
-const metadataCache = process.env.NODE_ENV === 'production'
-  ? { enabled: true, adapter: GeneratedCacheAdapter, options: { data: require('../temp/metadata.json') } }
-  : undefined
+let metadataCache: any = undefined
+if (process.env.NODE_ENV === 'production') {
+  metadataCache = {
+    enabled: true,
+    adapter: GeneratedCacheAdapter,
+    options: {
+      data: require('../temp/metadata.json'),
+    },
+  }
+}
 
 export default defineConfig({
   entities: [join(process.cwd(), 'dist/**/*.entity.js')],
   entitiesTs: [join(process.cwd(), 'src/**/*.entity.ts')],
   strict: true,
-  preferTs: process.env.NODE_ENV !== 'production',
   clientUrl: url,
   dbName: process.env.NODE_ENV === 'test' ? ':memory:' : undefined,
   driverOptions: {
