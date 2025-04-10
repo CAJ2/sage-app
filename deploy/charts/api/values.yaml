@@ -43,6 +43,10 @@ service:
   type: ClusterIP
   port: 3000
 
+env:
+  configMap: api-configmap
+  secret: api-secret
+
 ingress:
   enabled: false
   className: ''

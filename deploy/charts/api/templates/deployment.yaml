@@ -37,6 +37,12 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.env.configMap }}
+            - secretRef:
+                name: {{ .Values.env.secret }}
+                optional: true
           livenessProbe:
             httpGet:
               path: /health
