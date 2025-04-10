@@ -73,4 +73,5 @@ jobs:
             target: frontend
     with:
       registry: ghcr.io/caj2
-      image_name: sageleaf
+      image_name: ${{ matrix.image_name }}
+      target: ${{ matrix.target }}
