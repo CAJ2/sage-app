@@ -1,0 +1,1 @@
+DATABASE_URL="cockroachdb://user@node:26257/sage" pnpm exec mikro-orm cache:generate --combined --ts
