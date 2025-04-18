@@ -737,7 +737,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "json"
         },
         "desc": {
@@ -767,6 +767,15 @@
           "nullable": true,
           "length": 255,
           "mappedType": "string"
+        },
+        "osm": {
+          "name": "osm",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "places",
@@ -855,23 +864,33 @@
           "nullable": false,
           "mappedType": "json"
         },
-        "admin_level": {
-          "name": "admin_level",
-          "type": "smallint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "smallint"
-        },
         "geo": {
           "name": "geo",
           "type": "geography(multipolygon)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "unknown"
+        },
+        "properties": {
+          "name": "properties",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "placetype": {
+          "name": "placetype",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "regions",
@@ -1391,11 +1410,32 @@
           "nullable": true,
           "length": 255,
           "mappedType": "string"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "tags",
       "schema": "public",
       "indexes": [
+        {
+          "keyName": "tags_type_tag_id_unique",
+          "columnNames": [
+            "type",
+            "tag_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "tags_pkey",
           "columnNames": [

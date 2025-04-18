@@ -92,7 +92,7 @@ export class Migration20250320130239 extends Migration {
                    "created_at" timestamptz not null default current_timestamp(),
                    "updated_at" timestamptz not null default current_timestamp(),
                    "name" jsonb not null,
-                   "address" jsonb not null,
+                   "address" jsonb null,
                    "desc" jsonb null,
                    "location" geography (point) not null,
                    "org_id" varchar(255) null,
@@ -116,7 +116,7 @@ export class Migration20250320130239 extends Migration {
                    "updated_at" timestamptz not null default current_timestamp(),
                    "name" jsonb not null,
                    "admin_level" smallint not null,
-                   "geo" geography (multipolygon) not null,
+                   "geo" geography (multipolygon) null,
                    constraint "regions_pkey" primary key ("id")
                  );`)
     this.addSql(

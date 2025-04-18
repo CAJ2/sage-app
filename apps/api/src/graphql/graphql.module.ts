@@ -1,18 +1,12 @@
 import { IncomingMessage } from 'http'
 import { join } from 'path'
-import {} from '@apollo/server'
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
-import { ApolloDriver } from '@nestjs/apollo'
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { DynamicModule, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { Int, GraphQLModule as NestGraphQLModule } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import {
-  DirectiveLocation,
-  GraphQLBoolean,
-  GraphQLDirective,
-  GraphQLError,
-} from 'graphql'
+import { DirectiveLocation, GraphQLBoolean, GraphQLDirective } from 'graphql'
 import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
 import { CacheControlScopeEnum } from './cache-control'
 import { Context, IncomingMessageWithAuthCode } from './graphql.context'
@@ -25,7 +19,7 @@ export class GraphQLModule {
       driver: ApolloDriver,
       imports: [ConfigModule],
 
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService): ApolloDriverConfig => {
         const context: Context = {}
 
         return {
@@ -68,13 +62,15 @@ export class GraphQLModule {
               embed: true,
             }),
           ],
+          hideSchemaDetailsFromClientErrors:
+            process.env.NODE_ENV === 'production',
           resolvers: {
             DateTime: LuxonDateTimeResolver,
             JSONObject: JSONObjectResolver,
           },
           status400ForVariableCoercionErrors: true,
-          formatError: (err: GraphQLError) => this.formatError(err, context),
-          bodyParserConfig: false,
+          formatError: (err: GraphQLFormattedError) =>
+            this.formatError(err, context),
         }
       },
     })
@@ -88,7 +84,7 @@ export class GraphQLModule {
   }
 
   private static formatError(
-    error: GraphQLError,
+    error: GraphQLFormattedError,
     ctx: Context,
   ): GraphQLFormattedError {
     const msg = ctx.req as IncomingMessageWithAuthCode

@@ -32,11 +32,14 @@ export class Region extends BaseEntity {
   @Property({ type: 'json' })
   name!: TranslatedField
 
-  @Property({ type: 'int2' })
-  admin_level!: number
-
   @Property({ type: MultiPolygonType })
-  geo!: MultiPolygon
+  geo?: MultiPolygon
+
+  @Property({ type: 'json' })
+  properties!: Record<string, any>
+
+  @Property()
+  placetype!: string
 
   @OneToMany({ mappedBy: 'region' })
   variants = new Collection<Variant>(this)

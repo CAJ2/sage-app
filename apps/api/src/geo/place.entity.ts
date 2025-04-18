@@ -11,7 +11,7 @@ import {
   Property,
   Ref,
 } from '@mikro-orm/core'
-import { IDCreatedUpdated } from '@src/db/base.entity'
+import { CreatedUpdated } from '@src/db/base.entity'
 import { Point, PointType } from '@src/db/custom.types'
 import { TranslatedField } from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
@@ -21,12 +21,15 @@ import { User } from '@src/users/users.entity'
 
 @Entity({ tableName: 'places', schema: 'public' })
 @Index({ properties: ['location'], type: 'gist' })
-export class Place extends IDCreatedUpdated {
+export class Place extends CreatedUpdated {
+  @PrimaryKey()
+  id!: string
+
   @Property({ type: 'json' })
   name!: TranslatedField
 
   @Property({ type: 'json' })
-  address!: TranslatedField
+  address?: TranslatedField
 
   @Property({ type: 'json' })
   desc?: TranslatedField
@@ -36,6 +39,9 @@ export class Place extends IDCreatedUpdated {
 
   @ManyToOne()
   org?: Ref<Org>
+
+  @Property({ type: 'json' })
+  osm?: {}
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => PlacesTag })
   tags = new Collection<Tag>(this)

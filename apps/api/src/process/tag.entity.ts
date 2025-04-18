@@ -1,4 +1,11 @@
-import { Collection, Entity, Enum, ManyToMany, Property } from '@mikro-orm/core'
+import {
+  Collection,
+  Entity,
+  Enum,
+  ManyToMany,
+  Property,
+  Unique,
+} from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
 import { Place } from '@src/geo/place.entity'
@@ -12,6 +19,7 @@ export enum TagType {
 }
 
 @Entity({ tableName: 'tags', schema: 'public' })
+@Unique({ properties: ['type', 'tag_id'] })
 export class Tag extends IDCreatedUpdated {
   @Property({ type: 'json' })
   name!: TranslatedField
@@ -30,6 +38,9 @@ export class Tag extends IDCreatedUpdated {
 
   @Property()
   image?: string
+
+  @Property()
+  tag_id?: string
 
   @ManyToMany(() => Place, (place) => place.tags)
   places = new Collection<Place>(this)
