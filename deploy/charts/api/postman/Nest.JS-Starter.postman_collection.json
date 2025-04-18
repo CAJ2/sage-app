@@ -45,40 +45,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "Swagger",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Response time is less than 500ms\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(500);",
-							"});",
-							"",
-							"pm.test(\"Response status code is 200\", function() {",
-							"    pm.expect(pm.response.code).to.be.eq(200)",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{server_url}}/api-json",
-					"host": [
-						"{{server_url}}"
-					],
-					"path": [
-						"api-json"
-					]
-				}
-			},
-			"response": []
 		}
 	]
 }

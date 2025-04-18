@@ -41,7 +41,7 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 3000
+  port: 4444
 
 env:
   configMap: api-configmap
