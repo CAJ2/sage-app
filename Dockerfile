@@ -21,7 +21,7 @@ FROM base AS api
 COPY --from=api-build /prod/api /prod/api
 ENV NODE_ENV=production
 WORKDIR /prod/api
-EXPOSE 3000
+EXPOSE 4444
 CMD [ "node", "dist/main" ]
 
 FROM build AS frontend-build
