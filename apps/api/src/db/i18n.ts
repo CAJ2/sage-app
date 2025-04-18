@@ -7,21 +7,33 @@ export const Locales = ['en-US', 'sv-SE'] as const
 
 export type LocaleType = (typeof Locales)[number]
 
-export type LocaleText = {
-  auto?: boolean
-  text: string
-}
-
-const validFields = ['default', ...Locales]
+// Default language is represented as 'xx' in the database
+// and it can only be saved when there no other known languages
+// set and the input is of an unknown language.
+const validFields = ['xx', ...Locales]
 for (const lang of Locales) {
   validFields.push(lang.split('-')[0])
 }
-export const TranslatedJSON = z.record(
-  z.string(),
-  z.object({
-    auto: z.boolean().optional(),
-    text: z.string(),
-  }),
+export const TranslatedJSON = z.record(z.string(), z.string()).refine(
+  (data) => {
+    const keys = Object.keys(data)
+    for (const key of keys) {
+      const keyParts = key.split(';')
+      if (!validFields.includes(keyParts[0])) {
+        return false
+      }
+      if (keyParts.length > 1 && keyParts[1] !== 'auto') {
+        return false
+      }
+      if (!data[key]) {
+        return false
+      }
+    }
+    return true
+  },
+  {
+    message: 'Invalid translated field',
+  },
 )
 
 type TF = z.infer<typeof TranslatedJSON>
@@ -48,13 +60,13 @@ export function transformTranslatedField(
   if (_.isArray(obj._lang)) {
     const lang: string[] = obj._lang
     const langKey = _.findKey(field, (value: any, key: string) => {
-      return lang.includes(key)
+      return lang.includes(key.split(';')[0])
     })
     if (langKey) {
-      return (field as any)[langKey].text
+      return (field as any)[langKey]
     }
   }
-  return field.default?.text
+  return field.xx
 }
 
 export function setTranslatedField(
@@ -64,21 +76,17 @@ export function setTranslatedField(
   isAuto = false,
 ): void {
   if (!lang) {
-    lang = 'default'
+    lang = 'xx'
   }
   const bits = lang.split('-')
   if (bits.length >= 2) {
     lang = bits[0]
   }
-  if (!obj) obj = {}
-  if (!obj[lang]) {
-    obj[lang] = {
-      text: value,
-    }
-    obj[lang].auto = isAuto || undefined
+  if (isAuto) {
+    lang = `${lang};auto`
   }
-  obj[lang].text = value
-  obj[lang].auto = isAuto || undefined
+  if (!obj) obj = {}
+  obj[lang] = value
 }
 
 const supported = Locales.map((support) => {

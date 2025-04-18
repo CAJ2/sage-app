@@ -12,10 +12,10 @@ export class OrgFactory extends Factory<Org> {
       name,
       slug: _.snakeCase(faker.company.name()),
       name_translations: {
-        en: { text: name },
+        en: name,
       },
       desc: {
-        en: { text: faker.lorem.paragraph() },
+        en: faker.lorem.paragraph(),
       },
       avatar_url: faker.image.avatar(),
       website_url: faker.internet.url(),

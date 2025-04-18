@@ -8,9 +8,7 @@ export class OrgSeeder extends Seeder {
       name: 'Sage',
       slug: 'sage',
       desc: {
-        en: {
-          text: 'Sage is a circular economy database',
-        },
+        en: 'Sage is a circular economy database',
       },
       metadata: '{}',
       updated_at: new Date(),

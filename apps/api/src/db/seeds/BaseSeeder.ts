@@ -21,7 +21,7 @@ export class BaseSeeder extends Seeder {
       const root = em.create(Category, {
         id: CATEGORY_ROOT,
         name: {
-          default: CATEGORY_ROOT,
+          xx: CATEGORY_ROOT,
         },
         created_at: new Date(),
         updated_at: new Date(),
@@ -41,7 +41,7 @@ export class BaseSeeder extends Seeder {
       const root = em.create(Material, {
         id: MATERIAL_ROOT,
         name: {
-          default: MATERIAL_ROOT,
+          xx: MATERIAL_ROOT,
         },
         source: {},
         technical: false,
