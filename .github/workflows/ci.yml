@@ -30,12 +30,6 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
-      # This enables task distribution via Nx Cloud
-      # Run this command as early as possible, before dependencies are installed
-      # Learn more at https://nx.dev/ci/reference/nx-cloud-cli#npx-nxcloud-startcirun
-      # Uncomment this line to enable task distribution
-      # - run: pnpm dlx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
-
       # Cache node_modules
       - uses: actions/setup-node@v4
         with:
@@ -45,9 +39,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
-      # - run: pnpm exec nx-cloud record -- echo Hello World
-      # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
+      # Run migrations
+      - run: pnpm --filter api exec mikro-orm migration:up
+        env:
+          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+
+      # Run tests, build, and check linting
       - run: pnpm exec nx affected -t lint:ci test build
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
