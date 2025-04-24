@@ -40,6 +40,12 @@ export class Material extends IDCreatedUpdated {
   @OneToMany(() => MaterialTree, (tree) => tree.descendant)
   descendants = new Collection<MaterialTree>(this)
 
+  @OneToMany(() => MaterialEdge, (edge) => edge.parent)
+  parents = new Collection<MaterialEdge>(this)
+
+  @OneToMany(() => MaterialEdge, (edge) => edge.child)
+  children = new Collection<MaterialEdge>(this)
+
   @OneToMany({ mappedBy: 'primary_material' })
   primary_components = new Collection<Component>(this)
 
@@ -65,6 +71,15 @@ export class MaterialTree extends BaseEntity {
 
   @Property()
   depth!: number
+}
+
+@Entity({ tableName: 'material_edges', schema: 'public' })
+export class MaterialEdge extends BaseEntity {
+  @ManyToOne({ primary: true })
+  parent!: Material
+
+  @ManyToOne({ primary: true, index: true })
+  child!: Material
 }
 
 @Entity({ tableName: 'material_history', schema: 'public' })
