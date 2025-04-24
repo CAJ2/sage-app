@@ -38,6 +38,12 @@ export class Category extends IDCreatedUpdated {
   @OneToMany(() => CategoryTree, (tree) => tree.descendant)
   descendants = new Collection<CategoryTree>(this)
 
+  @OneToMany(() => CategoryEdge, (edge) => edge.parent)
+  parents = new Collection<CategoryEdge>(this)
+
+  @OneToMany(() => CategoryEdge, (edge) => edge.child)
+  children = new Collection<CategoryEdge>(this)
+
   @ManyToMany({
     entity: () => 'Item',
     mappedBy: (item: Item) => item.categories,
@@ -63,6 +69,15 @@ export class CategoryTree extends BaseEntity {
 
   @Property({ default: 0 })
   depth!: number
+}
+
+@Entity({ tableName: 'category_edges', schema: 'public' })
+export class CategoryEdge extends BaseEntity {
+  @ManyToOne({ primary: true })
+  parent!: Category
+
+  @ManyToOne({ primary: true, index: true })
+  child!: Category
 }
 
 @Entity({ tableName: 'category_history', schema: 'public' })
