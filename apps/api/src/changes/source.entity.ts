@@ -8,6 +8,10 @@ import {
   Ref,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
+import { Component } from '@src/process/component.entity'
+import { Process } from '@src/process/process.entity'
+import { Variant } from '@src/product/variant.entity'
+import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { Change } from './change.entity'
 
@@ -45,4 +49,25 @@ export class Source extends IDCreatedUpdated {
 
   @Property({ type: 'json', nullable: true })
   metadata?: Record<string, any>
+}
+
+@Entity({ tableName: 'external_sources', schema: 'public' })
+export class ExternalSource {
+  @Property({ primary: true })
+  source!: string
+
+  @Property({ primary: true })
+  source_id!: string
+
+  @ManyToOne(() => Org)
+  org?: Ref<Org>
+
+  @ManyToOne(() => Variant)
+  variant?: Ref<Variant>
+
+  @ManyToOne(() => Component)
+  component?: Ref<Component>
+
+  @ManyToOne(() => Process)
+  process?: Ref<Process>
 }
