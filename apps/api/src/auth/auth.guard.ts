@@ -2,7 +2,6 @@ import { createParamDecorator, Inject, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { APIError, type getSession } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
-import { ClsService } from 'nestjs-cls'
 import { AUTH_INSTANCE_KEY } from './symbols'
 import type { CanActivate, ExecutionContext } from '@nestjs/common'
 import type { Auth } from 'better-auth'
@@ -28,7 +27,6 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     @Inject(AUTH_INSTANCE_KEY)
     private readonly auth: Auth,
-    private readonly cls: ClsService,
   ) {}
 
   /**

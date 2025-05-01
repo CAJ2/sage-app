@@ -22,6 +22,7 @@ import { createAuthMiddleware } from 'better-auth/api'
 import { toNodeHandler } from 'better-auth/node'
 import { APIErrorExceptionFilter } from './api-error-exception-filter'
 import { configureAuth } from './auth'
+import { AuthGuard } from './auth.guard'
 import { AuthResolver } from './auth.resolver'
 import { AuthService } from './auth.service'
 import { SkipBodyParsingMiddleware } from './middlewares'
@@ -54,7 +55,7 @@ const HOOKS = [
  */
 @Module({
   imports: [MikroOrmModule, UsersModule, DiscoveryModule],
-  providers: [AuthService, AuthResolver, UsersService],
+  providers: [AuthService, AuthResolver, UsersService, AuthGuard],
 })
 export class AuthModule implements NestModule, OnModuleInit {
   constructor(
