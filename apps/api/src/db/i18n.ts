@@ -22,7 +22,7 @@ export const TranslatedJSON = z.record(z.string(), z.string()).refine(
       if (!validFields.includes(keyParts[0])) {
         return false
       }
-      if (keyParts.length > 1 && keyParts[1] !== 'auto') {
+      if (keyParts.length > 1 && keyParts[1] !== 'a') {
         return false
       }
       if (!data[key]) {
@@ -46,13 +46,15 @@ export function defaultTranslatedField(): TranslatedField {
 export function isTranslatedField(
   data: Record<string, any>,
 ): data is TranslatedField {
-  return TranslatedJSON.safeParse(data).success
+  const result = TranslatedJSON.safeParse(data)
+  return result.success
 }
 
-export function transformTranslatedField(
-  params: TransformFnParams,
-): string | undefined {
+export function translate(params: TransformFnParams): string | undefined {
   const { value, obj } = params
+  if (!value) {
+    return value
+  }
   if (!isTranslatedField(value)) {
     throw new GraphQLError('Invalid translated field')
   }
