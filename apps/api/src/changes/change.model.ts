@@ -118,6 +118,10 @@ export class UpdateChangeInput {
   metadata?: Record<string, any>
 }
 
+export interface MergeInput {
+  apply?: boolean
+}
+
 export function ChangeInputWithLang() {
   @InputType()
   class ChangeInputWithLangCls extends InputWithLang {
@@ -134,6 +138,9 @@ export function ChangeInputWithLang() {
 
     @Field(() => [ID], { nullable: true })
     remove_sources?: string[]
+
+    @Field(() => Boolean, { nullable: true })
+    apply?: boolean
   }
   return ChangeInputWithLangCls
 }

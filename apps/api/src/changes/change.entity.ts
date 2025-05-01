@@ -21,9 +21,13 @@ export enum ChangeStatus {
 }
 
 export class Edit {
-  model!: string
+  // The name of the created/updated/deleted entity
+  entity_name!: string
+  // If the entity currently exists, this is the ID
   id?: string
+  // The current state of the entity
   original?: Record<string, any>
+  // The new state of the entity
   changes?: Record<string, any>
 }
 

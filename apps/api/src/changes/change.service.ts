@@ -1,9 +1,21 @@
-import { EntityManager, ref } from '@mikro-orm/postgresql'
+import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
-import { Change, ChangeStatus } from './change.entity'
-import { CreateChangeInput, UpdateChangeInput } from './change.model'
+import _ from 'lodash'
+import { Change, ChangeStatus, Edit } from './change.entity'
+import {
+  CreateChangeInput,
+  MergeInput,
+  UpdateChangeInput,
+} from './change.model'
 import { Source } from './source.entity'
+import type {
+  EntityName,
+  FilterQuery,
+  Loaded,
+  Reference,
+} from '@mikro-orm/postgresql'
 
 @Injectable()
 export class ChangeService {
@@ -40,6 +52,30 @@ export class ChangeService {
       items: sources,
       count,
     }
+  }
+
+  async findOneOrCreate(
+    id?: string,
+    input?: CreateChangeInput,
+    userID?: string,
+  ) {
+    if (!id && !input) {
+      throw NotFoundErr('Must provide either a Change ID or Change input')
+    }
+    if (id && input) {
+      throw BadRequestErr('Cannot provide both a Change ID and Change input')
+    }
+    if (!userID) {
+      throw BadRequestErr('Must provide a user ID')
+    }
+
+    if (id) {
+      const change = await this.findOne(id)
+      return change
+    }
+
+    const newChange = await this.create(input!, userID)
+    return newChange
   }
 
   async create(input: CreateChangeInput, userID: string) {
@@ -98,5 +134,79 @@ export class ChangeService {
   async remove(id: string) {
     const change = await this.findOne(id)
     await this.em.removeAndFlush(change)
+  }
+
+  async findOneWithChange<T extends BaseEntity>(
+    change: Change,
+    model: EntityName<T>,
+    where: FilterQuery<T> & { id: string },
+  ): Promise<{ id: string } & Reference<Loaded<T>>> {
+    // First check if it exists in the change
+    const edit = change.edits.find((e) => {
+      if (e.entity_name === model && e.id === where.id) {
+        return true
+      }
+      return false
+    })
+    if (edit) {
+      return this.em.getReference(model, edit.id as any) as any
+    }
+    // If not, check if it exists in the database
+    const entity = await this.em.findOne<T>(model, where as FilterQuery<T>)
+    if (!entity) {
+      const entityName = model.toString()
+      throw NotFoundErr(`${entityName} with ID "${where.id}" not found`)
+    }
+    // TODO: Type this correctly?
+    return entity.toReference() as unknown as { id: string } & Reference<
+      Loaded<T>
+    >
+  }
+
+  async createEntityEdit(change: Change, entity: BaseEntity) {
+    const edit = new Edit()
+    edit.entity_name = entity.constructor.name
+    edit.changes = entity.toPOJO()
+    change.edits.push(edit)
+  }
+
+  async checkMerge(change: Change, mergeInput: MergeInput) {
+    if (change.status === ChangeStatus.APPROVED && mergeInput.apply) {
+      await this.merge(change)
+    }
+  }
+
+  async merge(change: Change) {
+    await this.em.begin()
+    try {
+      for (const edit of change.edits) {
+        if (edit.id) {
+          // This is an update
+          const entity = await this.em.findOne(edit.entity_name, {
+            id: edit.id,
+          })
+          if (!entity) {
+            throw NotFoundErr(
+              `Entity with ID "${edit.id}" not found in "${edit.entity_name}"`,
+            )
+          }
+          if (edit.original) {
+            _.merge(entity, edit.changes)
+          }
+          // TODO: Insert history
+        } else if (edit.changes) {
+          // This is a create
+          this.em.create(edit.entity_name, edit.changes)
+          // TODO: Insert history
+        }
+      }
+      change.status = ChangeStatus.MERGED
+      await this.em.commit()
+    } catch (error) {
+      await this.em.rollback()
+      change.status = ChangeStatus.REJECTED
+      await this.em.persistAndFlush(change)
+      throw error
+    }
   }
 }
