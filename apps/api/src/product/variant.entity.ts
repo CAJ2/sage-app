@@ -10,6 +10,7 @@ import {
   Property,
   Ref,
 } from '@mikro-orm/core'
+import { Source } from '@src/changes/source.entity'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
@@ -17,9 +18,13 @@ import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
-import { JsonLdDocument } from 'jsonld'
 import { Item } from './item.entity'
 import type { Opt } from '@mikro-orm/core'
+
+export enum VariantComponentUnit {
+  GRAMS = 'g',
+  LITERS = 'ml',
+}
 
 @Entity({ tableName: 'variants', schema: 'public' })
 export class Variant extends IDCreatedUpdated {
@@ -30,13 +35,13 @@ export class Variant extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  source!: JsonLdDocument
+  source!: {}
 
-  @Property({ type: 'json' })
-  files?: {}
+  @ManyToMany({ entity: () => Source, pivotEntity: () => VariantsSources })
+  sources = new Collection<Source>(this)
 
-  @Property({ type: 'json' })
-  links?: {}
+  @OneToMany(() => VariantsSources, (vs) => vs.variant)
+  variant_sources = new Collection<VariantsSources>(this)
 
   @ManyToOne()
   item?: Ref<Item>
@@ -66,6 +71,23 @@ export class Variant extends IDCreatedUpdated {
   history = new Collection<VariantHistory>(this)
 }
 
+@Entity({ tableName: 'variants_sources', schema: 'public' })
+export class VariantsSources extends BaseEntity {
+  @ManyToOne({ primary: true })
+  variant!: Variant
+
+  @ManyToOne({ primary: true })
+  source!: Source
+
+  // Metadata contains key value pairs for the connected
+  // source. For example: There is a single source for an API, but
+  // here the metadata contains an important string provided by that API.
+  // This can be used to format links directly to the source.
+  // If we just need external IDs, we use the ExternalSource entity.
+  @Property({ type: 'json' })
+  meta?: Record<string, any>
+}
+
 @Entity({ tableName: 'variants_tags', schema: 'public' })
 export class VariantsTags extends BaseEntity {
   @ManyToOne({ primary: true })
@@ -86,8 +108,11 @@ export class VariantsComponents extends BaseEntity {
   @ManyToOne({ primary: true })
   component!: Component
 
-  @Property()
+  @Property({ type: 'numeric', precision: 16, scale: 6 })
   quantity: number & Opt = 1
+
+  @Property({ type: 'string' })
+  unit?: VariantComponentUnit
 }
 
 @Entity({ tableName: 'variant_history', schema: 'public' })

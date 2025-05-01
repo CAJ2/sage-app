@@ -163,7 +163,7 @@ export class Migration20250320130239 extends Migration {
     this.addSql(`create table "components_materials" (
                    "component_id" varchar(255) not null,
                    "material_id" varchar(255) not null,
-                   "material_fraction" numeric(10, 0) not null default 0,
+                   "material_fraction" numeric(16, 6) not null default 0,
                    constraint "components_materials_pkey" primary key ("component_id", "material_id")
                  );`)
 
@@ -369,7 +369,7 @@ export class Migration20250320130239 extends Migration {
     this.addSql(`create table "variants_components" (
                    "variant_id" varchar(255) not null,
                    "component_id" varchar(255) not null,
-                   "quantity" int not null default 1,
+                   "quantity" numeric(16,6) not null default 1,
                    constraint "variants_components_pkey" primary key ("variant_id", "component_id")
                  );`)
 

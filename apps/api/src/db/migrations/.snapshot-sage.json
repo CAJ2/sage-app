@@ -1415,13 +1415,13 @@
         },
         "material_fraction": {
           "name": "material_fraction",
-          "type": "numeric(10,0)",
+          "type": "numeric(16,6)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "precision": 10,
-          "scale": 0,
+          "precision": 16,
+          "scale": 6,
           "default": "0",
           "mappedType": "decimal"
         }
@@ -1981,10 +1981,12 @@
           "primary": false,
           "nullable": false,
           "enumItems": [
+            "API",
             "TEXT",
             "IMAGE",
             "PDF",
             "URL",
+            "FILE",
             "VIDEO",
             "OTHER"
           ],
@@ -3730,24 +3732,6 @@
           "nullable": false,
           "mappedType": "json"
         },
-        "files": {
-          "name": "files",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "links": {
-          "name": "links",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "item_id": {
           "name": "item_id",
           "type": "varchar(255)",
@@ -4137,13 +4121,25 @@
         },
         "quantity": {
           "name": "quantity",
-          "type": "int",
+          "type": "numeric(16,6)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "precision": 16,
+          "scale": 6,
           "default": "1",
-          "mappedType": "integer"
+          "mappedType": "decimal"
+        },
+        "unit": {
+          "name": "unit",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "variants_components",
@@ -4185,6 +4181,82 @@
             "id"
           ],
           "referencedTableName": "public.components",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "variant_id": {
+          "name": "variant_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "variants_sources",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "variants_sources_pkey",
+          "columnNames": [
+            "variant_id",
+            "source_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "variants_sources_variant_id_foreign": {
+          "constraintName": "variants_sources_variant_id_foreign",
+          "columnNames": [
+            "variant_id"
+          ],
+          "localTableName": "public.variants_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.variants",
+          "updateRule": "cascade"
+        },
+        "variants_sources_source_id_foreign": {
+          "constraintName": "variants_sources_source_id_foreign",
+          "columnNames": [
+            "source_id"
+          ],
+          "localTableName": "public.variants_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.sources",
           "updateRule": "cascade"
         }
       },

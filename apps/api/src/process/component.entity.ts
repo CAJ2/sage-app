@@ -78,7 +78,7 @@ export class ComponentsMaterials extends BaseEntity {
   @ManyToOne({ primary: true })
   material!: Material
 
-  @Property({ type: 'numeric', default: 0 })
+  @Property({ type: 'numeric', precision: 16, scale: 6, default: 0 })
   material_fraction!: number
 }
 

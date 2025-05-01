@@ -111,6 +111,7 @@ type ComponentsPage {
 
 input CreateCategoryInput {
   add_sources: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   desc: String
@@ -136,6 +137,7 @@ input CreateChangeInput {
 
 input CreateComponentInput {
   add_sources: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   lang: String
@@ -150,6 +152,7 @@ type CreateComponentOutput {
 input CreateMaterialInput {
   add_sources: [ID!]
   ancestors: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   desc: String
@@ -167,6 +170,7 @@ type CreateMaterialOutput {
 
 input CreateProcessInput {
   add_sources: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   lang: String
@@ -194,6 +198,27 @@ input CreateTagInput {
   type: TagType!
 }
 
+input CreateVariantInput {
+  add_sources: [ID!]
+  apply: Boolean
+  change: CreateChangeInput
+  change_id: ID
+  components: [VariantComponentsInput!]
+  desc: String
+  item_id: ID
+  lang: String
+  name: String!
+  orgs: [VariantOrgsInput!]
+  region_id: ID
+  remove_sources: [ID!]
+  tags: [VariantTagsInput!]
+}
+
+type CreateVariantOutput {
+  change: Change
+  variant: Variant
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.
 """
@@ -212,7 +237,6 @@ type Item {
   categories(after: String, before: String, first: Int, last: Int): [Category!]!
   created_at: DateTime!
   desc: String
-  desc_short: String
   id: ID!
   image_url: String
   name: String
@@ -272,6 +296,7 @@ type Mutation {
   createProcess(input: CreateProcessInput!): CreateProcessOutput!
   createSource(input: CreateSourceInput!): Source!
   createTag(input: CreateTagInput!): Tag!
+  createVariant(input: CreateVariantInput!): CreateVariantOutput!
   deleteChange(id: ID!): Boolean!
   deleteSource(id: ID!): Boolean!
   markSourceProcessed(id: ID!): Source!
@@ -281,6 +306,7 @@ type Mutation {
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput!
   updateSource(input: UpdateSourceInput!): Source!
   updateTag(input: UpdateTagInput!): Tag!
+  updateVariant(input: UpdateVariantInput!): Variant!
 }
 
 type Org {
@@ -404,13 +430,14 @@ type Query {
   getTag(id: ID!): Tag!
   getTags(after: String, before: String, first: Int, last: Int): TagPage!
   getUser(id: ID!): User!
+  getVariant(id: ID!): Variant!
+  getVariants(after: String, before: String, first: Int, last: Int): VariantsPage!
   place(id: String!): Place
   places(page: Float = 1, perPage: Float = 10): PlacePage!
   region(id: String!): Region
   regions(page: Float = 1, perPage: Float = 10): RegionPage!
   rootCategory: Category!
   rootMaterial: Material!
-  variant(id: String!): Variant
 }
 
 type Region {
@@ -454,6 +481,8 @@ type SourceEdge {
 
 """Type of source data"""
 enum SourceType {
+  API
+  FILE
   IMAGE
   OTHER
   PDF
@@ -511,6 +540,7 @@ input UpdateChangeInput {
 
 input UpdateComponentInput {
   add_sources: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   lang: String
@@ -525,6 +555,7 @@ type UpdateComponentOutput {
 input UpdateMaterialInput {
   add_sources: [ID!]
   ancestors: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   desc: String
@@ -543,6 +574,7 @@ type UpdateMaterialOutput {
 
 input UpdateProcessInput {
   add_sources: [ID!]
+  apply: Boolean
   change: CreateChangeInput
   change_id: ID
   lang: String
@@ -570,6 +602,26 @@ input UpdateTagInput {
   meta_template: JSONObject
   name: String
   type: TagType
+}
+
+input UpdateVariantInput {
+  add_components: [VariantComponentsInput!]
+  add_orgs: [VariantOrgsInput!]
+  add_sources: [ID!]
+  add_tags: [VariantTagsInput!]
+  apply: Boolean
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  id: ID!
+  item_id: ID
+  lang: String
+  name: String
+  region_id: ID
+  remove_components: [VariantComponentsInput!]
+  remove_orgs: [VariantOrgsInput!]
+  remove_sources: [ID!]
+  remove_tags: [VariantTagsInput!]
 }
 
 type User {
@@ -605,7 +657,6 @@ type UserProfile {
 type Variant {
   created_at: DateTime!
   desc: String
-  desc_short: String
   history: [VariantHistory!]!
   id: ID!
   image_url: String
@@ -613,6 +664,12 @@ type Variant {
   name: String
   tags: [VariantTag!]!
   updated_at: DateTime!
+}
+
+input VariantComponentsInput {
+  id: ID!
+  quantity: Float
+  unit: String
 }
 
 type VariantEdge {
@@ -627,6 +684,22 @@ type VariantHistory {
   variant_id: String!
 }
 
+input VariantOrgsInput {
+  id: ID!
+}
+
 type VariantTag {
   tag_name: String!
+}
+
+input VariantTagsInput {
+  id: ID!
+  meta: JSONObject
+}
+
+type VariantsPage {
+  edges: [VariantEdge!]
+  nodes: [Variant!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }

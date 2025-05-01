@@ -13,7 +13,6 @@ import {
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
 import { User } from '@src/users/users.entity'
-import { JsonLdDocument } from 'jsonld'
 import { Category } from './category.entity'
 import { Variant } from './variant.entity'
 
@@ -26,7 +25,7 @@ export class Item extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  source!: JsonLdDocument
+  source!: {}
 
   @Property({ type: 'json' })
   tags?: {}

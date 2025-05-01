@@ -1,5 +1,6 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
+import { ChangesModule } from '@src/changes/changes.module'
 import { CategoryResolver } from './category.resolver'
 import { CategoryService } from './category.service'
 import { ItemResolver } from './item.resolver'
@@ -8,7 +9,7 @@ import { VariantResolver } from './variant.resolver'
 import { VariantService } from './variant.service'
 
 @Module({
-  imports: [MikroOrmModule.forFeature([])],
+  imports: [MikroOrmModule.forFeature([]), ChangesModule],
   providers: [
     CategoryResolver,
     ItemResolver,
