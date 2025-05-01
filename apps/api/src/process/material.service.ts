@@ -149,7 +149,7 @@ export class MaterialService {
     const change = new Change()
     change.edits = [
       {
-        model: 'Material',
+        entity_name: 'Material',
         id: material.id,
         changes: material.toObject(),
       },
@@ -182,7 +182,7 @@ export class MaterialService {
     const change = new Change()
     change.edits = [
       {
-        model: 'Material',
+        entity_name: 'Material',
         id: material.id,
         changes: material.toObject(),
       },

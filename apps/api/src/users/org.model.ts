@@ -1,6 +1,6 @@
 import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { transformTranslatedField } from '@src/db/i18n'
+import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
@@ -16,7 +16,7 @@ export class Org extends IDCreatedUpdated<OrgEntity> {
   slug!: string
 
   @Field(() => String, { nullable: true })
-  @Transform(transformTranslatedField)
+  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })

@@ -5,8 +5,10 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql'
+import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { Tag as TagEntity, TagType } from './tag.entity'
 
@@ -18,12 +20,14 @@ registerEnumType(TagType, {
 @ObjectType()
 export class Tag extends IDCreatedUpdated<TagEntity> {
   @Field(() => String)
+  @Transform(translate)
   name!: string
 
   @Field(() => TagType)
   type!: TagType
 
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })

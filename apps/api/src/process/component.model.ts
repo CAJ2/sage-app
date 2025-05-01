@@ -1,8 +1,10 @@
 import { ArgsType, Field, Float, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Transform } from 'class-transformer'
 import { MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -21,10 +23,12 @@ export class ComponentMaterial {
 @ObjectType()
 export class Component extends IDCreatedUpdated<ComponentEntity> {
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })

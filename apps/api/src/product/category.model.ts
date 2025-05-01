@@ -1,9 +1,11 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/db/i18n'
 import { CreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
+import { Transform } from 'class-transformer'
 import { IsOptional, IsUrl, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { Category as CategoryEntity } from './category.entity'
@@ -15,15 +17,18 @@ export class Category extends CreatedUpdated<CategoryEntity> {
   id!: string
 
   @Field(() => String)
+  @Transform(translate)
   @MaxLength(1024)
   name!: string
 
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   desc_short?: string
 
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })

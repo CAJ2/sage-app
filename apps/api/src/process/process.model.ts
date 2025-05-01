@@ -1,12 +1,14 @@
 import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/db/i18n'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
+import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { Material } from './material.model'
 import { Process as ProcessEntity, ProcessIntent } from './process.entity'
@@ -17,9 +19,11 @@ export class Process extends IDCreatedUpdated<ProcessEntity> {
   intent!: ProcessIntent
 
   @Field(() => String)
+  @Transform(translate)
   name!: string
 
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   desc?: string
 
   @Field(() => JSONObjectResolver)

@@ -1,8 +1,10 @@
 import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Transform } from 'class-transformer'
 import { IsUrl, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { Category } from './category.model'
@@ -12,14 +14,12 @@ import { Variant } from './variant.model'
 @ObjectType()
 export class Item extends IDCreatedUpdated<ItemEntity> {
   @Field(() => String, { nullable: true })
+  @Transform(translate)
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @MaxLength(1024)
-  desc_short?: string
-
-  @Field(() => String, { nullable: true })
+  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })
