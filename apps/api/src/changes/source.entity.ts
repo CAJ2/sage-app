@@ -16,10 +16,12 @@ import { User } from '@src/users/users.entity'
 import { Change } from './change.entity'
 
 export enum SourceType {
+  API = 'API',
   TEXT = 'TEXT',
   IMAGE = 'IMAGE',
   PDF = 'PDF',
   URL = 'URL',
+  FILE = 'FILE',
   VIDEO = 'VIDEO',
   OTHER = 'OTHER',
 }
