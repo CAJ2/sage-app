@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { CursorOptions } from '@src/common/transform'
 import { setTranslatedField } from '@src/db/i18n'
-import { Category, CategoryTree } from './category.entity'
+import { Category, CATEGORY_ROOT, CategoryTree } from './category.entity'
 import { CreateCategoryInput } from './category.model'
 
 @Injectable()
@@ -24,15 +24,11 @@ export class CategoryService {
   }
 
   async findRoot() {
-    const root = await this.em.findOne(
-      CategoryTree,
-      { ancestor: 'CATEGORY_ROOT', depth: 0 },
-      { populate: ['ancestor'] },
-    )
+    const root = await this.em.findOne(Category, { id: CATEGORY_ROOT })
     if (!root) {
       return null
     }
-    return root.ancestor as Category
+    return root as Category
   }
 
   async findDirectAncestors(childID: string, opts: CursorOptions<Category>) {
