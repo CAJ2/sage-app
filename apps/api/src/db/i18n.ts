@@ -71,12 +71,15 @@ export function translate(params: TransformFnParams): string | undefined {
   return field.xx
 }
 
-export function setTranslatedField(
+export function addTr(
   obj: TranslatedField | undefined,
   lang: string | undefined,
   value: string,
   isAuto = false,
-): void {
+) {
+  if (!value) {
+    return obj
+  }
   if (!lang) {
     lang = 'xx'
   }
@@ -85,10 +88,24 @@ export function setTranslatedField(
     lang = bits[0]
   }
   if (isAuto) {
-    lang = `${lang};auto`
+    lang = `${lang};a`
   }
   if (!obj) obj = {}
   obj[lang] = value
+  return obj
+}
+
+export function addTrReq(
+  obj: TranslatedField,
+  lang: string | undefined,
+  value: string,
+  isAuto = false,
+): TranslatedField {
+  const tr = addTr(obj, lang, value, isAuto)
+  if (!tr) {
+    throw new GraphQLError('Invalid translated field')
+  }
+  return tr
 }
 
 const supported = Locales.map((support) => {

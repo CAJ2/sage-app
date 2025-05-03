@@ -5,6 +5,8 @@ import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Component } from '@src/process/component.model'
+import { Org } from '@src/users/org.model'
 import { Transform } from 'class-transformer'
 import {
   IsOptional,
@@ -45,8 +47,14 @@ export class Variant extends IDCreatedUpdated<VariantEntity> {
   @Field(() => [Item])
   items: Item[] = []
 
+  @Field(() => [Org])
+  orgs: Org[] = []
+
   @Field(() => [VariantTag])
   tags: VariantTag[] = []
+
+  @Field(() => [Component])
+  components: Component[] = []
 
   @Field(() => [VariantHistory])
   history: VariantHistory[] = []
@@ -75,6 +83,15 @@ export class VariantsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class VariantComponentsArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class VariantOrgsArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class VariantTagsArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class VariantItemsArgs extends PaginationBasicArgs {}
 
 @InputType()
 export class VariantOrgsInput {

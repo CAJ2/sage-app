@@ -2,14 +2,15 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { ChangeService } from '@src/changes/change.service'
+import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
-import { setTranslatedField } from '@src/db/i18n'
+import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { Item } from './item.entity'
-import { Variant } from './variant.entity'
+import { Variant, VariantsTags } from './variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 @Injectable()
@@ -28,6 +29,66 @@ export class VariantService {
     const count = await this.em.count(Variant, opts.where)
     return {
       items: variants,
+      count,
+    }
+  }
+
+  async items(variantID: string, opts: CursorOptions<Item>) {
+    opts.where.variants = this.em.getReference(Variant, variantID)
+    const items = await this.em.find(Item, opts.where, opts.options)
+    const count = await this.em.count(Item, { variants: opts.where.variants })
+    return {
+      items,
+      count,
+    }
+  }
+
+  async orgs(variantID: string, opts: CursorOptions<Org>) {
+    opts.where.variants = this.em.getReference(Variant, variantID)
+    const orgs = await this.em.find(Org, opts.where, opts.options)
+    const count = await this.em.count(Org, { variants: opts.where.variants })
+    return {
+      items: orgs,
+      count,
+    }
+  }
+
+  async tags(variantID: string, opts: CursorOptions<Tag>) {
+    opts.where.variants = this.em.getReference(Variant, variantID)
+    const tagDefs = await this.em.find(Tag, opts.where, opts.options)
+    const tags = await this.em.find(
+      VariantsTags,
+      { variant: variantID },
+      {
+        orderBy: mapOrderBy(opts.options.orderBy, { id: 'tag' }),
+        limit: opts.options.limit,
+      },
+    )
+    const combinedTags = []
+    for (const tag of tags) {
+      const tagDef = tagDefs.find((t) => t.id === tag.tag.id)
+      if (tagDef) {
+        tagDef.meta = tag.meta
+        combinedTags.push(tagDef)
+      }
+    }
+    const count = await this.em.count(VariantsTags, {
+      variant: opts.where.variants,
+    })
+    return {
+      items: combinedTags,
+      count,
+    }
+  }
+
+  async components(variantID: string, opts: CursorOptions<Component>) {
+    opts.where.variants = this.em.getReference(Variant, variantID)
+    const components = await this.em.find(Component, opts.where, opts.options)
+    const count = await this.em.count(Component, {
+      variants: opts.where.variants,
+    })
+    return {
+      items: components,
       count,
     }
   }
@@ -73,10 +134,10 @@ export class VariantService {
     input: Partial<CreateVariantInput & UpdateVariantInput>,
   ) {
     if (input.name) {
-      setTranslatedField(variant.name, input.lang, input.name)
+      variant.name = addTrReq(variant.name, input.lang, input.name)
     }
     if (input.desc) {
-      setTranslatedField(variant.desc, input.lang, input.desc)
+      variant.desc = addTr(variant.desc, input.lang, input.desc)
     }
     if (input.item_id) {
       const item = await this.changeService.findOneWithChange(change, Item, {

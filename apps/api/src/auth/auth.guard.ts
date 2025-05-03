@@ -1,5 +1,7 @@
 import { createParamDecorator, Inject, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host'
+import { GqlArgumentsHost } from '@nestjs/graphql'
 import { APIError, type getSession } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
 import { AUTH_INSTANCE_KEY } from './symbols'
@@ -35,8 +37,12 @@ export class AuthGuard implements CanActivate {
    * @param context - The execution context of the current request
    * @returns True if the request is authorized to proceed, throws an error otherwise
    */
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest()
+  async canActivate(context: ExecutionContextHost): Promise<boolean> {
+    const gql = GqlArgumentsHost.create(context)
+    let request = gql.switchToHttp().getRequest()
+    if (!request && gql.getArgByIndex(2).req) {
+      request = gql.getArgByIndex(2).req
+    }
     const session = await this.auth.api.getSession({
       headers: fromNodeHeaders(request.headers),
     })
@@ -64,7 +70,11 @@ export class AuthGuard implements CanActivate {
 
 export const User = createParamDecorator(
   (data: keyof ReqUser | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest()
+    const gql = GqlArgumentsHost.create(ctx)
+    let request = gql.switchToHttp().getRequest()
+    if (!request && gql.getArgByIndex(2).req) {
+      request = gql.getArgByIndex(2).req
+    }
     const session = request.session as UserSession
 
     return data ? session?.user[data] : session?.user
