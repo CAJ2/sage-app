@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { CursorOptions } from '@src/common/transform'
-import { setTranslatedField } from '@src/db/i18n'
+import { addTr, addTrReq } from '@src/db/i18n'
 import { Component } from './component.entity'
 import { Material, MaterialTree } from './material.entity'
 import { CreateMaterialInput, UpdateMaterialInput } from './material.model'
@@ -112,9 +112,9 @@ export class MaterialService {
 
   async create(input: CreateMaterialInput) {
     const material = new Material()
-    setTranslatedField(material.name, input.lang, input.name)
+    material.name = addTrReq(material.name, input.lang, input.name)
     if (input.desc) {
-      setTranslatedField(material.desc, input.lang, input.desc)
+      material.desc = addTr(material.desc, input.lang, input.desc)
     }
     material.technical = input.technical
     if (input.ancestors) {
@@ -173,10 +173,10 @@ export class MaterialService {
     }
 
     if (input.name) {
-      setTranslatedField(material.name, input.lang, input.name)
+      material.name = addTrReq(material.name, input.lang, input.name)
     }
     if (input.desc) {
-      setTranslatedField(material.desc, input.lang, input.desc)
+      material.desc = addTr(material.desc, input.lang, input.desc)
     }
 
     const change = new Change()

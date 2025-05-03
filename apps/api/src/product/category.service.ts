@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { CursorOptions } from '@src/common/transform'
-import { setTranslatedField } from '@src/db/i18n'
+import { addTr, addTrReq } from '@src/db/i18n'
 import { Category, CATEGORY_ROOT, CategoryTree } from './category.entity'
 import { CreateCategoryInput } from './category.model'
 
@@ -76,12 +76,16 @@ export class CategoryService {
 
   async create(input: CreateCategoryInput) {
     const category = new Category()
-    setTranslatedField(category.name, input.lang, input.name)
+    category.name = addTrReq(category.name, input.lang, input.name)
     if (input.desc_short) {
-      setTranslatedField(category.desc_short, input.lang, input.desc_short)
+      category.desc_short = addTr(
+        category.desc_short,
+        input.lang,
+        input.desc_short,
+      )
     }
     if (input.desc) {
-      setTranslatedField(category.desc, input.lang, input.desc)
+      category.desc = addTr(category.desc, input.lang, input.desc)
     }
     category.image_url = input.image_url
     const change = new Change()
