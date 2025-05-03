@@ -2,6 +2,7 @@ import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
+import { User } from '@src/users/users.entity'
 import _ from 'lodash'
 import { Change, ChangeStatus, Edit } from './change.entity'
 import {
@@ -82,7 +83,7 @@ export class ChangeService {
     const change = new Change()
     change.title = input.title
     change.description = input.description
-    change.user.id = userID
+    change.user = ref(User, userID)
     change.status = input.status || ChangeStatus.DRAFT
     change.metadata = input.metadata
 
