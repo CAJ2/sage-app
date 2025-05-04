@@ -75,7 +75,7 @@ export class ComponentsSources extends BaseEntity {
   component!: Component
 
   @ManyToOne({ primary: true })
-  source!: Source
+  source!: Source & {}
 
   // Metadata contains key value pairs for the connected
   // source. For example: There is a single source for an API, but

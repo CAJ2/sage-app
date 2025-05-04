@@ -32,11 +32,17 @@ export class Material extends CreatedUpdated<MaterialEntity> {
   @Field(() => Boolean)
   technical: boolean = false
 
-  @Field(() => [Material])
-  ancestors: Material[] = []
+  @Field(() => MaterialsPage)
+  parents!: MaterialsPage & {}
 
-  @Field(() => [Material])
-  descendants: Material[] = []
+  @Field(() => MaterialsPage)
+  children!: MaterialsPage & {}
+
+  @Field(() => MaterialsPage)
+  ancestors!: MaterialsPage & {}
+
+  @Field(() => MaterialsPage)
+  descendants!: MaterialsPage & {}
 
   @Field(() => ComponentsPage)
   primary_components!: ComponentsPage & {}

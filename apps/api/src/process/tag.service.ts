@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
 import { Tag } from './tag.entity'
-import { CreateTagInput, UpdateTagInput } from './tag.model'
+import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'
 
 @Injectable()
 export class TagService {
@@ -21,13 +21,13 @@ export class TagService {
     return await this.em.findOne(Tag, { id })
   }
 
-  async create(input: CreateTagInput) {
+  async create(input: CreateTagDefinitionInput) {
     const tag = new Tag()
     await this.em.persistAndFlush(tag)
     return tag
   }
 
-  async update(input: UpdateTagInput) {
+  async update(input: UpdateTagDefinitionInput) {
     const tag = await this.em.findOne(Tag, { id: input.id })
     if (!tag) {
       throw new Error(`Tag with ID "${input.id}" not found`)

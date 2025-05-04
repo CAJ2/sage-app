@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common'
 import {
   Args,
   ID,
@@ -7,6 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
+import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -61,6 +63,30 @@ export class CategoryResolver {
   }
 
   @ResolveField()
+  async parents(@Parent() category: Category, @Args() args: CategoriesArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.categoryService.findParents(category.id, filter)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Category,
+      CategoriesPage,
+    )
+  }
+
+  @ResolveField()
+  async children(@Parent() category: Category, @Args() args: CategoriesArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.categoryService.findChildren(category.id, filter)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Category,
+      CategoriesPage,
+    )
+  }
+
+  @ResolveField()
   async ancestors(@Parent() category: Category, @Args() args: CategoriesArgs) {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.categoryService.findDirectAncestors(
@@ -94,10 +120,12 @@ export class CategoryResolver {
   }
 
   @Mutation(() => CreateCategoryOutput, { name: 'createCategory' })
+  @UseGuards(AuthGuard)
   async createCategory(
     @Args('input') input: CreateCategoryInput,
+    @User() user: ReqUser,
   ): Promise<CreateCategoryOutput> {
-    const created = await this.categoryService.create(input)
+    const created = await this.categoryService.create(input, user.id)
     const model = await this.transform.entityToModel(created.category, Category)
     const change = await this.transform.entityToModel(created.change, Change)
     return { category: model, change }

@@ -1,12 +1,14 @@
+import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { AuthGuard } from '@src/auth/auth.guard'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import {
-  CreateTagInput,
+  CreateTagDefinitionInput,
   Tag,
   TagArgs,
   TagPage,
-  UpdateTagInput,
+  UpdateTagDefinitionInput,
 } from './tag.model'
 import { TagService } from './tag.service'
 
@@ -33,14 +35,20 @@ export class TagResolver {
     return this.transform.entityToModel(tag, Tag)
   }
 
-  @Mutation(() => Tag, { name: 'createTag' })
-  async createTag(@Args('input') input: CreateTagInput): Promise<Tag> {
+  @Mutation(() => Tag, { name: 'createTagDefinition' })
+  @UseGuards(AuthGuard)
+  async createTagDefinition(
+    @Args('input') input: CreateTagDefinitionInput,
+  ): Promise<Tag> {
     const created = await this.tagService.create(input)
     return this.transform.entityToModel(created, Tag)
   }
 
-  @Mutation(() => Tag, { name: 'updateTag' })
-  async updateTag(@Args('input') input: UpdateTagInput): Promise<Tag> {
+  @Mutation(() => Tag, { name: 'updateTagDefinition' })
+  @UseGuards(AuthGuard)
+  async updateTagDefinition(
+    @Args('input') input: UpdateTagDefinitionInput,
+  ): Promise<Tag> {
     const updated = await this.tagService.update(input)
     return this.transform.entityToModel(updated, Tag)
   }

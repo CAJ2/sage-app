@@ -71,7 +71,7 @@ export class ItemsTags extends BaseEntity {
   item!: Item
 
   @ManyToOne({ primary: true })
-  tag!: Tag
+  tag!: Tag & {}
 
   @Property({ type: 'json' })
   meta?: Record<string, any>

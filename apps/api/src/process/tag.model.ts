@@ -18,7 +18,7 @@ registerEnumType(TagType, {
 })
 
 @ObjectType()
-export class Tag extends IDCreatedUpdated<TagEntity> {
+export class TagDefinition extends IDCreatedUpdated<TagEntity> {
   @Field(() => String)
   @Transform(translate)
   name!: string
@@ -41,13 +41,25 @@ export class Tag extends IDCreatedUpdated<TagEntity> {
 }
 
 @ObjectType()
+export class Tag extends TagDefinition {
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: Record<string, any>
+}
+
+@ObjectType()
+export class TagDefinitionPage extends Paginated(TagDefinition) {}
+
+@ArgsType()
+export class TagDefinitionArgs extends PaginationBasicArgs {}
+
+@ObjectType()
 export class TagPage extends Paginated(Tag) {}
 
 @ArgsType()
 export class TagArgs extends PaginationBasicArgs {}
 
 @InputType()
-export class CreateTagInput {
+export class CreateTagDefinitionInput {
   @Field(() => String)
   name!: string
 
@@ -68,7 +80,7 @@ export class CreateTagInput {
 }
 
 @InputType()
-export class UpdateTagInput {
+export class UpdateTagDefinitionInput {
   @Field(() => String)
   id!: string
 

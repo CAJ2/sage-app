@@ -18,6 +18,7 @@ type CategoriesPage {
 
 type Category {
   ancestors(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  children(after: String, before: String, first: Int, last: Int): CategoriesPage!
   created_at: DateTime!
   desc: String
   desc_short: String
@@ -26,6 +27,7 @@ type Category {
   image_url: String
   items: [Item!]!
   name: String!
+  parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
   updated_at: DateTime!
 }
 
@@ -149,6 +151,25 @@ type CreateComponentOutput {
   component: Component
 }
 
+input CreateItemInput {
+  add_sources: [ID!]
+  apply: Boolean
+  categories: [ItemCategoriesInput!]
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  image_url: String
+  lang: String
+  name: String
+  remove_sources: [ID!]
+  tags: [ItemTagsInput!]
+}
+
+type CreateItemOutput {
+  change: Change
+  item: Item
+}
+
 input CreateMaterialInput {
   add_sources: [ID!]
   ancestors: [ID!]
@@ -189,7 +210,7 @@ input CreateSourceInput {
   type: SourceType!
 }
 
-input CreateTagInput {
+input CreateTagDefinitionInput {
   bg_color: String
   desc: String
   image: String
@@ -240,13 +261,23 @@ type Item {
   id: ID!
   image_url: String
   name: String
+  tags(after: String, before: String, first: Int, last: Int): [Tag!]!
   updated_at: DateTime!
-  variants: [Variant!]!
+  variants(after: String, before: String, first: Int, last: Int): [Variant!]!
+}
+
+input ItemCategoriesInput {
+  id: ID!
 }
 
 type ItemEdge {
   cursor: String!
   node: Item!
+}
+
+input ItemTagsInput {
+  id: ID!
+  meta: JSONObject
 }
 
 type ItemsPage {
@@ -262,13 +293,15 @@ The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](
 scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 type Material {
-  ancestors(after: String, before: String, first: Int, last: Int): [Material!]!
+  ancestors(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  children(after: String, before: String, first: Int, last: Int): MaterialsPage!
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   created_at: DateTime!
   desc: String
-  descendants(after: String, before: String, first: Int, last: Int): [Material!]!
+  descendants(after: String, before: String, first: Int, last: Int): MaterialsPage!
   id: ID!
   name: String
+  parents(after: String, before: String, first: Int, last: Int): MaterialsPage!
   primary_components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   processes(after: String, before: String, first: Int, last: Int): ProcessPage!
   source: JSONObject
@@ -292,20 +325,22 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): CreateCategoryOutput!
   createChange(input: CreateChangeInput!): Change!
   createComponent(input: CreateComponentInput!): CreateComponentOutput!
+  createItem(input: CreateItemInput!): CreateItemOutput!
   createMaterial(input: CreateMaterialInput!): CreateMaterialOutput!
   createProcess(input: CreateProcessInput!): CreateProcessOutput!
   createSource(input: CreateSourceInput!): Source!
-  createTag(input: CreateTagInput!): Tag!
+  createTagDefinition(input: CreateTagDefinitionInput!): Tag!
   createVariant(input: CreateVariantInput!): CreateVariantOutput!
   deleteChange(id: ID!): Boolean!
   deleteSource(id: ID!): Boolean!
   markSourceProcessed(id: ID!): Source!
   updateChange(input: UpdateChangeInput!): Change!
   updateComponent(input: UpdateComponentInput!): UpdateComponentOutput!
+  updateItem(input: UpdateItemInput!): UpdateItemOutput!
   updateMaterial(input: UpdateMaterialInput!): UpdateMaterialOutput!
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput!
   updateSource(input: UpdateSourceInput!): Source!
-  updateTag(input: UpdateTagInput!): Tag!
+  updateTagDefinition(input: UpdateTagDefinitionInput!): Tag!
   updateVariant(input: UpdateVariantInput!): Variant!
 }
 
@@ -504,10 +539,28 @@ type Tag {
   desc: String
   id: ID!
   image: String
+  meta: JSONObject
   meta_template: JSONObject
   name: String!
   type: TagType!
   updated_at: DateTime!
+}
+
+type TagDefinition {
+  bg_color: String
+  created_at: DateTime!
+  desc: String
+  id: ID!
+  image: String
+  meta_template: JSONObject
+  name: String!
+  type: TagType!
+  updated_at: DateTime!
+}
+
+type TagDefinitionEdge {
+  cursor: String!
+  node: TagDefinition!
 }
 
 type TagEdge {
@@ -525,7 +578,9 @@ type TagPage {
 """The model type of the tag"""
 enum TagType {
   COMPONENT
+  ITEM
   PLACE
+  PROCESS
   VARIANT
 }
 
@@ -550,6 +605,28 @@ input UpdateComponentInput {
 type UpdateComponentOutput {
   change: Change
   component: Component
+}
+
+input UpdateItemInput {
+  add_categories: [ItemCategoriesInput!]
+  add_sources: [ID!]
+  add_tags: [ItemTagsInput!]
+  apply: Boolean
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  id: ID!
+  image_url: String
+  lang: String
+  name: String
+  remove_categories: [ItemCategoriesInput!]
+  remove_sources: [ID!]
+  remove_tags: [ItemTagsInput!]
+}
+
+type UpdateItemOutput {
+  change: Change
+  item: Item
 }
 
 input UpdateMaterialInput {
@@ -594,7 +671,7 @@ input UpdateSourceInput {
   type: SourceType
 }
 
-input UpdateTagInput {
+input UpdateTagDefinitionInput {
   bg_color: String
   desc: String
   id: String!
@@ -655,14 +732,16 @@ type UserProfile {
 }
 
 type Variant {
+  components(after: String, before: String, first: Int, last: Int): [Component!]!
   created_at: DateTime!
   desc: String
   history: [VariantHistory!]!
   id: ID!
   image_url: String
-  items: [Item!]!
+  items(after: String, before: String, first: Int, last: Int): [Item!]!
   name: String
-  tags: [VariantTag!]!
+  orgs(after: String, before: String, first: Int, last: Int): [Org!]!
+  tags(after: String, before: String, first: Int, last: Int): [VariantTag!]!
   updated_at: DateTime!
 }
 

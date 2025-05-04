@@ -4,7 +4,12 @@ import { Change } from '@src/changes/change.entity'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Component } from './component.entity'
-import { Material, MaterialTree } from './material.entity'
+import {
+  Material,
+  MATERIAL_ROOT,
+  MaterialEdge,
+  MaterialTree,
+} from './material.entity'
 import { CreateMaterialInput, UpdateMaterialInput } from './material.model'
 import { Process } from './process.entity'
 
@@ -26,15 +31,38 @@ export class MaterialService {
   }
 
   async findRoot() {
-    const root = await this.em.findOne(
-      MaterialTree,
-      { ancestor: 'MATERIAL_ROOT', depth: 0 },
-      { populate: ['ancestor'] },
-    )
-    if (!root) {
-      return null
+    const root = await this.em.findOne(Material, { id: MATERIAL_ROOT })
+    return root
+  }
+
+  async findParents(childID: string, opts: CursorOptions<Material>) {
+    const parents = await this.em
+      .createQueryBuilder(MaterialEdge)
+      .joinAndSelect('parent', 'parent')
+      .where({
+        child: childID,
+      })
+      .limit(opts.options.limit)
+      .getResult()
+    return {
+      items: parents.map((p) => p.parent) as Material[],
+      count: parents.length,
     }
-    return root.ancestor as Material
+  }
+
+  async findChildren(parentID: string, opts: CursorOptions<Material>) {
+    const children = await this.em
+      .createQueryBuilder(MaterialEdge)
+      .joinAndSelect('child', 'child')
+      .where({
+        parent: parentID,
+      })
+      .limit(opts.options.limit)
+      .getResult()
+    return {
+      items: children.map((c) => c.child) as Material[],
+      count: children.length,
+    }
   }
 
   async findDirectAncestors(materialID: string, opts: CursorOptions<Material>) {

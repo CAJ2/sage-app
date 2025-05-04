@@ -68,6 +68,30 @@ export class MaterialResolver {
   }
 
   @ResolveField()
+  async parents(@Parent() material: Material, @Args() args: MaterialsArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.materialService.findParents(material.id, filter)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Material,
+      MaterialsPage,
+    )
+  }
+
+  @ResolveField()
+  async children(@Parent() material: Material, @Args() args: MaterialsArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.materialService.findChildren(material.id, filter)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      Material,
+      MaterialsPage,
+    )
+  }
+
+  @ResolveField()
   async ancestors(@Parent() material: Material, @Args() args: MaterialsArgs) {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.materialService.findDirectAncestors(

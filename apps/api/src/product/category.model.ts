@@ -37,6 +37,12 @@ export class Category extends CreatedUpdated<CategoryEntity> {
   image_url?: string
 
   @Field(() => CategoriesPage)
+  parents!: CategoriesPage & {}
+
+  @Field(() => CategoriesPage)
+  children!: CategoriesPage & {}
+
+  @Field(() => CategoriesPage)
   ancestors!: CategoriesPage & {}
 
   @Field(() => CategoriesPage)
