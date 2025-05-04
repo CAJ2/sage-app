@@ -333,15 +333,6 @@
           "nullable": false,
           "mappedType": "json"
         },
-        "tags": {
-          "name": "tags",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "files": {
           "name": "files",
           "type": "jsonb",
@@ -1110,23 +1101,6 @@
           "default": "current_timestamp()",
           "mappedType": "datetime"
         },
-        "intent": {
-          "name": "intent",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "'COLLECTION'",
-          "enumItems": [
-            "COLLECTION",
-            "SORTATION",
-            "RECYCLE",
-            "REFURBISH",
-            "REUSE"
-          ],
-          "mappedType": "enum"
-        },
         "name": {
           "name": "name",
           "type": "jsonb",
@@ -1143,187 +1117,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "json"
-        },
-        "source": {
-          "name": "source",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
-        "material_id": {
-          "name": "material_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "org_id": {
-          "name": "org_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "region_id": {
-          "name": "region_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "place_id": {
-          "name": "place_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        }
-      },
-      "name": "processes",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "processes_pkey",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "processes_material_id_foreign": {
-          "constraintName": "processes_material_id_foreign",
-          "columnNames": [
-            "material_id"
-          ],
-          "localTableName": "public.processes",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.materials",
-          "updateRule": "cascade"
-        },
-        "processes_org_id_foreign": {
-          "constraintName": "processes_org_id_foreign",
-          "columnNames": [
-            "org_id"
-          ],
-          "localTableName": "public.processes",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.orgs",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "processes_region_id_foreign": {
-          "constraintName": "processes_region_id_foreign",
-          "columnNames": [
-            "region_id"
-          ],
-          "localTableName": "public.processes",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.regions",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "processes_place_id_foreign": {
-          "constraintName": "processes_place_id_foreign",
-          "columnNames": [
-            "place_id"
-          ],
-          "localTableName": "public.processes",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.places",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "current_timestamp()",
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "current_timestamp()",
-          "mappedType": "datetime"
-        },
-        "name": {
-          "name": "name",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
-        "desc": {
-          "name": "desc",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "source": {
-          "name": "source",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
           "mappedType": "json"
         },
         "region_id": {
@@ -1345,6 +1138,15 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "visual": {
+          "name": "visual",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "components",
@@ -1522,8 +1324,10 @@
           "nullable": false,
           "enumItems": [
             "PLACE",
+            "ITEM",
             "VARIANT",
-            "COMPONENT"
+            "COMPONENT",
+            "PROCESS"
           ],
           "mappedType": "enum"
         },
@@ -1672,6 +1476,82 @@
             "tag_id"
           ],
           "localTableName": "public.places_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.tags",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "item_id": {
+          "name": "item_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "items_tags",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "items_tags_pkey",
+          "columnNames": [
+            "item_id",
+            "tag_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "items_tags_item_id_foreign": {
+          "constraintName": "items_tags_item_id_foreign",
+          "columnNames": [
+            "item_id"
+          ],
+          "localTableName": "public.items_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.items",
+          "updateRule": "cascade"
+        },
+        "items_tags_tag_id_foreign": {
+          "constraintName": "items_tags_tag_id_foreign",
+          "columnNames": [
+            "tag_id"
+          ],
+          "localTableName": "public.items_tags",
           "referencedColumnNames": [
             "id"
           ],
@@ -2084,6 +1964,82 @@
     },
     {
       "columns": {
+        "component_id": {
+          "name": "component_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "components_sources",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "components_sources_pkey",
+          "columnNames": [
+            "component_id",
+            "source_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "components_sources_component_id_foreign": {
+          "constraintName": "components_sources_component_id_foreign",
+          "columnNames": [
+            "component_id"
+          ],
+          "localTableName": "public.components_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.components",
+          "updateRule": "cascade"
+        },
+        "components_sources_source_id_foreign": {
+          "constraintName": "components_sources_source_id_foreign",
+          "columnNames": [
+            "source_id"
+          ],
+          "localTableName": "public.components_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.sources",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
         "id": {
           "name": "id",
           "type": "varchar(255)",
@@ -2316,101 +2272,6 @@
             "user_id"
           ],
           "localTableName": "public.region_history",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.users",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "process_id": {
-          "name": "process_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "datetime": {
-          "name": "datetime",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "original": {
-          "name": "original",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "changes": {
-          "name": "changes",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        }
-      },
-      "name": "process_history",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "process_history_pkey",
-          "columnNames": [
-            "process_id",
-            "datetime"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "process_history_process_id_foreign": {
-          "constraintName": "process_history_process_id_foreign",
-          "columnNames": [
-            "process_id"
-          ],
-          "localTableName": "public.process_history",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.processes",
-          "updateRule": "cascade"
-        },
-        "process_history_user_id_foreign": {
-          "constraintName": "process_history_user_id_foreign",
-          "columnNames": [
-            "user_id"
-          ],
-          "localTableName": "public.process_history",
           "referencedColumnNames": [
             "id"
           ],
@@ -3793,6 +3654,399 @@
           ],
           "referencedTableName": "public.regions",
           "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp()",
+          "mappedType": "datetime"
+        },
+        "intent": {
+          "name": "intent",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'COLLECTION'",
+          "enumItems": [
+            "COLLECTION",
+            "SORTATION",
+            "RECYCLE",
+            "REFURBISH",
+            "REUSE"
+          ],
+          "mappedType": "enum"
+        },
+        "name": {
+          "name": "name",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "desc": {
+          "name": "desc",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "material_id": {
+          "name": "material_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "variant_id": {
+          "name": "variant_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "instructions": {
+          "name": "instructions",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "efficiency": {
+          "name": "efficiency",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "region_id": {
+          "name": "region_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "place_id": {
+          "name": "place_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "processes",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "processes_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "processes_material_id_foreign": {
+          "constraintName": "processes_material_id_foreign",
+          "columnNames": [
+            "material_id"
+          ],
+          "localTableName": "public.processes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.materials",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "processes_variant_id_foreign": {
+          "constraintName": "processes_variant_id_foreign",
+          "columnNames": [
+            "variant_id"
+          ],
+          "localTableName": "public.processes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.variants",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "processes_org_id_foreign": {
+          "constraintName": "processes_org_id_foreign",
+          "columnNames": [
+            "org_id"
+          ],
+          "localTableName": "public.processes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.orgs",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "processes_region_id_foreign": {
+          "constraintName": "processes_region_id_foreign",
+          "columnNames": [
+            "region_id"
+          ],
+          "localTableName": "public.processes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.regions",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "processes_place_id_foreign": {
+          "constraintName": "processes_place_id_foreign",
+          "columnNames": [
+            "place_id"
+          ],
+          "localTableName": "public.processes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.places",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "process_id": {
+          "name": "process_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "process_sources",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "process_sources_pkey",
+          "columnNames": [
+            "process_id",
+            "source_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "process_sources_process_id_foreign": {
+          "constraintName": "process_sources_process_id_foreign",
+          "columnNames": [
+            "process_id"
+          ],
+          "localTableName": "public.process_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.processes",
+          "updateRule": "cascade"
+        },
+        "process_sources_source_id_foreign": {
+          "constraintName": "process_sources_source_id_foreign",
+          "columnNames": [
+            "source_id"
+          ],
+          "localTableName": "public.process_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.sources",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "process_id": {
+          "name": "process_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "datetime": {
+          "name": "datetime",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "original": {
+          "name": "original",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "changes": {
+          "name": "changes",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "process_history",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "process_history_pkey",
+          "columnNames": [
+            "process_id",
+            "datetime"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "process_history_process_id_foreign": {
+          "constraintName": "process_history_process_id_foreign",
+          "columnNames": [
+            "process_id"
+          ],
+          "localTableName": "public.process_history",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.processes",
+          "updateRule": "cascade"
+        },
+        "process_history_user_id_foreign": {
+          "constraintName": "process_history_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "public.process_history",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
           "updateRule": "cascade"
         }
       },
