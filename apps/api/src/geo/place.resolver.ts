@@ -1,21 +1,53 @@
-import { Args, Query, Resolver } from '@nestjs/graphql'
-import { Place, PlacePage } from './place.model'
+import {
+  Args,
+  ID,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql'
+import { NotFoundErr } from '@src/common/exceptions'
+import { TransformService } from '@src/common/transform'
+import { Tag } from '@src/process/tag.model'
+import { Org } from '@src/users/org.model'
+import { Place, PlacesArgs, PlacesPage } from './place.model'
 import { PlaceService } from './place.service'
 
 @Resolver(() => Place)
 export class PlaceResolver {
-  constructor(private readonly placeService: PlaceService) {}
+  constructor(
+    private readonly placeService: PlaceService,
+    private readonly transform: TransformService,
+  ) {}
 
-  @Query(() => PlacePage)
-  async places(
-    @Args('page', { nullable: true, defaultValue: 1 }) page: number,
-    @Args('perPage', { nullable: true, defaultValue: 10 }) perPage: number,
-  ): Promise<PlacePage | null> {
-    return this.placeService.findAll(page, perPage)
+  @Query(() => PlacesPage, { name: 'getPlaces' })
+  async getPlaces(@Args() args: PlacesArgs): Promise<PlacesPage> {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.placeService.find(filter)
+    return this.transform.entityToPaginated(cursor, args, Place, PlacesPage)
   }
 
-  @Query(() => Place, { nullable: true })
-  async place(@Args('id') id: string) {
-    return this.placeService.findById(id)
+  @Query(() => Place, { name: 'getPlace', nullable: true })
+  async getPlace(@Args('id', { type: () => ID }) id: string): Promise<Place> {
+    const place = await this.placeService.findOneByID(id)
+    if (!place) {
+      throw NotFoundErr('Place not found')
+    }
+    return this.transform.entityToModel(place, Place)
+  }
+
+  @ResolveField()
+  async tags(@Parent() place: Place) {
+    const tags = await this.placeService.tags(place.id)
+    return this.transform.entitiesToModels(tags, Tag)
+  }
+
+  @ResolveField()
+  async org(@Parent() place: Place) {
+    const org = await this.placeService.org(place.id, place.entity)
+    if (!org) {
+      return null
+    }
+    return this.transform.entityToModel(org, Org)
   }
 }
