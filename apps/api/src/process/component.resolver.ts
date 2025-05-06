@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common'
 import {
   Args,
   ID,
@@ -7,6 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
+import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -19,7 +21,7 @@ import {
   UpdateComponentOutput,
 } from './component.model'
 import { ComponentService } from './component.service'
-import { ComponentsArgs } from './material.model'
+import { ComponentsArgs, Material } from './material.model'
 
 @Resolver(() => Component)
 export class ComponentResolver {
@@ -40,7 +42,7 @@ export class ComponentResolver {
     )
   }
 
-  @Query(() => Component, { name: 'getComponent' })
+  @Query(() => Component, { name: 'getComponent', nullable: true })
   async getComponent(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Component> {
@@ -52,33 +54,56 @@ export class ComponentResolver {
   }
 
   @ResolveField()
+  async primary_material(@Parent() component: Component) {
+    const material = await this.componentService.primary_material(
+      component.id,
+      component.entity,
+    )
+    if (!material) {
+      return null
+    }
+    return this.transform.entityToModel(material, Material)
+  }
+
+  @ResolveField()
   async materials(@Parent() component: Component) {
-    return this.componentService.getMaterials(component.id)
+    const materials = await this.componentService.materials(component.id)
+    return this.transform.entitiesToModels(materials, Material)
   }
 
   @Mutation(() => CreateComponentOutput, { name: 'createComponent' })
+  @UseGuards(AuthGuard)
   async createComponent(
     @Args('input') input: CreateComponentInput,
+    @User() user: ReqUser,
   ): Promise<CreateComponentOutput> {
-    const created = await this.componentService.create(input)
+    const created = await this.componentService.create(input, user.id)
     const model = await this.transform.entityToModel(
       created.component,
       Component,
     )
-    const change = await this.transform.entityToModel(created.change, Change)
-    return { component: model, change }
+    if (created.change) {
+      const change = await this.transform.entityToModel(created.change, Change)
+      return { component: model, change }
+    }
+    return { component: model }
   }
 
   @Mutation(() => UpdateComponentOutput, { name: 'updateComponent' })
+  @UseGuards(AuthGuard)
   async updateComponent(
     @Args('input') input: UpdateComponentInput,
+    @User() user: ReqUser,
   ): Promise<UpdateComponentOutput> {
-    const updated = await this.componentService.update(input)
+    const updated = await this.componentService.update(input, user.id)
     const model = await this.transform.entityToModel(
       updated.component,
       Component,
     )
-    const change = await this.transform.entityToModel(updated.change, Change)
-    return { component: model, change }
+    if (updated.change) {
+      const change = await this.transform.entityToModel(updated.change, Change)
+      return { component: model, change }
+    }
+    return { component: model }
   }
 }
