@@ -1,27 +1,21 @@
 import {
   Args,
   ID,
-  Mutation,
   Parent,
   Query,
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { Component, ComponentsPage } from './component.model'
 import {
   ComponentsArgs,
-  CreateMaterialInput,
-  CreateMaterialOutput,
   Material,
   MaterialsArgs,
   MaterialsPage,
   PrimaryComponentsArgs,
   ProcessesArgs,
-  UpdateMaterialInput,
-  UpdateMaterialOutput,
 } from './material.model'
 import { MaterialService } from './material.service'
 import { Process, ProcessPage } from './process.model'
@@ -45,7 +39,7 @@ export class MaterialResolver {
     )
   }
 
-  @Query(() => Material, { name: 'getMaterial' })
+  @Query(() => Material, { name: 'getMaterial', nullable: true })
   async getMaterial(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Material> {
@@ -156,25 +150,5 @@ export class MaterialResolver {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.materialService.processes(material.id, filter)
     return this.transform.entityToPaginated(cursor, args, Process, ProcessPage)
-  }
-
-  @Mutation(() => CreateMaterialOutput, { name: 'createMaterial' })
-  async createMaterial(
-    @Args('input') input: CreateMaterialInput,
-  ): Promise<CreateMaterialOutput> {
-    const created = await this.materialService.create(input)
-    const model = await this.transform.entityToModel(created.material, Material)
-    const change = await this.transform.entityToModel(created.change, Change)
-    return { material: model, change }
-  }
-
-  @Mutation(() => UpdateMaterialOutput, { name: 'updateMaterial' })
-  async updateMaterial(
-    @Args('input') input: UpdateMaterialInput,
-  ): Promise<UpdateMaterialOutput> {
-    const updated = await this.materialService.update(input)
-    const model = await this.transform.entityToModel(updated.material, Material)
-    const change = await this.transform.entityToModel(updated.change, Change)
-    return { material: model, change }
   }
 }

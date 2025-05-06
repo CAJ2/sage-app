@@ -5,8 +5,7 @@ import { translate } from '@src/db/i18n'
 import { CreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
-import { MaxLength } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
+import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { ComponentsPage } from './component.model'
 import { Material as MaterialEntity } from './material.entity'
@@ -19,15 +18,15 @@ export class Material extends CreatedUpdated<MaterialEntity> {
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
+  @IsOptional()
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
+  @IsOptional()
+  @MaxLength(100_000)
   desc?: string
-
-  @Field(() => JSONObjectResolver, { nullable: true })
-  source?: object
 
   @Field(() => Boolean)
   technical: boolean = false
@@ -97,10 +96,10 @@ export class CreateMaterialInput extends ChangeInputWithLang() {
   technical: boolean = false
 
   @Field(() => [ID], { nullable: true })
-  ancestors?: string[]
+  parents?: string[]
 
   @Field(() => [ID], { nullable: true })
-  descendants?: string[]
+  children?: string[]
 }
 
 @InputType()
@@ -119,10 +118,10 @@ export class UpdateMaterialInput extends ChangeInputWithLang() {
   technical?: boolean
 
   @Field(() => [ID], { nullable: true })
-  ancestors?: string[]
+  parents?: string[]
 
   @Field(() => [ID], { nullable: true })
-  descendants?: string[]
+  children?: string[]
 }
 
 @ObjectType()

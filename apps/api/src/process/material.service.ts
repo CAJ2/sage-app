@@ -1,8 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { Change } from '@src/changes/change.entity'
 import { CursorOptions } from '@src/common/transform'
-import { addTr, addTrReq } from '@src/db/i18n'
 import { Component } from './component.entity'
 import {
   Material,
@@ -10,7 +8,6 @@ import {
   MaterialEdge,
   MaterialTree,
 } from './material.entity'
-import { CreateMaterialInput, UpdateMaterialInput } from './material.model'
 import { Process } from './process.entity'
 
 @Injectable()
@@ -135,91 +132,6 @@ export class MaterialService {
     return {
       items: processes,
       count,
-    }
-  }
-
-  async create(input: CreateMaterialInput) {
-    const material = new Material()
-    material.name = addTrReq(material.name, input.lang, input.name)
-    if (input.desc) {
-      material.desc = addTr(material.desc, input.lang, input.desc)
-    }
-    material.technical = input.technical
-    if (input.ancestors) {
-      const ancestors = await this.em.find(
-        Material,
-        { id: { $in: input.ancestors } },
-        { fields: ['id'] },
-      )
-      for (const ancestor of ancestors) {
-        const tree = new MaterialTree()
-        tree.ancestor.id = ancestor.id
-        tree.descendant.id = material.id
-        tree.depth = 1
-        material.ancestors.add(tree)
-      }
-    }
-    if (input.descendants) {
-      const descendants = await this.em.find(
-        Material,
-        { id: { $in: input.descendants } },
-        { fields: ['id'] },
-      )
-      for (const descendant of descendants) {
-        const tree = new MaterialTree()
-        tree.ancestor.id = material.id
-        tree.descendant.id = descendant.id
-        tree.depth = 1
-        material.descendants.add(tree)
-      }
-    }
-
-    const change = new Change()
-    change.edits = [
-      {
-        entity_name: 'Material',
-        id: material.id,
-        changes: material.toObject(),
-      },
-    ]
-    await this.em.persistAndFlush(change)
-
-    return {
-      material,
-      change,
-    }
-  }
-
-  async update(input: UpdateMaterialInput) {
-    const material = await this.em.findOne(
-      Material,
-      { id: input.id },
-      { populate: ['ancestors', 'descendants'] },
-    )
-    if (!material) {
-      throw new Error(`Material with ID "${input.id}" not found`)
-    }
-
-    if (input.name) {
-      material.name = addTrReq(material.name, input.lang, input.name)
-    }
-    if (input.desc) {
-      material.desc = addTr(material.desc, input.lang, input.desc)
-    }
-
-    const change = new Change()
-    change.edits = [
-      {
-        entity_name: 'Material',
-        id: material.id,
-        changes: material.toObject(),
-      },
-    ]
-    await this.em.persistAndFlush(change)
-
-    return {
-      material,
-      change,
     }
   }
 }
