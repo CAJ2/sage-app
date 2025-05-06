@@ -12,7 +12,7 @@ import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { Tag, TagPage } from '@src/process/tag.model'
+import { Tag } from '@src/process/tag.model'
 import { CategoriesPage, Category } from './category.model'
 import {
   CreateItemInput,
@@ -21,7 +21,6 @@ import {
   ItemCategoriesArgs,
   ItemsArgs,
   ItemsPage,
-  ItemTagsArgs,
   ItemVariantsArgs,
   UpdateItemInput,
   UpdateItemOutput,
@@ -43,7 +42,7 @@ export class ItemResolver {
     return this.transform.entityToPaginated(cursor, args, Item, ItemsPage)
   }
 
-  @Query(() => Item, { name: 'getItem' })
+  @Query(() => Item, { name: 'getItem', nullable: true })
   async getItem(@Args('id', { type: () => ID }) id: string): Promise<Item> {
     const item = await this.itemService.findOneByID(id)
     if (!item) {
@@ -66,10 +65,9 @@ export class ItemResolver {
   }
 
   @ResolveField()
-  async tags(@Parent() item: Item, @Args() args: ItemTagsArgs) {
-    const filter = this.transform.paginationArgs(args)
-    const cursor = await this.itemService.tags(item.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Tag, TagPage)
+  async tags(@Parent() item: Item) {
+    const tags = await this.itemService.tags(item.id)
+    return this.transform.entitiesToModels(tags, Tag)
   }
 
   @ResolveField()

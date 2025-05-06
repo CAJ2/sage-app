@@ -40,7 +40,7 @@ export class CategoryResolver {
     )
   }
 
-  @Query(() => Category, { name: 'getCategory' })
+  @Query(() => Category, { name: 'getCategory', nullable: true })
   async getCategory(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Category> {

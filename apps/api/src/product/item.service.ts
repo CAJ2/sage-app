@@ -41,7 +41,27 @@ export class ItemService {
     }
   }
 
-  async tags(itemID: string, opts: CursorOptions<Tag>) {
+  async tags(itemID: string) {
+    const tagDefs = await this.em.find(Tag, { items: itemID })
+    const tags = await this.em.find(
+      ItemsTags,
+      { item: itemID },
+      {
+        orderBy: { tag: 'ASC' },
+      },
+    )
+    const combinedTags = []
+    for (const tag of tags) {
+      const tagDef = tagDefs.find((t) => t.id === tag.tag.id)
+      if (tagDef) {
+        tagDef.meta = tag.meta
+        combinedTags.push(tagDef)
+      }
+    }
+    return combinedTags
+  }
+
+  async tagsPage(itemID: string, opts: CursorOptions<Tag>) {
     opts.where.items = this.em.getReference(Item, itemID)
     const tagDefs = await this.em.find(Tag, opts.where, opts.options)
     const tags = await this.em.find(

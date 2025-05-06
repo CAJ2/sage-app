@@ -45,7 +45,7 @@ export class VariantResolver {
     return this.transform.entityToPaginated(cursor, args, Variant, VariantsPage)
   }
 
-  @Query(() => Variant, { name: 'getVariant' })
+  @Query(() => Variant, { name: 'getVariant', nullable: true })
   async getVariant(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Variant> {

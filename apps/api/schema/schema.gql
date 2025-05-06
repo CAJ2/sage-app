@@ -71,19 +71,16 @@ type ChangesPage {
 }
 
 type Component {
-  commercial_stream: String
   created_at: DateTime!
   desc: String
-  hazardous: Boolean!
-  hazardous_info: String
   history: [ComponentHistory!]!
   id: ID!
-  local_stream: String
+  image_url: String
   materials: [ComponentMaterial!]!
   name: String
   primary_material: Material!
-  residential_stream: String
-  source: JSONObject
+  region: Region
+  tags: [Tag!]!
   updated_at: DateTime!
 }
 
@@ -102,6 +99,20 @@ type ComponentHistory {
 type ComponentMaterial {
   material: Material!
   material_fraction: Float
+}
+
+input ComponentMaterialInput {
+  id: ID!
+  material_fraction: Float
+}
+
+input ComponentRegionInput {
+  id: ID!
+}
+
+input ComponentTagsInput {
+  id: ID!
+  meta: JSONObject
 }
 
 type ComponentsPage {
@@ -142,8 +153,15 @@ input CreateComponentInput {
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
+  desc: String
+  image_url: String
   lang: String
+  materials: [ComponentMaterialInput!]
+  name: String!
+  primary_material: ComponentMaterialInput
+  region: ComponentRegionInput
   remove_sources: [ID!]
+  tags: [ComponentTagsInput!]
 }
 
 type CreateComponentOutput {
@@ -170,32 +188,21 @@ type CreateItemOutput {
   item: Item
 }
 
-input CreateMaterialInput {
-  add_sources: [ID!]
-  ancestors: [ID!]
-  apply: Boolean
-  change: CreateChangeInput
-  change_id: ID
-  desc: String
-  descendants: [ID!]
-  lang: String
-  name: String!
-  remove_sources: [ID!]
-  technical: Boolean! = false
-}
-
-type CreateMaterialOutput {
-  change: Change
-  material: Material
-}
-
 input CreateProcessInput {
   add_sources: [ID!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
+  desc: String
+  intent: String! = "COLLECTION"
   lang: String
+  material: ID
+  name: String!
+  org: ID
+  place: ID
+  region: ID
   remove_sources: [ID!]
+  variant: ID
 }
 
 type CreateProcessOutput {
@@ -261,7 +268,7 @@ type Item {
   id: ID!
   image_url: String
   name: String
-  tags(after: String, before: String, first: Int, last: Int): [Tag!]!
+  tags: [Tag!]!
   updated_at: DateTime!
   variants(after: String, before: String, first: Int, last: Int): [Variant!]!
 }
@@ -304,7 +311,6 @@ type Material {
   parents(after: String, before: String, first: Int, last: Int): MaterialsPage!
   primary_components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   processes(after: String, before: String, first: Int, last: Int): ProcessPage!
-  source: JSONObject
   technical: Boolean!
   updated_at: DateTime!
 }
@@ -326,7 +332,6 @@ type Mutation {
   createChange(input: CreateChangeInput!): Change!
   createComponent(input: CreateComponentInput!): CreateComponentOutput!
   createItem(input: CreateItemInput!): CreateItemOutput!
-  createMaterial(input: CreateMaterialInput!): CreateMaterialOutput!
   createProcess(input: CreateProcessInput!): CreateProcessOutput!
   createSource(input: CreateSourceInput!): Source!
   createTagDefinition(input: CreateTagDefinitionInput!): Tag!
@@ -337,7 +342,6 @@ type Mutation {
   updateChange(input: UpdateChangeInput!): Change!
   updateComponent(input: UpdateComponentInput!): UpdateComponentOutput!
   updateItem(input: UpdateItemInput!): UpdateItemOutput!
-  updateMaterial(input: UpdateMaterialInput!): UpdateMaterialOutput!
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput!
   updateSource(input: UpdateSourceInput!): Source!
   updateTagDefinition(input: UpdateTagDefinitionInput!): Tag!
@@ -379,11 +383,11 @@ type Place {
   address: String
   created_at: DateTime!
   desc: String
-  history: [PlaceHistory!]!
   id: ID!
+  location: PlaceLocation
   name: String
   org: Org
-  tags: [PlaceTag!]!
+  tags: [Tag!]!
   updated_at: DateTime!
 }
 
@@ -392,23 +396,16 @@ type PlaceEdge {
   node: Place!
 }
 
-type PlaceHistory {
-  changes: String
-  datetime: DateTime!
-  original: String
-  place_id: String!
-  user_id: String!
+type PlaceLocation {
+  latitude: Float!
+  longitude: Float!
 }
 
-type PlacePage {
+type PlacesPage {
   edges: [PlaceEdge!]
   nodes: [Place!]
   pageInfo: PageInfo!
   totalCount: Int!
-}
-
-type PlaceTag {
-  tag_name: String!
 }
 
 type Process {
@@ -417,13 +414,13 @@ type Process {
   history: [ProcessHistory!]!
   id: ID!
   intent: String!
-  material: Material!
+  material: Material
   name: String!
   org: Org
   place: Place
   region: Region
-  source: JSONObject!
   updated_at: DateTime!
+  variant: Variant
 }
 
 type ProcessEdge {
@@ -448,38 +445,39 @@ type ProcessPage {
 
 type Query {
   getCategories(after: String, before: String, first: Int, last: Int): CategoriesPage!
-  getCategory(id: ID!): Category!
-  getChange(id: ID!): Change!
+  getCategory(id: ID!): Category
+  getChange(id: ID!): Change
   getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
-  getComponent(id: ID!): Component!
+  getComponent(id: ID!): Component
   getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
-  getItem(id: ID!): Item!
+  getItem(id: ID!): Item
   getItems(after: String, before: String, first: Int, last: Int): ItemsPage!
-  getMaterial(id: ID!): Material!
+  getMaterial(id: ID!): Material
   getMaterials(after: String, before: String, first: Int, last: Int): MaterialsPage!
-  getOrg(id: ID!): Org!
-  getProcess(id: ID!): Process!
+  getOrg(id: ID!): Org
+  getPlace(id: ID!): Place
+  getPlaces(after: String, before: String, first: Int, last: Int): PlacesPage!
+  getProcess(id: ID!): Process
   getProcesses(after: String, before: String, first: Int, last: Int): ProcessPage!
-  getSource(id: ID!): Source!
+  getRegion(id: ID!): Region
+  getRegions(after: String, before: String, first: Int, last: Int): RegionsPage!
+  getSource(id: ID!): Source
   getSources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
-  getTag(id: ID!): Tag!
+  getTag(id: ID!): Tag
   getTags(after: String, before: String, first: Int, last: Int): TagPage!
-  getUser(id: ID!): User!
-  getVariant(id: ID!): Variant!
+  getUser(id: ID!): User
+  getVariant(id: ID!): Variant
   getVariants(after: String, before: String, first: Int, last: Int): VariantsPage!
-  place(id: String!): Place
-  places(page: Float = 1, perPage: Float = 10): PlacePage!
-  region(id: String!): Region
-  regions(page: Float = 1, perPage: Float = 10): RegionPage!
   rootCategory: Category!
   rootMaterial: Material!
+  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latitude: Float!, longitude: Float!): RegionsPage!
 }
 
 type Region {
-  admin_level: Float!
   created_at: DateTime!
   id: ID!
   name: String
+  placetype: String!
   updated_at: DateTime!
 }
 
@@ -488,7 +486,7 @@ type RegionEdge {
   node: Region!
 }
 
-type RegionPage {
+type RegionsPage {
   edges: [RegionEdge!]
   nodes: [Region!]
   pageInfo: PageInfo!
@@ -595,11 +593,20 @@ input UpdateChangeInput {
 
 input UpdateComponentInput {
   add_sources: [ID!]
+  add_tags: [ComponentTagsInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
+  desc: String
+  id: ID!
+  image_url: String
   lang: String
+  materials: [ComponentMaterialInput!]
+  name: String
+  primary_material: ComponentMaterialInput
+  region: ComponentRegionInput
   remove_sources: [ID!]
+  remove_tags: [ComponentTagsInput!]
 }
 
 type UpdateComponentOutput {
@@ -629,33 +636,22 @@ type UpdateItemOutput {
   item: Item
 }
 
-input UpdateMaterialInput {
-  add_sources: [ID!]
-  ancestors: [ID!]
-  apply: Boolean
-  change: CreateChangeInput
-  change_id: ID
-  desc: String
-  descendants: [ID!]
-  id: ID!
-  lang: String
-  name: String
-  remove_sources: [ID!]
-  technical: Boolean
-}
-
-type UpdateMaterialOutput {
-  change: Change
-  material: Material
-}
-
 input UpdateProcessInput {
   add_sources: [ID!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
+  desc: String
+  id: ID!
+  intent: String
   lang: String
+  material: ID
+  name: String
+  org: ID
+  place: ID
+  region: ID
   remove_sources: [ID!]
+  variant: ID
 }
 
 type UpdateProcessOutput {
