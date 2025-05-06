@@ -56,16 +56,25 @@ export function translate(params: TransformFnParams): string | undefined {
     return value
   }
   if (!isTranslatedField(value)) {
-    throw new GraphQLError('Invalid translated field')
+    // TODO: Maybe log this issue
   }
   const field: TranslatedField = value
   if (_.isArray(obj._lang)) {
     const lang: string[] = obj._lang
-    const langKey = _.findKey(field, (value: any, key: string) => {
-      return lang.includes(key.split(';')[0])
-    })
-    if (langKey) {
-      return (field as any)[langKey]
+    for (const l of lang) {
+      const langKey = _.findKey(field, (value: any, key: string) => {
+        return l === key.split(';')[0]
+      })
+      if (langKey) {
+        return (field as any)[langKey]
+      }
+      const inexactKey = _.findKey(field, (value: any, key: string) => {
+        const bits = key.split(';')
+        return l === bits[0].split('-')[0] || bits[0].startsWith(l)
+      })
+      if (inexactKey) {
+        return (field as any)[inexactKey]
+      }
     }
   }
   return field.xx
