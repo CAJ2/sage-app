@@ -55,6 +55,18 @@ export class TransformService {
     return inst
   }
 
+  async entitiesToModels<T extends BaseEntity, S extends BaseModel<T>>(
+    entities: Loaded<T, never>[],
+    model: new () => S,
+  ): Promise<S[]> {
+    const models: S[] = []
+    for (const entity of entities) {
+      const inst = await this.entityToModel(entity, model)
+      models.push(inst)
+    }
+    return models
+  }
+
   paginationArgs(args: PaginationArgsType) {
     args.validate()
     const where: ObjectQuery<any> = {}
