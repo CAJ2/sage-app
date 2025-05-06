@@ -12,6 +12,7 @@ import { Place } from '@src/geo/place.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Component } from './component.entity'
+import type { JSONSchemaType } from 'ajv'
 
 export enum TagType {
   PLACE = 'PLACE',
@@ -19,6 +20,11 @@ export enum TagType {
   VARIANT = 'VARIANT',
   COMPONENT = 'COMPONENT',
   PROCESS = 'PROCESS',
+}
+
+export interface TagMetaTemplate {
+  schema?: JSONSchemaType<any>
+  ui_schema?: Record<string, any>
 }
 
 @Entity({ tableName: 'tags', schema: 'public' })
@@ -34,7 +40,7 @@ export class Tag extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  meta_template?: Record<string, any>
+  meta_template?: TagMetaTemplate
 
   @Property()
   bg_color?: string

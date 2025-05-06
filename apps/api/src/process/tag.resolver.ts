@@ -26,7 +26,7 @@ export class TagResolver {
     return this.transform.entityToPaginated(cursor, args, Tag, TagPage)
   }
 
-  @Query(() => Tag, { name: 'getTag' })
+  @Query(() => Tag, { name: 'getTag', nullable: true })
   async getTag(@Args('id', { type: () => ID }) id: string): Promise<Tag> {
     const tag = await this.tagService.findOneByID(id)
     if (!tag) {

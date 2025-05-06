@@ -1,8 +1,21 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
+import Ajv from 'ajv'
 import { Tag } from './tag.entity'
 import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'
+
+const ajv = new Ajv({
+  allErrors: true,
+  strict: true,
+  useDefaults: true,
+  removeAdditional: true,
+})
+
+export interface TagInput {
+  id: string
+  meta?: Record<string, any>
+}
 
 @Injectable()
 export class TagService {
@@ -34,6 +47,27 @@ export class TagService {
     }
     this.em.assign(tag, input)
     await this.em.persistAndFlush(tag)
+    return tag
+  }
+
+  async validateTagInput(input: TagInput): Promise<Tag> {
+    const tag = await this.em.findOne(Tag, { id: input.id })
+    if (!tag) {
+      throw new Error(`Tag with ID "${input.id}" not found`)
+    }
+    if (input.meta) {
+      if (tag.meta_template && tag.meta_template.schema) {
+        const validator = ajv.compile(tag.meta_template.schema)
+        const valid = validator(input.meta)
+        if (!valid) {
+          throw new Error(
+            `Invalid meta data for tag "${tag.id}": ${ajv.errorsText(validator.errors)}`,
+          )
+        }
+      } else {
+        throw new Error(`Tag "${tag.id}" does not have a meta template schema`)
+      }
+    }
     return tag
   }
 }
