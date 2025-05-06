@@ -1,4 +1,4 @@
-import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
@@ -6,10 +6,11 @@ import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
-import { JSONObjectResolver } from 'graphql-scalars'
+import { IsEnum, IsOptional } from 'class-validator'
 import { Material } from './material.model'
 import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
@@ -26,11 +27,11 @@ export class Process extends IDCreatedUpdated<ProcessEntity> {
   @Transform(translate)
   desc?: string
 
-  @Field(() => JSONObjectResolver)
-  source!: string
+  @Field(() => Material, { nullable: true })
+  material?: Material & {}
 
-  @Field(() => Material)
-  material!: Material & {}
+  @Field(() => Variant, { nullable: true })
+  variant?: Variant & {}
 
   @Field(() => Org, { nullable: true })
   org?: Org & {}
@@ -70,10 +71,64 @@ export class ProcessPage extends Paginated(Process) {}
 export class ProcessArgs extends PaginationBasicArgs {}
 
 @InputType()
-export class CreateProcessInput extends ChangeInputWithLang() {}
+export class CreateProcessInput extends ChangeInputWithLang() {
+  @Field(() => String)
+  @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
+  intent: ProcessIntent = ProcessIntent.COLLECTION
+
+  @Field(() => String)
+  name!: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => ID, { nullable: true })
+  material?: string
+
+  @Field(() => ID, { nullable: true })
+  variant?: string
+
+  @Field(() => ID, { nullable: true })
+  org?: string
+
+  @Field(() => ID, { nullable: true })
+  region?: string
+
+  @Field(() => ID, { nullable: true })
+  place?: string
+}
 
 @InputType()
-export class UpdateProcessInput extends ChangeInputWithLang() {}
+export class UpdateProcessInput extends ChangeInputWithLang() {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
+  intent?: ProcessIntent
+
+  @Field(() => String, { nullable: true })
+  name?: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => ID, { nullable: true })
+  material?: string
+
+  @Field(() => ID, { nullable: true })
+  variant?: string
+
+  @Field(() => ID, { nullable: true })
+  org?: string
+
+  @Field(() => ID, { nullable: true })
+  region?: string
+
+  @Field(() => ID, { nullable: true })
+  place?: string
+}
 
 @ObjectType()
 export class CreateProcessOutput {

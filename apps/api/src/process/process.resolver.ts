@@ -1,12 +1,14 @@
+import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ProcessesArgs } from './material.model'
 import {
   CreateProcessInput,
   CreateProcessOutput,
   Process,
+  ProcessArgs,
   ProcessPage,
   UpdateProcessInput,
   UpdateProcessOutput,
@@ -21,13 +23,13 @@ export class ProcessResolver {
   ) {}
 
   @Query(() => ProcessPage, { name: 'getProcesses' })
-  async getProcesses(@Args() args: ProcessesArgs): Promise<ProcessPage> {
+  async getProcesses(@Args() args: ProcessArgs): Promise<ProcessPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.processService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Process, ProcessPage)
   }
 
-  @Query(() => Process, { name: 'getProcess' })
+  @Query(() => Process, { name: 'getProcess', nullable: true })
   async getProcess(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Process> {
@@ -39,22 +41,32 @@ export class ProcessResolver {
   }
 
   @Mutation(() => CreateProcessOutput, { name: 'createProcess' })
+  @UseGuards(AuthGuard)
   async createProcess(
     @Args('input') input: CreateProcessInput,
+    @User() user: ReqUser,
   ): Promise<CreateProcessOutput> {
-    const created = await this.processService.create(input)
+    const created = await this.processService.create(input, user.id)
     const model = await this.transform.entityToModel(created.process, Process)
-    const change = await this.transform.entityToModel(created.change, Change)
-    return { process: model, change }
+    if (created.change) {
+      const change = await this.transform.entityToModel(created.change, Change)
+      return { process: model, change }
+    }
+    return { process: model }
   }
 
   @Mutation(() => UpdateProcessOutput, { name: 'updateProcess' })
+  @UseGuards(AuthGuard)
   async updateProcess(
     @Args('input') input: UpdateProcessInput,
+    @User() user: ReqUser,
   ): Promise<UpdateProcessOutput> {
-    const updated = await this.processService.update(input)
+    const updated = await this.processService.update(input, user.id)
     const model = await this.transform.entityToModel(updated.process, Process)
-    const change = await this.transform.entityToModel(updated.change, Change)
-    return { process: model, change }
+    if (updated.change) {
+      const change = await this.transform.entityToModel(updated.change, Change)
+      return { process: model, change }
+    }
+    return { process: model }
   }
 }
