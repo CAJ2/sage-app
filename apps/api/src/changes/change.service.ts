@@ -71,7 +71,10 @@ export class ChangeService {
     }
 
     if (id) {
-      const change = await this.findOne(id)
+      const change = await this.em.findOne(Change, { id, user: userID })
+      if (!change) {
+        throw NotFoundErr(`Change with ID "${id}" not found`)
+      }
       return change
     }
 

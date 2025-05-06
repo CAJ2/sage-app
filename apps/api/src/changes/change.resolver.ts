@@ -37,7 +37,7 @@ export class ChangeResolver {
     return this.transform.entityToPaginated(cursor, args, Change, ChangesPage)
   }
 
-  @Query(() => Change)
+  @Query(() => Change, { name: 'getChange', nullable: true })
   async getChange(@Args('id', { type: () => ID }) id: string) {
     return this.changeService.findOne(id)
   }

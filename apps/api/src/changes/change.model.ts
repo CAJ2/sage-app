@@ -141,6 +141,10 @@ export function ChangeInputWithLang() {
 
     @Field(() => Boolean, { nullable: true })
     apply?: boolean
+
+    useChange(): boolean {
+      return !!this.change_id || !!this.change
+    }
   }
   return ChangeInputWithLangCls
 }
