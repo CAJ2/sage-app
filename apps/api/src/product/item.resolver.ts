@@ -79,7 +79,7 @@ export class ItemResolver {
     return this.transform.entityToPaginated(cursor, args, Variant, VariantsPage)
   }
 
-  @Mutation(() => CreateItemOutput, { name: 'createItem' })
+  @Mutation(() => CreateItemOutput, { name: 'createItem', nullable: true })
   @UseGuards(AuthGuard)
   async createItem(
     @Args('input') input: CreateItemInput,
@@ -94,7 +94,7 @@ export class ItemResolver {
     return { change, item: result }
   }
 
-  @Mutation(() => UpdateItemOutput, { name: 'updateItem' })
+  @Mutation(() => UpdateItemOutput, { name: 'updateItem', nullable: true })
   @UseGuards(AuthGuard)
   async updateItem(
     @Args('input') input: UpdateItemInput,

@@ -16,17 +16,18 @@ import {
   ChangeSourcesArgs,
   ChangesPage,
   CreateChangeInput,
+  CreateChangeOutput,
+  DeleteChangeOutput,
   UpdateChangeInput,
+  UpdateChangeOutput,
 } from './change.model'
 import { ChangeService } from './change.service'
 import { Source, SourcesPage } from './source.model'
-import { SourceService } from './source.service'
 
 @Resolver(() => Change)
 export class ChangeResolver {
   constructor(
     private readonly changeService: ChangeService,
-    private readonly sourceService: SourceService,
     private readonly transform: TransformService,
   ) {}
 
@@ -42,25 +43,40 @@ export class ChangeResolver {
     return this.changeService.findOne(id)
   }
 
-  @Mutation(() => Change)
+  @Mutation(() => CreateChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
   async createChange(
     @Args('input') input: CreateChangeInput,
     @User() user: ReqUser,
-  ) {
-    return this.changeService.create(input, user.id)
+  ): Promise<CreateChangeOutput> {
+    const change = await this.changeService.create(input, user.id)
+    const model = await this.transform.entityToModel(change, Change)
+    return {
+      change: model,
+    }
   }
 
-  @Mutation(() => Change)
+  @Mutation(() => UpdateChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async updateChange(@Args('input') input: UpdateChangeInput) {
-    return this.changeService.update(input)
+  async updateChange(
+    @Args('input') input: UpdateChangeInput,
+  ): Promise<UpdateChangeOutput> {
+    const change = await this.changeService.update(input)
+    const model = await this.transform.entityToModel(change, Change)
+    return {
+      change: model,
+    }
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => DeleteChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async deleteChange(@Args('id', { type: () => ID }) id: string) {
-    return this.changeService.remove(id)
+  async deleteChange(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<DeleteChangeOutput> {
+    await this.changeService.remove(id)
+    return {
+      success: true,
+    }
   }
 
   @ResolveField(() => SourcesPage, { nullable: true })

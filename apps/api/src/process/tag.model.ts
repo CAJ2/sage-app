@@ -102,3 +102,15 @@ export class UpdateTagDefinitionInput {
   @Field(() => String, { nullable: true })
   image?: string
 }
+
+@ObjectType()
+export class CreateTagDefinitionOutput {
+  @Field(() => TagDefinition, { nullable: true })
+  tag?: TagDefinition
+}
+
+@ObjectType()
+export class UpdateTagDefinitionOutput {
+  @Field(() => TagDefinition, { nullable: true })
+  tag?: TagDefinition
+}

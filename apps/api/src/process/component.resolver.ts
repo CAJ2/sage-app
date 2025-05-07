@@ -71,7 +71,10 @@ export class ComponentResolver {
     return this.transform.entitiesToModels(materials, Material)
   }
 
-  @Mutation(() => CreateComponentOutput, { name: 'createComponent' })
+  @Mutation(() => CreateComponentOutput, {
+    name: 'createComponent',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async createComponent(
     @Args('input') input: CreateComponentInput,
@@ -89,7 +92,10 @@ export class ComponentResolver {
     return { component: model }
   }
 
-  @Mutation(() => UpdateComponentOutput, { name: 'updateComponent' })
+  @Mutation(() => UpdateComponentOutput, {
+    name: 'updateComponent',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async updateComponent(
     @Args('input') input: UpdateComponentInput,

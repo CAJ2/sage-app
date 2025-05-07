@@ -93,7 +93,10 @@ export class VariantResolver {
     )
   }
 
-  @Mutation(() => CreateVariantOutput, { name: 'createVariant' })
+  @Mutation(() => CreateVariantOutput, {
+    name: 'createVariant',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async createVariant(
     @Args('input') input: CreateVariantInput,
@@ -108,7 +111,10 @@ export class VariantResolver {
     return { change, variant: result }
   }
 
-  @Mutation(() => UpdateVariantOutput, { name: 'updateVariant' })
+  @Mutation(() => UpdateVariantOutput, {
+    name: 'updateVariant',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async updateVariant(
     @Args('input') input: UpdateVariantInput,

@@ -5,10 +5,12 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import {
   CreateTagDefinitionInput,
+  CreateTagDefinitionOutput,
   Tag,
   TagArgs,
   TagPage,
   UpdateTagDefinitionInput,
+  UpdateTagDefinitionOutput,
 } from './tag.model'
 import { TagService } from './tag.service'
 
@@ -35,21 +37,33 @@ export class TagResolver {
     return this.transform.entityToModel(tag, Tag)
   }
 
-  @Mutation(() => Tag, { name: 'createTagDefinition' })
+  @Mutation(() => CreateTagDefinitionOutput, {
+    name: 'createTagDefinition',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async createTagDefinition(
     @Args('input') input: CreateTagDefinitionInput,
-  ): Promise<Tag> {
+  ): Promise<CreateTagDefinitionOutput> {
     const created = await this.tagService.create(input)
-    return this.transform.entityToModel(created, Tag)
+    const model = await this.transform.entityToModel(created, Tag)
+    return {
+      tag: model,
+    }
   }
 
-  @Mutation(() => Tag, { name: 'updateTagDefinition' })
+  @Mutation(() => UpdateTagDefinitionOutput, {
+    name: 'updateTagDefinition',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async updateTagDefinition(
     @Args('input') input: UpdateTagDefinitionInput,
-  ): Promise<Tag> {
+  ): Promise<UpdateTagDefinitionOutput> {
     const updated = await this.tagService.update(input)
-    return this.transform.entityToModel(updated, Tag)
+    const model = await this.transform.entityToModel(updated, Tag)
+    return {
+      tag: model,
+    }
   }
 }

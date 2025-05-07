@@ -4,10 +4,14 @@ import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { TransformService } from '@src/common/transform'
 import {
   CreateSourceInput,
+  CreateSourceOutput,
+  DeleteSourceOutput,
+  MarkSourceProcessedOutput,
   Source,
   SourcesArgs,
   SourcesPage,
   UpdateSourceInput,
+  UpdateSourceOutput,
 } from './source.model'
 import { SourceService } from './source.service'
 
@@ -35,33 +39,50 @@ export class SourceResolver {
     return this.transform.entityToModel(source, Source)
   }
 
-  @Mutation(() => Source)
+  @Mutation(() => CreateSourceOutput, { nullable: true })
   @UseGuards(AuthGuard)
   async createSource(
     @Args('input') input: CreateSourceInput,
     @User() user: ReqUser,
-  ) {
+  ): Promise<CreateSourceOutput> {
     const source = await this.sourceService.create(input, user.id)
-    return this.transform.entityToModel(source, Source)
+    const model = await this.transform.entityToModel(source, Source)
+    return {
+      source: model,
+    }
   }
 
-  @Mutation(() => Source)
+  @Mutation(() => UpdateSourceOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async updateSource(@Args('input') input: UpdateSourceInput) {
+  async updateSource(
+    @Args('input') input: UpdateSourceInput,
+  ): Promise<UpdateSourceOutput> {
     const source = await this.sourceService.update(input)
-    return this.transform.entityToModel(source, Source)
+    const model = await this.transform.entityToModel(source, Source)
+    return {
+      source: model,
+    }
   }
 
-  @Mutation(() => Source)
+  @Mutation(() => MarkSourceProcessedOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async markSourceProcessed(@Args('id', { type: () => ID }) id: string) {
+  async markSourceProcessed(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<MarkSourceProcessedOutput> {
     const source = await this.sourceService.markProcessed(id)
-    return this.transform.entityToModel(source, Source)
+    return {
+      success: !!source,
+    }
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => DeleteSourceOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async deleteSource(@Args('id', { type: () => ID }) id: string) {
-    return this.sourceService.remove(id)
+  async deleteSource(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<DeleteSourceOutput> {
+    await this.sourceService.remove(id)
+    return {
+      success: true,
+    }
   }
 }

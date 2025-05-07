@@ -102,3 +102,27 @@ export class UpdateSourceInput {
   @IsOptional()
   metadata?: Record<string, any>
 }
+
+@ObjectType()
+export class CreateSourceOutput {
+  @Field(() => Source, { nullable: true })
+  source?: Source
+}
+
+@ObjectType()
+export class UpdateSourceOutput {
+  @Field(() => Source, { nullable: true })
+  source?: Source
+}
+
+@ObjectType()
+export class DeleteSourceOutput {
+  @Field(() => Boolean, { nullable: true })
+  success?: boolean
+}
+
+@ObjectType()
+export class MarkSourceProcessedOutput {
+  @Field(() => Boolean, { nullable: true })
+  success?: boolean
+}

@@ -40,7 +40,10 @@ export class ProcessResolver {
     return this.transform.entityToModel(process, Process)
   }
 
-  @Mutation(() => CreateProcessOutput, { name: 'createProcess' })
+  @Mutation(() => CreateProcessOutput, {
+    name: 'createProcess',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async createProcess(
     @Args('input') input: CreateProcessInput,
@@ -55,7 +58,10 @@ export class ProcessResolver {
     return { process: model }
   }
 
-  @Mutation(() => UpdateProcessOutput, { name: 'updateProcess' })
+  @Mutation(() => UpdateProcessOutput, {
+    name: 'updateProcess',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async updateProcess(
     @Args('input') input: UpdateProcessInput,

@@ -118,6 +118,24 @@ export class UpdateChangeInput {
   metadata?: Record<string, any>
 }
 
+@ObjectType()
+export class CreateChangeOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change
+}
+
+@ObjectType()
+export class UpdateChangeOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change
+}
+
+@ObjectType()
+export class DeleteChangeOutput {
+  @Field(() => Boolean, { nullable: true })
+  success?: boolean
+}
+
 export interface MergeInput {
   apply?: boolean
 }

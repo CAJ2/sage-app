@@ -128,7 +128,10 @@ export class CategoryResolver {
     return this.transform.entityToPaginated(cursor, args, Item, ItemsPage)
   }
 
-  @Mutation(() => CreateCategoryOutput, { name: 'createCategory' })
+  @Mutation(() => CreateCategoryOutput, {
+    name: 'createCategory',
+    nullable: true,
+  })
   @UseGuards(AuthGuard)
   async createCategory(
     @Args('input') input: CreateCategoryInput,

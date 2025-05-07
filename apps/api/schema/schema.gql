@@ -148,6 +148,10 @@ input CreateChangeInput {
   title: String
 }
 
+type CreateChangeOutput {
+  change: Change
+}
+
 input CreateComponentInput {
   add_sources: [ID!]
   apply: Boolean
@@ -217,6 +221,10 @@ input CreateSourceInput {
   type: SourceType!
 }
 
+type CreateSourceOutput {
+  source: Source
+}
+
 input CreateTagDefinitionInput {
   bg_color: String
   desc: String
@@ -224,6 +232,10 @@ input CreateTagDefinitionInput {
   meta_template: JSONObject
   name: String!
   type: TagType!
+}
+
+type CreateTagDefinitionOutput {
+  tag: TagDefinition
 }
 
 input CreateVariantInput {
@@ -251,6 +263,14 @@ type CreateVariantOutput {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.
 """
 scalar DateTime
+
+type DeleteChangeOutput {
+  success: Boolean
+}
+
+type DeleteSourceOutput {
+  success: Boolean
+}
 
 type Edit {
   changes: EditModel
@@ -299,6 +319,10 @@ The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](
 """
 scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
+type MarkSourceProcessedOutput {
+  success: Boolean
+}
+
 type Material {
   ancestors(after: String, before: String, first: Int, last: Int): MaterialsPage!
   children(after: String, before: String, first: Int, last: Int): MaterialsPage!
@@ -328,24 +352,24 @@ type MaterialsPage {
 }
 
 type Mutation {
-  createCategory(input: CreateCategoryInput!): CreateCategoryOutput!
-  createChange(input: CreateChangeInput!): Change!
-  createComponent(input: CreateComponentInput!): CreateComponentOutput!
-  createItem(input: CreateItemInput!): CreateItemOutput!
-  createProcess(input: CreateProcessInput!): CreateProcessOutput!
-  createSource(input: CreateSourceInput!): Source!
-  createTagDefinition(input: CreateTagDefinitionInput!): Tag!
-  createVariant(input: CreateVariantInput!): CreateVariantOutput!
-  deleteChange(id: ID!): Boolean!
-  deleteSource(id: ID!): Boolean!
-  markSourceProcessed(id: ID!): Source!
-  updateChange(input: UpdateChangeInput!): Change!
-  updateComponent(input: UpdateComponentInput!): UpdateComponentOutput!
-  updateItem(input: UpdateItemInput!): UpdateItemOutput!
-  updateProcess(input: UpdateProcessInput!): UpdateProcessOutput!
-  updateSource(input: UpdateSourceInput!): Source!
-  updateTagDefinition(input: UpdateTagDefinitionInput!): Tag!
-  updateVariant(input: UpdateVariantInput!): UpdateVariantOutput!
+  createCategory(input: CreateCategoryInput!): CreateCategoryOutput
+  createChange(input: CreateChangeInput!): CreateChangeOutput
+  createComponent(input: CreateComponentInput!): CreateComponentOutput
+  createItem(input: CreateItemInput!): CreateItemOutput
+  createProcess(input: CreateProcessInput!): CreateProcessOutput
+  createSource(input: CreateSourceInput!): CreateSourceOutput
+  createTagDefinition(input: CreateTagDefinitionInput!): CreateTagDefinitionOutput
+  createVariant(input: CreateVariantInput!): CreateVariantOutput
+  deleteChange(id: ID!): DeleteChangeOutput
+  deleteSource(id: ID!): DeleteSourceOutput
+  markSourceProcessed(id: ID!): MarkSourceProcessedOutput
+  updateChange(input: UpdateChangeInput!): UpdateChangeOutput
+  updateComponent(input: UpdateComponentInput!): UpdateComponentOutput
+  updateItem(input: UpdateItemInput!): UpdateItemOutput
+  updateProcess(input: UpdateProcessInput!): UpdateProcessOutput
+  updateSource(input: UpdateSourceInput!): UpdateSourceOutput
+  updateTagDefinition(input: UpdateTagDefinitionInput!): UpdateTagDefinitionOutput
+  updateVariant(input: UpdateVariantInput!): UpdateVariantOutput
 }
 
 type Org {
@@ -591,6 +615,10 @@ input UpdateChangeInput {
   title: String
 }
 
+type UpdateChangeOutput {
+  change: Change
+}
+
 input UpdateComponentInput {
   add_sources: [ID!]
   add_tags: [ComponentTagsInput!]
@@ -667,6 +695,10 @@ input UpdateSourceInput {
   type: SourceType
 }
 
+type UpdateSourceOutput {
+  source: Source
+}
+
 input UpdateTagDefinitionInput {
   bg_color: String
   desc: String
@@ -675,6 +707,10 @@ input UpdateTagDefinitionInput {
   meta_template: JSONObject
   name: String
   type: TagType
+}
+
+type UpdateTagDefinitionOutput {
+  tag: TagDefinition
 }
 
 input UpdateVariantInput {
