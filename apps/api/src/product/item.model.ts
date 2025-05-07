@@ -5,14 +5,14 @@ import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Tag } from '@src/process/tag.model'
+import { TagPage } from '@src/process/tag.model'
 import { Transform } from 'class-transformer'
 import { IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
-import { Category } from './category.model'
+import { CategoriesPage } from './category.model'
 import { Item as ItemEntity } from './item.entity'
-import { Variant } from './variant.model'
+import { VariantsPage } from './variant.model'
 
 @ObjectType()
 export class Item extends IDCreatedUpdated<ItemEntity> {
@@ -29,14 +29,14 @@ export class Item extends IDCreatedUpdated<ItemEntity> {
   @IsUrl()
   image_url?: string
 
-  @Field(() => [Category])
-  categories: Category[] = []
+  @Field(() => CategoriesPage)
+  categories!: CategoriesPage
 
-  @Field(() => [Tag])
-  tags: Tag[] = []
+  @Field(() => TagPage)
+  tags!: TagPage
 
-  @Field(() => [Variant])
-  variants: Variant[] = []
+  @Field(() => VariantsPage)
+  variants!: VariantsPage & {}
 }
 
 @ObjectType()

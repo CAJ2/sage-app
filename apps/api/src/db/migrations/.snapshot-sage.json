@@ -1036,6 +1036,15 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "admin_level": {
+          "name": "admin_level",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
         }
       },
       "name": "regions",
@@ -3584,25 +3593,6 @@
           "nullable": true,
           "mappedType": "json"
         },
-        "source": {
-          "name": "source",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
-        "item_id": {
-          "name": "item_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
         "region_id": {
           "name": "region_id",
           "type": "varchar(255)",
@@ -3630,19 +3620,6 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "variants_item_id_foreign": {
-          "constraintName": "variants_item_id_foreign",
-          "columnNames": [
-            "item_id"
-          ],
-          "localTableName": "public.variants",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.items",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
         "variants_region_id_foreign": {
           "constraintName": "variants_region_id_foreign",
           "columnNames": [
@@ -4435,6 +4412,73 @@
             "id"
           ],
           "referencedTableName": "public.components",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "variant_id": {
+          "name": "variant_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "variants_items",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "variants_items_pkey",
+          "columnNames": [
+            "variant_id",
+            "item_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "variants_items_variant_id_foreign": {
+          "constraintName": "variants_items_variant_id_foreign",
+          "columnNames": [
+            "variant_id"
+          ],
+          "localTableName": "public.variants_items",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.variants",
+          "updateRule": "cascade"
+        },
+        "variants_items_item_id_foreign": {
+          "constraintName": "variants_items_item_id_foreign",
+          "columnNames": [
+            "item_id"
+          ],
+          "localTableName": "public.variants_items",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.items",
           "updateRule": "cascade"
         }
       },

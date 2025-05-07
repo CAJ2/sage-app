@@ -25,7 +25,7 @@ type Category {
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
   id: ID!
   image_url: String
-  items: [Item!]!
+  items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String!
   parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
   updated_at: DateTime!
@@ -233,7 +233,7 @@ input CreateVariantInput {
   change_id: ID
   components: [VariantComponentsInput!]
   desc: String
-  item_id: ID
+  items: [VariantItemsInput!]
   lang: String
   name: String!
   orgs: [VariantOrgsInput!]
@@ -262,15 +262,15 @@ type Edit {
 union EditModel = Category | Component | Item | Material | Place | Process | Region | Variant
 
 type Item {
-  categories(after: String, before: String, first: Int, last: Int): [Category!]!
+  categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
   created_at: DateTime!
   desc: String
   id: ID!
   image_url: String
   name: String
-  tags: [Tag!]!
+  tags(after: String, before: String, first: Int, last: Int): TagPage!
   updated_at: DateTime!
-  variants(after: String, before: String, first: Int, last: Int): [Variant!]!
+  variants(after: String, before: String, first: Int, last: Int): VariantsPage!
 }
 
 input ItemCategoriesInput {
@@ -345,7 +345,7 @@ type Mutation {
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput!
   updateSource(input: UpdateSourceInput!): Source!
   updateTagDefinition(input: UpdateTagDefinitionInput!): Tag!
-  updateVariant(input: UpdateVariantInput!): Variant!
+  updateVariant(input: UpdateVariantInput!): UpdateVariantOutput!
 }
 
 type Org {
@@ -679,6 +679,7 @@ input UpdateTagDefinitionInput {
 
 input UpdateVariantInput {
   add_components: [VariantComponentsInput!]
+  add_items: [VariantItemsInput!]
   add_orgs: [VariantOrgsInput!]
   add_sources: [ID!]
   add_tags: [VariantTagsInput!]
@@ -687,14 +688,19 @@ input UpdateVariantInput {
   change_id: ID
   desc: String
   id: ID!
-  item_id: ID
   lang: String
   name: String
   region_id: ID
   remove_components: [VariantComponentsInput!]
+  remove_items: [VariantItemsInput!]
   remove_orgs: [VariantOrgsInput!]
   remove_sources: [ID!]
   remove_tags: [VariantTagsInput!]
+}
+
+type UpdateVariantOutput {
+  change: Change
+  variant: Variant
 }
 
 type User {
@@ -728,16 +734,15 @@ type UserProfile {
 }
 
 type Variant {
-  components(after: String, before: String, first: Int, last: Int): [Component!]!
+  components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   created_at: DateTime!
   desc: String
-  history: [VariantHistory!]!
   id: ID!
   image_url: String
-  items(after: String, before: String, first: Int, last: Int): [Item!]!
+  items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String
-  orgs(after: String, before: String, first: Int, last: Int): [Org!]!
-  tags(after: String, before: String, first: Int, last: Int): [VariantTag!]!
+  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+  tags(after: String, before: String, first: Int, last: Int): TagPage!
   updated_at: DateTime!
 }
 
@@ -752,19 +757,12 @@ type VariantEdge {
   node: Variant!
 }
 
-type VariantHistory {
-  changes: String
-  datetime: DateTime!
-  original: String
-  variant_id: String!
+input VariantItemsInput {
+  id: ID!
 }
 
 input VariantOrgsInput {
   id: ID!
-}
-
-type VariantTag {
-  tag_name: String!
 }
 
 input VariantTagsInput {

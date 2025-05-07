@@ -9,7 +9,7 @@ import { Transform } from 'class-transformer'
 import { IsOptional, IsUrl, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { Category as CategoryEntity } from './category.entity'
-import { Item } from './item.model'
+import { ItemsPage } from './item.model'
 
 @ObjectType()
 export class Category extends CreatedUpdated<CategoryEntity> {
@@ -48,8 +48,8 @@ export class Category extends CreatedUpdated<CategoryEntity> {
   @Field(() => CategoriesPage)
   descendants!: CategoriesPage & {}
 
-  @Field(() => [Item])
-  items: Item[] = []
+  @Field(() => ItemsPage)
+  items!: ItemsPage & {}
 }
 
 @ObjectType()
@@ -75,6 +75,9 @@ export class CategoriesPage extends Paginated(Category) {}
 
 @ArgsType()
 export class CategoriesArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class CategoryItemsArgs extends PaginationBasicArgs {}
 
 @InputType()
 export class CreateCategoryInput extends ChangeInputWithLang() {

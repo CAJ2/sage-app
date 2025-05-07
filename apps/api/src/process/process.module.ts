@@ -27,6 +27,6 @@ import { TagService } from './tag.service'
     TagResolver,
     TagService,
   ],
-  exports: [],
+  exports: [TagService],
 })
 export class ProcessModule {}

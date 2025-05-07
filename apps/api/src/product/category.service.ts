@@ -11,6 +11,7 @@ import {
   CategoryTree,
 } from './category.entity'
 import { CreateCategoryInput } from './category.model'
+import { Item } from './item.entity'
 
 @Injectable()
 export class CategoryService {
@@ -110,6 +111,16 @@ export class CategoryService {
     }
   }
 
+  async items(categoryID: string, opts: CursorOptions<Item>) {
+    opts.where.categories = this.em.getReference(Category, categoryID)
+    const items = await this.em.find(Item, opts.where, opts.options)
+    const count = await this.em.count(Item, opts.where)
+    return {
+      items,
+      count,
+    }
+  }
+
   async create(input: CreateCategoryInput, userID: string) {
     const category = new Category()
     const change = await this.changeService.findOneOrCreate(
@@ -117,7 +128,7 @@ export class CategoryService {
       input.change,
       userID,
     )
-    this.setFields(change, category, input)
+    this.setFields(category, input, change)
     await this.changeService.createEntityEdit(change, category)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -128,9 +139,9 @@ export class CategoryService {
   }
 
   async setFields(
-    change: Change,
     category: Category,
     input: CreateCategoryInput,
+    change?: Change,
   ) {
     if (input.name) {
       category.name = addTrReq(category.name, input.lang, input.name)

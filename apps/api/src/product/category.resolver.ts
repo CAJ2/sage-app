@@ -16,10 +16,12 @@ import {
   CategoriesArgs,
   CategoriesPage,
   Category,
+  CategoryItemsArgs,
   CreateCategoryInput,
   CreateCategoryOutput,
 } from './category.model'
 import { CategoryService } from './category.service'
+import { Item, ItemsPage } from './item.model'
 
 @Resolver(() => Category)
 export class CategoryResolver {
@@ -117,6 +119,13 @@ export class CategoryResolver {
       Category,
       CategoriesPage,
     )
+  }
+
+  @ResolveField()
+  async items(@Parent() category: Category, @Args() args: CategoryItemsArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.categoryService.items(category.id, filter)
+    return this.transform.entityToPaginated(cursor, args, Item, ItemsPage)
   }
 
   @Mutation(() => CreateCategoryOutput, { name: 'createCategory' })

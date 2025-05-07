@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/postgresql'
+import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { ChangeService } from '@src/changes/change.service'
@@ -8,6 +8,7 @@ import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
+import { TagService } from '@src/process/tag.service'
 import { Org } from '@src/users/org.entity'
 import { Item } from './item.entity'
 import { Variant, VariantsTags } from './variant.entity'
@@ -18,6 +19,7 @@ export class VariantService {
   constructor(
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
+    private readonly tagService: TagService,
   ) {}
 
   async findOneByID(id: string) {
@@ -95,12 +97,17 @@ export class VariantService {
 
   async create(input: CreateVariantInput, userID: string) {
     const variant = new Variant()
+    if (!input.useChange()) {
+      this.setFields(variant, input)
+      await this.em.persistAndFlush(variant)
+      return { variant }
+    }
     const change = await this.changeService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    this.setFields(change, variant, input)
+    this.setFields(variant, input, change)
     await this.changeService.createEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -111,17 +118,25 @@ export class VariantService {
     const variant = await this.em.findOne(
       Variant,
       { id: input.id },
-      { disableIdentityMap: true },
+      {
+        disableIdentityMap: input.useChange(),
+        populate: ['items', 'orgs', 'region', 'tags', 'components'],
+      },
     )
+    if (!variant) {
+      throw new Error('Variant not found')
+    }
+    if (!input.useChange()) {
+      this.setFields(variant, input)
+      await this.em.persistAndFlush(variant)
+      return { variant }
+    }
     const change = await this.changeService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    if (!variant) {
-      throw new Error('Variant not found')
-    }
-    this.setFields(change, variant, input)
+    this.setFields(variant, input, change)
     await this.changeService.createEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -129,9 +144,9 @@ export class VariantService {
   }
 
   async setFields(
-    change: Change,
     variant: Variant,
     input: Partial<CreateVariantInput & UpdateVariantInput>,
+    change?: Change,
   ) {
     if (input.name) {
       variant.name = addTrReq(variant.name, input.lang, input.name)
@@ -139,98 +154,154 @@ export class VariantService {
     if (input.desc) {
       variant.desc = addTr(variant.desc, input.lang, input.desc)
     }
-    if (input.item_id) {
-      const item = await this.changeService.findOneWithChange(change, Item, {
-        id: input.item_id,
-      })
-      variant.item = item
-    }
-    if (input.region_id) {
-      const region = await this.changeService.findOneWithChange(
-        change,
-        Region,
-        { id: input.region_id },
-      )
-      variant.region = region
-    }
-    if (input.orgs) {
-      for (const org of input.orgs) {
-        const orgEntity = await this.changeService.findOneWithChange(
-          change,
-          Org,
-          { id: org.id },
-        )
-        variant.orgs.add(orgEntity)
+    if (input.items || input.add_items) {
+      for (const item of input.items || input.add_items || []) {
+        if (!change) {
+          const itemEntity = await this.em.findOneOrFail(Item, { id: item.id })
+          if (variant.items.contains(ref(itemEntity))) {
+            variant.items.remove(ref(itemEntity))
+          }
+          variant.items.add(ref(itemEntity))
+        } else {
+          const itemEntity = await this.changeService.findOneWithChange(
+            change,
+            Item,
+            { id: item.id },
+          )
+          if (variant.items.contains(itemEntity)) {
+            variant.items.remove(itemEntity)
+          }
+          variant.items.add(itemEntity)
+        }
       }
     }
-    if (input.add_orgs) {
-      for (const org of input.add_orgs) {
-        const orgEntity = await this.changeService.findOneWithChange(
+    if (input.remove_items) {
+      for (const item of input.remove_items) {
+        if (!change) {
+          const itemEntity = await this.em.findOneOrFail(Item, { id: item.id })
+          if (variant.items.contains(ref(itemEntity))) {
+            variant.items.remove(ref(itemEntity))
+          }
+        } else {
+          const itemEntity = await this.changeService.findOneWithChange(
+            change,
+            Item,
+            { id: item.id },
+          )
+          if (variant.items.contains(itemEntity)) {
+            variant.items.remove(itemEntity)
+          }
+        }
+      }
+    }
+    if (input.region_id) {
+      if (!change) {
+        const region = await this.em.findOneOrFail(Region, {
+          id: input.region_id,
+        })
+        variant.region = ref(region)
+      } else {
+        const region = await this.changeService.findOneWithChange(
           change,
-          Org,
-          { id: org.id },
+          Region,
+          { id: input.region_id },
         )
-        variant.orgs.add(orgEntity)
+        variant.region = region
+      }
+    }
+    if (input.orgs || input.add_orgs) {
+      for (const org of input.orgs || input.add_orgs || []) {
+        if (!change) {
+          const orgEntity = await this.em.findOneOrFail(Org, { id: org.id })
+          if (variant.orgs.contains(ref(orgEntity))) {
+            variant.orgs.remove(ref(orgEntity))
+          }
+          variant.orgs.add(ref(orgEntity))
+        } else {
+          const orgEntity = await this.changeService.findOneWithChange(
+            change,
+            Org,
+            { id: org.id },
+          )
+          if (variant.orgs.contains(orgEntity)) {
+            variant.orgs.remove(orgEntity)
+          }
+          variant.orgs.add(orgEntity)
+        }
       }
     }
     if (input.remove_orgs) {
       for (const org of input.remove_orgs) {
-        const orgEntity = await this.changeService.findOneWithChange(
-          change,
-          Org,
-          { id: org.id },
-        )
-        variant.orgs.remove(orgEntity)
+        if (!change) {
+          const orgEntity = await this.em.findOneOrFail(Org, { id: org.id })
+          variant.orgs.remove(ref(orgEntity))
+        } else {
+          const orgEntity = await this.changeService.findOneWithChange(
+            change,
+            Org,
+            { id: org.id },
+          )
+          if (variant.orgs.contains(orgEntity)) {
+            variant.orgs.remove(orgEntity)
+          }
+        }
       }
     }
-    if (input.tags) {
-      for (const tag of input.tags) {
-        const tagEntity = await this.changeService.findOneWithChange(
-          change,
-          Tag,
-          { id: tag.id },
-        )
-        variant.tags.add(tagEntity)
-      }
-    }
-    if (input.add_tags) {
-      for (const tag of input.add_tags) {
-        const tagEntity = await this.changeService.findOneWithChange(
-          change,
-          Tag,
-          { id: tag.id },
-        )
-        variant.tags.add(tagEntity)
+    if (input.tags || input.add_tags) {
+      for (const tag of input.tags || input.add_tags || []) {
+        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
+        const tagDef = await this.tagService.validateTagInput(tag)
+        const tagInst = new VariantsTags()
+        tagInst.tag = tagEntity
+        tagInst.variant = variant
+        tagInst.meta = tagDef.meta
+        if (variant.variant_tags.contains(tagInst)) {
+          variant.variant_tags.remove(tagInst)
+        }
+        variant.variant_tags.add(tagInst)
       }
     }
     if (input.remove_tags) {
       for (const tag of input.remove_tags) {
-        const tagEntity = await this.changeService.findOneWithChange(
-          change,
-          Tag,
-          { id: tag.id },
-        )
-        variant.tags.remove(tagEntity)
+        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
+        variant.tags.remove(ref(tagEntity))
       }
     }
-    if (input.components) {
-      for (const component of input.components) {
-        const comp = await this.changeService.findOneWithChange(
-          change,
-          Component,
-          { id: component.id },
-        )
-        variant.components.add(comp)
+    if (input.components || input.add_components) {
+      for (const component of input.components || input.add_components || []) {
+        if (!change) {
+          const comp = await this.em.findOneOrFail(Component, {
+            id: component.id,
+          })
+          if (variant.components.contains(ref(comp))) {
+            variant.components.remove(ref(comp))
+          }
+          variant.components.add(ref(comp))
+        } else {
+          const comp = await this.changeService.findOneWithChange(
+            change,
+            Component,
+            { id: component.id },
+          )
+          variant.components.add(comp)
+        }
       }
     }
-    if (input.add_components) {
-      for (const component of input.add_components) {
-        const comp = await this.changeService.findOneWithChange(
-          change,
-          Component,
-          { id: component.id },
-        )
-        variant.components.add(comp)
+    if (input.remove_components) {
+      for (const component of input.remove_components) {
+        if (!change) {
+          const comp = await this.em.findOneOrFail(Component, {
+            id: component.id,
+          })
+          variant.components.remove(ref(comp))
+        } else {
+          const comp = await this.changeService.findOneWithChange(
+            change,
+            Component,
+            { id: component.id },
+          )
+          variant.components.remove(comp)
+        }
       }
     }
   }

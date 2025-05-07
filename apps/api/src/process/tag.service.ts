@@ -64,6 +64,7 @@ export class TagService {
             `Invalid meta data for tag "${tag.id}": ${ajv.errorsText(validator.errors)}`,
           )
         }
+        tag.meta = input.meta
       } else {
         throw new Error(`Tag "${tag.id}" does not have a meta template schema`)
       }

@@ -6,6 +6,7 @@ import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Tag } from '@src/process/tag.entity'
+import { TagService } from '@src/process/tag.service'
 import { Category } from './category.entity'
 import { Item, ItemsTags } from './item.entity'
 import { CreateItemInput, UpdateItemInput } from './item.model'
@@ -16,6 +17,7 @@ export class ItemService {
   constructor(
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
+    private readonly tagService: TagService,
   ) {}
 
   async findOneByID(id: string) {
@@ -41,7 +43,7 @@ export class ItemService {
     }
   }
 
-  async tags(itemID: string) {
+  async tagsList(itemID: string) {
     const tagDefs = await this.em.find(Tag, { items: itemID })
     const tags = await this.em.find(
       ItemsTags,
@@ -61,7 +63,7 @@ export class ItemService {
     return combinedTags
   }
 
-  async tagsPage(itemID: string, opts: CursorOptions<Tag>) {
+  async tags(itemID: string, opts: CursorOptions<Tag>) {
     opts.where.items = this.em.getReference(Item, itemID)
     const tagDefs = await this.em.find(Tag, opts.where, opts.options)
     const tags = await this.em.find(
@@ -88,9 +90,9 @@ export class ItemService {
   }
 
   async variants(itemID: string, opts: CursorOptions<Variant>) {
-    opts.where.item = this.em.getReference(Item, itemID)
+    opts.where.items = this.em.getReference(Item, itemID)
     const variants = await this.em.find(Variant, opts.where, opts.options)
-    const count = await this.em.count(Variant, { item: opts.where.item })
+    const count = await this.em.count(Variant, { items: opts.where.items })
     return {
       items: variants,
       count,
@@ -99,12 +101,17 @@ export class ItemService {
 
   async create(input: CreateItemInput, userID: string) {
     const item = new Item()
+    if (!input.useChange()) {
+      this.setFields(item, input)
+      await this.em.persistAndFlush(item)
+      return { item }
+    }
     const change = await this.changeService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    this.setFields(change, item, input)
+    this.setFields(item, input, change)
     await this.changeService.createEntityEdit(change, item)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -115,17 +122,25 @@ export class ItemService {
     const item = await this.em.findOne(
       Item,
       { id: input.id },
-      { disableIdentityMap: true },
+      {
+        disableIdentityMap: input.useChange(),
+        populate: ['categories', 'item_tags'],
+      },
     )
+    if (!item) {
+      throw new Error('Item not found')
+    }
+    if (!input.useChange()) {
+      this.setFields(item, input)
+      await this.em.persistAndFlush(item)
+      return { item }
+    }
     const change = await this.changeService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    if (!item) {
-      throw new Error('Item not found')
-    }
-    this.setFields(change, item, input)
+    this.setFields(item, input, change)
     await this.changeService.createEntityEdit(change, item)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -133,9 +148,9 @@ export class ItemService {
   }
 
   async setFields(
-    change: Change,
     item: Item,
     input: Partial<CreateItemInput & UpdateItemInput>,
+    change?: Change,
   ) {
     if (input.name) {
       item.name = addTrReq(item.name, input.lang, input.name)
@@ -149,18 +164,13 @@ export class ItemService {
       }
       item.files['image'] = { url: input.image_url }
     }
-    if (input.categories) {
-      for (const category of input.categories) {
-        const cat = await this.changeService.findOneWithChange(
-          change,
-          Category,
-          { id: category.id },
-        )
-        item.categories.add(cat)
-      }
-    }
-    if (input.add_categories) {
-      for (const category of input.add_categories) {
+    if (input.categories || input.add_categories) {
+      for (const category of input.categories || input.add_categories || []) {
+        if (!change) {
+          const cat = await this.em.findOneOrFail(Category, { id: category.id })
+          item.categories.add(cat)
+          continue
+        }
         const cat = await this.changeService.findOneWithChange(
           change,
           Category,
@@ -171,6 +181,11 @@ export class ItemService {
     }
     if (input.remove_categories) {
       for (const category of input.remove_categories) {
+        if (!change) {
+          const cat = await this.em.findOneOrFail(Category, { id: category.id })
+          item.categories.remove(cat)
+          continue
+        }
         const cat = await this.changeService.findOneWithChange(
           change,
           Category,
@@ -179,33 +194,23 @@ export class ItemService {
         item.categories.remove(cat)
       }
     }
-    if (input.tags) {
-      for (const tag of input.tags) {
-        const tagEntity = await this.changeService.findOneWithChange(
-          change,
-          Tag,
-          { id: tag.id },
-        )
-        item.tags.add(tagEntity)
-      }
-    }
-    if (input.add_tags) {
-      for (const tag of input.add_tags) {
-        const tagEntity = await this.changeService.findOneWithChange(
-          change,
-          Tag,
-          { id: tag.id },
-        )
-        item.tags.add(tagEntity)
+    if (input.tags || input.add_tags) {
+      for (const tag of input.tags || input.add_tags || []) {
+        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
+        const tagDef = await this.tagService.validateTagInput(tag)
+        const tagInst = new ItemsTags()
+        tagInst.tag = tagEntity
+        tagInst.item = item
+        tagInst.meta = tagDef.meta
+        if (item.item_tags.contains(tagInst)) {
+          item.item_tags.remove(tagInst)
+        }
+        item.item_tags.add(tagInst)
       }
     }
     if (input.remove_tags) {
       for (const tag of input.remove_tags) {
-        const tagEntity = await this.changeService.findOneWithChange(
-          change,
-          Tag,
-          { id: tag.id },
-        )
+        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
         item.tags.remove(tagEntity)
       }
     }

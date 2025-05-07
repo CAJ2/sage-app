@@ -41,6 +41,9 @@ export class Region extends BaseEntity {
   @Property()
   placetype!: string
 
+  @Property({ type: 'int4' })
+  admin_level?: number
+
   @OneToMany({ mappedBy: 'region' })
   variants = new Collection<Variant>(this)
 

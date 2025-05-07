@@ -5,8 +5,9 @@ import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Component } from '@src/process/component.model'
-import { Org } from '@src/users/org.model'
+import { ComponentsPage } from '@src/process/component.model'
+import { TagPage } from '@src/process/tag.model'
+import { OrgsPage } from '@src/users/org.model'
 import { Transform } from 'class-transformer'
 import {
   IsOptional,
@@ -17,14 +18,8 @@ import {
 } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
-import { Item } from './item.model'
+import { ItemsPage } from './item.model'
 import { Variant as VariantEntity } from './variant.entity'
-
-@ObjectType()
-export class VariantTag {
-  @Field(() => String)
-  tag_name: string = ''
-}
 
 @ObjectType()
 export class Variant extends IDCreatedUpdated<VariantEntity> {
@@ -44,20 +39,17 @@ export class Variant extends IDCreatedUpdated<VariantEntity> {
   @IsUrl({ protocols: ['https'] })
   image_url?: string
 
-  @Field(() => [Item])
-  items: Item[] = []
+  @Field(() => ItemsPage)
+  items!: ItemsPage
 
-  @Field(() => [Org])
-  orgs: Org[] = []
+  @Field(() => OrgsPage)
+  orgs!: OrgsPage
 
-  @Field(() => [VariantTag])
-  tags: VariantTag[] = []
+  @Field(() => TagPage)
+  tags!: TagPage
 
-  @Field(() => [Component])
-  components: Component[] = []
-
-  @Field(() => [VariantHistory])
-  history: VariantHistory[] = []
+  @Field(() => ComponentsPage)
+  components!: ComponentsPage & {}
 }
 
 @ObjectType()
@@ -92,6 +84,13 @@ export class VariantTagsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class VariantItemsArgs extends PaginationBasicArgs {}
+
+@InputType()
+export class VariantItemsInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+}
 
 @InputType()
 export class VariantOrgsInput {
@@ -139,10 +138,9 @@ export class CreateVariantInput extends ChangeInputWithLang() {
   @MaxLength(100_000)
   desc?: string
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
-  @Validate(IsNanoID)
-  item_id?: string
+  items?: VariantItemsInput[]
 
   @Field(() => ID, { nullable: true })
   @IsOptional()
@@ -177,10 +175,13 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @MaxLength(100_000)
   desc?: string
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
-  @Validate(IsNanoID)
-  item_id?: string
+  add_items?: VariantItemsInput[]
+
+  @Field(() => [VariantItemsInput], { nullable: true })
+  @IsOptional()
+  remove_items?: VariantItemsInput[]
 
   @Field(() => ID, { nullable: true })
   @IsOptional()

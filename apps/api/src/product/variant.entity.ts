@@ -34,17 +34,17 @@ export class Variant extends IDCreatedUpdated {
   @Property({ type: 'json' })
   desc?: TranslatedField
 
-  @Property({ type: 'json' })
-  source!: {}
-
   @ManyToMany({ entity: () => Source, pivotEntity: () => VariantsSources })
   sources = new Collection<Source>(this)
 
   @OneToMany(() => VariantsSources, (vs) => vs.variant)
   variant_sources = new Collection<VariantsSources>(this)
 
-  @ManyToOne()
-  item?: Ref<Item>
+  @ManyToMany({ entity: () => Item, pivotEntity: () => VariantsItems })
+  items = new Collection<Item>(this)
+
+  @OneToMany(() => VariantsItems, (vi) => vi.variant)
+  variant_items = new Collection<VariantsItems>(this)
 
   @ManyToOne()
   region?: Ref<Region>
@@ -86,6 +86,15 @@ export class VariantsSources extends BaseEntity {
   // If we just need external IDs, we use the ExternalSource entity.
   @Property({ type: 'json' })
   meta?: Record<string, any>
+}
+
+@Entity({ tableName: 'variants_items', schema: 'public' })
+export class VariantsItems extends BaseEntity {
+  @ManyToOne({ primary: true })
+  variant!: Variant
+
+  @ManyToOne({ primary: true })
+  item!: Item
 }
 
 @Entity({ tableName: 'variants_tags', schema: 'public' })

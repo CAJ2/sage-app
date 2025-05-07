@@ -12,7 +12,7 @@ import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { Tag } from '@src/process/tag.model'
+import { Tag, TagPage } from '@src/process/tag.model'
 import { CategoriesPage, Category } from './category.model'
 import {
   CreateItemInput,
@@ -21,6 +21,7 @@ import {
   ItemCategoriesArgs,
   ItemsArgs,
   ItemsPage,
+  ItemTagsArgs,
   ItemVariantsArgs,
   UpdateItemInput,
   UpdateItemOutput,
@@ -65,9 +66,10 @@ export class ItemResolver {
   }
 
   @ResolveField()
-  async tags(@Parent() item: Item) {
-    const tags = await this.itemService.tags(item.id)
-    return this.transform.entitiesToModels(tags, Tag)
+  async tags(@Parent() item: Item, @Args() args: ItemTagsArgs) {
+    const filter = this.transform.paginationArgs(args)
+    const cursor = await this.itemService.tags(item.id, filter)
+    return this.transform.entityToPaginated(cursor, args, Tag, TagPage)
   }
 
   @ResolveField()
@@ -85,6 +87,9 @@ export class ItemResolver {
   ): Promise<CreateItemOutput> {
     const created = await this.itemService.create(input, user.id)
     const result = await this.transform.entityToModel(created.item, Item)
+    if (!created.change) {
+      return { item: result }
+    }
     const change = await this.transform.entityToModel(created.change, Change)
     return { change, item: result }
   }
@@ -97,6 +102,9 @@ export class ItemResolver {
   ): Promise<UpdateItemOutput> {
     const updated = await this.itemService.update(input, user.id)
     const result = await this.transform.entityToModel(updated.item, Item)
+    if (!updated.change) {
+      return { item: result }
+    }
     const change = await this.transform.entityToModel(updated.change, Change)
     return { change, item: result }
   }

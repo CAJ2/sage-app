@@ -101,11 +101,14 @@ export class VariantResolver {
   ): Promise<CreateVariantOutput> {
     const created = await this.variantService.create(input, user.id)
     const result = await this.transform.entityToModel(created.variant, Variant)
+    if (!created.change) {
+      return { variant: result }
+    }
     const change = await this.transform.entityToModel(created.change, Change)
     return { change, variant: result }
   }
 
-  @Mutation(() => Variant, { name: 'updateVariant' })
+  @Mutation(() => UpdateVariantOutput, { name: 'updateVariant' })
   @UseGuards(AuthGuard)
   async updateVariant(
     @Args('input') input: UpdateVariantInput,
@@ -113,6 +116,9 @@ export class VariantResolver {
   ): Promise<UpdateVariantOutput> {
     const updated = await this.variantService.update(input, user.id)
     const result = await this.transform.entityToModel(updated.variant, Variant)
+    if (!updated.change) {
+      return { variant: result }
+    }
     const change = await this.transform.entityToModel(updated.change, Change)
     return { change, variant: result }
   }
