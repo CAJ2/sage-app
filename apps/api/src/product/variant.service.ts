@@ -154,6 +154,9 @@ export class VariantService {
     if (input.desc) {
       variant.desc = addTr(variant.desc, input.lang, input.desc)
     }
+    if (input.code) {
+      variant.code = input.code
+    }
     if (input.items || input.add_items) {
       for (const item of input.items || input.add_items || []) {
         if (!change) {
@@ -207,6 +210,30 @@ export class VariantService {
           { id: input.region_id },
         )
         variant.region = region
+      }
+    }
+    if (input.regions || input.add_regions) {
+      for (const region of input.regions || input.add_regions || []) {
+        const regionEntity = await this.em.findOneOrFail(Region, {
+          id: region.id,
+        })
+        if (variant.regions && variant.regions.includes(regionEntity.id)) {
+          variant.regions.push(regionEntity.id)
+        }
+        if (!variant.regions) {
+          variant.regions = []
+        }
+        variant.regions.push(regionEntity.id)
+      }
+    }
+    if (input.remove_regions) {
+      for (const region of input.remove_regions) {
+        const regionEntity = await this.em.findOneOrFail(Region, {
+          id: region.id,
+        })
+        if (variant.regions && variant.regions.includes(regionEntity.id)) {
+          variant.regions = variant.regions.filter((r) => r !== regionEntity.id)
+        }
       }
     }
     if (input.orgs || input.add_orgs) {

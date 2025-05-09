@@ -49,6 +49,12 @@ export class Variant extends IDCreatedUpdated {
   @ManyToOne()
   region?: Ref<Region>
 
+  @Property({ type: 'array' })
+  regions?: string[]
+
+  @Property({ index: true })
+  code?: string
+
   @ManyToMany()
   orgs = new Collection<Org>(this)
 

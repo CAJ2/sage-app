@@ -111,6 +111,13 @@ export class VariantTagsInput {
 }
 
 @InputType()
+export class VariantRegionsInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+}
+
+@InputType()
 export class VariantComponentsInput {
   @Field(() => ID)
   @Validate(IsNanoID)
@@ -145,6 +152,15 @@ export class CreateVariantInput extends ChangeInputWithLang() {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   region_id?: string
+
+  @Field(() => [VariantRegionsInput], { nullable: true })
+  @IsOptional()
+  regions?: VariantRegionsInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(128)
+  code?: string
 
   @Field(() => [VariantOrgsInput], { nullable: true })
   @IsOptional()
@@ -186,6 +202,19 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   region_id?: string
+
+  @Field(() => [VariantRegionsInput], { nullable: true })
+  @IsOptional()
+  add_regions?: VariantRegionsInput[]
+
+  @Field(() => [VariantRegionsInput], { nullable: true })
+  @IsOptional()
+  remove_regions?: VariantRegionsInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(128)
+  code?: string
 
   @Field(() => [VariantOrgsInput], { nullable: true })
   @IsOptional()

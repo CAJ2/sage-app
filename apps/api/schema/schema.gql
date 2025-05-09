@@ -243,6 +243,7 @@ input CreateVariantInput {
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
+  code: String
   components: [VariantComponentsInput!]
   desc: String
   items: [VariantItemsInput!]
@@ -250,6 +251,7 @@ input CreateVariantInput {
   name: String!
   orgs: [VariantOrgsInput!]
   region_id: ID
+  regions: [VariantRegionsInput!]
   remove_sources: [ID!]
   tags: [VariantTagsInput!]
 }
@@ -717,11 +719,13 @@ input UpdateVariantInput {
   add_components: [VariantComponentsInput!]
   add_items: [VariantItemsInput!]
   add_orgs: [VariantOrgsInput!]
+  add_regions: [VariantRegionsInput!]
   add_sources: [ID!]
   add_tags: [VariantTagsInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
+  code: String
   desc: String
   id: ID!
   lang: String
@@ -730,6 +734,7 @@ input UpdateVariantInput {
   remove_components: [VariantComponentsInput!]
   remove_items: [VariantItemsInput!]
   remove_orgs: [VariantOrgsInput!]
+  remove_regions: [VariantRegionsInput!]
   remove_sources: [ID!]
   remove_tags: [VariantTagsInput!]
 }
@@ -798,6 +803,10 @@ input VariantItemsInput {
 }
 
 input VariantOrgsInput {
+  id: ID!
+}
+
+input VariantRegionsInput {
   id: ID!
 }
 
