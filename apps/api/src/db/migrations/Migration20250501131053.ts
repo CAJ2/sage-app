@@ -20,6 +20,9 @@ export class Migration20250501131053 extends Migration {
                  drop constraint if exists "sources_type_check";`)
 
     this.addSql(`alter table "sources"
+                 drop constraint if exists "check_type";`)
+
+    this.addSql(`alter table "sources"
                  add constraint "sources_type_check" check (
                    "type" in (
                      'API',
