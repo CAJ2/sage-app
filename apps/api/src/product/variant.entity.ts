@@ -61,7 +61,11 @@ export class Variant extends IDCreatedUpdated {
   @ManyToMany({ entity: () => Tag, pivotEntity: () => VariantsTags })
   tags = new Collection<Tag>(this)
 
-  @OneToMany(() => VariantsTags, (vt) => vt.variant)
+  @OneToMany({
+    entity: () => VariantsTags,
+    mappedBy: (vt) => vt.variant,
+    orphanRemoval: true,
+  })
   variant_tags = new Collection<VariantsTags>(this)
 
   @ManyToMany({

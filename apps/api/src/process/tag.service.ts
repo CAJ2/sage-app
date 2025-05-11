@@ -1,13 +1,13 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
-import Ajv from 'ajv'
+import Ajv from 'ajv/dist/2020'
 import { Tag } from './tag.entity'
 import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'
 
 const ajv = new Ajv({
   allErrors: true,
-  strict: true,
+  strict: false,
   useDefaults: true,
   removeAdditional: true,
 })

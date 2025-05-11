@@ -46,7 +46,11 @@ export class Place extends CreatedUpdated {
   @ManyToMany({ entity: () => Tag, pivotEntity: () => PlacesTag })
   tags = new Collection<Tag>(this)
 
-  @OneToMany(() => PlacesTag, (pt) => pt.place)
+  @OneToMany({
+    entity: () => PlacesTag,
+    mappedBy: (pt) => pt.place,
+    orphanRemoval: true,
+  })
   place_tags = new Collection<PlacesTag>(this)
 
   @OneToMany({ mappedBy: 'place' })
