@@ -83,9 +83,19 @@ export function translate(params: TransformFnParams): string | undefined {
 export function addTr(
   obj: TranslatedField | undefined,
   lang: string | undefined,
-  value: string,
+  value: string | { lang: string; text?: string }[],
   isAuto = false,
 ) {
+  if (Array.isArray(value)) {
+    for (const v of value) {
+      if (!v.text) {
+        // TODO: Remove existing text when null?
+        continue
+      }
+      obj = addTr(obj, v.lang, v.text, isAuto)
+    }
+    return obj
+  }
   if (!value) {
     return obj
   }
@@ -107,7 +117,7 @@ export function addTr(
 export function addTrReq(
   obj: TranslatedField,
   lang: string | undefined,
-  value: string,
+  value: string | { lang: string; text?: string }[],
   isAuto = false,
 ): TranslatedField {
   const tr = addTr(obj, lang, value, isAuto)

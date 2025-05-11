@@ -32,6 +32,18 @@ export class CreatedUpdated<T> extends BaseModel<T> {
 }
 
 @InputType()
+export class TranslatedInput {
+  @Field(() => String)
+  lang!: string
+
+  @Field(() => String, { nullable: true })
+  text?: string
+
+  @Field(() => Boolean)
+  auto: boolean = false
+}
+
+@InputType()
 export class InputWithLang {
   @Field(() => String, { nullable: true })
   lang?: string
