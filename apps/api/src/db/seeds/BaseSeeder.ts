@@ -1,14 +1,6 @@
 import { Seeder } from '@mikro-orm/seeder'
-import {
-  Material,
-  MATERIAL_ROOT,
-  MaterialTree,
-} from '@src/process/material.entity'
-import {
-  Category,
-  CATEGORY_ROOT,
-  CategoryTree,
-} from '@src/product/category.entity'
+import { Material, MATERIAL_ROOT } from '@src/process/material.entity'
+import { Category, CATEGORY_ROOT } from '@src/product/category.entity'
 import type { EntityManager } from '@mikro-orm/core'
 
 export class BaseSeeder extends Seeder {
@@ -18,18 +10,13 @@ export class BaseSeeder extends Seeder {
       id: CATEGORY_ROOT,
     })
     if (!rootCategory) {
-      const root = em.create(Category, {
+      em.create(Category, {
         id: CATEGORY_ROOT,
         name: {
           xx: CATEGORY_ROOT,
         },
         created_at: new Date(),
         updated_at: new Date(),
-      })
-      em.create(CategoryTree, {
-        ancestor: root,
-        descendant: root,
-        depth: 0,
       })
     }
 
@@ -38,7 +25,7 @@ export class BaseSeeder extends Seeder {
       id: MATERIAL_ROOT,
     })
     if (!rootMaterial) {
-      const root = em.create(Material, {
+      em.create(Material, {
         id: MATERIAL_ROOT,
         name: {
           xx: MATERIAL_ROOT,
@@ -47,11 +34,6 @@ export class BaseSeeder extends Seeder {
         technical: false,
         created_at: new Date(),
         updated_at: new Date(),
-      })
-      em.create(MaterialTree, {
-        ancestor: root,
-        descendant: root,
-        depth: 0,
       })
     }
   }
