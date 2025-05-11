@@ -2,6 +2,7 @@ import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { ChangeService } from '@src/changes/change.service'
+import { Source } from '@src/changes/source.entity'
 import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
@@ -98,7 +99,7 @@ export class VariantService {
   async create(input: CreateVariantInput, userID: string) {
     const variant = new Variant()
     if (!input.useChange()) {
-      this.setFields(variant, input)
+      await this.setFields(variant, input)
       await this.em.persistAndFlush(variant)
       return { variant }
     }
@@ -107,7 +108,7 @@ export class VariantService {
       input.change,
       userID,
     )
-    this.setFields(variant, input, change)
+    await this.setFields(variant, input, change)
     await this.changeService.createEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -120,14 +121,21 @@ export class VariantService {
       { id: input.id },
       {
         disableIdentityMap: input.useChange(),
-        populate: ['items', 'orgs', 'region', 'tags', 'components'],
+        populate: [
+          'items',
+          'orgs',
+          'region',
+          'tags',
+          'variant_tags',
+          'components',
+        ],
       },
     )
     if (!variant) {
       throw new Error('Variant not found')
     }
     if (!input.useChange()) {
-      this.setFields(variant, input)
+      await this.setFields(variant, input)
       await this.em.persistAndFlush(variant)
       return { variant }
     }
@@ -136,7 +144,7 @@ export class VariantService {
       input.change,
       userID,
     )
-    this.setFields(variant, input, change)
+    await this.setFields(variant, input, change)
     await this.changeService.createEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -151,11 +159,38 @@ export class VariantService {
     if (input.name) {
       variant.name = addTrReq(variant.name, input.lang, input.name)
     }
+    if (input.name_tr) {
+      variant.name = addTrReq(variant.name, input.lang, input.name_tr)
+    }
     if (input.desc) {
       variant.desc = addTr(variant.desc, input.lang, input.desc)
     }
+    if (input.desc_tr) {
+      variant.desc = addTr(variant.desc, input.lang, input.desc_tr)
+    }
     if (input.code) {
       variant.code = input.code
+    }
+    if (!change && input.add_sources) {
+      for (const source of input.add_sources) {
+        const sourceEntity = await this.em.findOneOrFail(Source, {
+          id: source,
+        })
+        if (variant.sources.contains(ref(sourceEntity))) {
+          variant.sources.remove(ref(sourceEntity))
+        }
+        variant.sources.add(ref(sourceEntity))
+      }
+    }
+    if (!change && input.remove_sources) {
+      for (const source of input.remove_sources) {
+        const sourceEntity = await this.em.findOneOrFail(Source, {
+          id: source,
+        })
+        if (variant.sources.contains(ref(sourceEntity))) {
+          variant.sources.remove(ref(sourceEntity))
+        }
+      }
     }
     if (input.items || input.add_items) {
       for (const item of input.items || input.add_items || []) {
@@ -278,14 +313,17 @@ export class VariantService {
       for (const tag of input.tags || input.add_tags || []) {
         const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
         const tagDef = await this.tagService.validateTagInput(tag)
+        const tagEx = variant.variant_tags.find((t) => t.tag.id === tag.id)
+        if (tagEx) {
+          tagEx.meta = tagDef.meta
+          this.em.persist(tagEx)
+          continue
+        }
         const tagInst = new VariantsTags()
         tagInst.tag = tagEntity
         tagInst.variant = variant
         tagInst.meta = tagDef.meta
-        if (variant.variant_tags.contains(tagInst)) {
-          variant.variant_tags.remove(tagInst)
-        }
-        variant.variant_tags.add(tagInst)
+        this.em.persist(tagInst)
       }
     }
     if (input.remove_tags) {

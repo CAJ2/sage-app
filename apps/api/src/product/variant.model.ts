@@ -3,7 +3,7 @@ import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { ComponentsPage } from '@src/process/component.model'
 import { TagPage } from '@src/process/tag.model'
@@ -136,14 +136,23 @@ export class VariantComponentsInput {
 
 @InputType()
 export class CreateVariantInput extends ChangeInputWithLang() {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   @MaxLength(1000)
-  name!: string
+  name?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  name_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(100_000)
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  desc_tr?: TranslatedInput[]
 
   @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
@@ -186,10 +195,18 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @MaxLength(1000)
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(100_000)
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  desc_tr?: TranslatedInput[]
 
   @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()

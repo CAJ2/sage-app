@@ -246,9 +246,11 @@ input CreateVariantInput {
   code: String
   components: [VariantComponentsInput!]
   desc: String
+  desc_tr: [TranslatedInput!]
   items: [VariantItemsInput!]
   lang: String
-  name: String!
+  name: String
+  name_tr: [TranslatedInput!]
   orgs: [VariantOrgsInput!]
   region_id: ID
   regions: [VariantRegionsInput!]
@@ -608,6 +610,12 @@ enum TagType {
   VARIANT
 }
 
+input TranslatedInput {
+  auto: Boolean! = false
+  lang: String!
+  text: String
+}
+
 input UpdateChangeInput {
   description: String
   id: ID!
@@ -727,9 +735,11 @@ input UpdateVariantInput {
   change_id: ID
   code: String
   desc: String
+  desc_tr: [TranslatedInput!]
   id: ID!
   lang: String
   name: String
+  name_tr: [TranslatedInput!]
   region_id: ID
   remove_components: [VariantComponentsInput!]
   remove_items: [VariantItemsInput!]
