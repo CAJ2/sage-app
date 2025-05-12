@@ -1,9 +1,12 @@
-import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
+import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
+import { Validate } from 'class-validator'
 import { Org as OrgEntity } from './org.entity'
 import { User, UserPage } from './users.model'
 
@@ -26,11 +29,8 @@ export class Org extends IDCreatedUpdated<OrgEntity> {
   website_url?: string
 
   @Field(() => UserPage)
-  users: User[] = []
+  users!: UserPage & {}
 }
-
-@ObjectType()
-export class OrgsPage extends Paginated(Org) {}
 
 @ObjectType()
 export class OrgHistory {
@@ -41,7 +41,7 @@ export class OrgHistory {
   datetime!: Date
 
   @Field(() => User)
-  user!: User
+  user!: User & {}
 
   @Field(() => String, { nullable: true })
   original?: string
@@ -50,5 +50,66 @@ export class OrgHistory {
   changes?: string
 }
 
+@ObjectType()
+export class OrgsPage extends Paginated(Org) {}
+
 @ArgsType()
 export class OrgUsersArgs extends PaginationBasicArgs {}
+
+@InputType()
+export class CreateOrgInput extends ChangeInputWithLang() {
+  @Field(() => String)
+  name!: string
+
+  @Field(() => String)
+  slug!: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => String, { nullable: true })
+  avatar_url?: string
+
+  @Field(() => String, { nullable: true })
+  website_url?: string
+}
+
+@InputType()
+export class UpdateOrgInput extends ChangeInputWithLang() {
+  @Field(() => String)
+  @Validate(IsNanoID)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  name?: string
+
+  @Field(() => String, { nullable: true })
+  slug?: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => String, { nullable: true })
+  avatar_url?: string
+
+  @Field(() => String, { nullable: true })
+  website_url?: string
+}
+
+@ObjectType()
+export class CreateOrgOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Org, { nullable: true })
+  org?: Org
+}
+
+@ObjectType()
+export class UpdateOrgOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Org, { nullable: true })
+  org?: Org
+}

@@ -192,6 +192,25 @@ type CreateItemOutput {
   item: Item
 }
 
+input CreateOrgInput {
+  add_sources: [ID!]
+  apply: Boolean
+  avatar_url: String
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  lang: String
+  name: String!
+  remove_sources: [ID!]
+  slug: String!
+  website_url: String
+}
+
+type CreateOrgOutput {
+  change: Change
+  org: Org
+}
+
 input CreateProcessInput {
   add_sources: [ID!]
   apply: Boolean
@@ -360,6 +379,7 @@ type Mutation {
   createChange(input: CreateChangeInput!): CreateChangeOutput
   createComponent(input: CreateComponentInput!): CreateComponentOutput
   createItem(input: CreateItemInput!): CreateItemOutput
+  createOrg(input: CreateOrgInput!): CreateOrgOutput
   createProcess(input: CreateProcessInput!): CreateProcessOutput
   createSource(input: CreateSourceInput!): CreateSourceOutput
   createTagDefinition(input: CreateTagDefinitionInput!): CreateTagDefinitionOutput
@@ -370,6 +390,7 @@ type Mutation {
   updateChange(input: UpdateChangeInput!): UpdateChangeOutput
   updateComponent(input: UpdateComponentInput!): UpdateComponentOutput
   updateItem(input: UpdateItemInput!): UpdateItemOutput
+  updateOrg(input: UpdateOrgInput!): UpdateOrgOutput
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput
   updateSource(input: UpdateSourceInput!): UpdateSourceOutput
   updateTagDefinition(input: UpdateTagDefinitionInput!): UpdateTagDefinitionOutput
@@ -672,6 +693,26 @@ input UpdateItemInput {
 type UpdateItemOutput {
   change: Change
   item: Item
+}
+
+input UpdateOrgInput {
+  add_sources: [ID!]
+  apply: Boolean
+  avatar_url: String
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  id: String!
+  lang: String
+  name: String
+  remove_sources: [ID!]
+  slug: String
+  website_url: String
+}
+
+type UpdateOrgOutput {
+  change: Change
+  org: Org
 }
 
 input UpdateProcessInput {

@@ -25,9 +25,6 @@ export class Org extends IDCreatedUpdated {
   slug!: string
 
   @Property({ type: 'json' })
-  name_translations: TranslatedField = defaultTranslatedField()
-
-  @Property({ type: 'json' })
   desc: TranslatedField = defaultTranslatedField()
 
   @Property()
@@ -38,6 +35,9 @@ export class Org extends IDCreatedUpdated {
 
   @Property()
   metadata!: string
+
+  @Property({ type: 'json' })
+  name_translations: TranslatedField = defaultTranslatedField()
 
   @ManyToMany(() => User, (user) => user.orgs)
   users = new Collection<User>(this)
