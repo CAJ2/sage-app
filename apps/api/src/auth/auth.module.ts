@@ -16,8 +16,6 @@ import {
   HttpAdapterHost,
   MetadataScanner,
 } from '@nestjs/core'
-import { UsersModule } from '@src/users/users.module'
-import { UsersService } from '@src/users/users.service'
 import { createAuthMiddleware } from 'better-auth/api'
 import { toNodeHandler } from 'better-auth/node'
 import { APIErrorExceptionFilter } from './api-error-exception-filter'
@@ -54,8 +52,8 @@ const HOOKS = [
  * Provides authentication middleware, hooks, and exception handling.
  */
 @Module({
-  imports: [MikroOrmModule, UsersModule, DiscoveryModule],
-  providers: [AuthService, AuthResolver, UsersService, AuthGuard],
+  imports: [MikroOrmModule, DiscoveryModule],
+  providers: [AuthService, AuthResolver, AuthGuard],
 })
 export class AuthModule implements NestModule, OnModuleInit {
   constructor(
