@@ -40,7 +40,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
   content_url?: string
 
   @Field(() => User)
-  user!: User
+  user!: User & {}
 
   @Field(() => ChangesPage)
   changes!: ChangesPage & {}

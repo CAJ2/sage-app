@@ -43,7 +43,7 @@ export class Variant extends IDCreatedUpdated<VariantEntity> {
   items!: ItemsPage
 
   @Field(() => OrgsPage)
-  orgs!: OrgsPage
+  orgs!: OrgsPage & {}
 
   @Field(() => TagPage)
   tags!: TagPage

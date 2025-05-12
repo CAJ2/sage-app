@@ -37,7 +37,7 @@ export class Change extends IDCreatedUpdated<ChangeEntity> {
   status!: ChangeStatus & {}
 
   @Field(() => User)
-  user!: User
+  user!: User & {}
 
   @Field(() => [Edit])
   edits!: Edit[]

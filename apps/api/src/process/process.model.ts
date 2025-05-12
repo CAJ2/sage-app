@@ -55,7 +55,7 @@ export class ProcessHistory {
   datetime!: Date
 
   @Field(() => User)
-  user!: User
+  user!: User & {}
 
   @Field(() => String, { nullable: true })
   original?: string

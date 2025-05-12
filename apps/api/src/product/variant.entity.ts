@@ -87,7 +87,7 @@ export class VariantsSources extends BaseEntity {
   variant!: Variant
 
   @ManyToOne({ primary: true })
-  source!: Source
+  source!: Source & {}
 
   // Metadata contains key value pairs for the connected
   // source. For example: There is a single source for an API, but
@@ -125,7 +125,7 @@ export class VariantsComponents extends BaseEntity {
   variant!: Variant
 
   @ManyToOne({ primary: true })
-  component!: Component
+  component!: Component & {}
 
   @Property({ type: 'numeric', precision: 16, scale: 6 })
   quantity: number & Opt = 1

@@ -61,7 +61,7 @@ export class CategoryHistory {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User
+  user!: User & {}
 
   @Field(() => String, { nullable: true })
   original?: string
