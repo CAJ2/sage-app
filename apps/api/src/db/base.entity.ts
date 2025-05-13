@@ -1,6 +1,11 @@
 import { BaseEntity, PrimaryKey, Property } from '@mikro-orm/core'
 import { nanoid } from 'nanoid'
 
+export interface Searchable {
+  searchIndex(): string
+  toSearchDoc(): Promise<Record<string, any>>
+}
+
 export abstract class IDCreatedUpdated extends BaseEntity {
   constructor() {
     super()
