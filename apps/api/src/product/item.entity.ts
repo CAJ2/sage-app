@@ -10,8 +10,8 @@ import {
   Property,
   Ref,
 } from '@mikro-orm/core'
-import { IDCreatedUpdated } from '@src/db/base.entity'
-import { TranslatedField } from '@src/db/i18n'
+import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
+import { flattenTr, TranslatedField } from '@src/db/i18n'
 import { Tag } from '@src/process/tag.entity'
 import { User } from '@src/users/users.entity'
 import { Category } from './category.entity'
@@ -24,7 +24,7 @@ export interface ItemFiles {
 }
 
 @Entity({ tableName: 'items', schema: 'public' })
-export class Item extends IDCreatedUpdated {
+export class Item extends IDCreatedUpdated implements Searchable {
   @Property({ type: 'json' })
   name!: TranslatedField
 
@@ -58,6 +58,22 @@ export class Item extends IDCreatedUpdated {
 
   @OneToMany({ mappedBy: 'item' })
   history = new Collection<ItemHistory>(this)
+
+  searchIndex() {
+    return 'items'
+  }
+
+  async toSearchDoc() {
+    await this.item_tags.load()
+    return {
+      id: this.id,
+      ...flattenTr('name', this.name),
+      ...flattenTr('desc', this.desc || {}),
+      tags: this.item_tags
+        .getItems()
+        .map((it) => ({ name: it.tag.name, meta: it.meta })),
+    }
+  }
 }
 
 @Entity({ tableName: 'items_categories', schema: 'public' })

@@ -2,6 +2,8 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { ChangeService } from '@src/changes/change.service'
+import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
+import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 import { addTrReq } from '@src/db/i18n'
 import { Org } from './org.entity'
@@ -13,6 +15,7 @@ export class OrgService {
   constructor(
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
+    private readonly searchService: MeiliService,
   ) {}
 
   async findOneByID(id: string) {
@@ -30,10 +33,18 @@ export class OrgService {
   }
 
   async create(input: CreateOrgInput, userID: string) {
+    const checkOrg = await this.em.findOne(Org, { slug: input.slug })
+    if (checkOrg) {
+      throw ConflictErr(
+        'ORG_CONFLICT',
+        `Org with slug ${input.slug} already exists`,
+      )
+    }
     const org = new Org()
     if (!input.useChange()) {
       await this.setFields(org, input)
       await this.em.persistAndFlush(org)
+      await this.searchService.addDocs(org)
       return { org }
     }
     const change = await this.changeService.findOneOrCreate(
@@ -55,11 +66,12 @@ export class OrgService {
       { disableIdentityMap: input.useChange(), populate: ['users'] },
     )
     if (!org) {
-      throw new Error('Org not found')
+      throw NotFoundErr('ORG_NOT_FOUND', `Org with id ${input.id} not found`)
     }
     if (!input.useChange()) {
       await this.setFields(org, input)
       await this.em.persistAndFlush(org)
+      await this.searchService.addDocs(org)
       return { org }
     }
     const change = await this.changeService.findOneOrCreate(

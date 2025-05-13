@@ -18,6 +18,7 @@ import { VariantsPage } from './variant.model'
 export class Item extends IDCreatedUpdated<ItemEntity> {
   @Field(() => String, { nullable: true })
   @Transform(translate)
+  @IsOptional()
   @MaxLength(1024)
   name?: string
 
@@ -26,6 +27,7 @@ export class Item extends IDCreatedUpdated<ItemEntity> {
   desc?: string
 
   @Field(() => String, { nullable: true })
+  @IsOptional()
   @IsUrl()
   image_url?: string
 

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
 import { ChangeService } from '@src/changes/change.service'
 import { mapOrderBy } from '@src/common/db.utils'
+import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Tag } from '@src/process/tag.entity'
@@ -18,6 +19,7 @@ export class ItemService {
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
     private readonly tagService: TagService,
+    private readonly searchService: MeiliService,
   ) {}
 
   async findOneByID(id: string) {
@@ -104,6 +106,7 @@ export class ItemService {
     if (!input.useChange()) {
       this.setFields(item, input)
       await this.em.persistAndFlush(item)
+      await this.searchService.addDocs(item)
       return { item }
     }
     const change = await this.changeService.findOneOrCreate(
@@ -133,6 +136,7 @@ export class ItemService {
     if (!input.useChange()) {
       this.setFields(item, input)
       await this.em.persistAndFlush(item)
+      await this.searchService.addDocs(item)
       return { item }
     }
     const change = await this.changeService.findOneOrCreate(
@@ -163,6 +167,9 @@ export class ItemService {
         item.files = {}
       }
       item.files['image'] = { url: input.image_url }
+    }
+    if (!item.source) {
+      item.source = {}
     }
     if (input.categories || input.add_categories) {
       for (const category of input.categories || input.add_categories || []) {
