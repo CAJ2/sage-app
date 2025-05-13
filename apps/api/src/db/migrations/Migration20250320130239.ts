@@ -81,7 +81,7 @@ export class Migration20250320130239 extends Migration {
                    "desc" jsonb not null,
                    "avatar_url" varchar(255) null,
                    "website_url" varchar(255) null,
-                   "metadata" varchar(255) not null,
+                   "metadata" varchar(255) null,
                    constraint "orgs_pkey" primary key ("id")
                  );`)
     this.addSql(`alter table "orgs"

@@ -10,14 +10,18 @@ import {
   Property,
   Ref,
 } from '@mikro-orm/core'
-import { IDCreatedUpdated } from '@src/db/base.entity'
-import { defaultTranslatedField, TranslatedField } from '@src/db/i18n'
+import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
+import {
+  defaultTranslatedField,
+  flattenTr,
+  TranslatedField,
+} from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from './users.entity'
 
 @Entity({ tableName: 'orgs', schema: 'public' })
-export class Org extends IDCreatedUpdated {
+export class Org extends IDCreatedUpdated implements Searchable {
   @Property({ length: 128 })
   name!: string
 
@@ -34,7 +38,7 @@ export class Org extends IDCreatedUpdated {
   website_url?: string
 
   @Property()
-  metadata!: string
+  metadata?: string
 
   @Property({ type: 'json' })
   name_translations: TranslatedField = defaultTranslatedField()
@@ -53,6 +57,21 @@ export class Org extends IDCreatedUpdated {
 
   @OneToMany({ mappedBy: 'org' })
   history = new Collection<OrgHistory>(this)
+
+  searchIndex() {
+    return 'orgs'
+  }
+
+  async toSearchDoc() {
+    return {
+      id: this.id,
+      name: this.name,
+      slug: this.slug,
+      updated_at: this.updated_at,
+      avatar_url: this.avatar_url,
+      ...flattenTr('desc', this.desc),
+    }
+  }
 }
 
 @Entity({ tableName: 'org_history', schema: 'public' })

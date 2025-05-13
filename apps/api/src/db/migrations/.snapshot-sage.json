@@ -756,15 +756,6 @@
           "length": 128,
           "mappedType": "string"
         },
-        "name_translations": {
-          "name": "name_translations",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "desc": {
           "name": "desc",
           "type": "jsonb",
@@ -800,9 +791,18 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 255,
           "mappedType": "string"
+        },
+        "name_translations": {
+          "name": "name_translations",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
         }
       },
       "name": "orgs",
