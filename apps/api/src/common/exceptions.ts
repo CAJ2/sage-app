@@ -19,6 +19,15 @@ export function BadRequestErr(message: string, info?: string): GraphQLError {
   })
 }
 
+export function ConflictErr(message: string, info?: string): GraphQLError {
+  return new GraphQLError(message, {
+    extensions: {
+      code: 'CONFLICT',
+      info,
+    },
+  })
+}
+
 export interface ErrorEntry {
   field?: string
   message: string
