@@ -50,6 +50,9 @@ export function isTranslatedField(
   return result.success
 }
 
+// Defines a class-transformer function to pick the appropriate language
+// string from a JSON object containing one or more translations.
+// Relies on the _lang property of the object to determine the best match.
 export function translate(params: TransformFnParams): string | undefined {
   const { value, obj } = params
   if (!value) {
@@ -80,6 +83,8 @@ export function translate(params: TransformFnParams): string | undefined {
   return field.xx
 }
 
+// Modifies a TranslatedField JSON object to add a new translation.
+// Supports a single string or an array of lang, text objects.
 export function addTr(
   obj: TranslatedField | undefined,
   lang: string | undefined,
@@ -114,6 +119,8 @@ export function addTr(
   return obj
 }
 
+// Like addTr, but throws an error if the resulting object
+// is nullish (JSON object must have at least one translation).
 export function addTrReq(
   obj: TranslatedField,
   lang: string | undefined,
@@ -197,4 +204,18 @@ export function parseLanguageHeader(header: string): string[] {
     localeTypes.push('en')
   }
   return localeTypes
+}
+
+// Flattens a TranslatedField object into an object where each key is prepended
+// by the name of the field.
+// {"en": "Hello", "sv": "Hej"} => {"name_en": "Hello", "name_sv": "Hej"}
+export function flattenTr(fieldName: string, obj: TranslatedField) {
+  const result: Record<string, string> = {}
+  for (const key in obj) {
+    const value = obj[key]
+    if (value) {
+      result[`${fieldName}_${key}`] = value
+    }
+  }
+  return result
 }
