@@ -19,6 +19,7 @@ import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
+import { z } from 'zod'
 import { Material } from './material.entity'
 
 export enum ProcessIntent {
@@ -74,6 +75,24 @@ export interface ProcessInstructions {
   }
 }
 
+export const MatchRuleSchema = z.object({
+  // A process rule is given as input:
+  // One component, zero or more component tags, and one or more materials.
+  // These rules are used to match properties of any of these inputs.
+  // Check if this component tag is present.
+  component_tag: z.string().optional(),
+  // Run a JSON schema against the meta object.
+  component_tag_meta: z.string().optional(),
+  // Check if this material is present.
+  material: z.string().optional(),
+})
+
+export const ProcessRulesSchema = z
+  .array(z.union([MatchRuleSchema, z.object({ or: z.array(MatchRuleSchema) })]))
+  .optional()
+
+export type ProcessRules = z.infer<typeof ProcessRulesSchema>
+
 export interface ProcessEfficiency {
   // How much of the input is converted to useful output.
   // This is a number between 0 and 1.
@@ -114,6 +133,10 @@ export class Process extends IDCreatedUpdated {
   // converted to useful output.
   @Property({ type: 'json' })
   efficiency?: ProcessEfficiency
+
+  // Rules for matching materials/variants to this process.
+  @Property({ type: 'json' })
+  rules?: ProcessRules
 
   @ManyToMany({ entity: () => Source, pivotEntity: () => ProcessSources })
   sources = new Collection<Source>(this)

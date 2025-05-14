@@ -16,13 +16,48 @@ import { TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
+import { z } from 'zod'
 import { Material } from './material.entity'
 import { Tag } from './tag.entity'
 
-export interface ComponentVisual {
+export const ComponentVisualSchema = z.object({
   // The visual representation of the component.
-  image: string
-}
+  image: z.string().optional(),
+})
+
+export type ComponentVisual = z.infer<typeof ComponentVisualSchema>
+
+export const ComponentPhysicalSchema = z.object({
+  // The physical representation of the component.
+  dimensions: z
+    .object({
+      units: z.string().optional(),
+      width: z.number().optional(),
+      height: z.number().optional(),
+      depth: z.number().optional(),
+      // The +- uncertainty of the dimensions.
+      approx: z.number().optional(),
+    })
+    .optional(),
+  volume: z
+    .object({
+      units: z.string().optional(),
+      value: z.number().optional(),
+      // The +- uncertainty of the volume.
+      approx: z.number().optional(),
+    })
+    .optional(),
+  mass: z
+    .object({
+      units: z.string().optional(),
+      value: z.number().optional(),
+      // The +- uncertainty of the mass.
+      approx: z.number().optional(),
+    })
+    .optional(),
+})
+
+export type ComponentPhysical = z.infer<typeof ComponentPhysicalSchema>
 
 @Entity({ tableName: 'components', schema: 'public' })
 export class Component extends IDCreatedUpdated {
@@ -56,6 +91,9 @@ export class Component extends IDCreatedUpdated {
 
   @Property({ type: 'json' })
   visual?: ComponentVisual
+
+  @Property({ type: 'json' })
+  physical?: ComponentPhysical
 
   @ManyToMany({
     entity: () => Material,

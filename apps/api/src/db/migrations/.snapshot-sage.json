@@ -506,6 +506,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "boolean"
+        },
+        "shape": {
+          "name": "shape",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "materials",
@@ -1150,6 +1160,15 @@
         },
         "visual": {
           "name": "visual",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "physical": {
+          "name": "physical",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
@@ -3765,6 +3784,15 @@
         },
         "efficiency": {
           "name": "efficiency",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "rules": {
+          "name": "rules",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,

@@ -15,10 +15,35 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { TranslatedField } from '@src/db/i18n'
 import { User } from '@src/users/users.entity'
 import { JsonLdDocument } from 'jsonld'
+import { z } from 'zod'
 import { Component } from './component.entity'
 import { Process } from './process.entity'
 
 export const MATERIAL_ROOT = 'MATERIAL_ROOT'
+
+export const MaterialShapeSchema = z
+  .enum([
+    // Container that is enclosed with a rigid body
+    'BOX',
+    // Container with a flexible body
+    'BAG',
+    // Container that is always open to the air
+    'BIN',
+    // Any container that is re-sealable
+    'BOTTLE',
+    // Any container that is not re-sealable
+    'CAN',
+    // Enclosed container with a flexible body
+    'PACKET',
+    // Flexible material that can deform to closely fit the shape of the item
+    'WRAP',
+    // Container that doesn't fit into any of the above
+    'OTHER',
+    'UNKNOWN',
+  ])
+  .optional()
+
+export type MaterialShape = z.infer<typeof MaterialShapeSchema>
 
 @Entity({ tableName: 'materials', schema: 'public' })
 export class Material extends IDCreatedUpdated {
@@ -33,6 +58,9 @@ export class Material extends IDCreatedUpdated {
 
   @Property()
   technical!: boolean
+
+  @Property({ type: 'string' })
+  shape?: MaterialShape
 
   @OneToMany(() => MaterialTree, (tree) => tree.ancestor)
   ancestors = new Collection<MaterialTree>(this)
