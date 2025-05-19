@@ -1,13 +1,16 @@
 <template>
   <div class="flex justify-between items-center bg-base-200 p-3">
-    <button v-if="back" class="btn btn-ghost" @click.prevent="goBack">
-      <font-awesome-icon icon="fa-solid fa-angle-left" class="w-8 h-8" />
+    <button v-if="back" class="btn btn-ghost mx-3" @click.prevent="goBack">
+      <font-awesome-icon icon="fa-solid fa-angle-left" class="w-5 min-h-5" />
     </button>
-    <h3 class="text-lg font-bold text-base-content">
+    <h2 class="flex-1 text-xl px-3 font-bold text-base-content">
       {{ title }}
-    </h3>
-    <button v-if="context" class="btn btn-ghost">
-      <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" class="w-8 h-8" />
+    </h2>
+    <button v-if="context" class="btn btn-ghost mx-3">
+      <font-awesome-icon
+        icon="fa-solid fa-ellipsis-vertical"
+        class="w-5 min-h-5"
+      />
     </button>
   </div>
 </template>
@@ -17,7 +20,7 @@ const router = useRouter()
 
 const { title, back, context } = defineProps<{
   title: string
-  back?: boolean
+  back?: string
   context?: boolean
 }>()
 

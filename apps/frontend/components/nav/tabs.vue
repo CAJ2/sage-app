@@ -23,7 +23,7 @@
     </div>
 
     <!-- Center Search Button -->
-    <div class="inset-x-0 top-0 -translate-y-1/3 p-3">
+    <div class="inset-x-0 top-0 -translate-y-1/3 px-3">
       <router-link
         :to="{ path: '/search' }"
         class="flex items-center justify-center"
