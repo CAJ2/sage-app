@@ -12,7 +12,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
     new ExpressAdapter(),
-    { bodyParser: false, cors: true },
+    {
+      bodyParser: false,
+      cors: {
+        origin: [
+          'https://sageleaf.app',
+          'https://dev.sageleaf.app',
+          'http://localhost:3000',
+        ],
+      },
+    },
   )
   app.useGlobalPipes(
     new ValidationPipe({
@@ -26,8 +35,6 @@ async function bootstrap() {
     helmet({
       contentSecurityPolicy: {
         directives: {
-          defaultSrc: ["'self'", 'unpkg.com'],
-          fontSrc: ["'self'", 'fonts.gstatic.com', 'data:'],
           frameSrc: ["'self'", 'sandbox.embed.apollographql.com'],
           imgSrc: [
             "'self'",
@@ -38,13 +45,16 @@ async function bootstrap() {
             "'self'",
             'apollo-server-landing-page.cdn.apollographql.com',
           ],
-          scriptSrc: [
-            "'self'",
-            "https: 'unsafe-inline'",
-            'studio-ui-deployments.apollographql.com',
-          ],
+          scriptSrc: ["'self'", "https: 'unsafe-inline'"],
         },
       },
+      crossOriginOpenerPolicy: {
+        policy: 'same-origin',
+      },
+      crossOriginResourcePolicy: {
+        policy: 'same-site',
+      },
+      crossOriginEmbedderPolicy: false,
     }),
   )
   app.useGlobalFilters(new HttpExceptionFilter())
