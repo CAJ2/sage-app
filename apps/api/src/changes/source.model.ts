@@ -11,7 +11,7 @@ import { IsNanoID } from '@src/common/validator.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
-import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
+import { IsEnum, IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { ChangesPage } from './change.model'
@@ -66,13 +66,18 @@ export class CreateSourceInput {
   @IsEnum(SourceType)
   type!: SourceType
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(2048)
   location?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
   content?: Record<string, any>
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUrl({ protocols: ['https'] })
+  content_url?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
   metadata?: Record<string, any>
@@ -97,6 +102,11 @@ export class UpdateSourceInput {
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()
   content?: Record<string, any>
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUrl({ protocols: ['https'] })
+  content_url?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()

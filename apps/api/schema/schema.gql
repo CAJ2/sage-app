@@ -235,7 +235,8 @@ type CreateProcessOutput {
 
 input CreateSourceInput {
   content: JSONObject
-  location: String!
+  content_url: String
+  location: String
   metadata: JSONObject
   type: SourceType!
 }
@@ -740,6 +741,7 @@ type UpdateProcessOutput {
 
 input UpdateSourceInput {
   content: JSONObject
+  content_url: String
   id: ID!
   location: String
   metadata: JSONObject

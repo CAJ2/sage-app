@@ -1,6 +1,7 @@
-import { EntityManager } from '@mikro-orm/postgresql'
+import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
+import { User } from '@src/users/users.entity'
 import { Source } from './source.entity'
 import { CreateSourceInput, UpdateSourceInput } from './source.model'
 
@@ -33,34 +34,15 @@ export class SourceService {
 
   async create(input: CreateSourceInput, userID: string) {
     const source = new Source()
-    source.type = input.type
-    source.location = input.location
-    source.user.id = userID
-
-    if (input.content) {
-      source.content = input.content
-    }
-
-    if (input.metadata) {
-      source.metadata = input.metadata
-    }
-
+    source.user = ref(User, userID)
+    await this.setFields(source, input)
     await this.em.persistAndFlush(source)
     return source
   }
 
   async update(input: UpdateSourceInput) {
     const source = await this.findOne(input.id)
-
-    if (input.type) source.type = input.type
-    if (input.location) source.location = input.location
-    if (input.content !== undefined) {
-      source.content = input.content
-    }
-    if (input.metadata) {
-      source.metadata = input.metadata
-    }
-
+    await this.setFields(source, input)
     await this.em.persistAndFlush(source)
     return source
   }
@@ -76,5 +58,22 @@ export class SourceService {
     const source = await this.findOne(id)
     await this.em.removeAndFlush(source)
     return true
+  }
+
+  async setFields(
+    source: Source,
+    input: Partial<CreateSourceInput & UpdateSourceInput>,
+  ) {
+    if (input.type) source.type = input.type
+    if (input.location) source.location = input.location
+    if (input.content) {
+      source.content = input.content
+    }
+    if (input.content_url) {
+      source.content_url = input.content_url
+    }
+    if (input.metadata) {
+      source.metadata = input.metadata
+    }
   }
 }
