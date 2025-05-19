@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@pinia/nuxt',
     'reka-ui/nuxt',
+    'shadcn-nuxt',
   ],
 
   typescript: {
@@ -33,8 +34,19 @@ export default defineNuxtConfig({
     ],
   },
 
+  runtimeConfig: {
+    public: {
+      betterauthurl: 'https://api.dev.sageleaf.app/auth',
+    }
+  },
+
   colorMode: {
     classSuffix: '',
+  },
+
+  shadcn: {
+    prefix: '',
+    componentDir: 'components/ui',
   },
 
   compatibilityDate: '2025-02-12',
