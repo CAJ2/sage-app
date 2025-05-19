@@ -105,13 +105,11 @@ export class AuthModule implements NestModule, OnModuleInit {
     const isNotFunctionBased = trustedOrigins && Array.isArray(trustedOrigins)
 
     if (!this.options.disableTrustedOriginsCors && isNotFunctionBased) {
-      for (const origin of trustedOrigins) {
-        this.adapter.httpAdapter.enableCors({
-          origin,
-          methods: ['GET', 'POST', 'PUT', 'DELETE'],
-          credentials: true,
-        })
-      }
+      this.adapter.httpAdapter.enableCors({
+        origin: trustedOrigins,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+      })
     } else
       throw new Error(
         'Function-based trustedOrigins not supported in NestJS. Use string array or disable CORS with disableTrustedOriginsCors: true.',

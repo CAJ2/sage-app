@@ -11,7 +11,6 @@ import type { Adapter, BetterAuthOptions } from 'better-auth'
 export const configureAuth = (orm: MikroORM) => {
   return betterAuth({
     basePath: '/auth',
-    trustedOrigins: ['http://127.0.0.1:4444'],
     database: dbAdapter(orm),
     plugins: [
       username({
@@ -138,8 +137,23 @@ export const configureAuth = (orm: MikroORM) => {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       },
     },
+    trustedOrigins:
+      process.env.NODE_ENV === 'production'
+        ? ['https://sageleaf.app', 'https://dev.sageleaf.app']
+        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     advanced: {
       cookiePrefix: 'sage',
+      crossSubDomainCookies: {
+        enabled: true,
+        domain:
+          process.env.NODE_ENV === 'production' ? '.sageleaf.app' : undefined,
+      },
+      defaultCookieAttributes: {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none',
+        partitioned: true,
+      },
       generateId: () => nanoid(),
     },
     hooks: {},
