@@ -15,6 +15,7 @@ import { GraphQLModule } from './graphql/graphql.module'
 import { HealthModule } from './health/health.module'
 import { ProcessModule } from './process/process.module'
 import { ProductModule } from './product/product.module'
+import { SearchModule } from './search/search.module'
 import { UsersModule } from './users/users.module'
 
 @Module({
@@ -53,6 +54,7 @@ import { UsersModule } from './users/users.module'
     ProductModule,
     ProcessModule,
     ChangesModule,
+    SearchModule,
   ],
   providers: [AppService],
 })
