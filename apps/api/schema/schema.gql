@@ -520,6 +520,7 @@ type Query {
   getVariants(after: String, before: String, first: Int, last: Int): VariantsPage!
   rootCategory: Category!
   rootMaterial: Material!
+  search(limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
   searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latitude: Float!, longitude: Float!): RegionsPage!
 }
 
@@ -541,6 +542,30 @@ type RegionsPage {
   nodes: [Region!]
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+union SearchResultItem = Category | Component | Item | Org | Place | Variant
+
+type SearchResultItemEdge {
+  cursor: String!
+  node: SearchResultItem!
+}
+
+type SearchResultPage {
+  edges: [SearchResultItemEdge!]
+  nodes: [SearchResultItem!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"""The item type to search"""
+enum SearchType {
+  CATEGORY
+  COMPONENT
+  ITEM
+  ORG
+  PLACE
+  VARIANT
 }
 
 type Source {
