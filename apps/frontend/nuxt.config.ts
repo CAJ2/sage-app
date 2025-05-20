@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
+    '@nuxtjs/apollo',
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
     '@nuxt/icon',
@@ -34,9 +35,18 @@ export default defineNuxtConfig({
     ],
   },
 
+  apollo: {
+    clients: {
+      default: {
+        // @ts-expect-error
+        httpEndpoint: () => useRuntimeConfig().public.apiurl + '/graphql',
+      },
+    },
+  },
+
   runtimeConfig: {
     public: {
-      betterauthurl: 'https://api.dev.sageleaf.app/auth',
+      apiurl: 'https://api.dev.sageleaf.app',
     }
   },
 

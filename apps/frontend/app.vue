@@ -9,7 +9,7 @@
 import { useDark } from '@vueuse/core'
 useHead({
   title: 'Sage',
-  meta: [{ name: 'description', content: 'Recycling information.' }],
+  meta: [{ name: 'description', content: 'Circular economy information.' }],
 })
 useDark({
   selector: 'html',
