@@ -27,22 +27,7 @@ export const SearchResultItem = createUnionType({
   name: 'SearchResultItem',
   types: () => [Category, Item, Variant, Component, Org, Place] as const,
   resolveType: (value) => {
-    switch (value.type) {
-      case SearchType.CATEGORY:
-        return Category
-      case SearchType.ITEM:
-        return Item
-      case SearchType.VARIANT:
-        return Variant
-      case SearchType.COMPONENT:
-        return Component
-      case SearchType.ORG:
-        return Org
-      case SearchType.PLACE:
-        return Place
-      default:
-        return null
-    }
+    return value._type
   },
 })
 

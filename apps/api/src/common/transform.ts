@@ -206,4 +206,31 @@ export class TransformService {
     const lang: string[] | undefined = this.cls.get('lang')
     return lang ? lang[0] : undefined
   }
+
+  async objectsToPaginated<T, S extends PaginatedType<any, any>>(
+    objects: EntityDTO<T>[],
+    PageModel: new () => S,
+  ): Promise<PaginatedType<any, any>> {
+    const entities: any[] = []
+    for (const obj of objects) {
+      if (!(obj as any)._type) {
+        continue
+      }
+      ;(obj as any)._lang = this.cls.get('lang')
+      const inst: object = plainToInstance((obj as any)._type, obj)
+      await validateOrReject(inst).catch((errors) => {
+        throw new GraphQLError(errors.toString())
+      })
+      entities.push(inst)
+    }
+    const page = new PageModel()
+    page.edges = entities.map((node) => ({ cursor: '', node }))
+    page.nodes = entities
+    page.totalCount = entities.length
+    page.pageInfo = {
+      hasPreviousPage: false,
+      hasNextPage: false,
+    }
+    return page
+  }
 }

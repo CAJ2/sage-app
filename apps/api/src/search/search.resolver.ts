@@ -1,10 +1,14 @@
 import { Args, Query, Resolver } from '@nestjs/graphql'
+import { TransformService } from '@src/common/transform'
 import { SearchArgs, SearchResultPage } from './search.model'
 import { SearchService } from './search.service'
 
 @Resolver(() => SearchResultPage)
 export class SearchResolver {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(
+    private readonly searchService: SearchService,
+    private readonly transformService: TransformService,
+  ) {}
 
   @Query(() => SearchResultPage, { name: 'search' })
   async search(@Args() args: SearchArgs): Promise<any> {
@@ -20,6 +24,6 @@ export class SearchResolver {
         },
       }
     }
-    return cursor
+    return this.transformService.objectsToPaginated(cursor, SearchResultPage)
   }
 }

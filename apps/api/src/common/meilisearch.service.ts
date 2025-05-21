@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Searchable } from '@src/db/base.entity'
+import _ from 'lodash'
 import { MeiliSearch, RecordAny } from 'meilisearch'
 
 export enum SearchIndex {
@@ -53,7 +54,6 @@ export class MeiliService {
     const qs = queries.map((q) => ({
       indexUid: q.index,
       q: q.query,
-      limit: q.options?.limit || 10,
     }))
     const results = await this.client.multiSearch({
       queries: qs,
@@ -62,6 +62,37 @@ export class MeiliService {
         offset: offset || 0,
       },
     })
-    return results
+    return { ...results, hits: this.transformResults(results.hits) }
+  }
+
+  transformResults(results: any[]) {
+    return results.map((r) => {
+      for (const key in r) {
+        if (key.startsWith('name_')) {
+          r.name = _.set(r.name || {}, key.replace('name_', ''), r[key])
+          delete r[key]
+        }
+        if (key.startsWith('desc_short_')) {
+          r.desc_short = _.set(
+            r.desc_short || {},
+            key.replace('desc_short_', ''),
+            r[key],
+          )
+          delete r[key]
+        } else if (key.startsWith('desc_')) {
+          r.desc = _.set(r.desc || {}, key.replace('desc_', ''), r[key])
+          delete r[key]
+        }
+        if (key.startsWith('address_')) {
+          r.address = _.set(
+            r.address || {},
+            key.replace('address_', ''),
+            r[key],
+          )
+          delete r[key]
+        }
+      }
+      return r
+    })
   }
 }

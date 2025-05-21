@@ -1,28 +1,43 @@
 import { Injectable } from '@nestjs/common'
 import { MeiliService, SearchIndex } from '@src/common/meilisearch.service'
+import { Place } from '@src/geo/place.model'
+import { Component } from '@src/process/component.model'
+import { Material } from '@src/process/material.model'
+import { Category } from '@src/product/category.model'
+import { Item } from '@src/product/item.model'
+import { Variant } from '@src/product/variant.model'
+import { Org } from '@src/users/org.model'
 import { SearchType } from './search.model'
 
 @Injectable()
 export class SearchService {
   constructor(private readonly meili: MeiliService) {}
 
+  typeIndexMap: Record<SearchType, SearchIndex> = {
+    [SearchType.CATEGORY]: SearchIndex.CATEGORIES,
+    [SearchType.ITEM]: SearchIndex.ITEMS,
+    [SearchType.VARIANT]: SearchIndex.VARIANTS,
+    [SearchType.COMPONENT]: SearchIndex.COMPONENTS,
+    [SearchType.ORG]: SearchIndex.ORGS,
+    [SearchType.PLACE]: SearchIndex.PLACES,
+  }
+
+  indexModelMap: Record<SearchIndex, any> = {
+    [SearchIndex.CATEGORIES]: Category,
+    [SearchIndex.ITEMS]: Item,
+    [SearchIndex.VARIANTS]: Variant,
+    [SearchIndex.COMPONENTS]: Component,
+    [SearchIndex.ORGS]: Org,
+    [SearchIndex.MATERIALS]: Material,
+    [SearchIndex.PLACES]: Place,
+  }
+
   mapTypeToIndex(type: SearchType): SearchIndex {
-    switch (type) {
-      case SearchType.CATEGORY:
-        return SearchIndex.CATEGORIES
-      case SearchType.ITEM:
-        return SearchIndex.ITEMS
-      case SearchType.VARIANT:
-        return SearchIndex.VARIANTS
-      case SearchType.COMPONENT:
-        return SearchIndex.COMPONENTS
-      case SearchType.ORG:
-        return SearchIndex.ORGS
-      case SearchType.PLACE:
-        return SearchIndex.PLACES
-      default:
-        throw new Error(`Unknown search type: ${type}`)
-    }
+    return this.typeIndexMap[type]
+  }
+
+  mapIndexToModel(index: SearchIndex): string {
+    return this.indexModelMap[index]
   }
 
   async searchAll(
@@ -41,6 +56,8 @@ export class SearchService {
         SearchIndex.ITEMS,
         SearchIndex.VARIANTS,
         SearchIndex.COMPONENTS,
+        SearchIndex.ORGS,
+        SearchIndex.PLACES,
       ] as SearchIndex[])
     const results = await this.meili.federatedSearch(
       idxs.map((idx) => ({
@@ -54,30 +71,9 @@ export class SearchService {
       if (!h._federation) {
         return null
       }
-      switch (h._federation.indexUid) {
-        case SearchIndex.CATEGORIES:
-          return { ...h, type: SearchType.CATEGORY }
-        case SearchIndex.ITEMS:
-          return { ...h, type: SearchType.ITEM }
-        case SearchIndex.VARIANTS:
-          return { ...h, type: SearchType.VARIANT }
-        case SearchIndex.COMPONENTS:
-          return { ...h, type: SearchType.COMPONENT }
-        case SearchIndex.ORGS:
-          return { ...h, type: SearchType.ORG }
-        case SearchIndex.PLACES:
-          return { ...h, type: SearchType.PLACE }
-      }
-      return null
+      h._type = this.mapIndexToModel(h._federation.indexUid)
+      return h
     })
-    return {
-      edges: items.map((i) => ({ cursor: '', node: i })),
-      nodes: items,
-      totalCount: results.hits.length,
-      pageInfo: {
-        hasNextPage: results.hits.length > (limit || 10),
-        hasPreviousPage: offset ? offset > 0 : false,
-      },
-    }
+    return items
   }
 }

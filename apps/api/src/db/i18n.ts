@@ -59,7 +59,7 @@ export function translate(params: TransformFnParams): string | undefined {
     return value
   }
   if (!isTranslatedField(value)) {
-    // TODO: Maybe log this issue
+    console.error('Invalid translated field', value)
   }
   const field: TranslatedField = value
   if (_.isArray(obj._lang)) {
