@@ -430,7 +430,7 @@ type PageInfo {
 }
 
 type Place {
-  address: String
+  address: PlaceAddress
   created_at: DateTime!
   desc: String
   id: ID!
@@ -439,6 +439,15 @@ type Place {
   org: Org
   tags: [Tag!]!
   updated_at: DateTime!
+}
+
+type PlaceAddress {
+  city: String
+  country: String
+  housenumber: String
+  postal_code: String
+  region: String
+  street: String
 }
 
 type PlaceEdge {
