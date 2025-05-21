@@ -6,7 +6,7 @@ import { CreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
-import { IsOptional, IsUrl, MaxLength } from 'class-validator'
+import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { Category as CategoryEntity } from './category.entity'
 import { ItemsPage } from './item.model'
@@ -33,7 +33,6 @@ export class Category extends CreatedUpdated<CategoryEntity> {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUrl({ protocols: ['https', 'icon'] })
   image_url?: string
 
   @Field(() => CategoriesPage)
@@ -95,7 +94,6 @@ export class CreateCategoryInput extends ChangeInputWithLang() {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUrl({ protocols: ['https', 'icon'] })
   image_url?: string
 }
 
@@ -114,7 +112,6 @@ export class UpdateCategoryInput extends ChangeInputWithLang() {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUrl({ protocols: ['https', 'icon'] })
   image_url?: string
 }
 
