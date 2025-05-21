@@ -1,5 +1,160 @@
 <template>
-  <div></div>
+  <div>
+    <div class="flex justify-center">
+      <div class="w-full p-5 mb-[64px] max-w-2xl">
+        <div class="relative items-center">
+          <FormInput
+            id="search"
+            v-model="searchInput"
+            type="text"
+            placeholder="Search..."
+            class="pl-10"
+          />
+          <span
+            class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
+          >
+            <font-awesome-icon
+              icon="fa-solid fa-magnifying-glass"
+              class="text-neutral-700"
+            ></font-awesome-icon>
+          </span>
+        </div>
+        <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
+          <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
+            Search Results
+          </li>
+          <li v-if="status === 'pending'" class="list-row">
+            <div class="skeleton h-4 w-28"></div>
+            <div class="skeleton h-4 w-full"></div>
+            <div class="skeleton h-4 w-full"></div>
+          </li>
+
+          <div v-if="data">
+            <li v-for="res in data.search.nodes" :key="res.id">
+              <div v-if="res.id" class="list-row flex flex-col gap-0">
+                <p class="text-xs text-neutral-500 uppercase pb-1">
+                  {{ formatType(res.__typename) }}
+                </p>
+                <div class="flex items-center gap-2">
+                  <img class="size-10 rounded-box" :src="res.image_url" />
+                  <div class="flex-1 px-2">
+                    <div class="text-bold">
+                      {{ res.name || res.name_null }}
+                    </div>
+                    <div class="text-xs opacity-70">
+                      {{ res.desc_short }}
+                    </div>
+                  </div>
+                  <button class="btn btn-square btn-ghost">
+                    <font-awesome-icon
+                      icon="fa-solid fa-angle-right"
+                      class="size-[1.2em]"
+                    />
+                  </button>
+                </div>
+              </div>
+            </li>
+          </div>
+
+          <li
+            v-if="data?.search.nodes.length === 0 && searchInput.length > 0"
+            class="list-row"
+          >
+            No results found for "{{ searchInput }}"
+          </li>
+          <li
+            v-if="!data && searchInput.length === 0"
+            class="list-row flex items-center justify-center"
+          >
+            <div class="text-neutral-500">Search for anything</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { watchDebounced } from '@vueuse/core'
+
+const searchQuery = gql`
+  query Search($query: String!) {
+    search(query: $query) {
+      nodes {
+        __typename
+        ... on Category {
+          id
+          name
+          desc_short
+          desc
+          image_url
+        }
+        ... on Variant {
+          id
+          name_null: name
+          desc
+        }
+        ... on Place {
+          id
+          name_null: name
+          address {
+            street
+            city
+            region
+            country
+          }
+        }
+        ... on Org {
+          id
+          name
+          desc
+        }
+      }
+    }
+  }
+`
+const searchInput = shallowRef('')
+const status = ref('idle')
+const data = ref<SearchResult | null>(null)
+
+type SearchResult = {
+  search: {
+    nodes: {
+      id: string
+      name: string
+      name_null: string
+      desc_short: string
+      desc: string
+      image_url: string
+      __typename: string
+    }[]
+  }
+}
+
+watchDebounced(
+  searchInput,
+  async () => {
+    status.value = 'pending'
+    const results = await useLazyAsyncQuery<SearchResult>(searchQuery, {
+      query: searchInput.value,
+    })
+    status.value = results.status.value
+    console.log('searchQuery', results.data.value)
+    data.value = results.data.value
+  },
+  { debounce: 300 },
+)
+
+const formatType = (type: string) => {
+  switch (type) {
+    case 'Category':
+      return 'Category'
+    case 'Variant':
+      return 'Product'
+    case 'Org':
+      return 'Organization'
+    default:
+      return type
+  }
+}
+</script>
