@@ -2,9 +2,14 @@
   <div>
     <div class="grid grid-cols-4 md:grid-cols-12">
       <div class="p-5 col-span-4 md:col-span-6 md:col-start-4 bg-base-200">
-        <div v-if="session.data">
-          <p><strong>Name:</strong> {{ session.data.user.name }}</p>
-          <p><strong>Email:</strong> {{ session.data.user.email }}</p>
+        <div v-if="session.data" class="flex justify-between">
+          <div class="flex-1">
+            <p><strong>Name:</strong> {{ session.data.user.name }}</p>
+            <p><strong>Email:</strong> {{ session.data.user.email }}</p>
+          </div>
+          <button class="btn btn-ghost btn-circle" @click="signOut">
+            <font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
+          </button>
         </div>
         <div v-if="session.isPending" class="flex w-52 flex-col gap-4">
           <div class="flex items-center gap-4">
@@ -76,4 +81,8 @@ const toggleDark = useToggle(isDark)
 
 const auth = useAuthClient()
 const session = auth.useSession()
+
+const signOut = async () => {
+  await auth.signOut()
+}
 </script>
