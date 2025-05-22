@@ -21,7 +21,7 @@
         </div>
         <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
           <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
-            Search Results
+            Search Results ({{ data?.search.totalCount || 0 }})
           </li>
           <li v-if="status === 'pending'" class="list-row">
             <div class="skeleton h-4 w-28"></div>
@@ -29,14 +29,34 @@
             <div class="skeleton h-4 w-full"></div>
           </li>
 
-          <div v-if="data">
-            <li v-for="res in data.search.nodes" :key="res.id">
-              <div v-if="res.id" class="list-row flex flex-col gap-0">
-                <p class="text-xs text-neutral-500 uppercase pb-1">
+          <div
+            v-if="data && status !== 'pending'"
+            class="divide-y border-neutral-200"
+          >
+            <li
+              v-for="res in data.search.nodes"
+              :key="res.id"
+              class="border-neutral-200"
+            >
+              <div v-if="res.id" class="list-row flex flex-col gap-0 pt-2 pb-3">
+                <p class="text-xs text-neutral-500 uppercase pb-2">
                   {{ formatType(res.__typename) }}
                 </p>
                 <div class="flex items-center gap-2">
-                  <img class="size-10 rounded-box" :src="res.image_url" />
+                  <img
+                    v-if="res.image_url"
+                    class="size-12 rounded-box"
+                    :src="res.image_url"
+                  />
+                  <span
+                    v-else
+                    class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
+                  >
+                    <font-awesome-icon
+                      :icon="placeholderIcon(res.__typename)"
+                      class="size-6 h-6! p-1"
+                    />
+                  </span>
                   <div class="flex-1 px-2">
                     <div class="text-bold">
                       {{ res.name || res.name_null }}
@@ -45,12 +65,14 @@
                       {{ res.desc_short }}
                     </div>
                   </div>
-                  <button class="btn btn-square btn-ghost">
-                    <font-awesome-icon
-                      icon="fa-solid fa-angle-right"
-                      class="size-[1.2em]"
-                    />
-                  </button>
+                  <NuxtLink :to="exploreLink(res.__typename, res.id)">
+                    <button class="btn btn-square btn-ghost">
+                      <font-awesome-icon
+                        icon="fa-solid fa-angle-right"
+                        class="size-[1.2em]"
+                      />
+                    </button>
+                  </NuxtLink>
                 </div>
               </div>
             </li>
@@ -110,6 +132,7 @@ const searchQuery = gql`
           desc
         }
       }
+      totalCount
     }
   }
 `
@@ -128,12 +151,16 @@ type SearchResult = {
       image_url: string
       __typename: string
     }[]
+    totalCount: number
   }
 }
 
 watchDebounced(
   searchInput,
   async () => {
+    if (searchInput.value.length < 2) {
+      return
+    }
     status.value = 'pending'
     const results = await useLazyAsyncQuery<SearchResult>(searchQuery, {
       query: searchInput.value,
@@ -155,6 +182,30 @@ const formatType = (type: string) => {
       return 'Organization'
     default:
       return type
+  }
+}
+const placeholderIcon = (type: string) => {
+  switch (type) {
+    case 'Category':
+      return 'fa-solid fa-box'
+    case 'Variant':
+      return 'fa-solid fa-tags'
+    case 'Org':
+      return 'fa-solid fa-building'
+    default:
+      return 'fa-solid fa-question'
+  }
+}
+const exploreLink = (type: string, id: string) => {
+  switch (type) {
+    case 'Category':
+      return `/explore/categories/${id}`
+    case 'Variant':
+      return `/explore/variants/${id}`
+    case 'Org':
+      return `/explore/orgs/${id}`
+    default:
+      return '#'
   }
 }
 </script>
