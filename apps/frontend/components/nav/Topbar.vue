@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center bg-base-200 p-3">
+  <div class="flex justify-between items-center bg-base-200 p-2">
     <button v-if="back" class="btn btn-ghost mx-1" @click.prevent="goBack">
       <font-awesome-icon icon="fa-solid fa-angle-left" class="w-5 min-h-5" />
     </button>
