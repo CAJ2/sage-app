@@ -74,6 +74,9 @@ export class SearchService {
       h._type = this.mapIndexToModel(h._federation.indexUid)
       return h
     })
-    return items
+    return {
+      items,
+      count: results.totalHits || results.estimatedTotalHits || 0,
+    }
   }
 }

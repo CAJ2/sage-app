@@ -208,11 +208,11 @@ export class TransformService {
   }
 
   async objectsToPaginated<T, S extends PaginatedType<any, any>>(
-    objects: EntityDTO<T>[],
+    cursor: { items: EntityDTO<T>[]; count: number },
     PageModel: new () => S,
   ): Promise<PaginatedType<any, any>> {
     const entities: any[] = []
-    for (const obj of objects) {
+    for (const obj of cursor.items) {
       if (!(obj as any)._type) {
         continue
       }
@@ -226,9 +226,9 @@ export class TransformService {
     const page = new PageModel()
     page.edges = entities.map((node) => ({ cursor: '', node }))
     page.nodes = entities
-    page.totalCount = entities.length
+    page.totalCount = cursor.count
     page.pageInfo = {
-      hasPreviousPage: false,
+      hasPreviousPage: entities.length < cursor.count,
       hasNextPage: false,
     }
     return page
