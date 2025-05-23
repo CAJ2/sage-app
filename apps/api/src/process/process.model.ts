@@ -74,7 +74,7 @@ export class ProcessArgs extends PaginationBasicArgs {}
 export class CreateProcessInput extends ChangeInputWithLang() {
   @Field(() => String)
   @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
-  intent: ProcessIntent = ProcessIntent.COLLECTION
+  intent!: ProcessIntent
 
   @Field(() => String)
   name!: string

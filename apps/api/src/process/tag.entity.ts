@@ -20,6 +20,7 @@ export enum TagType {
   VARIANT = 'VARIANT',
   COMPONENT = 'COMPONENT',
   PROCESS = 'PROCESS',
+  ORG = 'ORG',
 }
 
 export interface TagMetaTemplate {

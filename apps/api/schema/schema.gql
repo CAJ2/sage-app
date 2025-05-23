@@ -217,7 +217,7 @@ input CreateProcessInput {
   change: CreateChangeInput
   change_id: ID
   desc: String
-  intent: String! = "COLLECTION"
+  intent: String!
   lang: String
   material: ID
   name: String!
@@ -661,6 +661,7 @@ type TagPage {
 enum TagType {
   COMPONENT
   ITEM
+  ORG
   PLACE
   PROCESS
   VARIANT

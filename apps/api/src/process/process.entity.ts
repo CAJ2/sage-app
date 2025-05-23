@@ -23,12 +23,35 @@ import { z } from 'zod'
 import { Material } from './material.entity'
 
 export enum ProcessIntent {
-  COLLECTION = 'COLLECTION',
-  SORTATION = 'SORTATION',
-  RECYCLE = 'RECYCLE',
-  REFURBISH = 'REFURBISH',
+  // Reuse a functional product.
   REUSE = 'REUSE',
+  // Repair a product to extend its life.
+  REPAIR = 'REPAIR',
+  // Refurbish old products to like-new status.
+  REFURBISH = 'REFURBISH',
+  // Use components in new products with the same function.
+  REMANUFACTURE = 'REMANUFACTURE',
+  // Use components in new products with different functions.
+  REPURPOSE = 'REPURPOSE',
+  // Recycle components into raw materials.
+  RECYCLE = 'RECYCLE',
+  // Energy recovery typically through incineration.
+  ENERGY_RECOVERY = 'ENERGY_RECOVERY',
+  // Disposal with no future use.
+  LANDFILL = 'LANDFILL',
+  // Improperly disposed components.
+  LITTER = 'LITTER',
 }
+
+export const ProcessInstructionsContainerTypeSchema = z.enum([
+  'BOX',
+  'BAG',
+  'BIN',
+  'SMART_BOX',
+  'DEPOSIT_RETURN',
+  'OTHER',
+  'UNKNOWN',
+])
 
 export enum ProcessInstructionsContainerType {
   // Container that is enclosed with a rigid body
@@ -46,6 +69,12 @@ export enum ProcessInstructionsContainerType {
   UNKNOWN = 'UNKNOWN',
 }
 
+export const ProcessInstructionsAccessSchema = z.enum([
+  'PUBLIC',
+  'PRIVATE',
+  'RESTRICTED',
+])
+
 export enum ProcessInstructionsAccess {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
@@ -53,6 +82,29 @@ export enum ProcessInstructionsAccess {
   // to the public, but with additional restrictions.
   RESTRICTED = 'RESTRICTED',
 }
+
+export const ProcessInstructionsSchema = z.object({
+  container: z
+    .object({
+      type: ProcessInstructionsContainerTypeSchema,
+      access: ProcessInstructionsAccessSchema.optional(),
+      image: z.string().optional(),
+      color: z.string().optional(),
+      shape: z
+        .object({
+          height: z.number().optional(),
+          width: z.number().optional(),
+          depth: z.number().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  pickup: z
+    .object({
+      rrule: z.string().optional(),
+    })
+    .optional(),
+})
 
 export interface ProcessInstructions {
   // Description of the container to deposit
@@ -105,7 +157,7 @@ export interface ProcessEfficiency {
 @Entity({ tableName: 'processes', schema: 'public' })
 export class Process extends IDCreatedUpdated {
   @Enum(() => ProcessIntent)
-  intent: ProcessIntent = ProcessIntent.COLLECTION
+  intent!: ProcessIntent
 
   @Property({ type: 'json' })
   name!: TranslatedField

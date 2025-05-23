@@ -1355,7 +1355,8 @@
             "ITEM",
             "VARIANT",
             "COMPONENT",
-            "PROCESS"
+            "PROCESS",
+            "ORG"
           ],
           "mappedType": "enum"
         },
@@ -3725,13 +3726,16 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "'COLLECTION'",
           "enumItems": [
-            "COLLECTION",
-            "SORTATION",
-            "RECYCLE",
+            "REUSE",
+            "REPAIR",
             "REFURBISH",
-            "REUSE"
+            "REMANUFACTURE",
+            "REPURPOSE",
+            "RECYCLE",
+            "ENERGY_RECOVERY",
+            "LANDFILL",
+            "LITTER"
           ],
           "mappedType": "enum"
         },
