@@ -99,6 +99,10 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
 
+onMounted(() => {
+  document.getElementById('search')?.focus()
+})
+
 const searchQuery = gql`
   query Search($query: String!) {
     search(query: $query) {

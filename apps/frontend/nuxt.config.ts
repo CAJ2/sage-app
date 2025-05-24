@@ -15,6 +15,10 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
   ],
 
+  app: {
+    pageTransition: { name: 'page-left', mode: 'default' },
+  },
+
   typescript: {
     typeCheck: true,
   },

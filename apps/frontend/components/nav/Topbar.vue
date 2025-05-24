@@ -48,6 +48,9 @@ const { title, subtitle, back, context, useImage, image } = defineProps<{
 }>()
 
 function goBack() {
-  router.go(-1)
+  // TODO: This is a terrible hack and only works for this case
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(router.options as unknown as any).is_back = true
+  router.back()
 }
 </script>

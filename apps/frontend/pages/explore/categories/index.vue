@@ -92,5 +92,4 @@ const { status, data } = await useLazyAsyncQuery<CategoryResult>(
   categoriesQuery,
   vars,
 )
-console.log('categoriesQuery', data.value)
 </script>

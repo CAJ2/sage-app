@@ -15,26 +15,30 @@
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
-              v-for="(_, index) in 5"
-              :key="index"
+              v-for="category in data?.rootCategory.children.nodes"
+              :key="category.id"
               class="pl-1 basis-1/2 md:basis-1/3 lg:basis-1/3"
             >
-              <div class="p-1">
-                <Card>
-                  <CardHeader class="p-4">
-                    <div class="flex flex-col items-start gap-2">
-                      <font-awesome-icon
-                        icon="fa-solid fa-home"
-                        class="text-neutral-700"
-                      ></font-awesome-icon>
-                      <CardTitle>Category {{ index + 1 }}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent class="flex flex-col justify-center px-4 pb-2">
-                    <span class="text-xl">{{ index + 1 }}</span>
-                  </CardContent>
-                </Card>
-              </div>
+              <NuxtLink :to="`/explore/categories/${category.id}`">
+                <div class="p-1">
+                  <Card>
+                    <CardHeader class="p-4 pb-2">
+                      <div class="flex flex-col items-start gap-2">
+                        <font-awesome-icon
+                          icon="fa-solid fa-home"
+                          class="text-neutral-700"
+                        ></font-awesome-icon>
+                        <CardTitle>{{ category.name }}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent class="flex flex-col justify-center px-4 pb-3">
+                      <span class="text-xs line-clamp-3">{{
+                        category.desc_short
+                      }}</span>
+                    </CardContent>
+                  </Card>
+                </div>
+              </NuxtLink>
             </CarouselItem>
           </CarouselContent>
         </Carousel>
@@ -43,4 +47,39 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const categoriesQuery = gql`
+  query GetCategories {
+    rootCategory {
+      children {
+        nodes {
+          id
+          name
+          desc_short
+          desc
+          image_url
+        }
+      }
+    }
+  }
+`
+const vars = {
+  limit: 6,
+}
+
+type CategoryResult = {
+  rootCategory: {
+    children: {
+      nodes: {
+        id: string
+        name: string
+        desc_short: string
+        desc: string
+        image_url: string
+      }[]
+    }
+  }
+}
+
+const { data } = await useLazyAsyncQuery<CategoryResult>(categoriesQuery, vars)
+</script>
