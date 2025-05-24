@@ -122,6 +122,12 @@ type ComponentsPage {
   totalCount: Int!
 }
 
+type Container {
+  access: String
+  image: String
+  type: String!
+}
+
 input CreateCategoryInput {
   add_sources: [ID!]
   apply: Boolean
@@ -531,6 +537,12 @@ type Query {
   rootMaterial: Material!
   search(limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
   searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latitude: Float!, longitude: Float!): RegionsPage!
+}
+
+type RecyclingStream {
+  container: Container
+  desc: String
+  name: String
 }
 
 type Region {

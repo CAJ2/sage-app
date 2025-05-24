@@ -19,19 +19,8 @@ import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { Component as ComponentEntity } from './component.entity'
 import { Material } from './material.model'
+import { RecyclingStream } from './stream.model'
 import { Tag } from './tag.model'
-
-@ObjectType()
-export class RecyclingStream {
-  @Field(() => String, { nullable: true })
-  @Transform(translate)
-  @MaxLength(1024)
-  name?: string
-
-  @Field(() => String, { nullable: true })
-  @Transform(translate)
-  desc?: string
-}
 
 @ObjectType()
 export class ComponentMaterial {
@@ -40,6 +29,12 @@ export class ComponentMaterial {
 
   @Field(() => Float, { nullable: true })
   material_fraction?: number
+}
+
+@ObjectType()
+export class ComponentRecycle {
+  @Field(() => RecyclingStream, { nullable: true })
+  stream?: RecyclingStream & {}
 }
 
 @ObjectType()
