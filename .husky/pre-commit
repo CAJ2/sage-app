@@ -1,3 +1,4 @@
 pnpm exec nx affected -t lint build test
 pnpm --filter api exec mikro-orm migration:check
 git update-index --again
+pnpm exec nx affected -t lint:ci

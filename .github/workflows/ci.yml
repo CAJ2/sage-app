@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: 'Test'
+    name: 'Build & Test'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -45,8 +45,14 @@ jobs:
         env:
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
-      # Run tests, build, and check linting
-      - run: pnpm exec nx affected -t lint:ci test build
+      # Build, and check linting
+      - run: pnpm exec nx affected -t lint:ci build
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+
+      # Run tests
+      - run: pnpm exec nx affected -t test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
