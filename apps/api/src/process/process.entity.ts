@@ -99,7 +99,7 @@ export const ProcessInstructionsSchema = z.object({
         .optional(),
     })
     .optional(),
-  pickup: z
+  collection: z
     .object({
       rrule: z.string().optional(),
     })
@@ -121,7 +121,7 @@ export interface ProcessInstructions {
     }
   }
   // How often items are collected.
-  pickup?: {
+  collection?: {
     // iCalendar RRULE string
     rrule?: string
   }
