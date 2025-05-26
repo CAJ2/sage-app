@@ -97,6 +97,13 @@ export const ProcessInstructionsSchema = z.object({
           depth: z.number().optional(),
         })
         .optional(),
+      image_entry_point: z
+        .object({
+          x: z.number(),
+          y: z.number(),
+          side: z.enum(['left', 'right', 'top', 'bottom']),
+        })
+        .optional(),
     })
     .optional(),
   collection: z
@@ -118,6 +125,14 @@ export interface ProcessInstructions {
       height?: number
       width?: number
       depth?: number
+    }
+    image_entry_point?: {
+      // The entry point is the relative position where items are placed in the container.
+      // x and y are pixels relative to the top left corner of the image.
+      // The side indicates how to display any item being placed in the container.
+      x: number
+      y: number
+      side: 'left' | 'right' | 'top' | 'bottom'
     }
   }
   // How often items are collected.
