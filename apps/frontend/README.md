@@ -1,23 +1,14 @@
-# Nuxt 3 Minimal Starter
+# Sage App Frontend
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+The frontend is built using Vue 3 and Nuxt 3.
+Check out the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
 
 Make sure to install the dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
 ## Development Server
@@ -25,51 +16,31 @@ bun install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+nx dev frontend
 ```
 
-## Production
+## Build & Install
 
-Build the application for production:
+The frontend is designed to be packaged as a cross-platform mobile app using Capacitor, or simply run in the browser.
+
+### Mobile App
+
+Capacitor and dependencies should be installed, for instructions visit the [Capacitor Docs](https://capacitorjs.com/docs/getting-started/environment-setup)
 
 ```bash
-# npm
-npm run build
+# Generate a build of the Nuxt project
+# Uses the dev API by default, for prod use frontend:generate:prod
+nx run frontend:generate
+# Sync Capacitor
+nx run frontend:sync
 
-# pnpm
-pnpm run build
+# ANDROID
+# Open in Android Studio to run/install/debug
+nx run frontend:android:open
+# OR package an APK
+nx run frontend:android:build
 
-# yarn
-yarn build
-
-# bun
-bun run build
+# iOS
+nx run frontend:ios:open
 ```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

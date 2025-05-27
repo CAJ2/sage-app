@@ -5,11 +5,19 @@
   "scripts": {
     "build": "nx nuxt:build",
     "dev": "nx serve",
-    "generate": "pnpm exec nuxi generate",
+    "generate": "pnpm exec nuxi generate --dotenv=config/dev/.env",
+    "generate:prod": "pnpm exec nuxi generate --dotenv=config/production/.env",
     "preview": "pnpm exec nuxi preview",
     "postinstall": "pnpm exec nuxi prepare",
     "lint": "pnpm exec eslint --fix",
-    "lint:ci": "pnpm exec eslint . --max-warnings 0"
+    "lint:ci": "pnpm exec eslint . --max-warnings 0",
+    "sync": "pnpm exec cap sync",
+    "android:open": "pnpm exec cap open android",
+    "android:build": "pnpm exec cap build android",
+    "android:run": "pnpm exec cap run android",
+    "ios:open": "pnpm exec cap open ios",
+    "ios:build": "pnpm exec cap build ios",
+    "ios:run": "pnpm exec cap run ios"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0",
