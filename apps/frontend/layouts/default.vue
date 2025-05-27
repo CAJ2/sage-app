@@ -16,9 +16,3 @@ import { Capacitor } from '@capacitor/core'
 
 const isAndroid = Capacitor.getPlatform() === 'android'
 </script>
-
-<style scoped>
-.android {
-  padding-top: 27px;
-}
-</style>

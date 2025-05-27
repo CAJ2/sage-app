@@ -8,7 +8,7 @@
       :key="index"
       class="flex-1 flex justify-center"
     >
-      <router-link :to="{ path: tab.path }">
+      <NuxtLink :to="{ path: tab.path }" @dragstart.prevent>
         <button
           class="flex flex-col items-center p-1 cursor-pointer"
           :class="{
@@ -19,14 +19,15 @@
           <font-awesome-icon :icon="tab.icon" class="w-6 h-6" />
           <span class="text-sm">{{ tab.label }}</span>
         </button>
-      </router-link>
+      </NuxtLink>
     </div>
 
     <!-- Center Search Button -->
     <div class="inset-x-0 top-0 -translate-y-1/3 px-3">
-      <router-link
+      <NuxtLink
         :to="{ path: '/search' }"
         class="flex items-center justify-center"
+        @dragstart.prevent
       >
         <button class="w-16 h-16 btn btn-primary rounded-full p-0">
           <font-awesome-icon
@@ -34,7 +35,7 @@
             class="w-8 h-8"
           />
         </button>
-      </router-link>
+      </NuxtLink>
     </div>
 
     <!-- Right Tabs -->
@@ -43,7 +44,7 @@
       :key="index"
       class="flex-1 flex justify-center"
     >
-      <router-link :to="{ path: tab.path }">
+      <NuxtLink :to="{ path: tab.path }" @dragstart.prevent>
         <button
           class="flex flex-col items-center p-1 cursor-pointer"
           :class="{
@@ -54,7 +55,7 @@
           <font-awesome-icon :icon="tab.icon" class="w-6 h-6" />
           <span class="text-sm">{{ tab.label }}</span>
         </button>
-      </router-link>
+      </NuxtLink>
     </div>
   </div>
 </template>
