@@ -5,8 +5,33 @@ export default defineNuxtRouteMiddleware((to, from) => {
   }
   const toDepth = getDepth(to.path)
   const fromDepth = getDepth(from.path)
+  const setTransition = (name: string) => {
+    to.meta.pageTransition = { name }
+    from.meta.pageTransition = { name }
+  }
 
-  if (toDepth > fromDepth) {
+  if (toDepth === 1 && fromDepth === 1) {
+    const toSeg = to.path.split('/')[1]
+    const fromSeg = from.path.split('/')[1]
+    setTransition('page-left')
+    if (fromSeg === 'explore') {
+      setTransition('page-left')
+    } else if (fromSeg === 'places') {
+      if (toSeg === 'explore') {
+        setTransition('page-right')
+      }
+    } else if (fromSeg === 'search') {
+      if (toSeg === 'explore' || toSeg === 'places') {
+        setTransition('page-right')
+      }
+    } else if (fromSeg === 'contribute') {
+      if (toSeg !== 'profile') {
+        setTransition('page-right')
+      }
+    } else if (fromSeg === 'profile') {
+      setTransition('page-right')
+    }
+  } else if (toDepth > fromDepth) {
     to.meta.pageTransition = { name: 'page-left' }
     from.meta.pageTransition = { name: 'page-left' }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
