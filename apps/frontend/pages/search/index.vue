@@ -2,95 +2,137 @@
   <div>
     <div class="flex justify-center">
       <div class="w-full p-5 mb-[64px] max-w-2xl">
-        <div class="relative items-center">
-          <FormInput
-            id="search"
-            v-model="searchInput"
-            type="text"
-            placeholder="Search..."
-            class="pl-10"
-          />
-          <span
-            class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
+        <TabsRoot
+          v-model:model-value="activeTab"
+          class="flex flex-col w-full"
+          default-value="search"
+        >
+          <TabsList
+            class="relative shrink-0 flex border-b border-primary mb-5"
+            aria-label="Manage your account"
           >
-            <font-awesome-icon
-              icon="fa-solid fa-magnifying-glass"
-              class="text-neutral-700"
-            ></font-awesome-icon>
-          </span>
-        </div>
-        <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
-          <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
-            Search Results ({{ data?.search.totalCount || 0 }})
-          </li>
-          <li v-if="status === 'pending'" class="list-row">
-            <div class="skeleton h-4 w-28"></div>
-            <div class="skeleton h-4 w-full"></div>
-            <div class="skeleton h-4 w-full"></div>
-          </li>
-
-          <div
-            v-if="data && status !== 'pending'"
-            class="divide-y border-neutral-200"
-          >
-            <li
-              v-for="res in data.search.nodes"
-              :key="res.id"
-              class="border-neutral-200"
+            <TabsIndicator
+              class="absolute px-8 left-0 h-[2px] bottom-0 w-[--reka-tabs-indicator-size] translate-x-[--reka-tabs-indicator-position] translate-y-[1px] rounded-full transition-[width,transform] duration-300"
             >
-              <div v-if="res.id" class="list-row flex flex-col gap-0 pt-2 pb-3">
-                <p class="text-xs text-neutral-500 uppercase pb-2">
-                  {{ formatType(res.__typename) }}
-                </p>
-                <div class="flex items-center gap-2">
-                  <img
-                    v-if="res.image_url"
-                    class="size-12 rounded-box"
-                    :src="res.image_url"
-                  />
-                  <span
-                    v-else
-                    class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
+              <div class="bg-primary w-full h-full" />
+            </TabsIndicator>
+            <TabsTrigger
+              class="px-5 h-[45px] flex-1 flex items-center justify-center text-sm leading-none select-none rounded-tl-md hover:text-primary data-[state=active]:text-primary outline-none cursor-default focus-visible:relative focus-visible:shadow-[0_0_0_2px] focus-visible:shadow-black"
+              value="search"
+            >
+              <font-awesome-icon
+                icon="fa-solid fa-magnifying-glass"
+                class="w-4 h-4 mr-2"
+              />
+              Search
+            </TabsTrigger>
+            <TabsTrigger
+              class="px-5 h-[45px] flex-1 flex items-center justify-center text-sm leading-none select-none rounded-tl-md hover:text-primary data-[state=active]:text-primary outline-none cursor-default focus-visible:relative focus-visible:shadow-[0_0_0_2px] focus-visible:shadow-black"
+              value="scan"
+            >
+              <font-awesome-icon
+                icon="fa-solid fa-qrcode"
+                class="w-4 h-4 mr-2"
+              />
+              Scan
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="search">
+            <div class="relative items-center">
+              <FormInput
+                id="search"
+                v-model="searchInput"
+                type="text"
+                placeholder="Search..."
+                class="pl-10"
+              />
+              <span
+                class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
+              >
+                <font-awesome-icon
+                  icon="fa-solid fa-magnifying-glass"
+                  class="text-neutral-700"
+                ></font-awesome-icon>
+              </span>
+            </div>
+            <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
+              <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
+                Search Results ({{ data?.search.totalCount || 0 }})
+              </li>
+              <li v-if="status === 'pending'" class="list-row">
+                <div class="skeleton h-4 w-28"></div>
+                <div class="skeleton h-4 w-full"></div>
+                <div class="skeleton h-4 w-full"></div>
+              </li>
+
+              <div
+                v-if="data && status !== 'pending'"
+                class="divide-y border-neutral-200"
+              >
+                <li
+                  v-for="res in data.search.nodes"
+                  :key="res.id"
+                  class="border-neutral-200"
+                >
+                  <div
+                    v-if="res.id"
+                    class="list-row flex flex-col gap-0 pt-2 pb-3"
                   >
-                    <font-awesome-icon
-                      :icon="placeholderIcon(res.__typename)"
-                      class="size-6 h-6! p-1"
-                    />
-                  </span>
-                  <div class="flex-1 px-2">
-                    <div class="text-bold">
-                      {{ res.name || res.name_null }}
-                    </div>
-                    <div class="text-xs opacity-70">
-                      {{ res.desc_short }}
+                    <p class="text-xs text-neutral-500 uppercase pb-2">
+                      {{ formatType(res.__typename) }}
+                    </p>
+                    <div class="flex items-center gap-2">
+                      <img
+                        v-if="res.image_url"
+                        class="size-12 rounded-box"
+                        :src="res.image_url"
+                      />
+                      <span
+                        v-else
+                        class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
+                      >
+                        <font-awesome-icon
+                          :icon="placeholderIcon(res.__typename)"
+                          class="size-6 h-6! p-1"
+                        />
+                      </span>
+                      <div class="flex-1 px-2">
+                        <div class="text-bold">
+                          {{ res.name || res.name_null }}
+                        </div>
+                        <div class="text-xs opacity-70">
+                          {{ res.desc_short }}
+                        </div>
+                      </div>
+                      <NuxtLink :to="exploreLink(res.__typename, res.id)">
+                        <button class="btn btn-square btn-ghost">
+                          <font-awesome-icon
+                            icon="fa-solid fa-angle-right"
+                            class="size-[1.2em]"
+                          />
+                        </button>
+                      </NuxtLink>
                     </div>
                   </div>
-                  <NuxtLink :to="exploreLink(res.__typename, res.id)">
-                    <button class="btn btn-square btn-ghost">
-                      <font-awesome-icon
-                        icon="fa-solid fa-angle-right"
-                        class="size-[1.2em]"
-                      />
-                    </button>
-                  </NuxtLink>
-                </div>
+                </li>
               </div>
-            </li>
-          </div>
 
-          <li
-            v-if="data?.search.nodes.length === 0 && searchInput.length > 0"
-            class="list-row"
-          >
-            No results found for "{{ searchInput }}"
-          </li>
-          <li
-            v-if="!data && searchInput.length === 0"
-            class="list-row flex items-center justify-center"
-          >
-            <div class="text-neutral-500">Search for anything</div>
-          </li>
-        </ul>
+              <li
+                v-if="data?.search.nodes.length === 0 && searchInput.length > 0"
+                class="list-row"
+              >
+                No results found for "{{ searchInput }}"
+              </li>
+              <li
+                v-if="!data && searchInput.length === 0"
+                class="list-row flex items-center justify-center"
+              >
+                <div class="text-neutral-500">Search for anything</div>
+              </li>
+            </ul>
+          </TabsContent>
+          <TabsContent value="scan"> </TabsContent>
+        </TabsRoot>
       </div>
     </div>
   </div>
@@ -98,6 +140,7 @@
 
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
+import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner'
 
 onMounted(() => {
   document.getElementById('search')?.focus()
@@ -140,6 +183,7 @@ const searchQuery = gql`
     }
   }
 `
+const activeTab = ref('search')
 const searchInput = shallowRef('')
 const status = ref('idle')
 const data = ref<SearchResult | null>(null)
@@ -158,6 +202,17 @@ type SearchResult = {
     totalCount: number
   }
 }
+
+watchDebounced(
+  activeTab,
+  async (newTab) => {
+    if (newTab === 'scan') {
+      const result = await CapacitorBarcodeScanner.scanBarcode({ hint: 17 })
+      console.log('Scanned result:', result.ScanResult)
+    }
+  },
+  { debounce: 300 },
+)
 
 watchDebounced(
   searchInput,
