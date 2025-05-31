@@ -31,14 +31,30 @@
       </div>
       <div class="col-span-4 md:col-span-6 md:col-start-4 py-3">
         <ul>
-          <li class="p-4 flex gap-2">
-            <div class="flex-none px-3">
-              <font-awesome-icon icon="fa-solid fa-user" />
-            </div>
-            <div class="flex-1">
-              <NuxtLink to="/profile/edit">Edit Profile</NuxtLink>
-            </div>
-          </li>
+          <NuxtLink to="/profile/region">
+            <li class="p-4 flex gap-2 items-center">
+              <div class="flex-none px-3">
+                <font-awesome-icon icon="fa-solid fa-globe" />
+              </div>
+              <div class="flex-1 flex flex-col">
+                <div class="px-2">
+                  <h2>Change Region</h2>
+                  <p class="text-xs opacity-70">
+                    {{ region.selectedRegion || '' }}
+                  </p>
+                </div>
+              </div>
+            </li>
+          </NuxtLink>
+          <div class="divider m-1"></div>
+          <NuxtLink to="/profile/edit">
+            <li class="p-4 flex gap-2">
+              <div class="flex-none px-3">
+                <font-awesome-icon icon="fa-solid fa-user" />
+              </div>
+              <div class="flex-1">Edit Profile</div>
+            </li>
+          </NuxtLink>
           <div class="divider m-1"></div>
           <li class="p-4 flex align-center">
             <div class="flex-none px-3">
@@ -81,6 +97,7 @@ const toggleDark = useToggle(isDark)
 
 const auth = useAuthClient()
 const session = auth.useSession()
+const region = useRegionStore()
 
 const signOut = async () => {
   await auth.signOut()
