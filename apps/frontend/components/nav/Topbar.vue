@@ -12,7 +12,7 @@
       <font-awesome-icon
         v-if="!image"
         icon="fa-solid fa-tags"
-        class="w-6 h-6! pt-1 text-neutral-700"
+        class="w-6 h-6! pt-1 text-neutral-700 dark:text-neutral-300"
       />
     </div>
     <div class="flex-1 flex flex-col">

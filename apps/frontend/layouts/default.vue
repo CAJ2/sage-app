@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ android: isAndroid }">
+    <div class="mb-[90px]" :class="{ android: isAndroid }">
       <slot />
     </div>
     <div class="relative">
