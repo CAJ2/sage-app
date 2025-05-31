@@ -144,7 +144,7 @@ export const configureAuth = (orm: MikroORM) => {
     advanced: {
       cookiePrefix: 'sage',
       crossSubDomainCookies: {
-        enabled: true,
+        enabled: process.env.NODE_ENV === 'production',
         domain:
           process.env.NODE_ENV === 'production' ? '.sageleaf.app' : undefined,
       },
