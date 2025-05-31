@@ -12,7 +12,12 @@ export class SearchResolver {
 
   @Query(() => SearchResultPage, { name: 'search' })
   async search(@Args() args: SearchArgs): Promise<any> {
-    const cursor = await this.searchService.searchAll(args.query)
+    const cursor = await this.searchService.searchAll(
+      args.query,
+      args.types,
+      args.limit,
+      args.offset,
+    )
     if (!cursor) {
       return {
         edges: [],

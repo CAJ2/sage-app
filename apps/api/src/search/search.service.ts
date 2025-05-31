@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { MeiliService, SearchIndex } from '@src/common/meilisearch.service'
 import { Place } from '@src/geo/place.model'
+import { Region } from '@src/geo/region.model'
 import { Component } from '@src/process/component.model'
 import { Material } from '@src/process/material.model'
 import { Category } from '@src/product/category.model'
@@ -20,6 +21,7 @@ export class SearchService {
     [SearchType.COMPONENT]: SearchIndex.COMPONENTS,
     [SearchType.ORG]: SearchIndex.ORGS,
     [SearchType.PLACE]: SearchIndex.PLACES,
+    [SearchType.REGION]: SearchIndex.REGIONS,
   }
 
   indexModelMap: Record<SearchIndex, any> = {
@@ -30,6 +32,7 @@ export class SearchService {
     [SearchIndex.ORGS]: Org,
     [SearchIndex.MATERIALS]: Material,
     [SearchIndex.PLACES]: Place,
+    [SearchIndex.REGIONS]: Region,
   }
 
   mapTypeToIndex(type: SearchType): SearchIndex {

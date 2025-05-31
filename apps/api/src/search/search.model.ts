@@ -7,6 +7,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql'
 import { Place } from '@src/geo/place.model'
+import { Region } from '@src/geo/region.model'
 import { IPaginatedType, PageInfo } from '@src/graphql/paginated'
 import { Component } from '@src/process/component.model'
 import { Category } from '@src/product/category.model'
@@ -21,11 +22,13 @@ export enum SearchType {
   COMPONENT = 'component',
   ORG = 'org',
   PLACE = 'place',
+  REGION = 'region',
 }
 
 export const SearchResultItem = createUnionType({
   name: 'SearchResultItem',
-  types: () => [Category, Item, Variant, Component, Org, Place] as const,
+  types: () =>
+    [Category, Item, Variant, Component, Org, Place, Region] as const,
   resolveType: (value) => {
     return value._type
   },

@@ -11,6 +11,7 @@ export enum SearchIndex {
   MATERIALS = 'materials',
   PLACES = 'places',
   ORGS = 'orgs',
+  REGIONS = 'regions',
 }
 
 @Injectable()

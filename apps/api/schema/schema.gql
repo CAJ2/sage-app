@@ -79,6 +79,7 @@ type Component {
   materials: [ComponentMaterial!]!
   name: String
   primary_material: Material!
+  recycle(region_id: ID): [ComponentRecycle!]
   region: Region
   tags: [Tag!]!
   updated_at: DateTime!
@@ -106,6 +107,11 @@ input ComponentMaterialInput {
   material_fraction: Float
 }
 
+type ComponentRecycle {
+  context: StreamContext
+  stream: RecyclingStream
+}
+
 input ComponentRegionInput {
   id: ID!
 }
@@ -124,8 +130,23 @@ type ComponentsPage {
 
 type Container {
   access: String
+  color: String
   image: String
+  image_entry_point: ContainerImageEntryPoint
+  shape: ContainerShape
   type: String!
+}
+
+type ContainerImageEntryPoint {
+  side: String!
+  x: Float!
+  y: Float!
+}
+
+type ContainerShape {
+  depth: Float
+  height: Float
+  width: Float
 }
 
 input CreateCategoryInput {
@@ -546,8 +567,10 @@ type RecyclingStream {
 }
 
 type Region {
+  bbox: [Float!]
   created_at: DateTime!
   id: ID!
+  min_zoom: Float
   name: String
   placetype: String!
   updated_at: DateTime!
@@ -565,7 +588,7 @@ type RegionsPage {
   totalCount: Int!
 }
 
-union SearchResultItem = Category | Component | Item | Org | Place | Variant
+union SearchResultItem = Category | Component | Item | Org | Place | Region | Variant
 
 type SearchResultItemEdge {
   cursor: String!
@@ -586,6 +609,7 @@ enum SearchType {
   ITEM
   ORG
   PLACE
+  REGION
   VARIANT
 }
 
@@ -625,6 +649,14 @@ type SourcesPage {
   nodes: [Source!]
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+type StreamContext {
+  desc: String
+  key: String!
+  name: String
+  type: String
+  value: String
 }
 
 type Tag {
