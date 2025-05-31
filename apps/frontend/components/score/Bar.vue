@@ -34,7 +34,7 @@ onBeforeUnmount(() => {
   <PopoverRoot :open="openPopover">
     <ProgressRoot
       v-model="progressValue"
-      class="rounded-full relative mt-10 h-4 overflow-hidden bg-white dark:bg-stone-950 border border-muted"
+      class="rounded-full relative mt-10 h-4 overflow-hidden bg-white dark:bg-stone-950 border border-neutral-600"
     >
       <PopoverAnchor class="w-full" as-child>
         <ProgressIndicator
@@ -52,7 +52,7 @@ onBeforeUnmount(() => {
         :align-offset="0"
         :side-offset="5"
         :disable-outside-pointer-events="true"
-        class="rounded-lg p-1 bg-white shadow-sm border will-change-[transform,opacity] data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade"
+        class="rounded-lg p-1 bg-white dark:bg-slate-700 shadow-sm border border-neutral-400 will-change-[transform,opacity] data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade"
       >
         <PopoverArrow
           class="fill-neutral-700 dark:fill-white stroke-gray-200"
