@@ -48,6 +48,9 @@ export class TransformService {
     const entityObj: EntityDTOCtx<T> = entity.toObject()
     entityObj._lang = this.cls.get('lang')
     const inst = plainToInstance(model, entityObj)
+    if ((inst as any).transform) {
+      ;(inst as any).transform(entityObj)
+    }
     await validateOrReject(inst).catch((errors) => {
       throw new GraphQLError(errors.toString())
     })
@@ -218,6 +221,9 @@ export class TransformService {
       }
       ;(obj as any)._lang = this.cls.get('lang')
       const inst: object = plainToInstance((obj as any)._type, obj)
+      if ((inst as any).transform) {
+        ;(inst as any).transform(obj)
+      }
       await validateOrReject(inst).catch((errors) => {
         throw new GraphQLError(errors.toString())
       })

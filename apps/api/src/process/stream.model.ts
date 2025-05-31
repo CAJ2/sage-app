@@ -64,3 +64,21 @@ export class RecyclingStream {
   @Field(() => Container, { nullable: true })
   container?: Container
 }
+
+@ObjectType()
+export class StreamContext {
+  @Field(() => String)
+  key!: string
+
+  @Field(() => String, { nullable: true })
+  type?: string
+
+  @Field(() => String, { nullable: true })
+  value?: string
+
+  @Field(() => String, { nullable: true })
+  name?: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+}

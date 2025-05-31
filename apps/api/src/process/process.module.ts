@@ -2,6 +2,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
+import { ClsModule } from 'nestjs-cls'
 import { ComponentResolver } from './component.resolver'
 import { ComponentService } from './component.service'
 import { MaterialResolver } from './material.resolver'
@@ -15,6 +16,7 @@ import { TagService } from './tag.service'
   imports: [
     MikroOrmModule.forFeature([]),
     AuthModule.registerAsync(),
+    ClsModule.forFeature(),
     ChangesModule,
   ],
   providers: [

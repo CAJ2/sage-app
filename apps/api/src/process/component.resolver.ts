@@ -14,6 +14,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import {
   Component,
+  ComponentRecycleArgs,
   ComponentsPage,
   CreateComponentInput,
   CreateComponentOutput,
@@ -69,6 +70,21 @@ export class ComponentResolver {
   async materials(@Parent() component: Component) {
     const materials = await this.componentService.materials(component.id)
     return this.transform.entitiesToModels(materials, Material)
+  }
+
+  @ResolveField()
+  async recycle(
+    @Parent() component: Component,
+    @Args() args: ComponentRecycleArgs,
+  ) {
+    const recycle = await this.componentService.recycle(
+      component.id,
+      args.region_id,
+    )
+    if (!recycle) {
+      return null
+    }
+    return recycle
   }
 
   @Mutation(() => CreateComponentOutput, {

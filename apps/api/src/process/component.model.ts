@@ -19,7 +19,7 @@ import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { Component as ComponentEntity } from './component.entity'
 import { Material } from './material.model'
-import { RecyclingStream } from './stream.model'
+import { RecyclingStream, StreamContext } from './stream.model'
 import { Tag } from './tag.model'
 
 @ObjectType()
@@ -35,6 +35,9 @@ export class ComponentMaterial {
 export class ComponentRecycle {
   @Field(() => RecyclingStream, { nullable: true })
   stream?: RecyclingStream & {}
+
+  @Field(() => StreamContext, { nullable: true })
+  context?: StreamContext & {}
 }
 
 @ObjectType()
@@ -64,8 +67,15 @@ export class Component extends IDCreatedUpdated<ComponentEntity> {
   @Field(() => Region, { nullable: true })
   region?: Region & {}
 
+  @Field(() => [ComponentRecycle], { nullable: true })
+  recycle?: ComponentRecycle[]
+
   @Field(() => [ComponentHistory])
   history: ComponentHistory[] = []
+
+  transform(entity: ComponentEntity) {
+    this.image_url = entity.visual?.image
+  }
 }
 
 @ObjectType()
@@ -87,7 +97,18 @@ export class ComponentHistory {
 export class ComponentsPage extends Paginated(Component) {}
 
 @ArgsType()
-export class ComponentsArgs extends PaginationBasicArgs {}
+export class ComponentsArgs extends PaginationBasicArgs {
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  region_id?: string
+}
+
+@ArgsType()
+export class ComponentRecycleArgs {
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  region_id?: string
+}
 
 @InputType()
 export class ComponentMaterialInput {
