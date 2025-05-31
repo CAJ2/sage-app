@@ -1,7 +1,12 @@
+import { readFileSync } from 'node:fs'
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
 import { z } from 'zod'
 import type { TransformFnParams } from 'class-transformer'
+
+const convert2to3 = JSON.parse(
+  readFileSync('./src/db/iso639_2to3.json', 'utf-8'),
+)
 
 export const Locales = ['en-US', 'sv-SE'] as const
 
@@ -19,7 +24,8 @@ export const TranslatedJSON = z.record(z.string(), z.string()).refine(
     const keys = Object.keys(data)
     for (const key of keys) {
       const keyParts = key.split(';')
-      if (!validFields.includes(keyParts[0])) {
+      const keyLang = keyParts[0].split('-')[0]
+      if (keyLang.length < 2 || keyLang.length > 3) {
         return false
       }
       if (keyParts.length > 1 && keyParts[1] !== 'a') {
@@ -65,6 +71,12 @@ export function translate(params: TransformFnParams): string | undefined {
   if (_.isArray(obj._lang)) {
     const lang: string[] = obj._lang
     for (const l of lang) {
+      const iso3 = (convert2to3 as any)[l]
+      if (iso3) {
+        lang.push(iso3)
+      }
+    }
+    for (const l of lang) {
       const langKey = _.findKey(field, (value: any, key: string) => {
         return l === key.split(';')[0]
       })
@@ -81,6 +93,19 @@ export function translate(params: TransformFnParams): string | undefined {
     }
   }
   return field.xx
+}
+
+// Non class-transformer version of the translate function.
+export function tr(
+  field: TranslatedField | undefined,
+  lang: string[],
+): string | undefined {
+  return translate({
+    value: field,
+    obj: {
+      _lang: lang,
+    },
+  } as TransformFnParams)
 }
 
 // Modifies a TranslatedField JSON object to add a new translation.
