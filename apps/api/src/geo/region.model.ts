@@ -7,6 +7,12 @@ import { Transform } from 'class-transformer'
 import { DateTime } from 'luxon'
 import { Region as RegionEntity } from './region.entity'
 
+function extractBbox(obj: RegionEntity): number[] | undefined {
+  if (obj.properties && obj.properties['geom:bbox']) {
+    return obj.properties['geom:bbox'].split(',').map(Number)
+  }
+}
+
 @ObjectType()
 export class Region extends CreatedUpdated<RegionEntity> {
   @Field(() => ID)
@@ -18,6 +24,19 @@ export class Region extends CreatedUpdated<RegionEntity> {
 
   @Field(() => String)
   placetype!: string
+
+  @Field(() => [Number], { nullable: true })
+  bbox?: number[]
+
+  @Field(() => Number, { nullable: true })
+  min_zoom?: number
+
+  transform(entity: RegionEntity) {
+    this.bbox = extractBbox(entity)
+    if (entity.properties && entity.properties['lbl:min_zoom']) {
+      this.min_zoom = Number(entity.properties['lbl:min_zoom'])
+    }
+  }
 }
 
 @ObjectType()

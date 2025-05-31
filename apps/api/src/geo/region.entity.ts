@@ -16,6 +16,7 @@ import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
+import _ from 'lodash'
 
 @Entity({ tableName: 'regions', schema: 'public' })
 @Index({ properties: ['geo'], type: 'gist' })
@@ -55,6 +56,21 @@ export class Region extends BaseEntity {
 
   @OneToMany({ mappedBy: 'region' })
   history = new Collection<RegionHistory>(this)
+
+  hierarchyIDs(): string[] {
+    const hierarchy: string[] = [this.id]
+    const adminLevel = this.admin_level || 11
+    if (this.properties && this.properties['hierarchy']) {
+      const hierarchyData: Record<string, string | number>[] =
+        this.properties['hierarchy']
+      hierarchy.push(
+        ..._.values(hierarchyData)
+          .filter((item) => (item['admin_level'] as number) <= adminLevel)
+          .map((item) => `wof_${item['id']}`),
+      )
+    }
+    return hierarchy
+  }
 }
 
 @Entity({ tableName: 'region_history', schema: 'public' })
