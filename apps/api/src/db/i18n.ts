@@ -1,12 +1,8 @@
-import { readFileSync } from 'node:fs'
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
 import { z } from 'zod'
+import { map2to3 } from './iso639'
 import type { TransformFnParams } from 'class-transformer'
-
-const convert2to3 = JSON.parse(
-  readFileSync('./src/db/iso639_2to3.json', 'utf-8'),
-)
 
 export const Locales = ['en-US', 'sv-SE'] as const
 
@@ -71,7 +67,7 @@ export function translate(params: TransformFnParams): string | undefined {
   if (_.isArray(obj._lang)) {
     const lang: string[] = obj._lang
     for (const l of lang) {
-      const iso3 = (convert2to3 as any)[l]
+      const iso3 = map2to3[l]
       if (iso3) {
         lang.push(iso3)
       }
