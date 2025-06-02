@@ -4332,75 +4332,6 @@
           "length": 255,
           "mappedType": "string"
         },
-        "org_id": {
-          "name": "org_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        }
-      },
-      "name": "variants_orgs",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "variants_orgs_pkey",
-          "columnNames": [
-            "variant_id",
-            "org_id"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "variants_orgs_variant_id_foreign": {
-          "constraintName": "variants_orgs_variant_id_foreign",
-          "columnNames": [
-            "variant_id"
-          ],
-          "localTableName": "public.variants_orgs",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.variants",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
-        "variants_orgs_org_id_foreign": {
-          "constraintName": "variants_orgs_org_id_foreign",
-          "columnNames": [
-            "org_id"
-          ],
-          "localTableName": "public.variants_orgs",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.orgs",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "variant_id": {
-          "name": "variant_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
         "component_id": {
           "name": "component_id",
           "type": "varchar(255)",
@@ -4540,6 +4471,108 @@
             "id"
           ],
           "referencedTableName": "public.items",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "variant_id": {
+          "name": "variant_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "region_id": {
+          "name": "region_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "variants_orgs",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "variants_orgs_pkey",
+          "columnNames": [
+            "variant_id",
+            "org_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "variants_orgs_variant_id_foreign": {
+          "constraintName": "variants_orgs_variant_id_foreign",
+          "columnNames": [
+            "variant_id"
+          ],
+          "localTableName": "public.variants_orgs",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.variants",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "variants_orgs_org_id_foreign": {
+          "constraintName": "variants_orgs_org_id_foreign",
+          "columnNames": [
+            "org_id"
+          ],
+          "localTableName": "public.variants_orgs",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.orgs",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "variants_orgs_region_id_foreign": {
+          "constraintName": "variants_orgs_region_id_foreign",
+          "columnNames": [
+            "region_id"
+          ],
+          "localTableName": "public.variants_orgs",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.regions",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },

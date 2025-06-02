@@ -18,13 +18,22 @@ import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
+import { z } from 'zod'
 import { Item } from './item.entity'
 import type { Opt } from '@mikro-orm/core'
+
+export const VariantComponentUnitSchema = z.enum(['g', 'ml']).optional()
 
 export enum VariantComponentUnit {
   GRAMS = 'g',
   LITERS = 'ml',
 }
+
+export const VariantOrgRoleSchema = z
+  .enum(['PRODUCER', 'DISTRIBUTOR'])
+  .optional()
+
+export type VariantOrgRole = z.infer<typeof VariantOrgRoleSchema>
 
 @Entity({ tableName: 'variants', schema: 'public' })
 export class Variant extends IDCreatedUpdated {
@@ -55,7 +64,7 @@ export class Variant extends IDCreatedUpdated {
   @Property({ index: true })
   code?: string
 
-  @ManyToMany()
+  @ManyToMany({ entity: () => Org, pivotEntity: () => VariantsOrgs })
   orgs = new Collection<Org>(this)
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => VariantsTags })
@@ -132,6 +141,21 @@ export class VariantsComponents extends BaseEntity {
 
   @Property({ type: 'string' })
   unit?: VariantComponentUnit
+}
+
+@Entity({ tableName: 'variants_orgs', schema: 'public' })
+export class VariantsOrgs extends BaseEntity {
+  @ManyToOne({ primary: true, deleteRule: 'cascade' })
+  variant!: Variant
+
+  @ManyToOne({ primary: true, deleteRule: 'cascade' })
+  org!: Org & {}
+
+  @Property({ type: 'string' })
+  role?: VariantOrgRole
+
+  @ManyToOne()
+  region?: Ref<Region>
 }
 
 @Entity({ tableName: 'variant_history', schema: 'public' })
