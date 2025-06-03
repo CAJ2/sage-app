@@ -166,8 +166,29 @@ export interface ProcessEfficiency {
   // For example, if 100kg of plastic is recycled into
   // 80kg of new plastic, the efficiency is 0.8.
   // This is usually a computed estimate.
+  // The value is between 0 and 1, where 1 means
+  // all input is converted to useful output.
   efficiency?: number
+  // How much of the input is converted to output that
+  // is used for the same purpose as the input.
+  // The value is between 0 and 1, where 1 means
+  // all input is converted to output that is used for
+  // the same purpose as the input.
+  equivalency?: number
+  // What is the ration of the value of the output
+  // compared to the value of the input.
+  // This generally means monetary value.
+  // The value cannot be less than 0, but possibly
+  // greater than 1, meaning the output is more valuable
+  // than the input.
+  value_ratio?: number
 }
+
+export const ProcessEfficiencySchema = z.object({
+  efficiency: z.number().min(0).max(1).optional(),
+  equivalency: z.number().min(0).max(1).optional(),
+  value_ratio: z.number().min(0).optional(),
+})
 
 @Entity({ tableName: 'processes', schema: 'public' })
 export class Process extends IDCreatedUpdated {
