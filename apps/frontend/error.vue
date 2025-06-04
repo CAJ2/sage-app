@@ -18,7 +18,9 @@ const { error } = defineProps<{
         <h1 class="text-2xl font-bold mb-4">
           {{ isNuxtError(error) ? error.statusCode : error?.().statusCode }}
         </h1>
-        <NuxtLink to="/" class="btn btn-primary">Go back home</NuxtLink>
+        <NuxtLinkLocale to="/" class="btn btn-primary"
+          >Go back home</NuxtLinkLocale
+        >
       </div>
     </NuxtLayout>
   </div>

@@ -1,4 +1,11 @@
 {
+  "tabs": {
+    "explore": "Utforska",
+    "places": "Platser",
+    "search": "Sök",
+    "contribute": "Bidraga",
+    "profile": "Profil"
+  },
   "contribute": {
     "title": "Bidraga"
   },

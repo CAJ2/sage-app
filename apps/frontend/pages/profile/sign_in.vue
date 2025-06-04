@@ -75,10 +75,10 @@
             />
             <FormLabel for="remember" class="text-md">Remember me</FormLabel>
           </div>
-          <NuxtLink
+          <NuxtLinkLocale
             to="/profile/forgot_password"
             class="text-sm underline-offset-4 hover:underline"
-            >Forgot password?</NuxtLink
+            >Forgot password?</NuxtLinkLocale
           >
         </div>
         <div>

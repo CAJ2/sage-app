@@ -25,13 +25,15 @@
           <h1 class="text-2xl py-3">Sign in to your Account</h1>
           <p class="py-3">Contribute to the project and save your settings.</p>
           <button class="btn btn-primary btn-block">
-            <NuxtLink to="/profile/sign_in">Sign in with Email</NuxtLink>
+            <NuxtLinkLocale to="/profile/sign_in"
+              >Sign in with Email</NuxtLinkLocale
+            >
           </button>
         </div>
       </div>
       <div class="col-span-4 md:col-span-6 md:col-start-4 py-3">
         <ul>
-          <NuxtLink to="/profile/region">
+          <NuxtLinkLocale to="/profile/region">
             <li class="p-4 flex gap-2 items-center">
               <div class="flex-none px-3">
                 <font-awesome-icon icon="fa-solid fa-globe" />
@@ -45,16 +47,39 @@
                 </div>
               </div>
             </li>
-          </NuxtLink>
+          </NuxtLinkLocale>
           <div class="divider m-1"></div>
-          <NuxtLink to="/profile/edit">
+          <NuxtLinkLocale to="/profile/edit">
             <li class="p-4 flex gap-2">
               <div class="flex-none px-3">
                 <font-awesome-icon icon="fa-solid fa-user" />
               </div>
               <div class="flex-1">Edit Profile</div>
             </li>
-          </NuxtLink>
+          </NuxtLinkLocale>
+          <div class="divider m-1"></div>
+          <Drawer>
+            <DrawerTrigger as-child>
+              <li class="p-4 flex gap-2">
+                <div class="flex-none px-3">
+                  <font-awesome-icon icon="fa-solid fa-globe" />
+                </div>
+                <div class="flex-1">
+                  <h2>Language</h2>
+                  <p class="text-xs opacity-70">
+                    {{ locales.find((l) => l.code === locale)?.name }}
+                  </p>
+                </div>
+              </li>
+            </DrawerTrigger>
+            <DrawerContent>
+              <SettingsLocaleSelect
+                :locales="locales"
+                :current="locale"
+                @select="setLocale($event as any)"
+              ></SettingsLocaleSelect>
+            </DrawerContent>
+          </Drawer>
           <div class="divider m-1"></div>
           <li class="p-4 flex align-center">
             <div class="flex-none px-3">
@@ -86,7 +111,9 @@
 <script setup lang="ts">
 import { useAuthClient } from '~/utils'
 import { useDark, useToggle } from '@vueuse/core'
+import { DrawerTrigger } from 'vaul-vue'
 
+const { locale, locales, setLocale } = useI18n()
 const isDark = useDark({
   selector: 'html',
   attribute: 'data-theme',

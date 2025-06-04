@@ -104,14 +104,14 @@
                           {{ res.desc_short }}
                         </div>
                       </div>
-                      <NuxtLink :to="exploreLink(res.__typename, res.id)">
+                      <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
                         <button class="btn btn-square btn-ghost">
                           <font-awesome-icon
                             icon="fa-solid fa-angle-right"
                             class="size-[1.2em]"
                           />
                         </button>
-                      </NuxtLink>
+                      </NuxtLinkLocale>
                     </div>
                   </div>
                 </li>

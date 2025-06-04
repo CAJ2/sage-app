@@ -3,7 +3,7 @@
     <NavTopbar title="Explore"></NavTopbar>
     <div class="flex justify-center">
       <div class="w-full p-5 max-w-2xl">
-        <NuxtLink to="/explore/categories">
+        <NuxtLinkLocale to="/explore/categories">
           <div class="flex items-center">
             <h2 class="text-xl py-3 font-bold">Categories</h2>
             <font-awesome-icon
@@ -11,7 +11,7 @@
               class="mx-4 text-neutral-700 font-bold"
             ></font-awesome-icon>
           </div>
-        </NuxtLink>
+        </NuxtLinkLocale>
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
@@ -19,7 +19,7 @@
               :key="category.id"
               class="pl-1 basis-1/2 md:basis-1/3 lg:basis-1/3"
             >
-              <NuxtLink :to="`/explore/categories/${category.id}`">
+              <NuxtLinkLocale :to="`/explore/categories/${category.id}`">
                 <div class="p-1">
                   <Card>
                     <CardHeader class="p-4 pb-2">
@@ -38,7 +38,7 @@
                     </CardContent>
                   </Card>
                 </div>
-              </NuxtLink>
+              </NuxtLinkLocale>
             </CarouselItem>
           </CarouselContent>
         </Carousel>

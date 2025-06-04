@@ -8,7 +8,7 @@
       :key="index"
       class="flex-1 flex justify-center"
     >
-      <NuxtLink :to="{ path: tab.path }" @dragstart.prevent>
+      <NuxtLinkLocale :to="{ path: tab.path }" @dragstart.prevent>
         <button
           class="flex flex-col items-center p-1 cursor-pointer"
           :class="{
@@ -19,12 +19,12 @@
           <font-awesome-icon :icon="tab.icon" class="w-6 h-6" />
           <span class="text-sm">{{ tab.label }}</span>
         </button>
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Center Search Button -->
     <div class="inset-x-0 top-0 -translate-y-1/3 px-3">
-      <NuxtLink
+      <NuxtLinkLocale
         :to="{ path: '/search' }"
         class="flex items-center justify-center"
         @dragstart.prevent
@@ -35,7 +35,7 @@
             class="w-8 h-8"
           />
         </button>
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Right Tabs -->
@@ -44,7 +44,7 @@
       :key="index"
       class="flex-1 flex justify-center"
     >
-      <NuxtLink :to="{ path: tab.path }" @dragstart.prevent>
+      <NuxtLinkLocale :to="{ path: tab.path }" @dragstart.prevent>
         <button
           class="flex flex-col items-center p-1 cursor-pointer"
           :class="{
@@ -55,42 +55,45 @@
           <font-awesome-icon :icon="tab.icon" class="w-6 h-6" />
           <span class="text-sm">{{ tab.label }}</span>
         </button>
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const route = useRoute()
+const { t } = useI18n()
 
-const leftTabs = [
+const leftTabs = computed(() => [
   {
     path: '/explore',
-    label: 'Explore',
+    label: t('tabs.explore'),
     icon: 'fa-regular fa-folder',
   },
   {
     path: '/places',
-    label: 'Places',
+    label: t('tabs.places'),
     icon: 'fa-regular fa-flag',
   },
-]
-const rightTabs = [
+])
+const rightTabs = computed(() => [
   {
     path: '/contribute',
-    label: 'Contribute',
+    label: t('tabs.contribute'),
     icon: 'fa-solid fa-circle-plus',
   },
   {
     path: '/profile',
-    label: 'Profile',
+    label: t('tabs.profile'),
     icon: 'fa-regular fa-user',
   },
-]
+])
+
+const localePath = useLocalePath()
 
 const activeTab = computed(() => {
-  const currentPath = route.path
-  const currentTab = [...leftTabs, ...rightTabs].find((tab) => {
+  const currentPath = localePath(route.path, 'en')
+  const currentTab = [...leftTabs.value, ...rightTabs.value].find((tab) => {
     return currentPath.startsWith(tab.path)
   })
   return currentTab ? currentTab.path : null
