@@ -66,11 +66,8 @@ export class RegionsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class RegionsSearchByPointArgs extends PaginationBasicArgs {
-  @Field(() => Number)
-  latitude!: number
-
-  @Field(() => Number)
-  longitude!: number
+  @Field(() => [Number])
+  lat_long!: number[]
 }
 
 export const RegionIDSchema = z.string().meta({

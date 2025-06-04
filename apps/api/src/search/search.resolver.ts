@@ -15,6 +15,7 @@ export class SearchResolver {
     const cursor = await this.searchService.searchAll(
       args.query,
       args.types,
+      args.lat_long,
       args.limit,
       args.offset,
     )

@@ -73,6 +73,9 @@ export class SearchArgs {
   @Field(() => [SearchType], { nullable: true })
   types?: SearchType[]
 
+  @Field(() => [Number], { nullable: true })
+  lat_long?: number[]
+
   @Field(() => Int, { nullable: true })
   limit?: number
 

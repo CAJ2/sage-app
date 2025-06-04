@@ -572,8 +572,8 @@ type Query {
   getVariants(after: String, before: String, first: Int, last: Int): VariantsPage!
   rootCategory: Category!
   rootMaterial: Material!
-  search(limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
-  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latitude: Float!, longitude: Float!): RegionsPage!
+  search(lat_long: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
+  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, lat_long: [Float!]!): RegionsPage!
 }
 
 type RecyclingStream {

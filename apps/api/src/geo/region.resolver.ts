@@ -37,7 +37,13 @@ export class RegionResolver {
     @Args() args: RegionsSearchByPointArgs,
   ): Promise<RegionsPage> {
     const filter = this.transform.paginationArgs(args)
-    const cursor = await this.regionService.searchByPoint(args, filter)
+    const cursor = await this.regionService.searchByPoint(
+      {
+        latitude: args.lat_long[0],
+        longitude: args.lat_long[1],
+      },
+      filter,
+    )
     return this.transform.entityToPaginated(cursor, args, Region, RegionsPage)
   }
 }
