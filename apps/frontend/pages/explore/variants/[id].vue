@@ -51,35 +51,12 @@
                   </div>
                 </div>
               </li>
-              <div class="p-1">
-                <Card v-for="re in component.recycle" :key="re.stream.name">
-                  <CardHeader class="p-4 pb-2">
-                    <CardTitle class="text-center">{{
-                      re.stream.name
-                    }}</CardTitle>
-                    <div class="flex flex-col items-start gap-2 relative">
-                      <img
-                        v-if="re.stream.container.image"
-                        :src="re.stream.container.image"
-                      />
-                      <img
-                        v-if="re.stream.container.image"
-                        :src="component.image_url"
-                        class="absolute w-15 h-15 rounded-xl"
-                        :style="{
-                          top: `${re.stream.container.image_entry_point.y}px`,
-                          left: `${re.stream.container.image_entry_point.x}px`,
-                        }"
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent class="flex flex-col justify-center px-4 pb-3">
-                    <span class="text-xs line-clamp-3">{{
-                      re.stream.desc
-                    }}</span>
-                  </CardContent>
-                </Card>
-              </div>
+              <RecycleContainer
+                v-for="recycle in component.recycle"
+                :key="recycle.stream.name"
+                :image="component.image_url"
+                :recycle="recycle"
+              ></RecycleContainer>
             </div>
             <div class="divider m-1"></div>
           </div>
