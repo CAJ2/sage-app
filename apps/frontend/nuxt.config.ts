@@ -35,9 +35,20 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: 'en',
     locales: [
-      { code: 'en', iso: 'en-US', name: 'English' },
-      { code: 'sv', iso: 'sv-SE', name: 'Svenska' },
+      { code: 'en', iso: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'sv', iso: 'sv-SE', name: 'Svenska', file: 'sv.json' },
     ],
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_set',
+      redirectOn: 'root',
+    },
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
+    experimental: {
+      autoImportTranslationFunctions: true,
+    }
   },
 
   apollo: {
