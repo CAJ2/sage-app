@@ -20,7 +20,12 @@ const baseConfig = [
 const standardConfig = [
   ...neostandard({
     ts: true,
-    ignores: [...resolveIgnoresFromGitignore(), '**/.nx/**', '**/*.config.ts'],
+    ignores: [
+      ...resolveIgnoresFromGitignore(),
+      '**/.nx/**',
+      '**/*.config.ts',
+      '**/*.generated.ts',
+    ],
   }),
   importPlugin.flatConfigs.recommended,
   {
