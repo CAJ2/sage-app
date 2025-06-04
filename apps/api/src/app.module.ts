@@ -1,3 +1,4 @@
+import path from 'path'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
@@ -5,6 +6,12 @@ import config from '@src/config/config'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
 import { ClsModule, ClsService } from 'nestjs-cls'
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
@@ -44,6 +51,19 @@ import { UsersModule } from './users/users.module'
           return existingId
         },
       },
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      typesOutputPath: path.join(__dirname, '../src/i18n/i18n.generated.ts'),
+      resolvers: [
+        new QueryResolver(['lang', 'locale']),
+        new HeaderResolver(['x-lang', 'x-locale']),
+        AcceptLanguageResolver,
+      ],
     }),
     MikroOrmModule.forRoot(),
     GraphQLModule.register(),
