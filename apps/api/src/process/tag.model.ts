@@ -10,6 +10,7 @@ import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
+import { z } from 'zod/v4'
 import { Tag as TagEntity, TagType } from './tag.entity'
 
 registerEnumType(TagType, {
@@ -57,6 +58,11 @@ export class TagPage extends Paginated(Tag) {}
 
 @ArgsType()
 export class TagArgs extends PaginationBasicArgs {}
+
+export const TagDefinitionIDSchema = z.nanoid().meta({
+  id: 'TagDefinition',
+  name: 'Tag Definition ID',
+})
 
 @InputType()
 export class CreateTagDefinitionInput {

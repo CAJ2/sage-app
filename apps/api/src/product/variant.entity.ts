@@ -18,7 +18,7 @@ import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Item } from './item.entity'
 import type { Opt } from '@mikro-orm/core'
 

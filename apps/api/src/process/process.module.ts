@@ -4,6 +4,7 @@ import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
 import { ClsModule } from 'nestjs-cls'
 import { ComponentResolver } from './component.resolver'
+import { ComponentSchemaService } from './component.schema'
 import { ComponentService } from './component.service'
 import { MaterialResolver } from './material.resolver'
 import { MaterialService } from './material.service'
@@ -24,6 +25,7 @@ import { TagService } from './tag.service'
     MaterialService,
     ComponentResolver,
     ComponentService,
+    ComponentSchemaService,
     ProcessResolver,
     ProcessService,
     TagResolver,

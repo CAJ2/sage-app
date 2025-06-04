@@ -185,10 +185,12 @@ input CreateComponentInput {
   change: CreateChangeInput
   change_id: ID
   desc: String
+  desc_tr: [TranslatedInput!]
   image_url: String
   lang: String
   materials: [ComponentMaterialInput!]
   name: String!
+  name_tr: [TranslatedInput!]
   primary_material: ComponentMaterialInput
   region: ComponentRegionInput
   remove_sources: [ID!]
@@ -244,10 +246,12 @@ input CreateProcessInput {
   change: CreateChangeInput
   change_id: ID
   desc: String
+  desc_tr: [TranslatedInput!]
   intent: String!
   lang: String
   material: ID
   name: String!
+  name_tr: [TranslatedInput!]
   org: ID
   place: ID
   region: ID
@@ -402,6 +406,17 @@ type MaterialsPage {
   totalCount: Int!
 }
 
+type ModelEditSchema {
+  create: ModelSchema
+  delete: ModelSchema
+  update: ModelSchema
+}
+
+type ModelSchema {
+  schema: JSONObject
+  uischema: JSONObject
+}
+
 type Mutation {
   createCategory(input: CreateCategoryInput!): CreateCategoryOutput
   createChange(input: CreateChangeInput!): CreateChangeOutput
@@ -535,6 +550,7 @@ type Query {
   getChange(id: ID!): Change
   getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
   getComponent(id: ID!): Component
+  getComponentSchema: ModelEditSchema
   getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
   getItem(id: ID!): Item
   getItems(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -737,11 +753,13 @@ input UpdateComponentInput {
   change: CreateChangeInput
   change_id: ID
   desc: String
+  desc_tr: [TranslatedInput!]
   id: ID!
   image_url: String
   lang: String
   materials: [ComponentMaterialInput!]
   name: String
+  name_tr: [TranslatedInput!]
   primary_material: ComponentMaterialInput
   region: ComponentRegionInput
   remove_sources: [ID!]
@@ -801,11 +819,13 @@ input UpdateProcessInput {
   change: CreateChangeInput
   change_id: ID
   desc: String
+  desc_tr: [TranslatedInput!]
   id: ID!
   intent: String
   lang: String
   material: ID
   name: String
+  name_tr: [TranslatedInput!]
   org: ID
   place: ID
   region: ID

@@ -2,7 +2,9 @@ import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { Validate } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import type { Loaded } from '@mikro-orm/core'
 
 export class BaseModel<T> {
@@ -31,6 +33,27 @@ export class CreatedUpdated<T> extends BaseModel<T> {
   updated_at!: DateTime
 }
 
+@ObjectType()
+export class ModelSchema {
+  @Field(() => JSONObjectResolver, { nullable: true })
+  schema?: Record<string, any>
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  uischema?: Record<string, any>
+}
+
+@ObjectType()
+export class ModelEditSchema {
+  @Field(() => ModelSchema, { nullable: true })
+  create?: ModelSchema
+
+  @Field(() => ModelSchema, { nullable: true })
+  update?: ModelSchema
+
+  @Field(() => ModelSchema, { nullable: true })
+  delete?: ModelSchema
+}
+
 @InputType()
 export class TranslatedInput {
   @Field(() => String)
@@ -42,6 +65,12 @@ export class TranslatedInput {
   @Field(() => Boolean)
   auto: boolean = false
 }
+
+export const TranslatedInputSchema = z.object({
+  lang: z.string(),
+  text: z.string().optional(),
+  auto: z.boolean().default(false),
+})
 
 @InputType()
 export class InputWithLang {

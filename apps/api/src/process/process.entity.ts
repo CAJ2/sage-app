@@ -19,7 +19,7 @@ import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Material } from './material.entity'
 
 export enum ProcessIntent {
@@ -99,8 +99,8 @@ export const ProcessInstructionsSchema = z.object({
         .optional(),
       image_entry_point: z
         .object({
-          x: z.number(),
-          y: z.number(),
+          x: z.int().min(-100).max(200),
+          y: z.int().min(-100).max(200),
           side: z.enum(['left', 'right', 'top', 'bottom']),
         })
         .optional(),
@@ -128,7 +128,9 @@ export interface ProcessInstructions {
     }
     image_entry_point?: {
       // The entry point is the relative position where items are placed in the container.
-      // x and y are pixels relative to the top left corner of the image.
+      // x and y are percentages (0-100) relative to the top left corner of the image.
+      // The percentages can be less than 0 or greater than 100, if the image should be
+      // outside the container image.
       // The side indicates how to display any item being placed in the container.
       x: number
       y: number

@@ -12,6 +12,7 @@ import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ModelEditSchema } from '@src/graphql/base.model'
 import {
   Component,
   ComponentRecycleArgs,
@@ -21,6 +22,7 @@ import {
   UpdateComponentInput,
   UpdateComponentOutput,
 } from './component.model'
+import { ComponentSchemaService } from './component.schema'
 import { ComponentService } from './component.service'
 import { ComponentsArgs, Material } from './material.model'
 
@@ -28,6 +30,7 @@ import { ComponentsArgs, Material } from './material.model'
 export class ComponentResolver {
   constructor(
     private readonly componentService: ComponentService,
+    private readonly componentSchemaService: ComponentSchemaService,
     private readonly transform: TransformService,
   ) {}
 
@@ -52,6 +55,20 @@ export class ComponentResolver {
       throw NotFoundErr('Component not found')
     }
     return this.transform.entityToModel(component, Component)
+  }
+
+  @Query(() => ModelEditSchema, { nullable: true })
+  async getComponentSchema(): Promise<ModelEditSchema> {
+    return {
+      create: {
+        schema: this.componentSchemaService.CreateComponentInputJSONSchema,
+        uischema: this.componentSchemaService.CreateComponentInputUISchema,
+      },
+      update: {
+        schema: this.componentSchemaService.UpdateComponentInputJSONSchema,
+        uischema: this.componentSchemaService.UpdateComponentInputUISchema,
+      },
+    }
   }
 
   @ResolveField()

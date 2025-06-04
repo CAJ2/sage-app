@@ -2,11 +2,12 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
-import { CreatedUpdated } from '@src/graphql/base.model'
+import { CreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import { ComponentsPage } from './component.model'
 import { Material as MaterialEntity } from './material.entity'
 import { ProcessPage } from './process.model'
@@ -83,14 +84,25 @@ export class ComponentsArgs extends PaginationBasicArgs {}
 @ArgsType()
 export class ProcessesArgs extends PaginationBasicArgs {}
 
+export const MaterialIDSchema = z.nanoid().meta({
+  id: 'Material',
+  name: 'Material ID',
+})
+
 @InputType()
 export class CreateMaterialInput extends ChangeInputWithLang() {
   @Field(() => String)
   @MaxLength(1024)
   name!: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => Boolean)
   technical: boolean = false
@@ -111,8 +123,14 @@ export class UpdateMaterialInput extends ChangeInputWithLang() {
   @MaxLength(1024)
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => Boolean, { nullable: true })
   technical?: boolean

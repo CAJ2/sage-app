@@ -4,7 +4,7 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
@@ -79,8 +79,14 @@ export class CreateProcessInput extends ChangeInputWithLang() {
   @Field(() => String)
   name!: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => ID, { nullable: true })
   material?: string
@@ -111,8 +117,14 @@ export class UpdateProcessInput extends ChangeInputWithLang() {
   @Field(() => String, { nullable: true })
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => ID, { nullable: true })
   material?: string

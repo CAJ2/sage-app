@@ -11,7 +11,7 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
@@ -134,22 +134,22 @@ export class ComponentTagsInput {
 @InputType()
 export class ComponentRegionInput {
   @Field(() => ID)
-  @Validate(IsNanoID)
   id!: string
 }
 
 @InputType()
 export class CreateComponentInput extends ChangeInputWithLang() {
   @Field(() => String)
-  @Transform(translate)
-  @MaxLength(1024)
   name!: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
-  @Transform(translate)
-  @IsOptional()
-  @MaxLength(100_000)
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   image_url?: string
@@ -174,16 +174,16 @@ export class UpdateComponentInput extends ChangeInputWithLang() {
   id!: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
-  @IsOptional()
-  @MaxLength(1024)
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
-  @Transform(translate)
-  @IsOptional()
-  @MaxLength(100_000)
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   image_url?: string

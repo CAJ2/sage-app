@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { map2to3 } from './iso639'
 import type { TransformFnParams } from 'class-transformer'
 
@@ -34,7 +34,7 @@ export const TranslatedJSON = z.record(z.string(), z.string()).refine(
     return true
   },
   {
-    message: 'Invalid translated field',
+    error: 'Invalid translated field',
   },
 )
 

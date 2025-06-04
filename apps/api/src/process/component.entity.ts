@@ -16,7 +16,7 @@ import { TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Material } from './material.entity'
 import { Tag } from './tag.entity'
 

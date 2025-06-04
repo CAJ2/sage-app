@@ -5,6 +5,7 @@ import { CreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import { Region as RegionEntity } from './region.entity'
 
 function extractBbox(obj: RegionEntity): number[] | undefined {
@@ -71,3 +72,8 @@ export class RegionsSearchByPointArgs extends PaginationBasicArgs {
   @Field(() => Number)
   longitude!: number
 }
+
+export const RegionIDSchema = z.string().meta({
+  id: 'Region',
+  name: 'Region ID',
+})
