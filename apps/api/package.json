@@ -55,6 +55,7 @@
     "meilisearch": "^0.50.0",
     "nanoid": "^3.0.0",
     "nestjs-cls": "^5.4.0",
+    "nestjs-i18n": "^10.5.1",
     "reflect-metadata": "^0.2.2",
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.1",
