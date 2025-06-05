@@ -10,6 +10,9 @@
               : 'No region selected'
           }}
         </h3>
+        <p class="text-sm opacity-70">
+          {{ regionStatus !== 'idle' ? placeType : '' }}
+        </p>
       </div>
       <button
         v-if="regionStore.selectedRegion"
@@ -66,10 +69,13 @@
                     class="size-6 h-6! p-1"
                   />
                 </span>
-                <div class="flex-1 px-2">
+                <div class="flex-1 px-2 flex flex-col">
                   <div class="text-bold">
                     {{ res.name }}
                   </div>
+                  <p class="text-sm opacity-70">
+                    {{ formatPlaceType(res.placetype) }}
+                  </p>
                 </div>
                 <button
                   class="btn btn-primary"
@@ -101,6 +107,8 @@
 
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
+
+const router = useRouter()
 
 const emit = defineEmits<{
   update: [region: string]
@@ -185,5 +193,24 @@ const selectRegion = async (regionId: string) => {
   })
   regionData.value = data.value
   regionStatus.value = status.value
+  router.back()
 }
+
+const placetypeMap: Record<string, string> = {
+  neighbourhood: 'Neighbourhood',
+  localadmin: 'Local Admin',
+  locality: 'Locality',
+  county: 'County',
+  region: 'Region',
+}
+
+const formatPlaceType = (type: string) => {
+  return placetypeMap[type] || type
+}
+
+const placeType = computed(() => {
+  const placetype = regionData.value?.getRegion.placetype
+  if (!placetype) return ''
+  return formatPlaceType(placetype)
+})
 </script>
