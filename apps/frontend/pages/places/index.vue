@@ -70,7 +70,7 @@ maplibregl.addProtocol('pmtiles', protocol.tile)
 
 const placeSearch = gql`
   query PlaceSearch($search: String!, $latLong: [Float!]) {
-    search(query: $search, types: [PLACE], lat_long: $latLong) {
+    search(query: $search, types: [PLACE], lat_long: $latLong, limit: 100) {
       nodes {
         ... on Place {
           id
@@ -139,27 +139,42 @@ watch(
   },
 )
 
-watchDebounced(
-  searchInput,
-  async (newSearch) => {
-    if (!newSearch.trim()) {
-      return
-    }
-    if (!mapBounds.value) {
-      return
-    }
-    search.refetch({
-      search: searchInput.value,
-      latLong: [
-        mapBounds.value[1][1],
-        mapBounds.value[1][0],
-        mapBounds.value[0][1],
-        mapBounds.value[0][0],
-      ],
-    })
-  },
-  { debounce: 300 },
-)
+const refreshSearch = async (newSearch: string) => {
+  if (!newSearch.trim()) {
+    return
+  }
+  if (!mapBounds.value) {
+    return
+  }
+  search.refetch({
+    search: newSearch,
+    latLong: [
+      mapBounds.value[1][1],
+      mapBounds.value[1][0],
+      mapBounds.value[0][1],
+      mapBounds.value[0][0],
+    ],
+  })
+}
+const refreshBounds = async (newBounds: [number, number][] | null) => {
+  if (!newBounds) {
+    return
+  }
+  search.refetch({
+    search: searchInput.value,
+    latLong: [
+      newBounds[1][1],
+      newBounds[1][0],
+      newBounds[0][1],
+      newBounds[0][0],
+    ],
+  })
+}
+
+watchDebounced(searchInput, refreshSearch, { debounce: 300 })
+watchDebounced(mapBounds, refreshBounds, {
+  debounce: 300,
+})
 
 onMounted(() => {
   if (!mapContainer.value) {
@@ -179,9 +194,39 @@ onMounted(() => {
     container: mapContainer.value,
     style: 'map-style-light.json',
     center,
-    zoom: regionData.value?.getRegion?.min_zoom || 2,
+    zoom: regionData.value?.getRegion?.min_zoom || 10,
+    attributionControl: false,
   })
   map.value.addControl(new NavigationControl(), 'top-right')
+  map.value.addControl(new maplibregl.AttributionControl(), 'bottom-left')
+  if (
+    regionData.value?.getRegion?.bbox &&
+    regionData.value.getRegion.bbox[0] === regionData.value.getRegion.bbox[2]
+  ) {
+    map.value.setCenter(center)
+  } else {
+    map.value.fitBounds(
+      regionData.value?.getRegion?.bbox
+        ? [
+            [
+              regionData.value.getRegion.bbox[0],
+              regionData.value.getRegion.bbox[1],
+            ],
+            [
+              regionData.value.getRegion.bbox[2],
+              regionData.value.getRegion.bbox[3],
+            ],
+          ]
+        : [
+            [-180, -90],
+            [180, 90],
+          ],
+      {
+        padding: { top: 20, bottom: 20, left: 20, right: 20 },
+        linear: true,
+      },
+    )
+  }
   const getBounds = () => {
     if (!map.value) {
       return null
@@ -219,5 +264,14 @@ onUnmounted(() => {
   left: 10px;
   bottom: 10px;
   z-index: 999;
+}
+</style>
+
+<style>
+.maplibregl-ctrl-bottom-left {
+  z-index: 0 !important;
+}
+.maplibregl-ctrl-attrib {
+  opacity: 0.8 !important;
 }
 </style>
