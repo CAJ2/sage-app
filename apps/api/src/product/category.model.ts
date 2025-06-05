@@ -3,6 +3,7 @@ import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import { CreatedUpdated } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
@@ -11,8 +12,10 @@ import { DateTime } from 'luxon'
 import { Category as CategoryEntity } from './category.entity'
 import { ItemsPage } from './item.model'
 
-@ObjectType()
-export class Category extends CreatedUpdated<CategoryEntity> {
+@ObjectType({
+  implements: () => [Named],
+})
+export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @Field(() => ID)
   id!: string
 

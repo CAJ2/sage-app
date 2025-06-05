@@ -4,6 +4,7 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
 import { Transform } from 'class-transformer'
@@ -14,8 +15,10 @@ import { CategoriesPage } from './category.model'
 import { Item as ItemEntity } from './item.entity'
 import { VariantsPage } from './variant.model'
 
-@ObjectType()
-export class Item extends IDCreatedUpdated<ItemEntity> {
+@ObjectType({
+  implements: () => [Named],
+})
+export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   @Field(() => String, { nullable: true })
   @Transform(translate)
   @IsOptional()

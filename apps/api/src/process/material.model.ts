@@ -3,6 +3,7 @@ import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import { CreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
@@ -12,8 +13,10 @@ import { ComponentsPage } from './component.model'
 import { Material as MaterialEntity } from './material.entity'
 import { ProcessPage } from './process.model'
 
-@ObjectType()
-export class Material extends CreatedUpdated<MaterialEntity> {
+@ObjectType({
+  implements: () => [Named],
+})
+export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   @Field(() => ID)
   id!: string
 

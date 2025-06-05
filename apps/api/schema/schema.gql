@@ -16,7 +16,7 @@ type CategoriesPage {
   totalCount: Int!
 }
 
-type Category {
+type Category implements Named {
   ancestors(after: String, before: String, first: Int, last: Int): CategoriesPage!
   children(after: String, before: String, first: Int, last: Int): CategoriesPage!
   created_at: DateTime!
@@ -70,10 +70,12 @@ type ChangesPage {
   totalCount: Int!
 }
 
-type Component {
+type Component implements Named {
   created_at: DateTime!
   desc: String
   history: [ComponentHistory!]!
+
+  """The ID of the model"""
   id: ID!
   image_url: String
   materials: [ComponentMaterial!]!
@@ -336,10 +338,12 @@ type Edit {
 
 union EditModel = Category | Component | Item | Material | Place | Process | Region | Variant
 
-type Item {
+type Item implements Named {
   categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
   created_at: DateTime!
   desc: String
+
+  """The ID of the model"""
   id: ID!
   image_url: String
   name: String
@@ -378,7 +382,7 @@ type MarkSourceProcessedOutput {
   success: Boolean
 }
 
-type Material {
+type Material implements Named {
   ancestors(after: String, before: String, first: Int, last: Int): MaterialsPage!
   children(after: String, before: String, first: Int, last: Int): MaterialsPage!
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
@@ -440,10 +444,23 @@ type Mutation {
   updateVariant(input: UpdateVariantInput!): UpdateVariantOutput
 }
 
-type Org {
+interface Named {
+  """The description of the model"""
+  desc: String
+
+  """The ID of the model"""
+  id: ID!
+
+  """The name of the model"""
+  name: String
+}
+
+type Org implements Named {
   avatar_url: String
   created_at: DateTime!
   desc: String
+
+  """The ID of the model"""
   id: ID!
   name: String!
   slug: String!
@@ -471,7 +488,7 @@ type PageInfo {
   startCursor: String
 }
 
-type Place {
+type Place implements Named {
   address: PlaceAddress
   created_at: DateTime!
   desc: String
@@ -509,14 +526,16 @@ type PlacesPage {
   totalCount: Int!
 }
 
-type Process {
+type Process implements Named {
   created_at: DateTime!
   desc: String
   history: [ProcessHistory!]!
+
+  """The ID of the model"""
   id: ID!
   intent: String!
   material: Material
-  name: String!
+  name: String
   org: Org
   place: Place
   region: Region
@@ -675,10 +694,12 @@ type StreamContext {
   value: String
 }
 
-type Tag {
+type Tag implements Named {
   bg_color: String
   created_at: DateTime!
   desc: String
+
+  """The ID of the model"""
   id: ID!
   image: String
   meta: JSONObject
@@ -688,10 +709,12 @@ type Tag {
   updated_at: DateTime!
 }
 
-type TagDefinition {
+type TagDefinition implements Named {
   bg_color: String
   created_at: DateTime!
   desc: String
+
+  """The ID of the model"""
   id: ID!
   image: String
   meta_template: JSONObject
@@ -926,10 +949,12 @@ type UserProfile {
   bio: String
 }
 
-type Variant {
+type Variant implements Named {
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   created_at: DateTime!
   desc: String
+
+  """The ID of the model"""
   id: ID!
   image_url: String
   items(after: String, before: String, first: Int, last: Int): ItemsPage!

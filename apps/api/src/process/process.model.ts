@@ -5,6 +5,7 @@ import { translate } from '@src/db/i18n'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
@@ -14,14 +15,16 @@ import { IsEnum, IsOptional } from 'class-validator'
 import { Material } from './material.model'
 import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
-@ObjectType()
-export class Process extends IDCreatedUpdated<ProcessEntity> {
+@ObjectType({
+  implements: () => [Named],
+})
+export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
   @Field(() => String)
   intent!: ProcessIntent
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Transform(translate)
-  name!: string
+  name?: string
 
   @Field(() => String, { nullable: true })
   @Transform(translate)

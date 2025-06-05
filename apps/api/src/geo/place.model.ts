@@ -2,6 +2,7 @@ import { ArgsType, Field, ID, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import { CreatedUpdated } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Tag } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
@@ -39,8 +40,10 @@ export class PlaceAddress {
   country?: string
 }
 
-@ObjectType()
-export class Place extends CreatedUpdated<PlaceEntity> {
+@ObjectType({
+  implements: () => [Named],
+})
+export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Field(() => ID)
   id!: string
 

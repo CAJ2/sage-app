@@ -12,6 +12,7 @@ import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
@@ -40,8 +41,13 @@ export class ComponentRecycle {
   context?: StreamContext & {}
 }
 
-@ObjectType()
-export class Component extends IDCreatedUpdated<ComponentEntity> {
+@ObjectType({
+  implements: () => [Named],
+})
+export class Component
+  extends IDCreatedUpdated<ComponentEntity>
+  implements Named
+{
   @Field(() => String, { nullable: true })
   @Transform(translate)
   @MaxLength(1024)
