@@ -360,6 +360,9 @@ importers:
       graphql-tag:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.11.0)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-vue-next:
         specifier: ^0.511.0
         version: 0.511.0(vue@3.5.15(typescript@5.8.3))
