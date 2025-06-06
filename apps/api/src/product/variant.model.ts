@@ -3,7 +3,11 @@ import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
-import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import {
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { ComponentsPage } from '@src/process/component.model'
@@ -54,6 +58,7 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => ComponentsPage)
   components!: ComponentsPage & {}
 }
+registerModel('Variant', Variant)
 
 @ObjectType()
 export class VariantHistory {

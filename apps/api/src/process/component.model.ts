@@ -11,7 +11,11 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import {
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
@@ -83,6 +87,7 @@ export class Component
     this.image_url = entity.visual?.image
   }
 }
+registerModel('Component', Component)
 
 @ObjectType()
 export class ComponentHistory {

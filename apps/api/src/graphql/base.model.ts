@@ -7,6 +7,17 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 import type { Loaded } from '@mikro-orm/core'
 
+export const ModelRegistry: Record<string, new () => BaseModel<any>> = {}
+export function registerModel<T extends BaseModel<any>>(
+  name: string,
+  model: new () => T,
+): void {
+  if (ModelRegistry[name]) {
+    throw new Error(`Model ${name} is already registered.`)
+  }
+  ModelRegistry[name] = model
+}
+
 export class BaseModel<T> {
   entity?: Loaded<T, never>
 }

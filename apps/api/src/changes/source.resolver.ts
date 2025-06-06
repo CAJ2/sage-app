@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { TransformService } from '@src/common/transform'
 import {
   CreateSourceInput,
@@ -43,7 +43,7 @@ export class SourceResolver {
   @UseGuards(AuthGuard)
   async createSource(
     @Args('input') input: CreateSourceInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<CreateSourceOutput> {
     const source = await this.sourceService.create(input, user.id)
     const model = await this.transform.entityToModel(source, Source)

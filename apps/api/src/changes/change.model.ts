@@ -1,9 +1,11 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { SourcesPage } from '@src/changes/source.model'
+import { transformUnion } from '@src/common/transform'
 import { IsNanoID } from '@src/common/validator.model'
 import { IDCreatedUpdated, InputWithLang } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
+import { Transform } from 'class-transformer'
 import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { Change as ChangeEntity, ChangeStatus } from './change.entity'
@@ -12,15 +14,17 @@ import { EditModel } from './change.enum'
 @ObjectType()
 export class Edit {
   @Field(() => String)
-  model!: string
+  entity_name!: string
 
   @Field(() => ID, { nullable: true })
   id?: string
 
   @Field(() => EditModel, { nullable: true })
+  @Transform(transformUnion('entity_name'))
   original?: typeof EditModel
 
   @Field(() => EditModel, { nullable: true })
+  @Transform(transformUnion('entity_name'))
   changes?: typeof EditModel
 }
 

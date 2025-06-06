@@ -4,7 +4,11 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import {
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Variant } from '@src/product/variant.model'
@@ -48,6 +52,7 @@ export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
   @Field(() => [ProcessHistory])
   history: ProcessHistory[] = []
 }
+registerModel('Process', Process)
 
 @ObjectType()
 export class ProcessHistory {

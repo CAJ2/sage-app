@@ -8,7 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -135,7 +135,7 @@ export class CategoryResolver {
   @UseGuards(AuthGuard)
   async createCategory(
     @Args('input') input: CreateCategoryInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<CreateCategoryOutput> {
     const created = await this.categoryService.create(input, user.id)
     const model = await this.transform.entityToModel(created.category, Category)

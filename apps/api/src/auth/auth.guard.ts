@@ -68,7 +68,7 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-export const User = createParamDecorator(
+export const AuthUser = createParamDecorator(
   (data: keyof ReqUser | undefined, ctx: ExecutionContext) => {
     const gql = GqlArgumentsHost.create(ctx)
     let request = gql.switchToHttp().getRequest()

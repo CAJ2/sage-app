@@ -7,7 +7,16 @@ import { Path } from "nestjs-i18n";
 export type I18nTranslations = {
     "schemas": {
         "components": {
+            "name_tr": {
+                "title": string;
+            };
+            "desc_tr": {
+                "title": string;
+            };
             "image_url": {
+                "title": string;
+            };
+            "primary_material": {
                 "title": string;
             };
         };

@@ -1,7 +1,7 @@
 import { BaseEntity } from '@mikro-orm/core'
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { BaseModel } from '@src/graphql/base.model'
+import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 import { plainToInstance } from 'class-transformer'
 import { validateOrReject } from 'class-validator'
 import { GraphQLError } from 'graphql'
@@ -20,6 +20,7 @@ import type {
   ObjectQuery,
   QueryOrderMap,
 } from '@mikro-orm/core'
+import type { TransformFnParams } from 'class-transformer'
 
 export type EntityDTOCtx<T> = EntityDTO<T> & {
   _lang?: string[]
@@ -55,6 +56,22 @@ export class TransformService {
       throw new GraphQLError(errors.toString())
     })
     inst.entity = entity
+    return inst
+  }
+
+  async objectToModel<T, S extends object>(
+    object: T,
+    model: new () => S,
+  ): Promise<S> {
+    const obj = object as EntityDTOCtx<T>
+    obj._lang = this.cls.get('lang')
+    const inst = plainToInstance(model, obj)
+    if ((inst as any).transform) {
+      ;(inst as any).transform(obj)
+    }
+    await validateOrReject(inst).catch((errors) => {
+      throw new GraphQLError(errors.toString())
+    })
     return inst
   }
 
@@ -238,5 +255,23 @@ export class TransformService {
       hasNextPage: false,
     }
     return page
+  }
+}
+
+export function transformUnion(
+  field: string,
+): (params: TransformFnParams) => object {
+  return (params: TransformFnParams) => {
+    const obj = params.obj as any
+    if (!obj || !obj[field]) {
+      return {}
+    }
+    const constr = ModelRegistry[obj[field]]
+    if (!constr) {
+      throw new Error(`Model ${obj[field]} not found in registry`)
+    }
+    params.value._lang = params.obj._lang || []
+    const instance = plainToInstance(constr, params.value)
+    return instance
   }
 }

@@ -1,7 +1,7 @@
 import { ArgsType, Field, ID, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
-import { CreatedUpdated } from '@src/graphql/base.model'
+import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { DateTime } from 'luxon'
@@ -39,6 +39,7 @@ export class Region extends CreatedUpdated<RegionEntity> {
     }
   }
 }
+registerModel('Region', Region)
 
 @ObjectType()
 export class RegionHistory {

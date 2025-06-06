@@ -3,7 +3,7 @@ import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
@@ -34,6 +34,7 @@ export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
   @Field(() => UserPage)
   users!: UserPage & {}
 }
+registerModel('Org', Org)
 
 @ObjectType()
 export class OrgHistory {

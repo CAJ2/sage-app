@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -47,7 +47,7 @@ export class ProcessResolver {
   @UseGuards(AuthGuard)
   async createProcess(
     @Args('input') input: CreateProcessInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<CreateProcessOutput> {
     const created = await this.processService.create(input, user.id)
     const model = await this.transform.entityToModel(created.process, Process)
@@ -65,7 +65,7 @@ export class ProcessResolver {
   @UseGuards(AuthGuard)
   async updateProcess(
     @Args('input') input: UpdateProcessInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<UpdateProcessOutput> {
     const updated = await this.processService.update(input, user.id)
     const model = await this.transform.entityToModel(updated.process, Process)

@@ -2,7 +2,7 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
-import { CreatedUpdated } from '@src/graphql/base.model'
+import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
@@ -53,6 +53,7 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @Field(() => ItemsPage)
   items!: ItemsPage & {}
 }
+registerModel('Category', Category)
 
 @ObjectType()
 export class CategoryHistory {

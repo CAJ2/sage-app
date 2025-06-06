@@ -8,7 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -83,7 +83,7 @@ export class ItemResolver {
   @UseGuards(AuthGuard)
   async createItem(
     @Args('input') input: CreateItemInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<CreateItemOutput> {
     const created = await this.itemService.create(input, user.id)
     const result = await this.transform.entityToModel(created.item, Item)
@@ -98,7 +98,7 @@ export class ItemResolver {
   @UseGuards(AuthGuard)
   async updateItem(
     @Args('input') input: UpdateItemInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<UpdateItemOutput> {
     const updated = await this.itemService.update(input, user.id)
     const result = await this.transform.entityToModel(updated.item, Item)

@@ -8,7 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -100,7 +100,7 @@ export class VariantResolver {
   @UseGuards(AuthGuard)
   async createVariant(
     @Args('input') input: CreateVariantInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<CreateVariantOutput> {
     const created = await this.variantService.create(input, user.id)
     const result = await this.transform.entityToModel(created.variant, Variant)
@@ -118,7 +118,7 @@ export class VariantResolver {
   @UseGuards(AuthGuard)
   async updateVariant(
     @Args('input') input: UpdateVariantInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<UpdateVariantOutput> {
     const updated = await this.variantService.update(input, user.id)
     const result = await this.transform.entityToModel(updated.variant, Variant)

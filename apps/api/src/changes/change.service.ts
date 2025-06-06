@@ -45,6 +45,18 @@ export class ChangeService {
     return change
   }
 
+  async edits(changeID: string) {
+    const change = await this.em.findOne(
+      Change,
+      { id: changeID },
+      { populate: ['edits'] },
+    )
+    if (!change) {
+      throw NotFoundErr(`Change with ID "${changeID}" not found`)
+    }
+    return change.edits
+  }
+
   async sources(changeID: string, opts: CursorOptions<Source>) {
     opts.where.changes = this.em.getReference(Change, changeID)
     const sources = await this.em.find(Source, opts.where, opts.options)
@@ -53,6 +65,10 @@ export class ChangeService {
       items: sources,
       count,
     }
+  }
+
+  async user(userID: string) {
+    return this.em.findOne(User, { id: userID })
   }
 
   async findOneOrCreate(
@@ -168,8 +184,9 @@ export class ChangeService {
   }
 
   async createEntityEdit(change: Change, entity: BaseEntity) {
-    const edit = new Edit()
-    edit.entity_name = entity.constructor.name
+    const edit: Edit = {
+      entity_name: entity.constructor.name,
+    }
     edit.changes = entity.toPOJO()
     change.edits.push(edit)
   }

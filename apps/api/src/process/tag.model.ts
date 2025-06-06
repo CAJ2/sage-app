@@ -6,7 +6,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql'
 import { translate } from '@src/db/i18n'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
@@ -46,12 +46,14 @@ export class TagDefinition
   @Field(() => String, { nullable: true })
   image?: string
 }
+registerModel('TagDefinition', TagDefinition)
 
 @ObjectType()
 export class Tag extends TagDefinition {
   @Field(() => JSONObjectResolver, { nullable: true })
   meta?: Record<string, any>
 }
+registerModel('Tag', Tag)
 
 @ObjectType()
 export class TagDefinitionPage extends Paginated(TagDefinition) {}

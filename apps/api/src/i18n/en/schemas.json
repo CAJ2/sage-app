@@ -1,7 +1,16 @@
 {
   "components": {
+    "name_tr": {
+      "title": "Name Translations"
+    },
+    "desc_tr": {
+      "title": "Description Translations"
+    },
     "image_url": {
       "title": "Image Source"
+    },
+    "primary_material": {
+      "title": "Primary Material"
     }
   }
 }

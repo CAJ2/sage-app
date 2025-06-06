@@ -2,7 +2,11 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
-import { CreatedUpdated, TranslatedInput } from '@src/graphql/base.model'
+import {
+  CreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
@@ -56,6 +60,7 @@ export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   @Field(() => ProcessPage)
   processes!: ProcessPage & {}
 }
+registerModel('Material', Material)
 
 @ObjectType()
 export class MaterialHistory {

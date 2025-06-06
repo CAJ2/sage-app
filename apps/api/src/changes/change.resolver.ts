@@ -8,8 +8,10 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { AuthGuard, ReqUser, User } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
+import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { User } from '@src/users/users.model'
 import {
   Change,
   ChangesArgs,
@@ -18,6 +20,7 @@ import {
   CreateChangeInput,
   CreateChangeOutput,
   DeleteChangeOutput,
+  Edit,
   UpdateChangeInput,
   UpdateChangeOutput,
 } from './change.model'
@@ -40,14 +43,18 @@ export class ChangeResolver {
 
   @Query(() => Change, { name: 'getChange', nullable: true })
   async getChange(@Args('id', { type: () => ID }) id: string) {
-    return this.changeService.findOne(id)
+    const change = await this.changeService.findOne(id)
+    if (!change) {
+      throw NotFoundErr('Change not found')
+    }
+    return this.transform.entityToModel(change, Change)
   }
 
   @Mutation(() => CreateChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
   async createChange(
     @Args('input') input: CreateChangeInput,
-    @User() user: ReqUser,
+    @AuthUser() user: ReqUser,
   ): Promise<CreateChangeOutput> {
     const change = await this.changeService.create(input, user.id)
     const model = await this.transform.entityToModel(change, Change)
@@ -79,10 +86,27 @@ export class ChangeResolver {
     }
   }
 
+  @ResolveField(() => [Edit], { nullable: true })
+  async edits(@Parent() change: Change): Promise<Edit[]> {
+    const edits = await this.changeService.edits(change.id)
+    return Promise.all(
+      edits.map(async (edit) => await this.transform.objectToModel(edit, Edit)),
+    )
+  }
+
   @ResolveField(() => SourcesPage, { nullable: true })
   async sources(@Parent() change: Change, @Args() args: ChangeSourcesArgs) {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.changeService.sources(change.id, filter)
     return this.transform.entityToPaginated(cursor, args, Source, SourcesPage)
+  }
+
+  @ResolveField(() => User, { nullable: true })
+  async user(@Parent() change: Change): Promise<User | null> {
+    const user = await this.changeService.user(change.user.id)
+    if (!user) {
+      return null
+    }
+    return this.transform.entityToModel(user, User)
   }
 }

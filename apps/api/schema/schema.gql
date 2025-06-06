@@ -331,8 +331,8 @@ type DeleteSourceOutput {
 
 type Edit {
   changes: EditModel
+  entity_name: String!
   id: ID
-  model: String!
   original: EditModel
 }
 
