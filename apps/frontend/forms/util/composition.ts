@@ -121,6 +121,17 @@ export const useVanillaArrayControl = <I extends { control: any }>(
       input.control.value.data,
       composePaths(`${index}`, childLabelProp),
     )
+    // When using a select with oneOf, use the title for the selected option
+    if (input.control.value.schema.properties[childLabelProp].oneOf) {
+      const findOne = input.control.value.schema.properties[
+        childLabelProp
+      ].oneOf.find(
+        (o: { const: string; title?: string }) => o.const === labelValue,
+      )
+      if (findOne) {
+        return `${findOne.title ?? findOne.const}`
+      }
+    }
     if (
       labelValue === undefined ||
       labelValue === null ||

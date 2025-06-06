@@ -138,3 +138,7 @@
 .control>.wrapper>textarea {
   flex: 1;
 }
+
+.array-list-item-content.expanded {
+  display: block;
+}

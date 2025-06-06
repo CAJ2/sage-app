@@ -24,7 +24,7 @@ export const defaultStyles: Styles = {
   },
   group: {
     root: 'group',
-    label: 'group-label',
+    label: 'group-label label pb-2',
     item: 'group-item',
   },
   arrayList: {
@@ -39,7 +39,7 @@ export const defaultStyles: Styles = {
       'array-list-item-toolbar flex items-center justify-end cursor-pointer',
     itemLabel: 'array-list-item-label flex-1 pl-1 h-6 leading-6',
     itemContent: 'array-list-item-content hidden py-0 px-4',
-    itemExpanded: 'expanded block',
+    itemExpanded: 'expanded',
     itemMoveUp: 'array-list-item-move-up btn btn-md btn-ghost',
     itemMoveDown: 'array-list-item-move-down btn btn-md btn-ghost',
     itemDelete: 'array-list-item-delete btn btn-md btn-ghost',

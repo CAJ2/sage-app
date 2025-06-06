@@ -5,29 +5,17 @@
     :is-focused="isFocused"
     :applied-options="appliedOptions"
   >
-    <select
+    <input
       :id="control.id + '-input'"
-      :class="styles.control.select"
+      :class="styles.control.input"
       :value="control.data"
       :disabled="!control.enabled"
       :autofocus="appliedOptions.focus"
+      :placeholder="appliedOptions.placeholder"
       @change="onChange"
       @focus="isFocused = true"
       @blur="isFocused = false"
-    >
-      <option key="empty" value="" :class="styles.control.option" />
-      <option
-        v-for="optionElement in control.options"
-        :key="optionElement.value"
-        :value="optionElement.value"
-        :label="
-          optionElement.label ||
-          control.schema.oneOf?.find((o) => o.const === optionElement.value)
-            ?.title
-        "
-        :class="styles.control.option"
-      ></option>
-    </select>
+    />
   </control-wrapper>
 </template>
 
@@ -36,16 +24,15 @@ import type {
   ControlElement,
   JsonFormsRendererRegistryEntry,
 } from '@jsonforms/core'
-import { rankWith, isOneOfEnumControl } from '@jsonforms/core'
+import { rankWith, and, uiTypeIs, schemaMatches } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
-import { rendererProps, useJsonFormsOneOfEnumControl } from '@jsonforms/vue'
-// eslint-disable-next-line import/no-named-default
-import { default as ControlWrapper } from './ControlWrapper.vue'
+import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { ControlWrapper } from '../controls'
 import { useVanillaControl } from '../util'
 
 const controlRenderer = defineComponent({
-  name: 'EnumOneofControlRenderer',
+  name: 'ReferenceRenderer',
   components: {
     ControlWrapper,
   },
@@ -53,8 +40,9 @@ const controlRenderer = defineComponent({
     ...rendererProps<ControlElement>(),
   },
   setup(props: RendererProps<ControlElement>) {
-    return useVanillaControl(useJsonFormsOneOfEnumControl(props), (target) =>
-      target.selectedIndex === 0 ? undefined : target.value,
+    return useVanillaControl(
+      useJsonFormsControl(props),
+      (target) => target.value || undefined,
     )
   },
 })
@@ -63,6 +51,14 @@ export default controlRenderer
 
 export const entry: JsonFormsRendererRegistryEntry = {
   renderer: controlRenderer,
-  tester: rankWith(5, isOneOfEnumControl),
+  tester: rankWith(
+    2,
+    and(
+      uiTypeIs('Control'),
+      schemaMatches((schema) =>
+        Object.prototype.hasOwnProperty.call(schema, '$id'),
+      ),
+    ),
+  ),
 }
 </script>

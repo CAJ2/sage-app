@@ -1,15 +1,12 @@
 <template>
   <div>
     <NavTopbar
-      :title="t('contribute.title')"
-      subtitle="Help us improve the platform by contributing."
+      title="Changes"
+      subtitle="View and manage your contributions."
+      back="true"
     ></NavTopbar>
     <h3 class="text-center text-lg font-semibold mt-8 p-3">
       🚧 Currently under construction 🚧
     </h3>
   </div>
 </template>
-
-<script setup lang="ts">
-const { t } = useI18n()
-</script>

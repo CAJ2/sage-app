@@ -1,12 +1,19 @@
 <template>
   <div>
-    <NavTopbar title="Edit Component" back="true"></NavTopbar>
+    <NavTopbar
+      :title="
+        route.params.component_id === 'new'
+          ? 'Create Component'
+          : 'Edit Component'
+      "
+      back="true"
+    ></NavTopbar>
     <div class="flex justify-center">
       <div class="w-full p-5 max-w-2xl">
         <JsonForms
-          v-if="formData"
-          :schema="formData.getComponentSchema.create.schema"
-          :uischema="formData.getComponentSchema.create.uischema"
+          v-if="jsonSchema && uiSchema"
+          :schema="jsonSchema"
+          :uischema="uiSchema"
           :data="{ id: route.params.component_id }"
           :ajv="ajv"
           :renderers="renderers"
@@ -22,6 +29,7 @@ import type { UISchemaElement } from '@jsonforms/core'
 import { JsonForms } from '@jsonforms/vue'
 import { renderers } from '~/forms'
 import Ajv from 'ajv/dist/2020'
+import addFormats from 'ajv-formats'
 
 const route = useRoute()
 const { locale } = useI18n()
@@ -33,6 +41,7 @@ const ajv = new Ajv({
   verbose: true,
   strict: false,
 })
+addFormats(ajv)
 
 const formQuery = gql`
   query FormQuery {
@@ -69,4 +78,17 @@ type FormResult = {
 }
 const { data: formData } = await useAsyncQuery<FormResult>(formQuery)
 console.log('formData', formData)
+
+const jsonSchema = computed(() => {
+  if (route.params.component_id === 'new') {
+    return formData.value?.getComponentSchema.create.schema
+  }
+  return formData.value?.getComponentSchema.update.schema
+})
+const uiSchema = computed(() => {
+  if (route.params.component_id === 'new') {
+    return formData.value?.getComponentSchema.create.uischema
+  }
+  return formData.value?.getComponentSchema.update.uischema
+})
 </script>
