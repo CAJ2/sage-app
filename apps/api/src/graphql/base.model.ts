@@ -1,8 +1,10 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
+import { iso639 } from '@src/db/iso639'
 import { Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
+import { map } from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 import type { Loaded } from '@mikro-orm/core'
@@ -78,10 +80,26 @@ export class TranslatedInput {
 }
 
 export const TranslatedInputSchema = z.object({
-  lang: z.string(),
+  lang: z.union(
+    map(iso639, (l) =>
+      z
+        .literal(l.part1 || l.part2t)
+        .meta({ title: `${l.nativeName} (${l.referenceName})` }),
+    ),
+  ),
   text: z.string().optional(),
   auto: z.boolean().default(false),
 })
+export const TrArraySchema = z
+  .array(TranslatedInputSchema)
+  .optional()
+  .default([
+    {
+      lang: 'en',
+      text: '',
+      auto: false,
+    },
+  ])
 
 @InputType()
 export class InputWithLang {

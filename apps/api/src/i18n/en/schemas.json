@@ -1,16 +1,25 @@
 {
+  "translated_input": {
+    "lang_title": "Language",
+    "text_title": "Translated Text",
+    "auto_title": "Is Auto-Translated?"
+  },
   "components": {
     "name_tr": {
-      "title": "Name Translations"
+      "title": "Name"
     },
     "desc_tr": {
-      "title": "Description Translations"
+      "title": "Description"
     },
     "image_url": {
       "title": "Image Source"
     },
     "primary_material": {
       "title": "Primary Material"
+    },
+    "materials": {
+      "title": "Materials",
+      "item_title": "Material"
     }
   }
 }

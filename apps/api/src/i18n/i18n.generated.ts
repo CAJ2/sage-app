@@ -6,6 +6,11 @@ import { Path } from "nestjs-i18n";
 /* prettier-ignore */
 export type I18nTranslations = {
     "schemas": {
+        "translated_input": {
+            "lang_title": string;
+            "text_title": string;
+            "auto_title": string;
+        };
         "components": {
             "name_tr": {
                 "title": string;
@@ -18,6 +23,10 @@ export type I18nTranslations = {
             };
             "primary_material": {
                 "title": string;
+            };
+            "materials": {
+                "title": string;
+                "item_title": string;
             };
         };
     };

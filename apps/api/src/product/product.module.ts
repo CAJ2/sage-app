@@ -2,6 +2,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
+import { CommonModule } from '@src/common/common.module'
 import { ProcessModule } from '@src/process/process.module'
 import { CategoryResolver } from './category.resolver'
 import { CategoryService } from './category.service'
@@ -12,6 +13,7 @@ import { VariantService } from './variant.service'
 
 @Module({
   imports: [
+    CommonModule,
     MikroOrmModule.forFeature([]),
     AuthModule.registerAsync(),
     ChangesModule,

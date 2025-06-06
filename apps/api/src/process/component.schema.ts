@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
+import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { TranslatedInputSchema } from '@src/graphql/base.model'
+import { TrArraySchema } from '@src/graphql/base.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
@@ -26,11 +27,23 @@ export class ComponentSchemaService {
   UpdateComponentInputJSONSchema: z.core.JSONSchema.BaseSchema
   UpdateComponentInputUISchema: UISchemaElement
 
-  constructor(private readonly i18n: I18nService<I18nTranslations>) {
-    this.ComponentMaterialInputSchema = z.strictObject({
-      id: MaterialIDSchema,
-      material_fraction: z.number().min(0).max(1).optional(),
-    })
+  constructor(
+    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly baseSchema: BaseSchemaService,
+  ) {
+    this.ComponentMaterialInputSchema = z
+      .strictObject({
+        id: MaterialIDSchema,
+        material_fraction: z
+          .number()
+          .min(0.000001)
+          .max(1)
+          .optional()
+          .default(1),
+      })
+      .meta({
+        title: this.i18n.t('schemas.components.materials.item_title'),
+      })
 
     this.ComponentTagsInputSchema = z.strictObject({
       id: TagDefinitionIDSchema,
@@ -43,19 +56,13 @@ export class ComponentSchemaService {
 
     this.CreateComponentInputSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024),
-      name_tr: z
-        .array(TranslatedInputSchema)
-        .optional()
-        .meta({
-          title: this.i18n.t('schemas.components.name_tr.title'),
-        }),
+      name_tr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.name_tr.title'),
+      }),
       desc: z.string().max(100_000).optional(),
-      desc_tr: z
-        .array(TranslatedInputSchema)
-        .optional()
-        .meta({
-          title: this.i18n.t('schemas.components.desc_tr.title'),
-        }),
+      desc_tr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.desc_tr.title'),
+      }),
       image_url: z
         .string()
         .optional()
@@ -63,21 +70,17 @@ export class ComponentSchemaService {
           title: this.i18n.t('schemas.components.image_url.title'),
         }),
       primary_material: this.ComponentMaterialInputSchema.optional(),
-      materials: this.ComponentMaterialInputSchema.array().optional(),
+      materials: this.ComponentMaterialInputSchema.array()
+        .optional()
+        .meta({
+          title: this.i18n.t('schemas.components.materials.title'),
+        }),
       tags: this.ComponentTagsInputSchema.array().optional(),
       region: this.ComponentRegionInputSchema.optional(),
     })
 
-    this.CreateComponentInputJSONSchema = z.toJSONSchema(
+    this.CreateComponentInputJSONSchema = zToSchema(
       this.CreateComponentInputSchema,
-      {
-        override: (ctx) => {
-          if (ctx.jsonSchema.id) {
-            ctx.jsonSchema.$id = ctx.jsonSchema.id
-            delete ctx.jsonSchema.id
-          }
-        },
-      },
     )
 
     this.CreateComponentInputUISchema = {
@@ -85,23 +88,20 @@ export class ComponentSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name',
-        },
-        {
-          type: 'Control',
           scope: '#/properties/name_tr',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/desc',
+          options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
           scope: '#/properties/desc_tr',
+          options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
           scope: '#/properties/image_url',
+          options: {
+            format: 'source',
+          },
         },
         {
           type: 'Group',
@@ -131,7 +131,13 @@ export class ComponentSchemaService {
     this.UpdateComponentInputSchema = ChangeInputWithLangSchema.extend({
       id: z.nanoid(),
       name: z.string().max(1024).optional(),
+      name_tr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.name_tr.title'),
+      }),
       desc: z.string().max(100_000).optional(),
+      desc_tr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.desc_tr.title'),
+      }),
       image_url: z.string().optional(),
       primary_material: this.ComponentMaterialInputSchema.optional(),
       materials: this.ComponentMaterialInputSchema.array().optional(),
@@ -140,7 +146,7 @@ export class ComponentSchemaService {
       region: this.ComponentRegionInputSchema.optional(),
     })
 
-    this.UpdateComponentInputJSONSchema = z.toJSONSchema(
+    this.UpdateComponentInputJSONSchema = zToSchema(
       this.UpdateComponentInputSchema,
     )
 
@@ -150,18 +156,14 @@ export class ComponentSchemaService {
         {
           type: 'Control',
           scope: '#/properties/id',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/name',
+          label: 'ID',
+          options: {
+            readonly: true,
+          },
         },
         {
           type: 'Control',
           scope: '#/properties/name_tr',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/desc',
         },
         {
           type: 'Control',
