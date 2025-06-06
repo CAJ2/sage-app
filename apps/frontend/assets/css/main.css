@@ -131,3 +131,10 @@
 }
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* JSON Forms */
+.control>.wrapper>input,
+.control>.wrapper>select,
+.control>.wrapper>textarea {
+  flex: 1;
+}
