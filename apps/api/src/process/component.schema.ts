@@ -43,9 +43,19 @@ export class ComponentSchemaService {
 
     this.CreateComponentInputSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024),
-      name_tr: z.array(TranslatedInputSchema).optional(),
+      name_tr: z
+        .array(TranslatedInputSchema)
+        .optional()
+        .meta({
+          title: this.i18n.t('schemas.components.name_tr.title'),
+        }),
       desc: z.string().max(100_000).optional(),
-      desc_tr: z.array(TranslatedInputSchema).optional(),
+      desc_tr: z
+        .array(TranslatedInputSchema)
+        .optional()
+        .meta({
+          title: this.i18n.t('schemas.components.desc_tr.title'),
+        }),
       image_url: z
         .string()
         .optional()
@@ -60,6 +70,14 @@ export class ComponentSchemaService {
 
     this.CreateComponentInputJSONSchema = z.toJSONSchema(
       this.CreateComponentInputSchema,
+      {
+        override: (ctx) => {
+          if (ctx.jsonSchema.id) {
+            ctx.jsonSchema.$id = ctx.jsonSchema.id
+            delete ctx.jsonSchema.id
+          }
+        },
+      },
     )
 
     this.CreateComponentInputUISchema = {
@@ -86,8 +104,14 @@ export class ComponentSchemaService {
           scope: '#/properties/image_url',
         },
         {
-          type: 'Control',
-          scope: '#/properties/primary_material',
+          type: 'Group',
+          label: this.i18n.t('schemas.components.primary_material.title'),
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/primary_material/properties/id',
+            },
+          ],
         },
         {
           type: 'Control',
