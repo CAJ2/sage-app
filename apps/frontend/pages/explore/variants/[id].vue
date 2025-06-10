@@ -58,8 +58,11 @@
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent class="space-y-2">
-        <div class="px-3 pb-4">
-          <ScoreBar size="medium" :score="40"></ScoreBar>
+        <div v-if="recyclingResult" class="px-3 pb-4">
+          <ScoreBar
+            size="medium"
+            :score="recyclingResult.getVariant?.recycle_score?.score"
+          ></ScoreBar>
         </div>
         <ul class="list bg-base-100 rounded-box shadow-md">
           <li class="px-4 pb-2 text-sm opacity-80 tracking-wide">Components</li>
@@ -70,7 +73,12 @@
             <div class="skeleton h-4 w-full"></div>
           </li>
 
-          <div v-if="recyclingResult?.getVariant?.components">
+          <div
+            v-if="
+              recyclingResult?.getVariant?.components.nodes &&
+              recyclingResult.getVariant.components.nodes.length > 0
+            "
+          >
             <div
               v-for="component in recyclingResult.getVariant.components.nodes"
               :key="component.id"
@@ -106,7 +114,9 @@
             </div>
           </div>
 
-          <li v-else class="list-row">There are no components to show</li>
+          <li v-else class="list-row">
+            Recycling instructions are currently not available
+          </li>
         </ul>
       </CollapsibleContent>
     </Collapsible>
@@ -152,6 +162,11 @@ const variantRecycling = graphql(`
     getVariant(id: $id) {
       id
       name
+      recycle_score(region_id: $region) {
+        score
+        rating
+        rating_f
+      }
       components {
         nodes {
           id

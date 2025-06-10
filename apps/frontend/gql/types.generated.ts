@@ -1487,6 +1487,7 @@ export type Variant = Named & {
   items: ItemsPage;
   name?: Maybe<Scalars['String']['output']>;
   orgs: OrgsPage;
+  recycle_score?: Maybe<StreamScore>;
   tags: TagPage;
   updated_at: Scalars['DateTime']['output'];
 };
@@ -1513,6 +1514,11 @@ export type VariantOrgsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type VariantRecycle_ScoreArgs = {
+  region_id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 

@@ -25,6 +25,7 @@ import {
   VariantComponentsArgs,
   VariantItemsArgs,
   VariantOrgsArgs,
+  VariantRecycleArgs,
   VariantsArgs,
   VariantsPage,
   VariantTagsArgs,
@@ -91,6 +92,21 @@ export class VariantResolver {
       Component,
       ComponentsPage,
     )
+  }
+
+  @ResolveField()
+  async recycle_score(
+    @Parent() variant: Variant,
+    @Args() args: VariantRecycleArgs,
+  ) {
+    const score = await this.variantService.recycle_score(
+      variant.id,
+      args.region_id,
+    )
+    if (!score) {
+      return null
+    }
+    return score
   }
 
   @Mutation(() => CreateVariantOutput, {

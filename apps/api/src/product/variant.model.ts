@@ -11,6 +11,7 @@ import {
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { ComponentsPage } from '@src/process/component.model'
+import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
 import { OrgsPage } from '@src/users/org.model'
 import { Transform } from 'class-transformer'
@@ -55,6 +56,9 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => TagPage)
   tags!: TagPage
 
+  @Field(() => StreamScore, { nullable: true })
+  recycle_score?: StreamScore
+
   @Field(() => ComponentsPage)
   components!: ComponentsPage & {}
 }
@@ -92,6 +96,12 @@ export class VariantTagsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class VariantItemsArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class VariantRecycleArgs {
+  @Field(() => ID, { nullable: true })
+  region_id?: string
+}
 
 @InputType()
 export class VariantItemsInput {

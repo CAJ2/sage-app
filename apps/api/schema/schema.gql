@@ -984,6 +984,7 @@ type Variant implements Named {
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String
   orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+  recycle_score(region_id: ID): StreamScore
   tags(after: String, before: String, first: Int, last: Int): TagPage!
   updated_at: DateTime!
 }

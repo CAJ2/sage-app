@@ -8,9 +8,12 @@ import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
+import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
+import { StreamService } from '@src/process/stream.service'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Org } from '@src/users/org.entity'
+import { I18nService } from 'nestjs-i18n'
 import { Item } from './item.entity'
 import { Variant, VariantsTags } from './variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from './variant.model'
@@ -21,6 +24,8 @@ export class VariantService {
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
     private readonly tagService: TagService,
+    private readonly streamService: StreamService,
+    private readonly i18n: I18nService,
   ) {}
 
   async findOneByID(id: string) {
@@ -94,6 +99,43 @@ export class VariantService {
       items: components,
       count,
     }
+  }
+
+  async recycle_score(variantID: string, regionID?: string) {
+    const variant = await this.em.findOne(
+      Variant,
+      { id: variantID },
+      { populate: ['region', 'components'] },
+    )
+    if (!variant) {
+      throw new Error(`Variant with ID "${variantID}" not found`)
+    }
+    const region = await this.em.findOne(Region, { id: regionID })
+    if (!region) {
+      throw new Error(`Region with ID "${regionID}" not found`)
+    }
+    if (variant.components.getItems().length === 0) {
+      return new StreamScore()
+    }
+    let totalScore = 0
+    for (const component of variant.components.getItems()) {
+      const score = await this.streamService.recycleComponentScore(
+        component.id,
+        regionID,
+      )
+      if (score && score.score) {
+        totalScore += score.score
+      }
+    }
+    const variantScore = new StreamScore()
+    variantScore.score = Math.floor(
+      totalScore / variant.components.getItems().length,
+    )
+    variantScore.rating = StreamScoreRating.VERY_GOOD
+    variantScore.rating_f = this.i18n.t(
+      `stream.score_rating.${variantScore.rating}`,
+    )
+    return variantScore
   }
 
   async create(input: CreateVariantInput, userID: string) {

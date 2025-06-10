@@ -11,6 +11,7 @@ import { MaterialResolver } from './material.resolver'
 import { MaterialService } from './material.service'
 import { ProcessResolver } from './process.resolver'
 import { ProcessService } from './process.service'
+import { StreamService } from './stream.service'
 import { TagResolver } from './tag.resolver'
 import { TagService } from './tag.service'
 
@@ -32,7 +33,8 @@ import { TagService } from './tag.service'
     ProcessService,
     TagResolver,
     TagService,
+    StreamService,
   ],
-  exports: [TagService],
+  exports: [TagService, StreamService],
 })
 export class ProcessModule {}
