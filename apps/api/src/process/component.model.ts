@@ -24,7 +24,7 @@ import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { Component as ComponentEntity } from './component.entity'
 import { Material } from './material.model'
-import { RecyclingStream, StreamContext } from './stream.model'
+import { RecyclingStream, StreamContext, StreamScore } from './stream.model'
 import { Tag } from './tag.model'
 
 @ObjectType()
@@ -79,6 +79,9 @@ export class Component
 
   @Field(() => [ComponentRecycle], { nullable: true })
   recycle?: ComponentRecycle[]
+
+  @Field(() => StreamScore, { nullable: true })
+  recycle_score?: StreamScore
 
   @Field(() => [ComponentHistory])
   history: ComponentHistory[] = []

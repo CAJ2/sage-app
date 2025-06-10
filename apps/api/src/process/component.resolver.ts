@@ -104,6 +104,21 @@ export class ComponentResolver {
     return recycle
   }
 
+  @ResolveField()
+  async recycle_score(
+    @Parent() component: Component,
+    @Args() args: ComponentRecycleArgs,
+  ) {
+    const score = await this.componentService.recycleScore(
+      component.id,
+      args.region_id,
+    )
+    if (!score) {
+      return null
+    }
+    return score
+  }
+
   @Mutation(() => CreateComponentOutput, {
     name: 'createComponent',
     nullable: true,

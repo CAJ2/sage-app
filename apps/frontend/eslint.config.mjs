@@ -7,7 +7,7 @@ const baseConfig = [
     files: ['**/*.{js,jsx,ts,tsx,vue}'],
   },
   {
-    ignores: ['**/.nx/**', '**/*.config.ts', '**/ios', '**/android'],
+    ignores: ['**/.nx/**', '**/*.config.ts', '**/ios', '**/android', '**/gql'],
   },
   {
     languageOptions: {

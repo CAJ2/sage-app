@@ -30,6 +30,16 @@ export type I18nTranslations = {
             };
         };
     };
+    "stream": {
+        "score_rating": {
+            "POOR": string;
+            "FAIR": string;
+            "GOOD": string;
+            "VERY_GOOD": string;
+            "EXCELLENT": string;
+            "UNKNOWN": string;
+        };
+    };
 };
 /* prettier-ignore */
 export type I18nPath = Path<I18nTranslations>;

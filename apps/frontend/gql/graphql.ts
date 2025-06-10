@@ -1,0 +1,1689 @@
+/* eslint-disable */
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339. */
+  DateTime: { input: any; output: any; }
+  /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
+  JSONObject: { input: any; output: any; }
+};
+
+export enum CacheControlScope {
+  Private = 'PRIVATE',
+  Public = 'PUBLIC'
+}
+
+export type CategoriesPage = {
+  __typename?: 'CategoriesPage';
+  edges?: Maybe<Array<CategoryEdge>>;
+  nodes?: Maybe<Array<Category>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Category = Named & {
+  __typename?: 'Category';
+  ancestors: CategoriesPage;
+  children: CategoriesPage;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  desc_short?: Maybe<Scalars['String']['output']>;
+  descendants: CategoriesPage;
+  id: Scalars['ID']['output'];
+  image_url?: Maybe<Scalars['String']['output']>;
+  items: ItemsPage;
+  name: Scalars['String']['output'];
+  parents: CategoriesPage;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type CategoryAncestorsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CategoryChildrenArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CategoryDescendantsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CategoryItemsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CategoryParentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CategoryEdge = {
+  __typename?: 'CategoryEdge';
+  cursor: Scalars['String']['output'];
+  node: Category;
+};
+
+export type Change = {
+  __typename?: 'Change';
+  created_at: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  edits: Array<Edit>;
+  id: Scalars['ID']['output'];
+  metadata?: Maybe<Scalars['JSONObject']['output']>;
+  sources: SourcesPage;
+  status: ChangeStatus;
+  title?: Maybe<Scalars['String']['output']>;
+  updated_at: Scalars['DateTime']['output'];
+  user: User;
+};
+
+
+export type ChangeSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChangeEdge = {
+  __typename?: 'ChangeEdge';
+  cursor: Scalars['String']['output'];
+  node: Change;
+};
+
+/** Status of a change */
+export enum ChangeStatus {
+  Approved = 'APPROVED',
+  Draft = 'DRAFT',
+  Merged = 'MERGED',
+  Proposed = 'PROPOSED',
+  Rejected = 'REJECTED'
+}
+
+export type ChangesPage = {
+  __typename?: 'ChangesPage';
+  edges?: Maybe<Array<ChangeEdge>>;
+  nodes?: Maybe<Array<Change>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Component = Named & {
+  __typename?: 'Component';
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  history: Array<ComponentHistory>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  image_url?: Maybe<Scalars['String']['output']>;
+  materials: Array<ComponentMaterial>;
+  name?: Maybe<Scalars['String']['output']>;
+  primary_material: Material;
+  recycle?: Maybe<Array<ComponentRecycle>>;
+  recycle_score?: Maybe<StreamScore>;
+  region?: Maybe<Region>;
+  tags: Array<Tag>;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type ComponentRecycleArgs = {
+  region_id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type ComponentRecycle_ScoreArgs = {
+  region_id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type ComponentEdge = {
+  __typename?: 'ComponentEdge';
+  cursor: Scalars['String']['output'];
+  node: Component;
+};
+
+export type ComponentHistory = {
+  __typename?: 'ComponentHistory';
+  changes?: Maybe<Scalars['String']['output']>;
+  component_id: Scalars['String']['output'];
+  datetime: Scalars['DateTime']['output'];
+  original?: Maybe<Scalars['String']['output']>;
+};
+
+export type ComponentMaterial = {
+  __typename?: 'ComponentMaterial';
+  material: Material;
+  material_fraction?: Maybe<Scalars['Float']['output']>;
+};
+
+export type ComponentMaterialInput = {
+  id: Scalars['ID']['input'];
+  material_fraction?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type ComponentRecycle = {
+  __typename?: 'ComponentRecycle';
+  context?: Maybe<StreamContext>;
+  stream?: Maybe<RecyclingStream>;
+};
+
+export type ComponentRegionInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type ComponentTagsInput = {
+  id: Scalars['ID']['input'];
+  meta?: InputMaybe<Scalars['JSONObject']['input']>;
+};
+
+export type ComponentsPage = {
+  __typename?: 'ComponentsPage';
+  edges?: Maybe<Array<ComponentEdge>>;
+  nodes?: Maybe<Array<Component>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Container = {
+  __typename?: 'Container';
+  access?: Maybe<Scalars['String']['output']>;
+  color?: Maybe<Scalars['String']['output']>;
+  image?: Maybe<Scalars['String']['output']>;
+  image_entry_point?: Maybe<ContainerImageEntryPoint>;
+  shape?: Maybe<ContainerShape>;
+  type: Scalars['String']['output'];
+};
+
+export type ContainerImageEntryPoint = {
+  __typename?: 'ContainerImageEntryPoint';
+  side: Scalars['String']['output'];
+  x: Scalars['Float']['output'];
+  y: Scalars['Float']['output'];
+};
+
+export type ContainerShape = {
+  __typename?: 'ContainerShape';
+  depth?: Maybe<Scalars['Float']['output']>;
+  height?: Maybe<Scalars['Float']['output']>;
+  width?: Maybe<Scalars['Float']['output']>;
+};
+
+export type CreateCategoryInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_short?: InputMaybe<Scalars['String']['input']>;
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type CreateCategoryOutput = {
+  __typename?: 'CreateCategoryOutput';
+  category?: Maybe<Category>;
+  change?: Maybe<Change>;
+};
+
+export type CreateChangeInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
+  sources?: Array<Scalars['ID']['input']>;
+  status?: InputMaybe<ChangeStatus>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateChangeOutput = {
+  __typename?: 'CreateChangeOutput';
+  change?: Maybe<Change>;
+};
+
+export type CreateComponentInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  materials?: InputMaybe<Array<ComponentMaterialInput>>;
+  name: Scalars['String']['input'];
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  primary_material?: InputMaybe<ComponentMaterialInput>;
+  region?: InputMaybe<ComponentRegionInput>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<ComponentTagsInput>>;
+};
+
+export type CreateComponentOutput = {
+  __typename?: 'CreateComponentOutput';
+  change?: Maybe<Change>;
+  component?: Maybe<Component>;
+};
+
+export type CreateItemInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  categories?: InputMaybe<Array<ItemCategoriesInput>>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<ItemTagsInput>>;
+};
+
+export type CreateItemOutput = {
+  __typename?: 'CreateItemOutput';
+  change?: Maybe<Change>;
+  item?: Maybe<Item>;
+};
+
+export type CreateOrgInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  avatar_url?: InputMaybe<Scalars['String']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  slug: Scalars['String']['input'];
+  website_url?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateOrgOutput = {
+  __typename?: 'CreateOrgOutput';
+  change?: Maybe<Change>;
+  org?: Maybe<Org>;
+};
+
+export type CreateProcessInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  intent: Scalars['String']['input'];
+  lang?: InputMaybe<Scalars['String']['input']>;
+  material?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  org?: InputMaybe<Scalars['ID']['input']>;
+  place?: InputMaybe<Scalars['ID']['input']>;
+  region?: InputMaybe<Scalars['ID']['input']>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  variant?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type CreateProcessOutput = {
+  __typename?: 'CreateProcessOutput';
+  change?: Maybe<Change>;
+  process?: Maybe<Process>;
+};
+
+export type CreateSourceInput = {
+  content?: InputMaybe<Scalars['JSONObject']['input']>;
+  content_url?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
+  type: SourceType;
+};
+
+export type CreateSourceOutput = {
+  __typename?: 'CreateSourceOutput';
+  source?: Maybe<Source>;
+};
+
+export type CreateTagDefinitionInput = {
+  bg_color?: InputMaybe<Scalars['String']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  image?: InputMaybe<Scalars['String']['input']>;
+  meta_template?: InputMaybe<Scalars['JSONObject']['input']>;
+  name: Scalars['String']['input'];
+  type: TagType;
+};
+
+export type CreateTagDefinitionOutput = {
+  __typename?: 'CreateTagDefinitionOutput';
+  tag?: Maybe<TagDefinition>;
+};
+
+export type CreateVariantInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  components?: InputMaybe<Array<VariantComponentsInput>>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  items?: InputMaybe<Array<VariantItemsInput>>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  orgs?: InputMaybe<Array<VariantOrgsInput>>;
+  region_id?: InputMaybe<Scalars['ID']['input']>;
+  regions?: InputMaybe<Array<VariantRegionsInput>>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<VariantTagsInput>>;
+};
+
+export type CreateVariantOutput = {
+  __typename?: 'CreateVariantOutput';
+  change?: Maybe<Change>;
+  variant?: Maybe<Variant>;
+};
+
+export type DeleteChangeOutput = {
+  __typename?: 'DeleteChangeOutput';
+  success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DeleteSourceOutput = {
+  __typename?: 'DeleteSourceOutput';
+  success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type Edit = {
+  __typename?: 'Edit';
+  changes?: Maybe<EditModel>;
+  entity_name: Scalars['String']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
+  original?: Maybe<EditModel>;
+};
+
+export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
+
+export type Item = Named & {
+  __typename?: 'Item';
+  categories: CategoriesPage;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  image_url?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  tags: TagPage;
+  updated_at: Scalars['DateTime']['output'];
+  variants: VariantsPage;
+};
+
+
+export type ItemCategoriesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type ItemTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type ItemVariantsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ItemCategoriesInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type ItemEdge = {
+  __typename?: 'ItemEdge';
+  cursor: Scalars['String']['output'];
+  node: Item;
+};
+
+export type ItemTagsInput = {
+  id: Scalars['ID']['input'];
+  meta?: InputMaybe<Scalars['JSONObject']['input']>;
+};
+
+export type ItemsPage = {
+  __typename?: 'ItemsPage';
+  edges?: Maybe<Array<ItemEdge>>;
+  nodes?: Maybe<Array<Item>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type MarkSourceProcessedOutput = {
+  __typename?: 'MarkSourceProcessedOutput';
+  success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type Material = Named & {
+  __typename?: 'Material';
+  ancestors: MaterialsPage;
+  children: MaterialsPage;
+  components: ComponentsPage;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  descendants: MaterialsPage;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  parents: MaterialsPage;
+  primary_components: ComponentsPage;
+  processes: ProcessPage;
+  technical: Scalars['Boolean']['output'];
+  updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type MaterialAncestorsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialChildrenArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialComponentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialDescendantsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialParentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialPrimary_ComponentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialProcessesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type MaterialEdge = {
+  __typename?: 'MaterialEdge';
+  cursor: Scalars['String']['output'];
+  node: Material;
+};
+
+export type MaterialsPage = {
+  __typename?: 'MaterialsPage';
+  edges?: Maybe<Array<MaterialEdge>>;
+  nodes?: Maybe<Array<Material>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ModelEditSchema = {
+  __typename?: 'ModelEditSchema';
+  create?: Maybe<ModelSchema>;
+  delete?: Maybe<ModelSchema>;
+  update?: Maybe<ModelSchema>;
+};
+
+export type ModelSchema = {
+  __typename?: 'ModelSchema';
+  schema?: Maybe<Scalars['JSONObject']['output']>;
+  uischema?: Maybe<Scalars['JSONObject']['output']>;
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createCategory?: Maybe<CreateCategoryOutput>;
+  createChange?: Maybe<CreateChangeOutput>;
+  createComponent?: Maybe<CreateComponentOutput>;
+  createItem?: Maybe<CreateItemOutput>;
+  createOrg?: Maybe<CreateOrgOutput>;
+  createProcess?: Maybe<CreateProcessOutput>;
+  createSource?: Maybe<CreateSourceOutput>;
+  createTagDefinition?: Maybe<CreateTagDefinitionOutput>;
+  createVariant?: Maybe<CreateVariantOutput>;
+  deleteChange?: Maybe<DeleteChangeOutput>;
+  deleteSource?: Maybe<DeleteSourceOutput>;
+  markSourceProcessed?: Maybe<MarkSourceProcessedOutput>;
+  updateChange?: Maybe<UpdateChangeOutput>;
+  updateComponent?: Maybe<UpdateComponentOutput>;
+  updateItem?: Maybe<UpdateItemOutput>;
+  updateOrg?: Maybe<UpdateOrgOutput>;
+  updateProcess?: Maybe<UpdateProcessOutput>;
+  updateSource?: Maybe<UpdateSourceOutput>;
+  updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
+  updateVariant?: Maybe<UpdateVariantOutput>;
+};
+
+
+export type MutationCreateCategoryArgs = {
+  input: CreateCategoryInput;
+};
+
+
+export type MutationCreateChangeArgs = {
+  input: CreateChangeInput;
+};
+
+
+export type MutationCreateComponentArgs = {
+  input: CreateComponentInput;
+};
+
+
+export type MutationCreateItemArgs = {
+  input: CreateItemInput;
+};
+
+
+export type MutationCreateOrgArgs = {
+  input: CreateOrgInput;
+};
+
+
+export type MutationCreateProcessArgs = {
+  input: CreateProcessInput;
+};
+
+
+export type MutationCreateSourceArgs = {
+  input: CreateSourceInput;
+};
+
+
+export type MutationCreateTagDefinitionArgs = {
+  input: CreateTagDefinitionInput;
+};
+
+
+export type MutationCreateVariantArgs = {
+  input: CreateVariantInput;
+};
+
+
+export type MutationDeleteChangeArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationMarkSourceProcessedArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateChangeArgs = {
+  input: UpdateChangeInput;
+};
+
+
+export type MutationUpdateComponentArgs = {
+  input: UpdateComponentInput;
+};
+
+
+export type MutationUpdateItemArgs = {
+  input: UpdateItemInput;
+};
+
+
+export type MutationUpdateOrgArgs = {
+  input: UpdateOrgInput;
+};
+
+
+export type MutationUpdateProcessArgs = {
+  input: UpdateProcessInput;
+};
+
+
+export type MutationUpdateSourceArgs = {
+  input: UpdateSourceInput;
+};
+
+
+export type MutationUpdateTagDefinitionArgs = {
+  input: UpdateTagDefinitionInput;
+};
+
+
+export type MutationUpdateVariantArgs = {
+  input: UpdateVariantInput;
+};
+
+export type Named = {
+  /** The description of the model */
+  desc?: Maybe<Scalars['String']['output']>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  /** The name of the model */
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type Org = Named & {
+  __typename?: 'Org';
+  avatar_url?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  users: UserPage;
+  website_url?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type OrgUsersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type OrgEdge = {
+  __typename?: 'OrgEdge';
+  cursor: Scalars['String']['output'];
+  node: Org;
+};
+
+export type OrgsPage = {
+  __typename?: 'OrgsPage';
+  edges?: Maybe<Array<OrgEdge>>;
+  nodes?: Maybe<Array<Org>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars['Boolean']['output'];
+  startCursor?: Maybe<Scalars['String']['output']>;
+};
+
+export type Place = Named & {
+  __typename?: 'Place';
+  address?: Maybe<PlaceAddress>;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  location?: Maybe<PlaceLocation>;
+  name?: Maybe<Scalars['String']['output']>;
+  org?: Maybe<Org>;
+  tags: Array<Tag>;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type PlaceAddress = {
+  __typename?: 'PlaceAddress';
+  city?: Maybe<Scalars['String']['output']>;
+  country?: Maybe<Scalars['String']['output']>;
+  housenumber?: Maybe<Scalars['String']['output']>;
+  postal_code?: Maybe<Scalars['String']['output']>;
+  region?: Maybe<Scalars['String']['output']>;
+  street?: Maybe<Scalars['String']['output']>;
+};
+
+export type PlaceEdge = {
+  __typename?: 'PlaceEdge';
+  cursor: Scalars['String']['output'];
+  node: Place;
+};
+
+export type PlaceLocation = {
+  __typename?: 'PlaceLocation';
+  latitude: Scalars['Float']['output'];
+  longitude: Scalars['Float']['output'];
+};
+
+export type PlacesPage = {
+  __typename?: 'PlacesPage';
+  edges?: Maybe<Array<PlaceEdge>>;
+  nodes?: Maybe<Array<Place>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Process = Named & {
+  __typename?: 'Process';
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  history: Array<ProcessHistory>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  intent: Scalars['String']['output'];
+  material?: Maybe<Material>;
+  name?: Maybe<Scalars['String']['output']>;
+  org?: Maybe<Org>;
+  place?: Maybe<Place>;
+  region?: Maybe<Region>;
+  updated_at: Scalars['DateTime']['output'];
+  variant?: Maybe<Variant>;
+};
+
+export type ProcessEdge = {
+  __typename?: 'ProcessEdge';
+  cursor: Scalars['String']['output'];
+  node: Process;
+};
+
+export type ProcessHistory = {
+  __typename?: 'ProcessHistory';
+  changes?: Maybe<Scalars['String']['output']>;
+  datetime: Scalars['DateTime']['output'];
+  original?: Maybe<Scalars['String']['output']>;
+  process: Process;
+  user: User;
+};
+
+export type ProcessPage = {
+  __typename?: 'ProcessPage';
+  edges?: Maybe<Array<ProcessEdge>>;
+  nodes?: Maybe<Array<Process>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  getCategories: CategoriesPage;
+  getCategory?: Maybe<Category>;
+  getChange?: Maybe<Change>;
+  getChanges: ChangesPage;
+  getComponent?: Maybe<Component>;
+  getComponentSchema?: Maybe<ModelEditSchema>;
+  getComponents: ComponentsPage;
+  getItem?: Maybe<Item>;
+  getItems: ItemsPage;
+  getMaterial?: Maybe<Material>;
+  getMaterials: MaterialsPage;
+  getOrg?: Maybe<Org>;
+  getPlace?: Maybe<Place>;
+  getPlaces: PlacesPage;
+  getProcess?: Maybe<Process>;
+  getProcesses: ProcessPage;
+  getRegion?: Maybe<Region>;
+  getRegions: RegionsPage;
+  getSource?: Maybe<Source>;
+  getSources: SourcesPage;
+  getTag?: Maybe<Tag>;
+  getTags: TagPage;
+  getUser?: Maybe<User>;
+  getVariant?: Maybe<Variant>;
+  getVariants: VariantsPage;
+  rootCategory: Category;
+  rootMaterial: Material;
+  search: SearchResultPage;
+  searchRegionsByPoint: RegionsPage;
+};
+
+
+export type QueryGetCategoriesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetCategoryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetChangeArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetChangesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<ChangeStatus>;
+  user_id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryGetComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetComponentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetItemArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetItemsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetMaterialArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetMaterialsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetOrgArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetPlaceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetPlacesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetProcessArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetProcessesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetRegionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetRegionsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<SourceType>;
+};
+
+
+export type QueryGetTagArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetVariantArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetVariantsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySearchArgs = {
+  lat_long?: InputMaybe<Array<Scalars['Float']['input']>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
+  types?: InputMaybe<Array<SearchType>>;
+};
+
+
+export type QuerySearchRegionsByPointArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  lat_long: Array<Scalars['Float']['input']>;
+};
+
+export type RecyclingStream = {
+  __typename?: 'RecyclingStream';
+  container?: Maybe<Container>;
+  desc?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  score?: Maybe<StreamScore>;
+  scores?: Maybe<Array<StreamScore>>;
+};
+
+export type Region = {
+  __typename?: 'Region';
+  bbox?: Maybe<Array<Scalars['Float']['output']>>;
+  created_at: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  min_zoom?: Maybe<Scalars['Float']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  placetype: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type RegionEdge = {
+  __typename?: 'RegionEdge';
+  cursor: Scalars['String']['output'];
+  node: Region;
+};
+
+export type RegionsPage = {
+  __typename?: 'RegionsPage';
+  edges?: Maybe<Array<RegionEdge>>;
+  nodes?: Maybe<Array<Region>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SearchResultItem = Category | Component | Item | Org | Place | Region | Variant;
+
+export type SearchResultItemEdge = {
+  __typename?: 'SearchResultItemEdge';
+  cursor: Scalars['String']['output'];
+  node: SearchResultItem;
+};
+
+export type SearchResultPage = {
+  __typename?: 'SearchResultPage';
+  edges?: Maybe<Array<SearchResultItemEdge>>;
+  nodes?: Maybe<Array<SearchResultItem>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** The item type to search */
+export enum SearchType {
+  Category = 'CATEGORY',
+  Component = 'COMPONENT',
+  Item = 'ITEM',
+  Org = 'ORG',
+  Place = 'PLACE',
+  Region = 'REGION',
+  Variant = 'VARIANT'
+}
+
+export type Source = {
+  __typename?: 'Source';
+  changes: ChangesPage;
+  content?: Maybe<Scalars['JSONObject']['output']>;
+  content_url?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  location?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<Scalars['JSONObject']['output']>;
+  processed_at?: Maybe<Scalars['DateTime']['output']>;
+  type: SourceType;
+  updated_at: Scalars['DateTime']['output'];
+  user: User;
+};
+
+export type SourceEdge = {
+  __typename?: 'SourceEdge';
+  cursor: Scalars['String']['output'];
+  node: Source;
+};
+
+/** Type of source data */
+export enum SourceType {
+  Api = 'API',
+  File = 'FILE',
+  Image = 'IMAGE',
+  Other = 'OTHER',
+  Pdf = 'PDF',
+  Text = 'TEXT',
+  Url = 'URL',
+  Video = 'VIDEO'
+}
+
+export type SourcesPage = {
+  __typename?: 'SourcesPage';
+  edges?: Maybe<Array<SourceEdge>>;
+  nodes?: Maybe<Array<Source>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type StreamContext = {
+  __typename?: 'StreamContext';
+  desc?: Maybe<Scalars['String']['output']>;
+  key: Scalars['String']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+export type StreamScore = {
+  __typename?: 'StreamScore';
+  data_quality?: Maybe<StreamScoreRating>;
+  data_quality_f?: Maybe<Scalars['String']['output']>;
+  max_score?: Maybe<Scalars['Float']['output']>;
+  min_score?: Maybe<Scalars['Float']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  rating?: Maybe<StreamScoreRating>;
+  rating_f?: Maybe<Scalars['String']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
+};
+
+/** A rating enum used to describe scores */
+export enum StreamScoreRating {
+  Excellent = 'EXCELLENT',
+  Fair = 'FAIR',
+  Good = 'GOOD',
+  Poor = 'POOR',
+  Unknown = 'UNKNOWN',
+  VeryGood = 'VERY_GOOD'
+}
+
+export type Tag = Named & {
+  __typename?: 'Tag';
+  bg_color?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  image?: Maybe<Scalars['String']['output']>;
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  meta_template?: Maybe<Scalars['JSONObject']['output']>;
+  name: Scalars['String']['output'];
+  type: TagType;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type TagDefinition = Named & {
+  __typename?: 'TagDefinition';
+  bg_color?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  image?: Maybe<Scalars['String']['output']>;
+  meta_template?: Maybe<Scalars['JSONObject']['output']>;
+  name: Scalars['String']['output'];
+  type: TagType;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type TagDefinitionEdge = {
+  __typename?: 'TagDefinitionEdge';
+  cursor: Scalars['String']['output'];
+  node: TagDefinition;
+};
+
+export type TagEdge = {
+  __typename?: 'TagEdge';
+  cursor: Scalars['String']['output'];
+  node: Tag;
+};
+
+export type TagPage = {
+  __typename?: 'TagPage';
+  edges?: Maybe<Array<TagEdge>>;
+  nodes?: Maybe<Array<Tag>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** The model type of the tag */
+export enum TagType {
+  Component = 'COMPONENT',
+  Item = 'ITEM',
+  Org = 'ORG',
+  Place = 'PLACE',
+  Process = 'PROCESS',
+  Variant = 'VARIANT'
+}
+
+export type TranslatedInput = {
+  auto?: Scalars['Boolean']['input'];
+  lang: Scalars['String']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateChangeInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
+  sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  status?: InputMaybe<ChangeStatus>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateChangeOutput = {
+  __typename?: 'UpdateChangeOutput';
+  change?: Maybe<Change>;
+};
+
+export type UpdateComponentInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  add_tags?: InputMaybe<Array<ComponentTagsInput>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  materials?: InputMaybe<Array<ComponentMaterialInput>>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  primary_material?: InputMaybe<ComponentMaterialInput>;
+  region?: InputMaybe<ComponentRegionInput>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  remove_tags?: InputMaybe<Array<ComponentTagsInput>>;
+};
+
+export type UpdateComponentOutput = {
+  __typename?: 'UpdateComponentOutput';
+  change?: Maybe<Change>;
+  component?: Maybe<Component>;
+};
+
+export type UpdateItemInput = {
+  add_categories?: InputMaybe<Array<ItemCategoriesInput>>;
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  add_tags?: InputMaybe<Array<ItemTagsInput>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  remove_categories?: InputMaybe<Array<ItemCategoriesInput>>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  remove_tags?: InputMaybe<Array<ItemTagsInput>>;
+};
+
+export type UpdateItemOutput = {
+  __typename?: 'UpdateItemOutput';
+  change?: Maybe<Change>;
+  item?: Maybe<Item>;
+};
+
+export type UpdateOrgInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  avatar_url?: InputMaybe<Scalars['String']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  website_url?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateOrgOutput = {
+  __typename?: 'UpdateOrgOutput';
+  change?: Maybe<Change>;
+  org?: Maybe<Org>;
+};
+
+export type UpdateProcessInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  intent?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  material?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  org?: InputMaybe<Scalars['ID']['input']>;
+  place?: InputMaybe<Scalars['ID']['input']>;
+  region?: InputMaybe<Scalars['ID']['input']>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  variant?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type UpdateProcessOutput = {
+  __typename?: 'UpdateProcessOutput';
+  change?: Maybe<Change>;
+  process?: Maybe<Process>;
+};
+
+export type UpdateSourceInput = {
+  content?: InputMaybe<Scalars['JSONObject']['input']>;
+  content_url?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  location?: InputMaybe<Scalars['String']['input']>;
+  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
+  type?: InputMaybe<SourceType>;
+};
+
+export type UpdateSourceOutput = {
+  __typename?: 'UpdateSourceOutput';
+  source?: Maybe<Source>;
+};
+
+export type UpdateTagDefinitionInput = {
+  bg_color?: InputMaybe<Scalars['String']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['String']['input']>;
+  meta_template?: InputMaybe<Scalars['JSONObject']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<TagType>;
+};
+
+export type UpdateTagDefinitionOutput = {
+  __typename?: 'UpdateTagDefinitionOutput';
+  tag?: Maybe<TagDefinition>;
+};
+
+export type UpdateVariantInput = {
+  add_components?: InputMaybe<Array<VariantComponentsInput>>;
+  add_items?: InputMaybe<Array<VariantItemsInput>>;
+  add_orgs?: InputMaybe<Array<VariantOrgsInput>>;
+  add_regions?: InputMaybe<Array<VariantRegionsInput>>;
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  add_tags?: InputMaybe<Array<VariantTagsInput>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  region_id?: InputMaybe<Scalars['ID']['input']>;
+  remove_components?: InputMaybe<Array<VariantComponentsInput>>;
+  remove_items?: InputMaybe<Array<VariantItemsInput>>;
+  remove_orgs?: InputMaybe<Array<VariantOrgsInput>>;
+  remove_regions?: InputMaybe<Array<VariantRegionsInput>>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  remove_tags?: InputMaybe<Array<VariantTagsInput>>;
+};
+
+export type UpdateVariantOutput = {
+  __typename?: 'UpdateVariantOutput';
+  change?: Maybe<Change>;
+  variant?: Maybe<Variant>;
+};
+
+export type User = {
+  __typename?: 'User';
+  avatar_url?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  email_verified: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  lang?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  orgs: OrgsPage;
+  profile?: Maybe<UserProfile>;
+  updated_at: Scalars['DateTime']['output'];
+  username: Scalars['String']['output'];
+};
+
+
+export type UserOrgsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserEdge = {
+  __typename?: 'UserEdge';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type UserPage = {
+  __typename?: 'UserPage';
+  edges?: Maybe<Array<UserEdge>>;
+  nodes?: Maybe<Array<User>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserProfile = {
+  __typename?: 'UserProfile';
+  bio?: Maybe<Scalars['String']['output']>;
+};
+
+export type Variant = Named & {
+  __typename?: 'Variant';
+  components: ComponentsPage;
+  created_at: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  image_url?: Maybe<Scalars['String']['output']>;
+  items: ItemsPage;
+  name?: Maybe<Scalars['String']['output']>;
+  orgs: OrgsPage;
+  tags: TagPage;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type VariantComponentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type VariantItemsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type VariantOrgsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type VariantTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type VariantComponentsInput = {
+  id: Scalars['ID']['input'];
+  quantity?: InputMaybe<Scalars['Float']['input']>;
+  unit?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type VariantEdge = {
+  __typename?: 'VariantEdge';
+  cursor: Scalars['String']['output'];
+  node: Variant;
+};
+
+export type VariantItemsInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type VariantOrgsInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type VariantRegionsInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type VariantTagsInput = {
+  id: Scalars['ID']['input'];
+  meta?: InputMaybe<Scalars['JSONObject']['input']>;
+};
+
+export type VariantsPage = {
+  __typename?: 'VariantsPage';
+  edges?: Maybe<Array<VariantEdge>>;
+  nodes?: Maybe<Array<Variant>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type RegionSelectQueryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RegionSelectQueryQuery = { __typename?: 'Query', getRegion?: { __typename?: 'Region', id: string, name?: string | null, placetype: string } | null };
+
+export type RegionSelectSearchQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+
+export type RegionSelectSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category' } | { __typename: 'Component' } | { __typename: 'Item' } | { __typename: 'Org' } | { __typename: 'Place' } | { __typename: 'Region', id: string, name?: string | null, placetype: string } | { __typename: 'Variant' }> | null } };
+
+export type FormQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FormQueryQuery = { __typename?: 'Query', getComponentSchema?: { __typename?: 'ModelEditSchema', create?: { __typename?: 'ModelSchema', schema?: any | null, uischema?: any | null } | null, update?: { __typename?: 'ModelSchema', schema?: any | null, uischema?: any | null } | null } | null };
+
+export type ChangeQueryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ChangeQueryQuery = { __typename?: 'Query', getChange?: { __typename?: 'Change', id: string, status: ChangeStatus, title?: string | null, description?: string | null, created_at: any, updated_at: any, user: { __typename?: 'User', id: string, username: string }, edits: Array<{ __typename?: 'Edit', id?: string | null, entity_name: string, original?: { __typename?: 'Category' } | { __typename?: 'Component', name?: string | null } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename?: 'Process' } | { __typename?: 'Region' } | { __typename?: 'Variant', name?: string | null } | null, changes?: { __typename?: 'Category' } | { __typename?: 'Component', name?: string | null } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename?: 'Process' } | { __typename?: 'Region' } | { __typename?: 'Variant', name?: string | null } | null }> } | null };
+
+export type CategoriesIdGetCategoriesQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CategoriesIdGetCategoriesQuery = { __typename?: 'Query', getCategory?: { __typename?: 'Category', id: string, name: string, desc_short?: string | null, desc?: string | null, image_url?: string | null, children: { __typename?: 'CategoriesPage', nodes?: Array<{ __typename?: 'Category', id: string, name: string, desc_short?: string | null, desc?: string | null, image_url?: string | null }> | null } } | null };
+
+export type CategoriesIndexGetCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CategoriesIndexGetCategoriesQuery = { __typename?: 'Query', rootCategory: { __typename?: 'Category', children: { __typename?: 'CategoriesPage', nodes?: Array<{ __typename?: 'Category', id: string, name: string, desc_short?: string | null, desc?: string | null, image_url?: string | null }> | null } } };
+
+export type GetCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCategoriesQuery = { __typename?: 'Query', rootCategory: { __typename?: 'Category', children: { __typename?: 'CategoriesPage', nodes?: Array<{ __typename?: 'Category', id: string, name: string, desc_short?: string | null, desc?: string | null, image_url?: string | null }> | null } } };
+
+export type GetItemQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetItemQuery = { __typename?: 'Query', getItem?: { __typename?: 'Item', id: string, name?: string | null, desc?: string | null, image_url?: string | null } | null };
+
+export type GetOrgQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetOrgQuery = { __typename?: 'Query', getOrg?: { __typename?: 'Org', id: string, name: string, desc?: string | null } | null };
+
+export type GetVariantQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetVariantQuery = { __typename?: 'Query', getVariant?: { __typename?: 'Variant', id: string, name?: string | null, desc?: string | null, image_url?: string | null, orgs: { __typename?: 'OrgsPage', nodes?: Array<{ __typename?: 'Org', id: string, name: string, desc?: string | null, avatar_url?: string | null }> | null }, components: { __typename?: 'ComponentsPage', nodes?: Array<{ __typename?: 'Component', id: string, name?: string | null, desc?: string | null, image_url?: string | null }> | null } } | null };
+
+export type GetVariantRecyclingQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  region: Scalars['ID']['input'];
+}>;
+
+
+export type GetVariantRecyclingQuery = { __typename?: 'Query', getVariant?: { __typename?: 'Variant', id: string, name?: string | null, components: { __typename?: 'ComponentsPage', nodes?: Array<{ __typename?: 'Component', id: string, name?: string | null, desc?: string | null, image_url?: string | null, recycle_score?: { __typename?: 'StreamScore', score?: number | null, rating?: StreamScoreRating | null, rating_f?: string | null } | null, recycle?: Array<{ __typename?: 'ComponentRecycle', context?: { __typename?: 'StreamContext', key: string, desc?: string | null } | null, stream?: { __typename?: 'RecyclingStream', name?: string | null, desc?: string | null, container?: { __typename?: 'Container', type: string, access?: string | null, color?: string | null, image?: string | null, shape?: { __typename?: 'ContainerShape', width?: number | null, height?: number | null, depth?: number | null } | null, image_entry_point?: { __typename?: 'ContainerImageEntryPoint', x: number, y: number, side: string } | null } | null } | null }> | null }> | null } } | null };
+
+export type GetPlaceQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetPlaceQuery = { __typename?: 'Query', getPlace?: { __typename?: 'Place', id: string, name?: string | null, desc?: string | null } | null };
+
+export type PlacesIndexRegionQueryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type PlacesIndexRegionQueryQuery = { __typename?: 'Query', getRegion?: { __typename?: 'Region', id: string, name?: string | null, placetype: string, bbox?: Array<number> | null, min_zoom?: number | null } | null };
+
+export type PlaceSearchQueryVariables = Exact<{
+  search: Scalars['String']['input'];
+  latLong?: InputMaybe<Array<Scalars['Float']['input']> | Scalars['Float']['input']>;
+}>;
+
+
+export type PlaceSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename?: 'Category' } | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Org' } | { __typename?: 'Place', id: string, name?: string | null, address?: { __typename?: 'PlaceAddress', city?: string | null } | null, location?: { __typename?: 'PlaceLocation', latitude: number, longitude: number } | null } | { __typename?: 'Region' } | { __typename?: 'Variant' }> | null } };
+
+export type RegionQueryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RegionQueryQuery = { __typename?: 'Query', getRegion?: { __typename?: 'Region', id: string, name?: string | null, placetype: string } | null };
+
+export type SearchQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+
+export type SearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string, desc_short?: string | null, desc?: string | null, image_url?: string | null } | { __typename: 'Component' } | { __typename: 'Item', id: string, desc?: string | null, image_url?: string | null, name_null?: string | null } | { __typename: 'Org', id: string, name: string, desc?: string | null } | { __typename: 'Place', id: string, name_null?: string | null, address?: { __typename?: 'PlaceAddress', street?: string | null, city?: string | null, region?: string | null, country?: string | null } | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, desc?: string | null, name_null?: string | null }> | null } };
+
+
+export const RegionSelectQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionSelectQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getRegion"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}}]}}]} as unknown as DocumentNode<RegionSelectQueryQuery, RegionSelectQueryQueryVariables>;
+export const RegionSelectSearchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionSelectSearch"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"search"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"REGION"}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Region"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<RegionSelectSearchQuery, RegionSelectSearchQueryVariables>;
+export const FormQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FormQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getComponentSchema"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"create"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"schema"}},{"kind":"Field","name":{"kind":"Name","value":"uischema"}}]}},{"kind":"Field","name":{"kind":"Name","value":"update"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"schema"}},{"kind":"Field","name":{"kind":"Name","value":"uischema"}}]}}]}}]}}]} as unknown as DocumentNode<FormQueryQuery, FormQueryQueryVariables>;
+export const ChangeQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ChangeQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}},{"kind":"Field","name":{"kind":"Name","value":"updated_at"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edits"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"entity_name"}},{"kind":"Field","name":{"kind":"Name","value":"original"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Variant"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Component"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"changes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Variant"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Component"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ChangeQueryQuery, ChangeQueryQueryVariables>;
+export const CategoriesIdGetCategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CategoriesIDGetCategories"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc_short"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}},{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc_short"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CategoriesIdGetCategoriesQuery, CategoriesIdGetCategoriesQueryVariables>;
+export const CategoriesIndexGetCategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CategoriesIndexGetCategories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rootCategory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc_short"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CategoriesIndexGetCategoriesQuery, CategoriesIndexGetCategoriesQueryVariables>;
+export const GetCategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCategories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rootCategory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc_short"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetCategoriesQuery, GetCategoriesQueryVariables>;
+export const GetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}}]}}]} as unknown as DocumentNode<GetItemQuery, GetItemQueryVariables>;
+export const GetOrgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetOrg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getOrg"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}}]}}]}}]} as unknown as DocumentNode<GetOrgQuery, GetOrgQueryVariables>;
+export const GetVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}},{"kind":"Field","name":{"kind":"Name","value":"orgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"avatar_url"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"components"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetVariantQuery, GetVariantQueryVariables>;
+export const GetVariantRecyclingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetVariantRecycling"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"region"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"components"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}},{"kind":"Field","name":{"kind":"Name","value":"recycle_score"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"region_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"region"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"rating_f"}}]}},{"kind":"Field","name":{"kind":"Name","value":"recycle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"region_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"region"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"context"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}}]}},{"kind":"Field","name":{"kind":"Name","value":"stream"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"container"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"access"}},{"kind":"Field","name":{"kind":"Name","value":"shape"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"depth"}}]}},{"kind":"Field","name":{"kind":"Name","value":"color"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"image_entry_point"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"x"}},{"kind":"Field","name":{"kind":"Name","value":"y"}},{"kind":"Field","name":{"kind":"Name","value":"side"}}]}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetVariantRecyclingQuery, GetVariantRecyclingQueryVariables>;
+export const GetPlaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPlace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}}]}}]}}]} as unknown as DocumentNode<GetPlaceQuery, GetPlaceQueryVariables>;
+export const PlacesIndexRegionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PlacesIndexRegionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getRegion"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}},{"kind":"Field","name":{"kind":"Name","value":"bbox"}},{"kind":"Field","name":{"kind":"Name","value":"min_zoom"}}]}}]}}]} as unknown as DocumentNode<PlacesIndexRegionQueryQuery, PlacesIndexRegionQueryQueryVariables>;
+export const PlaceSearchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PlaceSearch"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"latLong"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"search"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"PLACE"}]}},{"kind":"Argument","name":{"kind":"Name","value":"lat_long"},"value":{"kind":"Variable","name":{"kind":"Name","value":"latLong"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Place"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"city"}}]}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"latitude"}},{"kind":"Field","name":{"kind":"Name","value":"longitude"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<PlaceSearchQuery, PlaceSearchQueryVariables>;
+export const RegionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getRegion"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}}]}}]} as unknown as DocumentNode<RegionQueryQuery, RegionQueryQueryVariables>;
+export const SearchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Search"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"search"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Category"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc_short"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Item"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name_null"},"name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"image_url"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Variant"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name_null"},"name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Place"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name_null"},"name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"region"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Org"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<SearchQuery, SearchQueryVariables>;

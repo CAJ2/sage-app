@@ -82,6 +82,7 @@ type Component implements Named {
   name: String
   primary_material: Material!
   recycle(region_id: ID): [ComponentRecycle!]
+  recycle_score(region_id: ID): StreamScore
   region: Region
   tags: [Tag!]!
   updated_at: DateTime!
@@ -599,6 +600,8 @@ type RecyclingStream {
   container: Container
   desc: String
   name: String
+  score: StreamScore
+  scores: [StreamScore!]
 }
 
 type Region {
@@ -692,6 +695,27 @@ type StreamContext {
   name: String
   type: String
   value: String
+}
+
+type StreamScore {
+  data_quality: StreamScoreRating
+  data_quality_f: String
+  max_score: Float
+  min_score: Float
+  name: String
+  rating: StreamScoreRating
+  rating_f: String
+  score: Float
+}
+
+"""A rating enum used to describe scores"""
+enum StreamScoreRating {
+  EXCELLENT
+  FAIR
+  GOOD
+  POOR
+  UNKNOWN
+  VERY_GOOD
 }
 
 type Tag implements Named {

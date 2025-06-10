@@ -1,0 +1,10 @@
+{
+  "score_rating": {
+    "POOR": "Bad",
+    "FAIR": "Fair",
+    "GOOD": "Good",
+    "VERY_GOOD": "Very Good",
+    "EXCELLENT": "Excellent",
+    "UNKNOWN": "Unknown"
+  }
+}

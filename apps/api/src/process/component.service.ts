@@ -6,6 +6,7 @@ import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq, tr } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { ClsService } from 'nestjs-cls'
+import { I18nService } from 'nestjs-i18n'
 import { Component, ComponentsTags } from './component.entity'
 import {
   ComponentRecycle,
@@ -14,7 +15,7 @@ import {
 } from './component.model'
 import { Material } from './material.entity'
 import { Process } from './process.entity'
-import { RecyclingStream } from './stream.model'
+import { RecyclingStream, StreamScore, StreamScoreRating } from './stream.model'
 import { TagService } from './tag.service'
 
 @Injectable()
@@ -24,6 +25,7 @@ export class ComponentService {
     private readonly changeService: ChangeService,
     private readonly tagService: TagService,
     private readonly cls: ClsService,
+    private readonly i18n: I18nService,
   ) {}
 
   async find(opts: CursorOptions<Component>) {
@@ -93,10 +95,46 @@ export class ComponentService {
       r.stream = new RecyclingStream()
       r.stream.name = tr(processMatch.name, lang)
       r.stream.desc = tr(processMatch.desc, lang)
+      r.stream.score = this.calculateScore(processMatch)
       r.stream.container = processMatch.instructions.container
       recycle.push(r)
     }
     return recycle
+  }
+
+  async recycleScore(componentId: string, regionId?: string) {
+    const recycle = await this.recycle(componentId, regionId)
+    if (!recycle) {
+      return null
+    }
+    const score = new StreamScore()
+    let totalScore = 0
+    let validScores = 0
+    for (const r of recycle) {
+      if (r.stream && r.stream.score) {
+        if (r.stream.score.score) {
+          totalScore += r.stream.score.score
+          validScores++
+        }
+      }
+    }
+    score.score = validScores > 0 ? totalScore / validScores : undefined
+    score.rating =
+      validScores > 0 ? StreamScoreRating.GOOD : StreamScoreRating.UNKNOWN
+    score.rating_f = this.i18n.t(`stream.score_rating.${score.rating}`)
+    return score
+  }
+
+  calculateScore(process: Process) {
+    const score = new StreamScore()
+    if (process.efficiency && process.efficiency.efficiency) {
+      score.score = process.efficiency.efficiency * 100
+      score.rating = StreamScoreRating.GOOD
+    } else {
+      score.rating = StreamScoreRating.UNKNOWN
+    }
+    score.rating_f = this.i18n.t(`stream.score_rating.${score.rating}`)
+    return score
   }
 
   async create(input: CreateComponentInput, userID: string) {

@@ -1,10 +1,52 @@
-import { Field, ObjectType } from '@nestjs/graphql'
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
 import { translate } from '@src/db/i18n'
 import { Transform } from 'class-transformer'
 import {
   ProcessInstructionsAccess,
   ProcessInstructionsContainerType,
 } from './process.entity'
+
+export enum StreamScoreRating {
+  POOR = 'POOR',
+  FAIR = 'FAIR',
+  GOOD = 'GOOD',
+  VERY_GOOD = 'VERY_GOOD',
+  EXCELLENT = 'EXCELLENT',
+  UNKNOWN = 'UNKNOWN',
+}
+
+registerEnumType(StreamScoreRating, {
+  name: 'StreamScoreRating',
+  description: 'A rating enum used to describe scores',
+})
+
+@ObjectType()
+export class StreamScore {
+  @Field(() => Number, { nullable: true })
+  score?: number
+
+  @Field(() => Number, { nullable: true })
+  min_score?: number
+
+  @Field(() => Number, { nullable: true })
+  max_score?: number
+
+  @Field(() => StreamScoreRating, { nullable: true })
+  rating?: StreamScoreRating
+
+  @Field(() => String, { nullable: true })
+  rating_f?: string
+
+  @Field(() => StreamScoreRating, { nullable: true })
+  data_quality?: StreamScoreRating
+
+  @Field(() => String, { nullable: true })
+  data_quality_f?: string
+
+  @Field(() => String, { nullable: true })
+  @Transform(translate)
+  name?: string
+}
 
 @ObjectType()
 export class ContainerShape {
@@ -60,6 +102,12 @@ export class RecyclingStream {
   @Field(() => String, { nullable: true })
   @Transform(translate)
   desc?: string
+
+  @Field(() => StreamScore, { nullable: true })
+  score?: StreamScore
+
+  @Field(() => [StreamScore], { nullable: true })
+  scores?: StreamScore[]
 
   @Field(() => Container, { nullable: true })
   container?: Container
