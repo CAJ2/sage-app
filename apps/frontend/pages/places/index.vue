@@ -37,7 +37,7 @@ const searchInput = ref('')
 
 const regionStore = useRegionStore()
 const regionQuery = gql`
-  query RegionQuery($id: ID!) {
+  query PlacesIndexRegionQuery($id: ID!) {
     getRegion(id: $id) {
       id
       name

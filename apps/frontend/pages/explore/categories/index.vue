@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 const categoriesQuery = gql`
-  query GetCategories {
+  query CategoriesIndexGetCategories {
     rootCategory {
       children {
         nodes {

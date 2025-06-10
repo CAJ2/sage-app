@@ -115,7 +115,7 @@ const emit = defineEmits<{
 }>()
 
 const regionQuery = gql`
-  query RegionQuery($id: ID!) {
+  query RegionSelectQuery($id: ID!) {
     getRegion(id: $id) {
       id
       name
@@ -131,7 +131,7 @@ type RegionResult = {
   }
 }
 const searchQuery = gql`
-  query Search($query: String!) {
+  query RegionSelectSearch($query: String!) {
     search(query: $query, types: [REGION]) {
       nodes {
         __typename

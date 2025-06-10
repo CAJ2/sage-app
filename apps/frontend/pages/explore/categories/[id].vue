@@ -14,7 +14,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const categoriesQuery = gql`
-  query GetCategories($id: ID!) {
+  query CategoriesIDGetCategories($id: ID!) {
     getCategory(id: $id) {
       id
       name
