@@ -1,5 +1,7 @@
 <template>
-  <div class="flex justify-between items-center bg-base-200 p-2">
+  <div
+    class="sticky top-0 z-1 flex justify-between items-center bg-base-200 p-2"
+  >
     <button v-if="back" class="btn btn-ghost ml-1" @click.prevent="goBack">
       <font-awesome-icon icon="fa-solid fa-angle-left" class="w-5 min-h-5" />
     </button>
