@@ -3,15 +3,23 @@ import {
   ProgressIndicator,
   ProgressRoot,
   PopoverAnchor,
-  PopoverArrow,
-  PopoverContent,
-  PopoverPortal,
   PopoverRoot,
 } from 'reka-ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-const { score } = defineProps<{
-  score?: number
+const { size, score, scoreSlide, rating, ratingFmt } = defineProps<{
+  size: 'small' | 'medium' | 'large'
+  score?: number | null
+  scoreSlide?: boolean | null
+  rating?:
+    | 'POOR'
+    | 'FAIR'
+    | 'GOOD'
+    | 'VERY_GOOD'
+    | 'EXCELLENT'
+    | 'UNKNOWN'
+    | null
+  ratingFmt?: string | null
 }>()
 
 const progressValue = ref(0)
@@ -28,37 +36,59 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearTimeout(timer.value)
 })
+
+const bgColor = computed(() => {
+  switch (rating) {
+    case 'POOR':
+      return 'bg-error'
+    case 'FAIR':
+      return 'bg-warning'
+    case 'GOOD':
+      return 'bg-primary/60'
+    case 'VERY_GOOD':
+      return 'bg-primary/80'
+    case 'EXCELLENT':
+      return 'bg-primary'
+    default:
+      return 'bg-primary/80'
+  }
+})
 </script>
 
 <template>
   <PopoverRoot :open="openPopover">
+    <span
+      class="relative block w-full font-bold text-center pb-2"
+      :class="{
+        'text-sm': size === 'small',
+        'text-md': size === 'medium',
+        'text-lg': size === 'large',
+      }"
+      :style="{
+        transform: scoreSlide ? `translateX(-${100 - progressValue}%)` : '',
+      }"
+      >{{ progressValue + '%' + (ratingFmt ? ` - ${ratingFmt}` : '') }}</span
+    >
     <ProgressRoot
       v-model="progressValue"
-      class="rounded-full relative mt-10 h-4 overflow-hidden bg-white dark:bg-stone-950 border border-neutral-600"
+      class="rounded-full relative overflow-hidden bg-base-100 border border-neutral"
+      :class="{
+        'h-2': size === 'small',
+        'h-3': size === 'medium',
+        'h-4': size === 'large',
+      }"
     >
       <PopoverAnchor class="w-full" as-child>
         <ProgressIndicator
           ref="indicator"
-          class="indicator rounded-full block relative w-full h-full bg-primary transition-transform overflow-hidden duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] after:animate-progress after:content-[''] after:absolute after:inset-0 after:bg-[length:30px_30px]"
-          :style="`transform: translateX(-${100 - progressValue}%)`"
+          class="indicator rounded-full block relative w-full h-full transition-transform overflow-hidden duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] after:animate-progress after:content-[''] after:absolute after:inset-0 after:bg-[length:30px_30px]"
+          :class="[bgColor]"
+          :style="{
+            transform: `translateX(-${100 - progressValue}%)`,
+          }"
         />
         <span class="relative h-4"></span>
       </PopoverAnchor>
     </ProgressRoot>
-    <PopoverPortal>
-      <PopoverContent
-        side="top"
-        :align="'end'"
-        :align-offset="0"
-        :side-offset="5"
-        :disable-outside-pointer-events="true"
-        class="rounded-lg p-1 bg-white dark:bg-slate-700 shadow-sm border border-neutral-400 will-change-[transform,opacity] data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade"
-      >
-        <PopoverArrow
-          class="fill-neutral-700 dark:fill-white stroke-gray-200"
-        />
-        {{ progressValue }}%
-      </PopoverContent>
-    </PopoverPortal>
   </PopoverRoot>
 </template>

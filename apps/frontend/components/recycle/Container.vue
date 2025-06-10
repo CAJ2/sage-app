@@ -1,8 +1,8 @@
 <template>
-  <div class="m-3">
+  <div v-if="recycle.stream && recycle.stream.container" class="m-3">
     <Card>
       <CardHeader class="p-4 pb-2 items-center">
-        <CardTitle class="text-lg text-center mb-3">{{
+        <CardTitle class="text-md text-center mb-3">{{
           recycle.stream.name
         }}</CardTitle>
         <div class="relative">
@@ -14,12 +14,12 @@
           <img
             v-if="recycle.stream.container.image"
             ref="compImage"
-            :src="image"
+            :src="image || ''"
             class="absolute w-15 h-15 rounded-xl border-2"
             :style="{
               top: `${compPercs.y}%`,
               left: `${compPercs.x}%`,
-              'border-color': recycle.stream.container.color,
+              'border-color': recycle.stream.container.color || '#000',
             }"
           />
         </div>
@@ -33,22 +33,11 @@
 
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core'
+import type { ComponentRecycle } from '~/gql/types.generated'
 
 const { image, recycle } = defineProps<{
-  image: string
-  recycle: {
-    stream: {
-      name: string
-      desc: string
-      container: {
-        type: string
-        access: string
-        image: string
-        color: string
-        image_entry_point: { x: number; y: number }
-      }
-    }
-  }
+  image?: string | null
+  recycle: ComponentRecycle
 }>()
 
 const containerImage = useTemplateRef<HTMLImageElement>('containerImage')
@@ -58,7 +47,7 @@ const compDims = useElementSize(compImage)
 
 const compPercs = computed(() => {
   if (!containerDims.width || !containerDims.height) return { x: 0, y: 0 }
-  if (!recycle.stream.container.image_entry_point) return { x: 0, y: 0 }
+  if (!recycle?.stream?.container?.image_entry_point) return { x: 0, y: 0 }
   return {
     x:
       recycle.stream.container.image_entry_point.x -
