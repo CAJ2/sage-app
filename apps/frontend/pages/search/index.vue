@@ -158,6 +158,12 @@ const searchQuery = gql`
           desc
           image_url
         }
+        ... on Item {
+          id
+          name_null: name
+          desc
+          image_url
+        }
         ... on Variant {
           id
           name_null: name
@@ -225,7 +231,6 @@ watchDebounced(
       query: searchInput.value,
     })
     status.value = results.status.value
-    console.log('searchQuery', results.data.value)
     data.value = results.data.value
   },
   { debounce: 300 },
@@ -247,10 +252,14 @@ const placeholderIcon = (type: string) => {
   switch (type) {
     case 'Category':
       return 'fa-solid fa-box'
+    case 'Item':
+      return 'fa-solid fa-cube'
     case 'Variant':
       return 'fa-solid fa-tags'
     case 'Org':
       return 'fa-solid fa-building'
+    case 'Place':
+      return 'fa-solid fa-map-marker-alt'
     default:
       return 'fa-solid fa-question'
   }
@@ -259,10 +268,14 @@ const exploreLink = (type: string, id: string) => {
   switch (type) {
     case 'Category':
       return `/explore/categories/${id}`
+    case 'Item':
+      return `/explore/items/${id}`
     case 'Variant':
       return `/explore/variants/${id}`
     case 'Org':
       return `/explore/orgs/${id}`
+    case 'Place':
+      return `/places/${id}`
     default:
       return '#'
   }
