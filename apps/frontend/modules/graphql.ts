@@ -1,6 +1,7 @@
 // From https://github.com/genu/nuxt-codegen/blob/master/src/module.ts
 // and licensed under the MIT License
 import { defineNuxtModule } from '@nuxt/kit'
+import type { Nuxt, WatchEvent } from 'nuxt/schema'
 import { basename } from 'pathe'
 
 export interface ModuleOptions {
@@ -22,7 +23,7 @@ export default defineNuxtModule<ModuleOptions>({
     devOnly: true,
     extensions: ['.graphql', '.gql'],
   },
-  setup(options, nuxt) {
+  setup(options: ModuleOptions, nuxt: Nuxt) {
     if (options.devOnly && !nuxt.options.dev) {
       console.info('NuxtCodegen: Skipping Codegen')
       return
@@ -49,10 +50,10 @@ export default defineNuxtModule<ModuleOptions>({
       )
     })
 
-    nuxt.hook('builder:watch', (_event, path) => {
+    nuxt.hook('builder:watch', (_event: WatchEvent, path: string) => {
       const modifiedConfig = basename(path) === basename(options.configFile)
-      const modifiedWatchedExtension = options.extensions.some((extension) =>
-        path.endsWith(extension),
+      const modifiedWatchedExtension = options.extensions.some(
+        (extension: string) => path.endsWith(extension),
       )
 
       if (!modifiedWatchedExtension && !modifiedConfig) {

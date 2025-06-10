@@ -6,13 +6,13 @@
       :alt="alt"
       :fit="fit"
       placeholder
-      :img-attrs="{ class: 'object-contain ' + whClass }"
+      :img-attrs="{ class: 'object-contain', style: widthHeightStyle }"
     />
     <iconify-icon
       v-if="src && srcType === 'icon'"
       :icon="src.replace('iconify://', '')"
       :alt="alt"
-      :class="whClass"
+      :style="widthHeightStyle"
       :width="'100%'"
       :height="'100%'"
     />
@@ -50,16 +50,19 @@ const srcType = computed(() => {
   }
 })
 
-const whClass = computed(() => {
-  if (!props.width && !props.height) {
-    return ''
-  }
+const widthHeightStyle = computed(() => {
   if (props.width && !props.height) {
-    return `w-${props.width}`
+    return { width: `${props.width * 0.25}rem` }
   }
   if (!props.width && props.height) {
-    return `h-${props.height}`
+    return { height: `${props.height * 0.25}rem` }
   }
-  return props.width && props.height ? `w-${props.width} h-${props.height}` : ''
+  if (props.width && props.height) {
+    return {
+      width: `${props.width * 0.25}rem`,
+      height: `${props.height * 0.25}rem`,
+    }
+  }
+  return {}
 })
 </script>
