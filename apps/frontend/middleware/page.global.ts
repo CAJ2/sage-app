@@ -38,6 +38,9 @@ export default defineNuxtRouteMiddleware((to, from) => {
   } else if (toDepth < fromDepth || (router.options as any).is_back) {
     to.meta.pageTransition = { name: 'page-right' }
     from.meta.pageTransition = { name: 'page-right' }
+  } else {
+    to.meta.pageTransition = { name: 'page-left' }
+    from.meta.pageTransition = { name: 'page-left' }
   }
   // TODO: Come up with a better way
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

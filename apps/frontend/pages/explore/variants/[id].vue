@@ -8,7 +8,7 @@
       back="true"
     ></NavTopbar>
     <div class="flex flex-col p-4">
-      <img
+      <UiImage
         v-if="data?.getVariant?.image_url"
         :src="data?.getVariant?.image_url"
         class="rounded-box shadow-md w-32 h-32 object-cover mb-4"
@@ -41,7 +41,10 @@
       </CollapsibleContent>
     </Collapsible>
 
-    <Collapsible v-model:open="recyclingOpen" class="space-y-2 pb-2 border-b-1">
+    <Collapsible
+      v-model:open="recyclingOpen"
+      class="space-y-2 pb-2 border-b-1 border-neutral-700"
+    >
       <CollapsibleTrigger as-child>
         <div
           class="flex items-center justify-between space-x-4 p-3 mb-0 border-t-1 border-b-0 border-neutral-700"
@@ -85,7 +88,7 @@
             >
               <li class="list-row">
                 <div>
-                  <img
+                  <UiImage
                     class="size-10 rounded-box"
                     :src="component.image_url || undefined"
                   />

@@ -10,7 +10,10 @@ const props = defineProps<{
 <template>
   <div
     :class="
-      cn('rounded-lg border bg-card text-card-foreground shadow', props.class)
+      cn(
+        'rounded-md border border-accent-content bg-card text-card-foreground shadow',
+        props.class,
+      )
     "
   >
     <slot />

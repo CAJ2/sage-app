@@ -131,7 +131,9 @@
               </li>
             </ul>
           </TabsContent>
-          <TabsContent value="scan"> </TabsContent>
+          <TabsContent value="scan">
+            <SearchScanner></SearchScanner>
+          </TabsContent>
         </TabsRoot>
       </div>
     </div>
@@ -140,7 +142,6 @@
 
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
-import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner'
 
 onMounted(() => {
   document.getElementById('search')?.focus()
@@ -208,17 +209,6 @@ type SearchResult = {
     totalCount: number
   }
 }
-
-watchDebounced(
-  activeTab,
-  async (newTab) => {
-    if (newTab === 'scan') {
-      const result = await CapacitorBarcodeScanner.scanBarcode({ hint: 17 })
-      console.log('Scanned result:', result.ScanResult)
-    }
-  },
-  { debounce: 300 },
-)
 
 watchDebounced(
   searchInput,

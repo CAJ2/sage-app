@@ -1,30 +1,35 @@
 <template>
   <div v-if="recycle.stream && recycle.stream.container" class="m-3">
-    <Card>
+    <Card class="bg-base-200 shadow-lg">
       <CardHeader class="p-4 pb-2 items-center">
         <CardTitle class="text-md text-center mb-3">{{
           recycle.stream.name
         }}</CardTitle>
+      </CardHeader>
+      <CardContent class="flex flex-col justify-center px-4 pb-3">
         <div class="relative">
           <img
             v-if="recycle.stream.container.image"
             ref="containerImage"
             :src="recycle.stream.container.image"
           />
-          <img
+          <div
             v-if="recycle.stream.container.image"
-            ref="compImage"
-            :src="image || ''"
-            class="absolute w-15 h-15 rounded-xl border-2"
+            class="absolute border-2 rounded-xl bg-base-100"
             :style="{
               top: `${compPercs.y}%`,
               left: `${compPercs.x}%`,
               'border-color': recycle.stream.container.color || '#000',
             }"
-          />
+          >
+            <UiImage
+              ref="compImage"
+              :src="image || ''"
+              :width="14"
+              :height="14"
+            />
+          </div>
         </div>
-      </CardHeader>
-      <CardContent class="flex flex-col justify-center px-4 pb-3">
         <span class="text-xs line-clamp-3">{{ recycle.stream.desc }}</span>
       </CardContent>
     </Card>

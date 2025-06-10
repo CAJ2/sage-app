@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxt/icon',
     '@nuxt/eslint',
+    '@nuxt/image',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     'reka-ui/nuxt',
@@ -28,6 +29,12 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+  },
+
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => tag === 'iconify-icon',
+    },
   },
 
   ssr: false,
@@ -73,7 +80,7 @@ export default defineNuxtConfig({
 
   shadcn: {
     prefix: '',
-    componentDir: 'components/ui',
+    componentDir: 'components/shadcn',
   },
 
   compatibilityDate: '2025-02-12',
