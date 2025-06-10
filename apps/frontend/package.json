@@ -11,6 +11,7 @@
     "postinstall": "pnpm exec nuxi prepare",
     "lint": "pnpm exec eslint --fix",
     "lint:ci": "pnpm exec eslint . --max-warnings 0",
+    "codegen": "graphql-codegen --config codegen.ts",
     "sync": "pnpm exec cap sync",
     "android:open": "pnpm exec cap open android",
     "android:build": "pnpm exec cap build android",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0",
+    "@graphql-codegen/cli": "5.0.7",
     "@nuxt/devtools": "latest",
     "@nuxt/eslint": "^1.3.0",
     "@nuxt/icon": "^1.11.0",
@@ -35,7 +37,8 @@
     "typescript": "^5.8.3",
     "vue": "^3.5.15",
     "vue-router": "^4.5.1",
-    "vue-tsc": "^2.2.10"
+    "vue-tsc": "^2.2.10",
+    "@graphql-codegen/client-preset": "4.8.2"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

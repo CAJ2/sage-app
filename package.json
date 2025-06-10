@@ -38,6 +38,7 @@
       "@nestjs/core",
       "@parcel/watcher",
       "@swc/core",
+      "core-js",
       "esbuild",
       "nx",
       "sharp",
