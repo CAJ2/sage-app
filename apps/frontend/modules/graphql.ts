@@ -21,7 +21,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     configFile: 'codegen.ts',
     devOnly: true,
-    extensions: ['.graphql', '.gql'],
+    extensions: ['.graphql', '.gql', '.vue'],
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {
     if (options.devOnly && !nuxt.options.dev) {

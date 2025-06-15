@@ -94,6 +94,9 @@
             </template>
           </form.Subscribe>
         </div>
+        <Alert v-if="formError" variant="error" class="mt-4">
+          <AlertDescription>{{ formError }}</AlertDescription>
+        </Alert>
       </form>
     </div>
   </div>
@@ -110,6 +113,7 @@ const session = auth.useSession()
 if (session.value.data) {
   router.replace('/profile')
 }
+const formError = ref<string | null>(null)
 
 const form = useForm({
   defaultValues: {
@@ -125,12 +129,13 @@ const form = useForm({
     }),
   },
   onSubmit: async ({ value }) => {
+    formError.value = null
     const { error } = await auth.signIn.email({
       email: value.email,
       password: value.password,
     })
     if (error) {
-      console.error(error)
+      formError.value = error.message || 'An error occurred during sign in'
     }
     const session = await auth.getSession()
     if (session.data) {

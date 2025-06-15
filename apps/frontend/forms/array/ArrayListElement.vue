@@ -1,8 +1,13 @@
 <template>
   <div :class="styles.arrayList.item">
     <div :class="toolbarClasses" @click="expandClicked">
-      <div :class="styles.arrayList.itemLabel">{{ label }}</div>
+      <div :class="styles.arrayList.itemLabel">
+        <span :class="{ 'text-base-content/50': !label, italic: !label }">{{
+          label || 'Empty'
+        }}</span>
+      </div>
       <button
+        v-if="moveShown"
         :disabled="!moveUpEnabled"
         :class="styles.arrayList.itemMoveUp"
         type="button"
@@ -11,6 +16,7 @@
         ↑
       </button>
       <button
+        v-if="moveShown"
         :disabled="!moveDownEnabled"
         :class="styles.arrayList.itemMoveDown"
         type="button"
@@ -51,6 +57,11 @@ const listItem = defineComponent({
       required: false,
       type: String,
       default: '',
+    },
+    moveShown: {
+      required: false,
+      type: Boolean,
+      default: true,
     },
     moveUpEnabled: {
       required: false,

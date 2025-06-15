@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavTopbar
-      :title="data?.getOrg.name || 'Organization'"
+      :title="data?.getOrg?.name || 'Organization'"
       back="true"
     ></NavTopbar>
     <ul class="list bg-base-100 rounded-box shadow-md">
@@ -20,8 +20,10 @@
 </template>
 
 <script setup lang="ts">
+import { graphql } from '~/gql'
+
 const route = useRoute()
-const orgQuery = gql`
+const orgQuery = graphql(`
   query GetOrg($id: ID!) {
     getOrg(id: $id) {
       id
@@ -29,19 +31,10 @@ const orgQuery = gql`
       desc
     }
   }
-`
+`)
 const vars = {
   id: route.params.id,
 }
 
-type OrgResult = {
-  getOrg: {
-    id: string
-    name: string
-    desc: string
-    image_url: string
-  }
-}
-
-const { status, data } = await useLazyAsyncQuery<OrgResult>(orgQuery, vars)
+const { status, data } = await useLazyAsyncQuery(orgQuery, vars)
 </script>

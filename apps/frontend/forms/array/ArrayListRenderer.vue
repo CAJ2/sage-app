@@ -21,6 +21,9 @@
       :class="styles.arrayList.itemWrapper"
     >
       <array-list-element
+        :move-shown="
+          !control.uischema.options || control.uischema.options.showSortButtons
+        "
         :move-up="moveUp ? moveUp(control.path, index) : undefined"
         :move-up-enabled="control.enabled && index > 0"
         :move-down="moveDown ? moveDown(control.path, index) : undefined"

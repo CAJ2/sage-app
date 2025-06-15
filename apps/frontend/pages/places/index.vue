@@ -32,11 +32,12 @@ import maplibregl, {
 } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'
+import { graphql } from '~/gql'
 
 const searchInput = ref('')
 
 const regionStore = useRegionStore()
-const regionQuery = gql`
+const regionQuery = graphql(`
   query PlacesIndexRegionQuery($id: ID!) {
     getRegion(id: $id) {
       id
@@ -46,17 +47,8 @@ const regionQuery = gql`
       min_zoom
     }
   }
-`
-type RegionResult = {
-  getRegion: {
-    id: string
-    name?: string
-    placetype: string
-    bbox?: [number, number, number, number]
-    min_zoom?: number
-  }
-}
-const { data: regionData } = await useAsyncQuery<RegionResult>(regionQuery, {
+`)
+const { data: regionData } = await useAsyncQuery(regionQuery, {
   id: regionStore.selectedRegion,
 })
 
@@ -68,7 +60,7 @@ const mapBounds = ref<[number, number][] | null>(null)
 const protocol = new Protocol()
 maplibregl.addProtocol('pmtiles', protocol.tile)
 
-const placeSearch = gql`
+const placeSearch = graphql(`
   query PlaceSearch($search: String!, $latLong: [Float!]) {
     search(query: $search, types: [PLACE], lat_long: $latLong, limit: 100) {
       nodes {
@@ -87,24 +79,8 @@ const placeSearch = gql`
       totalCount
     }
   }
-`
-type PlaceSearchResult = {
-  search: {
-    nodes: Array<{
-      id: string
-      name: string
-      address?: {
-        city?: string
-      }
-      location: {
-        latitude: number
-        longitude: number
-      }
-    }>
-    totalCount: number
-  }
-}
-const search = useQuery<PlaceSearchResult>(placeSearch, {
+`)
+const search = useQuery(placeSearch, {
   search: searchInput.value,
   latLong: [
     mapBounds.value ? mapBounds.value[1][1] : 0,
@@ -118,11 +94,11 @@ let markers: Pick<maplibregl.Marker, 'remove'>[] = []
 watch(
   () => search.result.value,
   () => {
-    if (map.value && search.result.value) {
+    if (map.value && search.result.value && search.result.value.search.nodes) {
       markers.forEach((marker) => marker.remove())
       markers = []
       search.result.value.search.nodes.forEach((place) => {
-        if (!place.location) {
+        if (place.__typename !== 'Place' || !place.location) {
           return
         }
         const marker = new maplibregl.Marker({ color: '#005d58' })

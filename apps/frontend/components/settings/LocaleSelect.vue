@@ -10,7 +10,6 @@ const { locales, current } = defineProps<{
 }>()
 
 const selected = ref(current)
-console.log('selected', selected.value)
 
 const emits = defineEmits<{
   (e: 'select', locale: string): void

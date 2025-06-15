@@ -2,15 +2,27 @@
   <div>
     <NavTopbar
       :title="changeData?.getChange?.title || 'Change'"
-      :subtitle="changeData?.getChange?.description"
+      :subtitle="changeData?.getChange?.description || undefined"
       back="true"
     ></NavTopbar>
     <div class="flex justify-center">
       <div class="w-full p-5 max-w-2xl">
         <Card class="mb-4">
-          <CardContent class="pt-4">
-            <div v-if="changeData" class="flex items-center">
-              <div class="badge badge-lg badge-primary">
+          <CardContent v-if="changeData" class="p-4">
+            <div class="flex items-center pb-3">
+              <div
+                class="badge badge-md"
+                :class="{
+                  'badge-primary':
+                    changeData.getChange?.status === ChangeStatus.Merged,
+                  'badge-error':
+                    changeData.getChange?.status === ChangeStatus.Rejected,
+                  'badge-warning':
+                    changeData.getChange?.status === ChangeStatus.Draft,
+                  'badge-info':
+                    changeData.getChange?.status === ChangeStatus.Proposed,
+                }"
+              >
                 {{ changeData.getChange?.status }}
               </div>
               <div class="px-4">
@@ -21,28 +33,101 @@
                     new Date(
                       changeData.getChange?.created_at,
                     ).toLocaleDateString()
-                  }}</span
-                >
+                  }}
+                </span>
               </div>
+            </div>
+            <Drawer v-model:open="openEditTitle">
+              <DrawerContent class="min-h-[90vh]">
+                <DrawerHeader class="text-left">
+                  <DrawerTitle>Edit Change Details</DrawerTitle>
+                </DrawerHeader>
+                <FormChangeTitle
+                  :data="{
+                    title: changeData.getChange?.title || '',
+                    description: changeData.getChange?.description || '',
+                  }"
+                  @submit="submitTitleForm"
+                ></FormChangeTitle>
+              </DrawerContent>
+            </Drawer>
+            <div class="flex flex-col" @click="openEditTitle = true">
+              <h2
+                class="text-lg font-bold"
+                :class="{ italic: !changeData.getChange?.title }"
+              >
+                {{ changeData.getChange?.title || 'Untitled Change' }}
+              </h2>
+              <p
+                class="text-md opacity-70"
+                :class="{
+                  italic: !changeData.getChange?.description,
+                }"
+              >
+                {{
+                  changeData.getChange?.description ||
+                  'No description provided.'
+                }}
+              </p>
+            </div>
+            <div
+              v-if="changeData?.getChange"
+              class="flex justify-center space-x-2 my-3"
+            >
+              <button
+                v-if="changeData.getChange.status === ChangeStatus.Draft"
+                class="grow btn btn-primary btn-sm"
+                @click="setStatus(ChangeStatus.Proposed)"
+              >
+                <font-awesome-icon
+                  icon="fa-solid fa-upload"
+                  class="size-4 mr-2"
+                />
+                Publish Change
+              </button>
+              <button
+                v-if="changeData.getChange.status === ChangeStatus.Proposed"
+                class="grow btn btn-primary btn-sm"
+                @click="setStatus(ChangeStatus.Draft)"
+              >
+                <font-awesome-icon
+                  icon="fa-solid fa-pencil"
+                  class="size-4 mr-2"
+                />
+                Revert to Draft
+              </button>
+              <button
+                v-if="
+                  changeData.getChange.status !== ChangeStatus.Merged &&
+                  changeData.getChange.status !== ChangeStatus.Rejected
+                "
+                class="btn btn-danger btn-sm"
+                @click="deleteChange"
+              >
+                <font-awesome-icon icon="fa-solid fa-trash" class="size-4" />
+              </button>
             </div>
           </CardContent>
         </Card>
         <div class="mt-3">
           <h2 class="text-lg">Edits</h2>
-          <ul v-if="changeData" class="divide-y-1">
+          <ul v-if="changeData?.getChange?.edits" class="divide-y-1">
             <li
-              v-for="edit in changeData.getChange.edits"
-              :key="edit.id"
+              v-for="edit in changeData.getChange.edits.nodes"
+              :key="edit.id || edit.entity_name"
               class="border-neutral-300"
             >
-              <NuxtLinkLocale :to="getEditSubLink(edit)">
-                <div class="p-4">
+              <NuxtLinkLocale :to="getEditSubLink(edit as Edit)">
+                <div v-if="edit.changes" class="my-4 mx-3">
                   <div class="flex items-center">
                     <div class="badge badge-sm badge-secondary">
                       {{ edit.entity_name }}
                     </div>
-                    <div class="flex-1 px-4">
-                      <span class="">{{ edit.changes.name }}</span>
+                    <div class="flex-1 px-2">
+                      <span class="">{{
+                        (edit.changes as any).name_req ||
+                        (edit.changes as any).name
+                      }}</span>
                     </div>
                     <div>
                       <font-awesome-icon
@@ -54,6 +139,11 @@
                 </div>
               </NuxtLinkLocale>
             </li>
+            <span
+              v-if="changeData.getChange.edits.nodes?.length === 0"
+              class="text-neutral-500 text-sm"
+              >No edits found</span
+            >
           </ul>
         </div>
       </div>
@@ -62,9 +152,19 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
+import { graphql } from '~/gql'
+import {
+  ChangeStatus,
+  type Edit,
+  type UpdateChangeInput,
+} from '~/gql/types.generated'
 
-const changeQuery = gql`
+const route = useRoute()
+const localeRoute = useLocaleRoute()
+
+const openEditTitle = ref(false)
+
+const changeQuery = graphql(`
   query ChangeQuery($id: ID!) {
     getChange(id: $id) {
       id
@@ -78,52 +178,43 @@ const changeQuery = gql`
         username
       }
       edits {
-        id
-        entity_name
-        original {
-          ... on Variant {
-            name
+        nodes {
+          id
+          entity_name
+          original {
+            ... on Variant {
+              name
+            }
+            ... on Component {
+              name
+            }
+            ... on Category {
+              name_req: name
+            }
           }
-          ... on Component {
-            name
+          changes {
+            ... on Variant {
+              name
+            }
+            ... on Component {
+              name
+            }
+            ... on Category {
+              name_req: name
+            }
           }
         }
-        changes {
-          ... on Variant {
-            name
-          }
-          ... on Component {
-            name
-          }
-        }
+        totalCount
       }
     }
   }
-`
-type ChangeResult = {
-  getChange: {
-    id: string
-    status: string
-    title: string
-    description?: string
-    created_at: string
-    updated_at: string
-    user: {
-      id: string
-      username: string
-    }
-    edits: Array<{
-      id: string
-      entity_name: string
-      original: { name?: string }
-      changes: { name?: string }
-    }>
-  }
-}
-const { data: changeData } = await useAsyncQuery<ChangeResult>(changeQuery, {
-  id: route.params.id,
-})
-console.log(changeData.value?.getChange)
+`)
+const { result: changeData, refetch: refetchChangeData } = useQuery(
+  changeQuery,
+  {
+    id: route.params.id as string,
+  },
+)
 
 const entityToPage: Record<string, string> = {
   Variant: 'variants',
@@ -134,7 +225,69 @@ const entityToPage: Record<string, string> = {
   Item: 'items',
 }
 
-const getEditSubLink = (edit: ChangeResult['getChange']['edits'][0]) => {
-  return `/contribute/changes/${changeData.value?.getChange.id}/${entityToPage[edit.entity_name]}/${edit.id}`
+const getEditSubLink = (edit: Edit) => {
+  return `/contribute/changes/${changeData.value?.getChange?.id}/${entityToPage[edit.entity_name]}/${edit.id}`
+}
+
+const changeEditMutation = graphql(`
+  mutation ChangeEditMutation($input: UpdateChangeInput!) {
+    updateChange(input: $input) {
+      change {
+        id
+      }
+    }
+  }
+`)
+const changeEdit = useMutation(changeEditMutation, {
+  variables: {
+    input: {
+      id: route.params.id as string,
+    } as UpdateChangeInput,
+  },
+})
+const changeDeleteMutation = graphql(`
+  mutation ChangeDeleteMutation($id: ID!) {
+    deleteChange(id: $id) {
+      success
+    }
+  }
+`)
+const changeDelete = useMutation(changeDeleteMutation, {
+  variables: {
+    id: route.params.id as string,
+  },
+})
+
+const setStatus = async (status: ChangeStatus) => {
+  await changeEdit.mutate({
+    input: {
+      id: route.params.id as string,
+      status,
+    },
+  })
+  await refetchChangeData()
+}
+
+const deleteChange = async () => {
+  const result = await changeDelete.mutate()
+  if (result?.data) {
+    navigateTo(localeRoute('/contribute/changes'))
+  } else {
+    console.error('Failed to delete change:', result)
+  }
+}
+
+const submitTitleForm = async (data: {
+  title: string
+  description: string
+}) => {
+  await changeEdit.mutate({
+    input: {
+      id: route.params.id as string,
+      title: data.title,
+      description: data.description,
+    },
+  })
+  await refetchChangeData()
 }
 </script>

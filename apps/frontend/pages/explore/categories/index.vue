@@ -2,14 +2,16 @@
   <div>
     <NavTopbar title="Categories" back="true"></NavTopbar>
     <ModelCategoryChildren
+      v-if="data"
       :status="status"
-      :data="data?.rootCategory"
+      :data="data.rootCategory.children"
     ></ModelCategoryChildren>
   </div>
 </template>
 
 <script setup lang="ts">
-const categoriesQuery = gql`
+import { graphql } from '~/gql'
+const categoriesQuery = graphql(`
   query CategoriesIndexGetCategories {
     rootCategory {
       children {
@@ -23,27 +25,10 @@ const categoriesQuery = gql`
       }
     }
   }
-`
+`)
 const vars = {
   limit: 20,
 }
 
-type CategoryResult = {
-  rootCategory: {
-    children: {
-      nodes: {
-        id: string
-        name: string
-        desc_short: string
-        desc: string
-        image_url: string
-      }[]
-    }
-  }
-}
-
-const { status, data } = await useLazyAsyncQuery<CategoryResult>(
-  categoriesQuery,
-  vars,
-)
+const { status, data } = await useLazyAsyncQuery(categoriesQuery, vars)
 </script>

@@ -77,7 +77,6 @@ type FormResult = {
   }
 }
 const { data: formData } = await useAsyncQuery<FormResult>(formQuery)
-console.log('formData', formData)
 
 const jsonSchema = computed(() => {
   if (route.params.component_id === 'new') {

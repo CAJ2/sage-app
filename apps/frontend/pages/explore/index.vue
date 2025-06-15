@@ -48,7 +48,9 @@
 </template>
 
 <script setup lang="ts">
-const categoriesQuery = gql`
+import { graphql } from '~/gql'
+
+const categoriesQuery = graphql(`
   query GetCategories {
     rootCategory {
       children {
@@ -62,24 +64,10 @@ const categoriesQuery = gql`
       }
     }
   }
-`
+`)
 const vars = {
   limit: 6,
 }
 
-type CategoryResult = {
-  rootCategory: {
-    children: {
-      nodes: {
-        id: string
-        name: string
-        desc_short: string
-        desc: string
-        image_url: string
-      }[]
-    }
-  }
-}
-
-const { data } = await useLazyAsyncQuery<CategoryResult>(categoriesQuery, vars)
+const { data } = await useLazyAsyncQuery(categoriesQuery, vars)
 </script>

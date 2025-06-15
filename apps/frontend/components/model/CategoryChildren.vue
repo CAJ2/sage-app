@@ -9,13 +9,16 @@
       </li>
 
       <div v-if="data">
-        <li v-for="category in data.children.nodes" :key="category.id">
+        <li v-for="category in data.nodes" :key="category.id">
           <NuxtLinkLocale
             :to="`/explore/categories/${category.id}`"
             class="list-row"
           >
             <div>
-              <img class="size-10 rounded-box" :src="category.image_url" />
+              <img
+                class="size-10 rounded-box"
+                :src="category.image_url || ''"
+              />
             </div>
             <div>
               <div class="text-bold">{{ category.name }}</div>
@@ -49,7 +52,7 @@
         </li>
       </div>
 
-      <li v-if="data && data.children.nodes.length === 0" class="list-row">
+      <li v-if="data && data.nodes?.length === 0" class="list-row">
         There are no categories to show
       </li>
     </ul>
@@ -57,18 +60,13 @@
 </template>
 
 <script setup lang="ts">
+import type { Category } from '~/gql/types.generated'
 const { data } = defineProps<{
   status?: string
   data?: {
-    children: {
-      nodes: {
-        id: string
-        name: string
-        desc_short: string
-        desc: string
-        image_url: string
-      }[]
-    }
+    nodes?:
+      | Pick<Category, 'id' | 'name' | 'desc_short' | 'desc' | 'image_url'>[]
+      | null
   }
 }>()
 </script>

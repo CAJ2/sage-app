@@ -24,7 +24,13 @@ import type {
   ControlElement,
   JsonFormsRendererRegistryEntry,
 } from '@jsonforms/core'
-import { rankWith, and, uiTypeIs, schemaMatches } from '@jsonforms/core'
+import {
+  rankWith,
+  and,
+  uiTypeIs,
+  schemaMatches,
+  schemaTypeIs,
+} from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
@@ -55,8 +61,11 @@ export const entry: JsonFormsRendererRegistryEntry = {
     2,
     and(
       uiTypeIs('Control'),
-      schemaMatches((schema) =>
-        Object.prototype.hasOwnProperty.call(schema, '$id'),
+      and(
+        schemaMatches((schema) =>
+          Object.prototype.hasOwnProperty.call(schema, '$id'),
+        ),
+        schemaTypeIs('string'),
       ),
     ),
   ),

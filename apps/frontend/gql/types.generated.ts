@@ -38,11 +38,14 @@ export type Category = Named & {
   created_at: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   desc_short?: Maybe<Scalars['String']['output']>;
+  desc_short_tr?: Maybe<Array<TranslatedOutput>>;
+  desc_tr?: Maybe<Array<TranslatedOutput>>;
   descendants: CategoriesPage;
   id: Scalars['ID']['output'];
   image_url?: Maybe<Scalars['String']['output']>;
   items: ItemsPage;
   name: Scalars['String']['output'];
+  name_tr?: Maybe<Array<TranslatedOutput>>;
   parents: CategoriesPage;
   updated_at: Scalars['DateTime']['output'];
 };
@@ -97,14 +100,18 @@ export type Change = {
   __typename?: 'Change';
   created_at: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  edits: Array<Edit>;
+  edits: ChangeEditsPage;
   id: Scalars['ID']['output'];
-  metadata?: Maybe<Scalars['JSONObject']['output']>;
   sources: SourcesPage;
   status: ChangeStatus;
   title?: Maybe<Scalars['String']['output']>;
   updated_at: Scalars['DateTime']['output'];
   user: User;
+};
+
+
+export type ChangeEditsArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -119,6 +126,14 @@ export type ChangeEdge = {
   __typename?: 'ChangeEdge';
   cursor: Scalars['String']['output'];
   node: Change;
+};
+
+export type ChangeEditsPage = {
+  __typename?: 'ChangeEditsPage';
+  edges?: Maybe<Array<EditEdge>>;
+  nodes?: Maybe<Array<Edit>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** Status of a change */
@@ -245,9 +260,12 @@ export type CreateCategoryInput = {
   change_id?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   desc_short?: InputMaybe<Scalars['String']['input']>;
+  desc_short_tr?: InputMaybe<Array<TranslatedInput>>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
   image_url?: InputMaybe<Scalars['String']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
@@ -259,7 +277,6 @@ export type CreateCategoryOutput = {
 
 export type CreateChangeInput = {
   description?: InputMaybe<Scalars['String']['input']>;
-  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
   sources?: Array<Scalars['ID']['input']>;
   status?: InputMaybe<ChangeStatus>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -425,9 +442,16 @@ export type DeleteSourceOutput = {
 export type Edit = {
   __typename?: 'Edit';
   changes?: Maybe<EditModel>;
+  changes_update?: Maybe<Scalars['JSONObject']['output']>;
   entity_name: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
   original?: Maybe<EditModel>;
+};
+
+export type EditEdge = {
+  __typename?: 'EditEdge';
+  cursor: Scalars['String']['output'];
+  node: Edit;
 };
 
 export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
@@ -612,6 +636,7 @@ export type Mutation = {
   deleteChange?: Maybe<DeleteChangeOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
   markSourceProcessed?: Maybe<MarkSourceProcessedOutput>;
+  updateCategory?: Maybe<UpdateCategoryOutput>;
   updateChange?: Maybe<UpdateChangeOutput>;
   updateComponent?: Maybe<UpdateComponentOutput>;
   updateItem?: Maybe<UpdateItemOutput>;
@@ -680,6 +705,11 @@ export type MutationDeleteSourceArgs = {
 
 export type MutationMarkSourceProcessedArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateCategoryArgs = {
+  input: UpdateCategoryInput;
 };
 
 
@@ -862,6 +892,7 @@ export type Query = {
   __typename?: 'Query';
   getCategories: CategoriesPage;
   getCategory?: Maybe<Category>;
+  getCategorySchema?: Maybe<ModelEditSchema>;
   getChange?: Maybe<Change>;
   getChanges: ChangesPage;
   getComponent?: Maybe<Component>;
@@ -1263,10 +1294,39 @@ export type TranslatedInput = {
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type TranslatedOutput = {
+  __typename?: 'TranslatedOutput';
+  auto: Scalars['Boolean']['output'];
+  lang: Scalars['String']['output'];
+  text?: Maybe<Scalars['String']['output']>;
+};
+
+export type UpdateCategoryInput = {
+  add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  desc_short?: InputMaybe<Scalars['String']['input']>;
+  desc_short_tr?: InputMaybe<Array<TranslatedInput>>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  image_url?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type UpdateCategoryOutput = {
+  __typename?: 'UpdateCategoryOutput';
+  category?: Maybe<Category>;
+  change?: Maybe<Change>;
+};
+
 export type UpdateChangeInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
-  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
   sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   status?: InputMaybe<ChangeStatus>;
   title?: InputMaybe<Scalars['String']['input']>;

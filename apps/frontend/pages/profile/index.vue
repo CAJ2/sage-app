@@ -49,7 +49,7 @@
             </li>
           </NuxtLinkLocale>
           <div class="divider m-1"></div>
-          <NuxtLinkLocale to="/profile/edit">
+          <NuxtLinkLocale v-if="session.data" to="/profile/edit">
             <li class="p-4 flex gap-2">
               <div class="flex-none px-3">
                 <font-awesome-icon icon="fa-solid fa-user" />
@@ -57,7 +57,7 @@
               <div class="flex-1">Edit Profile</div>
             </li>
           </NuxtLinkLocale>
-          <div class="divider m-1"></div>
+          <div v-if="session.data" class="divider m-1"></div>
           <Drawer>
             <DrawerTrigger as-child>
               <li class="p-4 flex gap-2">

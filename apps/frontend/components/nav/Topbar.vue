@@ -26,7 +26,7 @@
       </h2>
       <h4
         v-if="subtitle"
-        class="text-xs text-base-content mx-3"
+        class="text-xs text-base-content mx-3 line-clamp-1"
         :class="{ 'mb-1': !!subtitle }"
       >
         {{ subtitle }}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavTopbar :title="data?.getItem.name || 'Item'" back="true"></NavTopbar>
+    <NavTopbar :title="data?.getItem?.name || 'Item'" back="true"></NavTopbar>
     <ul class="list bg-base-100 rounded-box shadow-md">
       <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Product</li>
       <li v-if="status === 'pending'" class="list-row">
@@ -17,8 +17,10 @@
 </template>
 
 <script setup lang="ts">
+import { graphql } from '~/gql'
+
 const route = useRoute()
-const itemQuery = gql`
+const itemQuery = graphql(`
   query GetItem($id: ID!) {
     getItem(id: $id) {
       id
@@ -27,19 +29,10 @@ const itemQuery = gql`
       image_url
     }
   }
-`
+`)
 const vars = {
   id: route.params.id,
 }
 
-type ItemResult = {
-  getItem: {
-    id: string
-    name: string
-    desc: string
-    image_url: string
-  }
-}
-
-const { status, data } = await useLazyAsyncQuery<ItemResult>(itemQuery, vars)
+const { status, data } = await useLazyAsyncQuery(itemQuery, vars)
 </script>
