@@ -92,7 +92,7 @@ export class ComponentsArgs extends PaginationBasicArgs {}
 @ArgsType()
 export class ProcessesArgs extends PaginationBasicArgs {}
 
-export const MaterialIDSchema = z.nanoid().meta({
+export const MaterialIDSchema = z.string().meta({
   id: 'Material',
   name: 'Material ID',
 })

@@ -67,7 +67,7 @@ export class TagPage extends Paginated(Tag) {}
 @ArgsType()
 export class TagArgs extends PaginationBasicArgs {}
 
-export const TagDefinitionIDSchema = z.nanoid().meta({
+export const TagDefinitionIDSchema = z.string().meta({
   id: 'TagDefinition',
   name: 'Tag Definition ID',
 })

@@ -1,10 +1,8 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
-import { iso639 } from '@src/db/iso639'
-import { Validate } from 'class-validator'
+import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
-import { map } from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 import type { Loaded } from '@mikro-orm/core'
@@ -67,8 +65,8 @@ export class ModelEditSchema {
   delete?: ModelSchema
 }
 
-@InputType()
-export class TranslatedInput {
+@ObjectType()
+export class TranslatedOutput {
   @Field(() => String)
   lang!: string
 
@@ -79,14 +77,28 @@ export class TranslatedInput {
   auto: boolean = false
 }
 
+@InputType()
+export class TranslatedInput {
+  @Field(() => String)
+  lang!: string
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(100_000)
+  text?: string
+
+  @Field(() => Boolean)
+  auto: boolean = false
+}
+
 export const TranslatedInputSchema = z.object({
-  lang: z.union(
-    map(iso639, (l) =>
-      z
-        .literal(l.part1 || l.part2t)
-        .meta({ title: `${l.nativeName} (${l.referenceName})` }),
-    ),
-  ),
+  lang: z
+    .string()
+    .regex(/^[a-z]{2,3}(-[A-Z]{2,8}(-[^-]{2,8})?)?$/)
+    .meta({
+      id: 'lang',
+      title: 'Language Code',
+    }),
   text: z.string().optional(),
   auto: z.boolean().default(false),
 })
@@ -100,6 +112,10 @@ export const TrArraySchema = z
       auto: false,
     },
   ])
+export const ImageOrIconSchema = z
+  .url({ protocol: /^(https|iconify):\/\// })
+  .optional()
+  .default('')
 
 @InputType()
 export class InputWithLang {

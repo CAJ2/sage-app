@@ -6,6 +6,7 @@ export const zToSchema = (
   schema: core.$ZodType,
 ): core.JSONSchema.BaseSchema => {
   return z.toJSONSchema(schema, {
+    io: 'input',
     override: (ctx) => {
       if (ctx.jsonSchema.id) {
         ctx.jsonSchema.$id = ctx.jsonSchema.id
@@ -43,13 +44,23 @@ export class BaseSchemaService {
             scope: '#/properties/text',
             label: this.i18n.t('schemas.translated_input.text_title'),
           },
-          {
-            type: 'Control',
-            scope: '#/properties/auto',
-            label: this.i18n.t('schemas.translated_input.auto_title'),
-          },
         ],
       },
+      showSortButtons: false,
+    }
+  }
+
+  imageOrIconOptionsUISchema() {
+    return {
+      control: [
+        {
+          type: 'Icon',
+        },
+        {
+          type: 'Source',
+          format: 'IMAGE',
+        },
+      ],
     }
   }
 }

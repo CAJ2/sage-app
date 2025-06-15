@@ -10,7 +10,7 @@ import { z } from 'zod/v4'
 import { MaterialIDSchema } from './material.model'
 import { TagDefinitionIDSchema } from './tag.model'
 
-export const ComponentIDSchema = z.nanoid().meta({
+export const ComponentIDSchema = z.string().meta({
   id: 'Component',
   name: 'Component ID',
 })
@@ -99,9 +99,7 @@ export class ComponentSchemaService {
         {
           type: 'Control',
           scope: '#/properties/image_url',
-          options: {
-            format: 'source',
-          },
+          options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
           type: 'Group',
@@ -129,7 +127,7 @@ export class ComponentSchemaService {
     }
 
     this.UpdateComponentInputSchema = ChangeInputWithLangSchema.extend({
-      id: z.nanoid(),
+      id: z.string(),
       name: z.string().max(1024).optional(),
       name_tr: TrArraySchema.meta({
         title: this.i18n.t('schemas.components.name_tr.title'),
@@ -164,18 +162,21 @@ export class ComponentSchemaService {
         {
           type: 'Control',
           scope: '#/properties/name_tr',
+          options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
           scope: '#/properties/desc_tr',
+          options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
           scope: '#/properties/image_url',
+          options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/primary_material',
+          scope: '#/properties/primary_material/properties/id',
         },
         {
           type: 'Control',

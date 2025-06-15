@@ -7,7 +7,7 @@ import { z } from 'zod/v4'
 import { MaterialIDSchema } from './material.model'
 import { ProcessIntent } from './process.entity'
 
-export const ProcessIDSchema = z.nanoid().meta({
+export const ProcessIDSchema = z.string().meta({
   id: 'Process',
   name: 'Process ID',
 })

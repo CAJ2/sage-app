@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import { SourceType } from './source.entity'
 
-export const SourceIDSchema = z.nanoid().meta({
+export const SourceIDSchema = z.string().meta({
   id: 'Source',
   title: 'Source ID',
 })

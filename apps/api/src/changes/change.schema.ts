@@ -2,7 +2,7 @@ import { z } from 'zod/v4'
 import { ChangeStatus } from './change.entity'
 import { SourceIDSchema } from './source.schema'
 
-export const ChangeIDSchema = z.nanoid().meta({
+export const ChangeIDSchema = z.string().meta({
   id: 'Change',
   title: 'Change ID',
 })
