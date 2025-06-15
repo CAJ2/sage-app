@@ -26,12 +26,21 @@ export class Edit {
   @Field(() => EditModel, { nullable: true })
   @Transform(transformUnion('entity_name'))
   changes?: typeof EditModel
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes_update?: Record<string, any>
+
+  transform(obj: Record<string, any>) {
+    this.changes_update = this.changes
+  }
 }
+
+@ObjectType()
+export class ChangeEditsPage extends Paginated(Edit) {}
 
 @ObjectType()
 export class Change extends IDCreatedUpdated<ChangeEntity> {
   @Field(() => String, { nullable: true })
-  @MaxLength(255)
   title?: string
 
   @Field(() => String, { nullable: true })
@@ -43,14 +52,11 @@ export class Change extends IDCreatedUpdated<ChangeEntity> {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => [Edit])
-  edits!: Edit[]
+  @Field(() => ChangeEditsPage)
+  edits!: ChangeEditsPage
 
   @Field(() => SourcesPage)
   sources!: SourcesPage & {}
-
-  @Field(() => JSONObjectResolver, { nullable: true })
-  metadata?: Record<string, any>
 }
 
 @ObjectType()
@@ -71,6 +77,12 @@ export class ChangesArgs extends PaginationBasicArgs {
 @ArgsType()
 export class ChangeSourcesArgs extends PaginationBasicArgs {}
 
+@ArgsType()
+export class ChangeEditsArgs {
+  @Field(() => ID, { nullable: true })
+  id?: string
+}
+
 @InputType()
 export class CreateChangeInput {
   @Field(() => String, { nullable: true })
@@ -88,9 +100,6 @@ export class CreateChangeInput {
 
   @Field(() => [ID])
   sources: string[] = []
-
-  @Field(() => JSONObjectResolver, { nullable: true })
-  metadata?: Record<string, any>
 }
 
 @InputType()
@@ -116,10 +125,6 @@ export class UpdateChangeInput {
   @Field(() => [ID], { nullable: true })
   @IsOptional()
   sources?: string[]
-
-  @Field(() => JSONObjectResolver, { nullable: true })
-  @IsOptional()
-  metadata?: Record<string, any>
 }
 
 @ObjectType()

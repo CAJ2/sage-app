@@ -2,7 +2,12 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
-import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
+import {
+  CreatedUpdated,
+  registerModel,
+  TranslatedInput,
+  TranslatedOutput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
@@ -24,15 +29,24 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @MaxLength(1024)
   name!: string
 
+  @Field(() => [TranslatedOutput], { nullable: true })
+  name_tr?: TranslatedOutput[]
+
   @Field(() => String, { nullable: true })
   @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   desc_short?: string
 
+  @Field(() => [TranslatedOutput], { nullable: true })
+  desc_short_tr?: TranslatedOutput[]
+
   @Field(() => String, { nullable: true })
   @Transform(translate)
   desc?: string
+
+  @Field(() => [TranslatedOutput], { nullable: true })
+  desc_tr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -84,17 +98,28 @@ export class CategoryItemsArgs extends PaginationBasicArgs {}
 
 @InputType()
 export class CreateCategoryInput extends ChangeInputWithLang() {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   @MaxLength(1024)
-  name!: string
+  name?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1024)
   desc_short?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_short_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
+  @IsOptional()
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -111,8 +136,23 @@ export class UpdateCategoryInput extends ChangeInputWithLang() {
   @MaxLength(1024)
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(1024)
+  desc_short?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_short_tr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()

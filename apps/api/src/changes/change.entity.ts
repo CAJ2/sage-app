@@ -29,6 +29,9 @@ export interface Edit {
   original?: Record<string, any>
   // The new state of the entity
   changes?: Record<string, any>
+
+  // For GraphQL conversion
+  _type?: new () => any
 }
 
 @Entity({ tableName: 'changes', schema: 'public' })

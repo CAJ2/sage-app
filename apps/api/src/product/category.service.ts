@@ -10,7 +10,8 @@ import {
   CategoryEdge,
   CategoryTree,
 } from './category.entity'
-import { CreateCategoryInput } from './category.model'
+import { CreateCategoryInput, UpdateCategoryInput } from './category.model'
+import { CategorySchemaService } from './category.schema'
 import { Item } from './item.entity'
 
 @Injectable()
@@ -18,6 +19,7 @@ export class CategoryService {
   constructor(
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
+    private readonly categorySchemaService: CategorySchemaService, // inject schema service
   ) {}
 
   async find(opts: CursorOptions<Category>) {
@@ -128,8 +130,30 @@ export class CategoryService {
       input.change,
       userID,
     )
-    this.setFields(category, input, change)
+    await this.setFields(category, input, change)
     await this.changeService.createEntityEdit(change, category)
+    await this.em.persistAndFlush(change)
+    await this.changeService.checkMerge(change, input)
+    return {
+      change,
+      category,
+    }
+  }
+
+  async update(input: UpdateCategoryInput, userID: string) {
+    const category = await this.em.findOneOrFail(
+      Category,
+      { id: input.id },
+      { disableIdentityMap: input.useChange() },
+    )
+    const change = await this.changeService.findOneOrCreate(
+      input.change_id,
+      input.change,
+      userID,
+    )
+    await this.changeService.beginUpdateEntityEdit(change, category)
+    await this.setFields(category, input, change)
+    await this.changeService.updateEntityEdit(change, category)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
     return {
@@ -140,11 +164,14 @@ export class CategoryService {
 
   async setFields(
     category: Category,
-    input: CreateCategoryInput,
+    input: Partial<CreateCategoryInput & UpdateCategoryInput>,
     change?: Change,
   ) {
     if (input.name) {
       category.name = addTrReq(category.name, input.lang, input.name)
+    }
+    if (input.name_tr) {
+      category.name = addTrReq(category.name, input.lang, input.name_tr)
     }
     if (input.desc_short) {
       category.desc_short = addTr(
@@ -153,11 +180,35 @@ export class CategoryService {
         input.desc_short,
       )
     }
+    if (input.desc_short_tr) {
+      category.desc_short = addTr(
+        category.desc_short,
+        input.lang,
+        input.desc_short_tr,
+      )
+    }
     if (input.desc) {
       category.desc = addTr(category.desc, input.lang, input.desc)
     }
+    if (input.desc_tr) {
+      category.desc = addTr(category.desc, input.lang, input.desc_tr)
+    }
     if (input.image_url) {
       category.image_url = input.image_url
+    }
+  }
+
+  getCreateSchema() {
+    return {
+      schema: this.categorySchemaService.CreateCategoryInputJSONSchema,
+      uischema: this.categorySchemaService.CreateCategoryInputUISchema,
+    }
+  }
+
+  getUpdateSchema() {
+    return {
+      schema: this.categorySchemaService.UpdateCategoryInputJSONSchema,
+      uischema: this.categorySchemaService.UpdateCategoryInputUISchema,
     }
   }
 }

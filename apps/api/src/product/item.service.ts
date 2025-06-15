@@ -114,7 +114,7 @@ export class ItemService {
       input.change,
       userID,
     )
-    this.setFields(item, input, change)
+    await this.setFields(item, input, change)
     await this.changeService.createEntityEdit(change, item)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
@@ -144,8 +144,9 @@ export class ItemService {
       input.change,
       userID,
     )
-    this.setFields(item, input, change)
-    await this.changeService.createEntityEdit(change, item)
+    await this.changeService.beginUpdateEntityEdit(change, item)
+    await this.setFields(item, input, change)
+    await this.changeService.updateEntityEdit(change, item)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
     return { item, change }

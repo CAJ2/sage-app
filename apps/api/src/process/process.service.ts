@@ -59,7 +59,11 @@ export class ProcessService {
   }
 
   async update(input: UpdateProcessInput, userID: string) {
-    const process = await this.em.findOne(Process, { id: input.id })
+    const process = await this.em.findOne(
+      Process,
+      { id: input.id },
+      { disableIdentityMap: input.useChange() },
+    )
     if (!process) {
       throw new Error(`Process with ID "${input.id}" not found`)
     }
@@ -76,8 +80,9 @@ export class ProcessService {
       input.change,
       userID,
     )
+    await this.changeService.beginUpdateEntityEdit(change, process)
     await this.setFields(process, input, change)
-    await this.changeService.createEntityEdit(change, process)
+    await this.changeService.updateEntityEdit(change, process)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
     return {

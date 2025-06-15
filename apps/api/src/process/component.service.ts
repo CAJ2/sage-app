@@ -96,7 +96,11 @@ export class ComponentService {
   }
 
   async update(input: UpdateComponentInput, userID: string) {
-    const component = await this.em.findOne(Component, { id: input.id })
+    const component = await this.em.findOne(
+      Component,
+      { id: input.id },
+      { disableIdentityMap: input.useChange() },
+    )
     if (!component) {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
@@ -113,8 +117,9 @@ export class ComponentService {
       input.change,
       userID,
     )
+    await this.changeService.beginUpdateEntityEdit(change, component)
     await this.setFields(component, input, change)
-    await this.changeService.createEntityEdit(change, component)
+    await this.changeService.updateEntityEdit(change, component)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
     return {

@@ -12,6 +12,7 @@ import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ModelEditSchema } from '@src/graphql/base.model'
 import {
   CategoriesArgs,
   CategoriesPage,
@@ -19,7 +20,10 @@ import {
   CategoryItemsArgs,
   CreateCategoryInput,
   CreateCategoryOutput,
+  UpdateCategoryInput,
+  UpdateCategoryOutput,
 } from './category.model'
+import { CategorySchemaService } from './category.schema'
 import { CategoryService } from './category.service'
 import { Item, ItemsPage } from './item.model'
 
@@ -27,6 +31,7 @@ import { Item, ItemsPage } from './item.model'
 export class CategoryResolver {
   constructor(
     private readonly categoryService: CategoryService,
+    private readonly categorySchemaService: CategorySchemaService,
     private readonly transform: TransformService,
   ) {}
 
@@ -62,6 +67,20 @@ export class CategoryResolver {
     }
     const model = await this.transform.entityToModel(category, Category)
     return model
+  }
+
+  @Query(() => ModelEditSchema, { nullable: true })
+  async getCategorySchema(): Promise<ModelEditSchema> {
+    return {
+      create: {
+        schema: this.categorySchemaService.CreateCategoryInputJSONSchema,
+        uischema: this.categorySchemaService.CreateCategoryInputUISchema,
+      },
+      update: {
+        schema: this.categorySchemaService.UpdateCategoryInputJSONSchema,
+        uischema: this.categorySchemaService.UpdateCategoryInputUISchema,
+      },
+    }
   }
 
   @ResolveField()
@@ -140,6 +159,21 @@ export class CategoryResolver {
     const created = await this.categoryService.create(input, user.id)
     const model = await this.transform.entityToModel(created.category, Category)
     const change = await this.transform.entityToModel(created.change, Change)
+    return { category: model, change }
+  }
+
+  @Mutation(() => UpdateCategoryOutput, {
+    name: 'updateCategory',
+    nullable: true,
+  })
+  @UseGuards(AuthGuard)
+  async updateCategory(
+    @Args('input') input: UpdateCategoryInput,
+    @AuthUser() user: ReqUser,
+  ): Promise<UpdateCategoryOutput> {
+    const updated = await this.categoryService.update(input, user.id)
+    const model = await this.transform.entityToModel(updated.category, Category)
+    const change = await this.transform.entityToModel(updated.change, Change)
     return { category: model, change }
   }
 }

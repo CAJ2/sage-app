@@ -186,8 +186,9 @@ export class VariantService {
       input.change,
       userID,
     )
+    await this.changeService.beginUpdateEntityEdit(change, variant)
     await this.setFields(variant, input, change)
-    await this.changeService.createEntityEdit(change, variant)
+    await this.changeService.updateEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
     return { variant, change }

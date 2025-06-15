@@ -79,8 +79,9 @@ export class OrgService {
       input.change,
       userID,
     )
+    await this.changeService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
-    await this.changeService.createEntityEdit(change, org)
+    await this.changeService.updateEntityEdit(change, org)
     await this.em.persistAndFlush(change)
     await this.changeService.checkMerge(change, input)
     return { org, change }

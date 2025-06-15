@@ -14,13 +14,14 @@ import { TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.model'
 import {
   Change,
+  ChangeEditsArgs,
+  ChangeEditsPage,
   ChangesArgs,
   ChangeSourcesArgs,
   ChangesPage,
   CreateChangeInput,
   CreateChangeOutput,
   DeleteChangeOutput,
-  Edit,
   UpdateChangeInput,
   UpdateChangeOutput,
 } from './change.model'
@@ -86,11 +87,15 @@ export class ChangeResolver {
     }
   }
 
-  @ResolveField(() => [Edit], { nullable: true })
-  async edits(@Parent() change: Change): Promise<Edit[]> {
-    const edits = await this.changeService.edits(change.id)
-    return Promise.all(
-      edits.map(async (edit) => await this.transform.objectToModel(edit, Edit)),
+  @ResolveField(() => ChangeEditsPage, { nullable: true })
+  async edits(
+    @Parent() change: Change,
+    @Args() args: ChangeEditsArgs,
+  ): Promise<ChangeEditsPage> {
+    const edits = await this.changeService.edits(change.id, args.id)
+    return this.transform.objectsToPaginated(
+      { items: edits, count: edits.length },
+      ChangeEditsPage,
     )
   }
 

@@ -22,11 +22,14 @@ type Category implements Named {
   created_at: DateTime!
   desc: String
   desc_short: String
+  desc_short_tr: [TranslatedOutput!]
+  desc_tr: [TranslatedOutput!]
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
   id: ID!
   image_url: String
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String!
+  name_tr: [TranslatedOutput!]
   parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
   updated_at: DateTime!
 }
@@ -39,9 +42,8 @@ type CategoryEdge {
 type Change {
   created_at: DateTime!
   description: String
-  edits: [Edit!]!
+  edits(id: ID): ChangeEditsPage!
   id: ID!
-  metadata: JSONObject
   sources(after: String, before: String, first: Int, last: Int): SourcesPage!
   status: ChangeStatus!
   title: String
@@ -52,6 +54,13 @@ type Change {
 type ChangeEdge {
   cursor: String!
   node: Change!
+}
+
+type ChangeEditsPage {
+  edges: [EditEdge!]
+  nodes: [Edit!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 """Status of a change"""
@@ -159,9 +168,12 @@ input CreateCategoryInput {
   change_id: ID
   desc: String
   desc_short: String
+  desc_short_tr: [TranslatedInput!]
+  desc_tr: [TranslatedInput!]
   image_url: String
   lang: String
-  name: String!
+  name: String
+  name_tr: [TranslatedInput!]
   remove_sources: [ID!]
 }
 
@@ -172,7 +184,6 @@ type CreateCategoryOutput {
 
 input CreateChangeInput {
   description: String
-  metadata: JSONObject
   sources: [ID!]! = []
   status: ChangeStatus
   title: String
@@ -332,9 +343,15 @@ type DeleteSourceOutput {
 
 type Edit {
   changes: EditModel
+  changes_update: JSONObject
   entity_name: String!
   id: ID
   original: EditModel
+}
+
+type EditEdge {
+  cursor: String!
+  node: Edit!
 }
 
 union EditModel = Category | Component | Item | Material | Place | Process | Region | Variant
@@ -435,6 +452,7 @@ type Mutation {
   deleteChange(id: ID!): DeleteChangeOutput
   deleteSource(id: ID!): DeleteSourceOutput
   markSourceProcessed(id: ID!): MarkSourceProcessedOutput
+  updateCategory(input: UpdateCategoryInput!): UpdateCategoryOutput
   updateChange(input: UpdateChangeInput!): UpdateChangeOutput
   updateComponent(input: UpdateComponentInput!): UpdateComponentOutput
   updateItem(input: UpdateItemInput!): UpdateItemOutput
@@ -567,6 +585,7 @@ type ProcessPage {
 type Query {
   getCategories(after: String, before: String, first: Int, last: Int): CategoriesPage!
   getCategory(id: ID!): Category
+  getCategorySchema: ModelEditSchema
   getChange(id: ID!): Change
   getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
   getComponent(id: ID!): Component
@@ -780,10 +799,37 @@ input TranslatedInput {
   text: String
 }
 
+type TranslatedOutput {
+  auto: Boolean!
+  lang: String!
+  text: String
+}
+
+input UpdateCategoryInput {
+  add_sources: [ID!]
+  apply: Boolean
+  change: CreateChangeInput
+  change_id: ID
+  desc: String
+  desc_short: String
+  desc_short_tr: [TranslatedInput!]
+  desc_tr: [TranslatedInput!]
+  id: ID!
+  image_url: String
+  lang: String
+  name: String
+  name_tr: [TranslatedInput!]
+  remove_sources: [ID!]
+}
+
+type UpdateCategoryOutput {
+  category: Category
+  change: Change
+}
+
 input UpdateChangeInput {
   description: String
   id: ID!
-  metadata: JSONObject
   sources: [ID!]
   status: ChangeStatus
   title: String
