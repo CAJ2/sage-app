@@ -64,6 +64,9 @@ export default defineNuxtConfig({
       default: {
         // @ts-expect-error
         httpEndpoint: () => useRuntimeConfig().public.apiurl + '/graphql',
+        httpLinkOptions: {
+          credentials: 'include',
+        }
       },
     },
   },
