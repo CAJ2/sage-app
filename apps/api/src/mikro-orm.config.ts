@@ -15,7 +15,12 @@ if (dotenv) {
 const storage = new AsyncLocalStorage<EntityManager>()
 
 const highlighter = new SqlHighlighter()
-const url = process.env.DATABASE_URL
+let url = process.env.DATABASE_URL
+if (process.env.NODE_ENV === 'test') {
+  // Use a test database URL if in test environment
+  // We require a different env var to prevent accidentially overwriting the main database
+  url = process.env.TEST_DATABASE_URL || 'cockroachdb://localhost:26257/sage_test'
+}
 let ssl: any = true
 if (url?.includes('sslmode=disable')) {
   ssl = false
@@ -38,7 +43,6 @@ export default defineConfig({
   entitiesTs: [join(process.cwd(), 'src/**/*.entity.ts')],
   strict: true,
   clientUrl: url,
-  dbName: process.env.NODE_ENV === 'test' ? ':memory:' : undefined,
   driverOptions: {
     client: 'cockroachdb',
     connection: {
