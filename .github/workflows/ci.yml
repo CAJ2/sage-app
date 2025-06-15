@@ -55,7 +55,8 @@ jobs:
       - run: pnpm exec nx affected -t test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
-          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          NODE_ENV: test
+          TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
   build-image:
     name: 'Build images'
