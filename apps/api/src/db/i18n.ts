@@ -56,13 +56,22 @@ export function isTranslatedField(
 // string from a JSON object containing one or more translations.
 // Relies on the _lang property of the object to determine the best match.
 export function translate(params: TransformFnParams): string | undefined {
-  const { value, obj } = params
+  const value = params.value as TranslatedField | undefined
+  const obj = params.obj as Record<string, any>
   if (!value) {
     return value
   }
   if (!isTranslatedField(value)) {
     console.error('Invalid translated field', value)
   }
+  // Set _tr property to full translation object
+  obj[params.key + '_tr'] = _.map(value, (text, lang) => {
+    return {
+      lang,
+      text,
+      auto: lang.endsWith(';a'),
+    }
+  })
   const field: TranslatedField = value
   if (_.isArray(obj._lang)) {
     const lang: string[] = obj._lang
@@ -124,6 +133,9 @@ export function addTr(
   }
   if (!value) {
     return obj
+  }
+  if (value.length > 100_000) {
+    throw new GraphQLError('Translation text is too long')
   }
   if (!lang) {
     lang = 'xx'

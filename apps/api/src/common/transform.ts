@@ -5,6 +5,7 @@ import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 import { plainToInstance } from 'class-transformer'
 import { validateOrReject } from 'class-validator'
 import { GraphQLError } from 'graphql'
+import _ from 'lodash'
 import { ClsService } from 'nestjs-cls'
 import {
   DEFAULT_PAGE_SIZE,
@@ -49,6 +50,12 @@ export class TransformService {
     const entityObj: EntityDTOCtx<T> = entity.toObject()
     entityObj._lang = this.cls.get('lang')
     const inst = plainToInstance(model, entityObj)
+    // Transform special cases like translation objects
+    _.each(entityObj, (value, key) => {
+      if (key.endsWith('_tr')) {
+        ;(inst as any)[key] = value
+      }
+    })
     if ((inst as any).transform) {
       ;(inst as any).transform(entityObj)
     }
@@ -66,6 +73,12 @@ export class TransformService {
     const obj = object as EntityDTOCtx<T>
     obj._lang = this.cls.get('lang')
     const inst = plainToInstance(model, obj)
+    // Transform special cases like translation objects
+    _.each(obj, (value, key) => {
+      if (key.endsWith('_tr')) {
+        ;(inst as any)[key] = value
+      }
+    })
     if ((inst as any).transform) {
       ;(inst as any).transform(obj)
     }
@@ -238,6 +251,12 @@ export class TransformService {
       }
       ;(obj as any)._lang = this.cls.get('lang')
       const inst: object = plainToInstance((obj as any)._type, obj)
+      // Transform special cases like translation objects
+      _.each(obj, (value, key) => {
+        if (key.endsWith('_tr')) {
+          ;(inst as any)[key] = value
+        }
+      })
       if ((inst as any).transform) {
         ;(inst as any).transform(obj)
       }
@@ -272,6 +291,15 @@ export function transformUnion(
     }
     params.value._lang = params.obj._lang || []
     const instance = plainToInstance(constr, params.value)
+    // Transform special cases like translation objects
+    _.each(params.value, (value, key) => {
+      if (key.endsWith('_tr')) {
+        ;(instance as any)[key] = value
+      }
+    })
+    if ((instance as any).transform) {
+      ;(instance as any).transform(obj)
+    }
     return instance
   }
 }
