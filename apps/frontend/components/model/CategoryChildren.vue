@@ -15,10 +15,7 @@
             class="list-row"
           >
             <div>
-              <img
-                class="size-10 rounded-box"
-                :src="category.image_url || ''"
-              />
+              <UiImage class="size-10" :src="category.image_url"></UiImage>
             </div>
             <div>
               <div class="text-bold">{{ category.name }}</div>

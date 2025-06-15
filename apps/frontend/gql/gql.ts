@@ -23,6 +23,10 @@ type Documents = {
     "\n  query ChangeQuery($id: ID!) {\n    getChange(id: $id) {\n      id\n      status\n      title\n      description\n      created_at\n      updated_at\n      user {\n        id\n        username\n      }\n      edits {\n        nodes {\n          id\n          entity_name\n          original {\n            ... on Variant {\n              name\n            }\n            ... on Component {\n              name\n            }\n            ... on Category {\n              name_req: name\n            }\n          }\n          changes {\n            ... on Variant {\n              name\n            }\n            ... on Component {\n              name\n            }\n            ... on Category {\n              name_req: name\n            }\n          }\n        }\n        totalCount\n      }\n    }\n  }\n": typeof types.ChangeQueryDocument,
     "\n  mutation ChangeEditMutation($input: UpdateChangeInput!) {\n    updateChange(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": typeof types.ChangeEditMutationDocument,
     "\n  mutation ChangeDeleteMutation($id: ID!) {\n    deleteChange(id: $id) {\n      success\n    }\n  }\n": typeof types.ChangeDeleteMutationDocument,
+    "\n  query ChangesProcessSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.ChangesProcessSchemaDocument,
+    "\n  query ChangesProcessEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": typeof types.ChangesProcessEditDocument,
+    "\n  mutation ChangeProcessCreate($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": typeof types.ChangeProcessCreateDocument,
+    "\n  mutation ChangeProcessUpdate($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": typeof types.ChangeProcessUpdateDocument,
     "\n  query ChangesIndexGetChanges($first: Int) {\n    getChanges(first: $first) {\n      nodes {\n        id\n        status\n        title\n        description\n        created_at\n        updated_at\n        edits {\n          totalCount\n        }\n      }\n    }\n  }\n": typeof types.ChangesIndexGetChangesDocument,
     "\n  query ContributeIndexGetChanges($first: Int) {\n    getChanges(first: $first) {\n      nodes {\n        id\n        status\n        title\n        description\n        created_at\n        updated_at\n      }\n    }\n  }\n": typeof types.ContributeIndexGetChangesDocument,
     "\n  mutation UpdateCategoryNewChange($input: UpdateCategoryInput!) {\n    updateCategory(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": typeof types.UpdateCategoryNewChangeDocument,
@@ -49,6 +53,10 @@ const documents: Documents = {
     "\n  query ChangeQuery($id: ID!) {\n    getChange(id: $id) {\n      id\n      status\n      title\n      description\n      created_at\n      updated_at\n      user {\n        id\n        username\n      }\n      edits {\n        nodes {\n          id\n          entity_name\n          original {\n            ... on Variant {\n              name\n            }\n            ... on Component {\n              name\n            }\n            ... on Category {\n              name_req: name\n            }\n          }\n          changes {\n            ... on Variant {\n              name\n            }\n            ... on Component {\n              name\n            }\n            ... on Category {\n              name_req: name\n            }\n          }\n        }\n        totalCount\n      }\n    }\n  }\n": types.ChangeQueryDocument,
     "\n  mutation ChangeEditMutation($input: UpdateChangeInput!) {\n    updateChange(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": types.ChangeEditMutationDocument,
     "\n  mutation ChangeDeleteMutation($id: ID!) {\n    deleteChange(id: $id) {\n      success\n    }\n  }\n": types.ChangeDeleteMutationDocument,
+    "\n  query ChangesProcessSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.ChangesProcessSchemaDocument,
+    "\n  query ChangesProcessEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": types.ChangesProcessEditDocument,
+    "\n  mutation ChangeProcessCreate($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": types.ChangeProcessCreateDocument,
+    "\n  mutation ChangeProcessUpdate($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": types.ChangeProcessUpdateDocument,
     "\n  query ChangesIndexGetChanges($first: Int) {\n    getChanges(first: $first) {\n      nodes {\n        id\n        status\n        title\n        description\n        created_at\n        updated_at\n        edits {\n          totalCount\n        }\n      }\n    }\n  }\n": types.ChangesIndexGetChangesDocument,
     "\n  query ContributeIndexGetChanges($first: Int) {\n    getChanges(first: $first) {\n      nodes {\n        id\n        status\n        title\n        description\n        created_at\n        updated_at\n      }\n    }\n  }\n": types.ContributeIndexGetChangesDocument,
     "\n  mutation UpdateCategoryNewChange($input: UpdateCategoryInput!) {\n    updateCategory(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": types.UpdateCategoryNewChangeDocument,
@@ -116,6 +124,22 @@ export function graphql(source: "\n  mutation ChangeEditMutation($input: UpdateC
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation ChangeDeleteMutation($id: ID!) {\n    deleteChange(id: $id) {\n      success\n    }\n  }\n"): (typeof documents)["\n  mutation ChangeDeleteMutation($id: ID!) {\n    deleteChange(id: $id) {\n      success\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ChangesProcessSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n"): (typeof documents)["\n  query ChangesProcessSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ChangesProcessEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query ChangesProcessEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ChangeProcessCreate($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation ChangeProcessCreate($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ChangeProcessUpdate($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation ChangeProcessUpdate($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

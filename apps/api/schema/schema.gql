@@ -264,7 +264,7 @@ input CreateProcessInput {
   intent: String!
   lang: String
   material: ID
-  name: String!
+  name: String
   name_tr: [TranslatedInput!]
   org: ID
   place: ID
@@ -599,6 +599,7 @@ type Query {
   getPlace(id: ID!): Place
   getPlaces(after: String, before: String, first: Int, last: Int): PlacesPage!
   getProcess(id: ID!): Process
+  getProcessSchema: ModelEditSchema
   getProcesses(after: String, before: String, first: Int, last: Int): ProcessPage!
   getRegion(id: ID!): Region
   getRegions(after: String, before: String, first: Int, last: Int): RegionsPage!

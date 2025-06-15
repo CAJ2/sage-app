@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavTopbar
-      :title="route.params.id === 'new' ? 'New Category' : 'Edit Category'"
+      :title="categoryID === 'new' ? 'New Category' : 'Edit Category'"
       back="true"
     />
     <div class="flex justify-center">
@@ -31,6 +31,7 @@ import type { UpdateCategoryInput } from '~/gql/types.generated'
 
 const route = useRoute()
 const changeID = route.params.id as string
+const categoryID = route.params.category_id as string
 
 const ajv = new Ajv({
   allErrors: true,
@@ -67,23 +68,23 @@ const categoryEditQuery = graphql(`
   }
 `)
 const jsonSchema = computed(() => {
-  if (route.params.component_id === 'new') {
+  if (categoryID === 'new') {
     return formData.value?.getCategorySchema?.create?.schema
   }
   return formData.value?.getCategorySchema?.update?.schema
 })
 const uiSchema = computed(() => {
-  if (route.params.component_id === 'new') {
+  if (categoryID === 'new') {
     return formData.value?.getCategorySchema?.create?.uischema
   }
   return formData.value?.getCategorySchema?.update?.uischema
 })
 
 const categoryData = ref<UpdateCategoryInput | null>(null)
-if (route.params.category_id !== 'new') {
+if (categoryID !== 'new') {
   const { data } = await useAsyncQuery(categoryEditQuery, {
-    id: route.params.category_id as string,
-    changeID: route.params.id as string,
+    id: categoryID,
+    changeID,
   })
   if (
     data?.value?.getChange?.edits.nodes &&
@@ -109,7 +110,7 @@ const categoryUpdate = useMutation(categoryUpdateMutation, {
   variables: {
     input: {
       change_id: changeID,
-      id: route.params.category_id as string,
+      id: categoryID,
       ...categoryData.value,
     },
   },
@@ -128,7 +129,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
     await categoryUpdate.mutate({
       input: {
         change_id: changeID,
-        id: route.params.category_id as string,
+        id: categoryID,
         ...categoryData.value,
       },
     })

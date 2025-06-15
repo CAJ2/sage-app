@@ -906,6 +906,7 @@ export type Query = {
   getPlace?: Maybe<Place>;
   getPlaces: PlacesPage;
   getProcess?: Maybe<Process>;
+  getProcessSchema?: Maybe<ModelEditSchema>;
   getProcesses: ProcessPage;
   getRegion?: Maybe<Region>;
   getRegions: RegionsPage;

@@ -4,6 +4,7 @@ import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ModelEditSchema } from '@src/graphql/base.model'
 import {
   CreateProcessInput,
   CreateProcessOutput,
@@ -13,6 +14,7 @@ import {
   UpdateProcessInput,
   UpdateProcessOutput,
 } from './process.model'
+import { ProcessSchemaService } from './process.schema'
 import { ProcessService } from './process.service'
 
 @Resolver(() => Process)
@@ -20,6 +22,7 @@ export class ProcessResolver {
   constructor(
     private readonly processService: ProcessService,
     private readonly transform: TransformService,
+    private readonly processSchemaService: ProcessSchemaService,
   ) {}
 
   @Query(() => ProcessPage, { name: 'getProcesses' })
@@ -38,6 +41,20 @@ export class ProcessResolver {
       throw NotFoundErr('Process not found')
     }
     return this.transform.entityToModel(process, Process)
+  }
+
+  @Query(() => ModelEditSchema, { nullable: true })
+  async getProcessSchema(): Promise<ModelEditSchema> {
+    return {
+      create: {
+        schema: this.processSchemaService.CreateProcessInputJSONSchema,
+        uischema: this.processSchemaService.CreateProcessInputUISchema,
+      },
+      update: {
+        schema: this.processSchemaService.UpdateProcessInputJSONSchema,
+        uischema: this.processSchemaService.UpdateProcessInputUISchema,
+      },
+    }
   }
 
   @Mutation(() => CreateProcessOutput, {

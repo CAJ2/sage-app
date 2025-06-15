@@ -21,18 +21,18 @@
             >
               <NuxtLinkLocale :to="`/explore/categories/${category.id}`">
                 <div class="p-1">
-                  <Card>
+                  <Card class="min-h-32">
                     <CardHeader class="p-4 pb-2">
                       <div class="flex flex-col items-start gap-2">
-                        <font-awesome-icon
-                          icon="fa-solid fa-home"
-                          class="text-neutral-700"
-                        ></font-awesome-icon>
+                        <UiImage
+                          class="size-10 rounded-xl"
+                          :src="category.image_url"
+                        ></UiImage>
                         <CardTitle>{{ category.name }}</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent class="flex flex-col justify-center px-4 pb-3">
-                      <span class="text-xs line-clamp-3">{{
+                      <span class="text-xs line-clamp-2">{{
                         category.desc_short
                       }}</span>
                     </CardContent>

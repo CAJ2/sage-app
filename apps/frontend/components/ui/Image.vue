@@ -19,6 +19,9 @@
     <div
       v-if="!src || srcType === 'unknown'"
       class="skeleton h-full w-full shrink-0 rounded-xl"
+      :class="{
+        'animate-none': srcType === 'unknown',
+      }"
     ></div>
   </div>
 </template>

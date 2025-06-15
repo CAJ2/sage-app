@@ -54,10 +54,17 @@ const { title, subtitle, back, context, useImage, image, icon } = defineProps<{
   icon?: string
 }>()
 
+const localeRoute = useLocaleRoute()
+
 function goBack() {
   // TODO: This is a terrible hack and only works for this case
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(router.options as unknown as any).is_back = true
-  router.back()
+
+  if (back?.startsWith('/')) {
+    navigateTo(localeRoute(back))
+  } else {
+    router.back()
+  }
 }
 </script>

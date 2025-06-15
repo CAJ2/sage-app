@@ -145,6 +145,24 @@
               >No edits found</span
             >
           </ul>
+          <UiList
+            v-if="changeData"
+            class="pt-4"
+            :items="[
+              {
+                id: 'new_category',
+                link: `/contribute/changes/${changeData.getChange?.id}/categories/new`,
+                title: 'New Category',
+                icon: 'fa-solid fa-plus',
+              },
+              {
+                id: 'new_process',
+                link: `/contribute/changes/${changeData.getChange?.id}/processes/new`,
+                title: 'New Process',
+                icon: 'fa-solid fa-plus',
+              },
+            ]"
+          ></UiList>
         </div>
       </div>
     </div>
@@ -153,11 +171,8 @@
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
-import {
-  ChangeStatus,
-  type Edit,
-  type UpdateChangeInput,
-} from '~/gql/types.generated'
+import type { Edit, UpdateChangeInput } from '~/gql/types.generated'
+import { ChangeStatus } from '~/gql/types.generated'
 
 const route = useRoute()
 const localeRoute = useLocaleRoute()

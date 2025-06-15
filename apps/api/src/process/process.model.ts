@@ -84,8 +84,8 @@ export class CreateProcessInput extends ChangeInputWithLang() {
   @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
   intent!: ProcessIntent
 
-  @Field(() => String)
-  name!: string
+  @Field(() => String, { nullable: true })
+  name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
   name_tr?: TranslatedInput[]

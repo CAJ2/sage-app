@@ -10,6 +10,7 @@ import { ComponentService } from './component.service'
 import { MaterialResolver } from './material.resolver'
 import { MaterialService } from './material.service'
 import { ProcessResolver } from './process.resolver'
+import { ProcessSchemaService } from './process.schema'
 import { ProcessService } from './process.service'
 import { StreamService } from './stream.service'
 import { TagResolver } from './tag.resolver'
@@ -31,6 +32,7 @@ import { TagService } from './tag.service'
     ComponentSchemaService,
     ProcessResolver,
     ProcessService,
+    ProcessSchemaService,
     TagResolver,
     TagService,
     StreamService,
