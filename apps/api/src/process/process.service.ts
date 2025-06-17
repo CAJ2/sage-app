@@ -59,11 +59,10 @@ export class ProcessService {
   }
 
   async update(input: UpdateProcessInput, userID: string) {
-    const process = await this.em.findOne(
-      Process,
-      { id: input.id },
-      { disableIdentityMap: input.useChange() },
-    )
+    const { entity: process, change } =
+      await this.changeService.findOneWithChangeInput(input, userID, Process, {
+        id: input.id,
+      })
     if (!process) {
       throw new Error(`Process with ID "${input.id}" not found`)
     }
@@ -75,11 +74,6 @@ export class ProcessService {
         change: null,
       }
     }
-    const change = await this.changeService.findOneOrCreate(
-      input.change_id,
-      input.change,
-      userID,
-    )
     await this.changeService.beginUpdateEntityEdit(change, process)
     await this.setFields(process, input, change)
     await this.changeService.updateEntityEdit(change, process)
@@ -102,11 +96,26 @@ export class ProcessService {
     if (input.name) {
       process.name = addTrReq(process.name, input.lang, input.name)
     }
+    if (input.name_tr) {
+      process.name = addTrReq(process.name, input.lang, input.name_tr)
+    }
     if (input.desc) {
       process.desc = addTr(process.desc, input.lang, input.desc)
     }
+    if (input.desc_tr) {
+      process.desc = addTr(process.desc, input.lang, input.desc_tr)
+    }
+    if (input.instructions) {
+      process.instructions = input.instructions
+    }
+    if (input.efficiency) {
+      process.efficiency = input.efficiency
+    }
+    if (input.rules) {
+      process.rules = input.rules
+    }
     if (input.material) {
-      const material = await this.em.findOne(Material, { id: input.material })
+      const material = await this.em.findOne(Material, input.material)
       if (!material) {
         throw NotFoundErr(`Material with ID "${input.material}" not found`)
       }

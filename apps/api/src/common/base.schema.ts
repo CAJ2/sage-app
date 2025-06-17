@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import Ajv2020 from 'ajv/dist/2020'
+import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { core, z } from 'zod/v4'
 
@@ -18,7 +20,6 @@ export const zToSchema = (
           const oneOf = ctx.jsonSchema.anyOf
           delete ctx.jsonSchema.anyOf
           ctx.jsonSchema.oneOf = oneOf
-          ctx.jsonSchema.type = 'string'
         }
       }
     },
@@ -27,7 +28,30 @@ export const zToSchema = (
 
 @Injectable()
 export class BaseSchemaService {
-  constructor(private readonly i18n: I18nService) {}
+  ajv: Ajv2020
+  constructor(private readonly i18n: I18nService) {
+    this.ajv = new Ajv2020({
+      strict: true,
+      coerceTypes: true,
+      allErrors: true,
+      useDefaults: true,
+      removeAdditional: true,
+      keywords: ['name'],
+      formats: {
+        date: true,
+        url: true,
+        uri: true,
+      },
+    })
+  }
+
+  flattenRefs(data: any) {
+    _.each(data, (value, key) => {
+      if (_.isPlainObject(value) && value.id && _.keys(value).length === 1) {
+        data[key] = (data[key] as any).id
+      }
+    })
+  }
 
   trOptionsUISchema() {
     return {

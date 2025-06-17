@@ -157,7 +157,13 @@ export const MatchRuleSchema = z.object({
 })
 
 export const ProcessRulesSchema = z
-  .array(z.union([MatchRuleSchema, z.object({ or: z.array(MatchRuleSchema) })]))
+  .object({
+    match: z
+      .array(
+        z.union([MatchRuleSchema, z.object({ or: z.array(MatchRuleSchema) })]),
+      )
+      .optional(),
+  })
   .optional()
 
 export type ProcessRules = z.infer<typeof ProcessRulesSchema>

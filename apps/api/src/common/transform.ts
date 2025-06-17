@@ -243,30 +243,38 @@ export class TransformService {
   async objectsToPaginated<T, S extends PaginatedType<any, any>>(
     cursor: { items: EntityDTO<T>[]; count: number },
     PageModel: new () => S,
+    skipTransform?: boolean,
   ): Promise<PaginatedType<any, any>> {
     const entities: any[] = []
-    for (const obj of cursor.items) {
-      if (!(obj as any)._type) {
-        continue
-      }
-      ;(obj as any)._lang = this.cls.get('lang')
-      const inst: object = plainToInstance((obj as any)._type, obj)
-      // Transform special cases like translation objects
-      _.each(obj, (value, key) => {
-        if (key.endsWith('_tr')) {
-          ;(inst as any)[key] = value
+    if (skipTransform) {
+      entities.push(...cursor.items)
+    } else {
+      for (const obj of cursor.items) {
+        if (!(obj as any)._type) {
+          continue
         }
-      })
-      if ((inst as any).transform) {
-        ;(inst as any).transform(obj)
+        ;(obj as any)._lang = this.cls.get('lang')
+        const inst: object = plainToInstance((obj as any)._type, obj)
+        // Transform special cases like translation objects
+        _.each(obj, (value, key) => {
+          if (key.endsWith('_tr')) {
+            ;(inst as any)[key] = value
+          }
+        })
+        if ((inst as any).transform) {
+          ;(inst as any).transform(obj)
+        }
+        await validateOrReject(inst).catch((errors) => {
+          throw new GraphQLError(errors.toString())
+        })
+        entities.push(inst)
       }
-      await validateOrReject(inst).catch((errors) => {
-        throw new GraphQLError(errors.toString())
-      })
-      entities.push(inst)
     }
     const page = new PageModel()
-    page.edges = entities.map((node) => ({ cursor: '', node }))
+    page.edges = entities.map((node) => ({
+      cursor: Buffer.from(node.id || '').toString('base64'),
+      node,
+    }))
     page.nodes = entities
     page.totalCount = cursor.count
     page.pageInfo = {

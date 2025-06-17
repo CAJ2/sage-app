@@ -47,12 +47,12 @@ export class ProcessResolver {
   async getProcessSchema(): Promise<ModelEditSchema> {
     return {
       create: {
-        schema: this.processSchemaService.CreateProcessInputJSONSchema,
-        uischema: this.processSchemaService.CreateProcessInputUISchema,
+        schema: this.processSchemaService.CreateJSONSchema,
+        uischema: this.processSchemaService.CreateUISchema,
       },
       update: {
-        schema: this.processSchemaService.UpdateProcessInputJSONSchema,
-        uischema: this.processSchemaService.UpdateProcessInputUISchema,
+        schema: this.processSchemaService.UpdateJSONSchema,
+        uischema: this.processSchemaService.UpdateUISchema,
       },
     }
   }

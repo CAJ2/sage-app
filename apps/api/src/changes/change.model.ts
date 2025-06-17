@@ -28,11 +28,10 @@ export class Edit {
   changes?: typeof EditModel
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  changes_update?: Record<string, any>
+  changes_create?: Record<string, any>
 
-  transform(obj: Record<string, any>) {
-    this.changes_update = this.changes
-  }
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes_update?: Record<string, any>
 }
 
 @ObjectType()
@@ -145,8 +144,23 @@ export class DeleteChangeOutput {
   success?: boolean
 }
 
+@ObjectType()
+export class MergeChangeOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change
+}
+
 export interface MergeInput {
   apply?: boolean
+}
+
+export interface IChangeInputWithLang {
+  change_id?: string
+  change?: CreateChangeInput & {}
+  add_sources?: string[]
+  remove_sources?: string[]
+  apply?: boolean
+  useChange(): boolean
 }
 
 export function ChangeInputWithLang() {

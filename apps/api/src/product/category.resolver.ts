@@ -73,12 +73,12 @@ export class CategoryResolver {
   async getCategorySchema(): Promise<ModelEditSchema> {
     return {
       create: {
-        schema: this.categorySchemaService.CreateCategoryInputJSONSchema,
-        uischema: this.categorySchemaService.CreateCategoryInputUISchema,
+        schema: this.categorySchemaService.CreateJSONSchema,
+        uischema: this.categorySchemaService.CreateUISchema,
       },
       update: {
-        schema: this.categorySchemaService.UpdateCategoryInputJSONSchema,
-        uischema: this.categorySchemaService.UpdateCategoryInputUISchema,
+        schema: this.categorySchemaService.UpdateJSONSchema,
+        uischema: this.categorySchemaService.UpdateUISchema,
       },
     }
   }

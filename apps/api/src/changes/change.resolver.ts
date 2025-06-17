@@ -22,6 +22,7 @@ import {
   CreateChangeInput,
   CreateChangeOutput,
   DeleteChangeOutput,
+  MergeChangeOutput,
   UpdateChangeInput,
   UpdateChangeOutput,
 } from './change.model'
@@ -87,6 +88,21 @@ export class ChangeResolver {
     }
   }
 
+  @Mutation(() => MergeChangeOutput, { nullable: true })
+  @UseGuards(AuthGuard)
+  async mergeChange(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<MergeChangeOutput> {
+    const result = await this.changeService.mergeID(id)
+    if (!result) {
+      throw NotFoundErr('Change not found or already merged')
+    }
+    const model = await this.transform.entityToModel(result.change, Change)
+    return {
+      change: model,
+    }
+  }
+
   @ResolveField(() => ChangeEditsPage, { nullable: true })
   async edits(
     @Parent() change: Change,
@@ -96,6 +112,7 @@ export class ChangeResolver {
     return this.transform.objectsToPaginated(
       { items: edits, count: edits.length },
       ChangeEditsPage,
+      true,
     )
   }
 

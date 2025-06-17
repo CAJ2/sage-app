@@ -19,17 +19,9 @@ import {
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from './users.entity'
-import type { EntityDTO, FromEntityType } from '@mikro-orm/core'
 
 @Entity({ tableName: 'orgs', schema: 'public' })
 export class Org extends IDCreatedUpdated implements Searchable {
-  constructor(data?: Partial<EntityDTO<Org>>) {
-    super()
-    if (data) {
-      this.assign(data as Partial<EntityDTO<FromEntityType<this>>>)
-    }
-  }
-
   @Property({ length: 128 })
   name!: string
 

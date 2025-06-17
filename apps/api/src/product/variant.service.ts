@@ -244,7 +244,7 @@ export class VariantService {
           }
           variant.items.add(ref(itemEntity))
         } else {
-          const itemEntity = await this.changeService.findOneWithChange(
+          const itemEntity = await this.changeService.findRefWithChange(
             change,
             Item,
             { id: item.id },
@@ -264,7 +264,7 @@ export class VariantService {
             variant.items.remove(ref(itemEntity))
           }
         } else {
-          const itemEntity = await this.changeService.findOneWithChange(
+          const itemEntity = await this.changeService.findRefWithChange(
             change,
             Item,
             { id: item.id },
@@ -282,7 +282,7 @@ export class VariantService {
         })
         variant.region = ref(region)
       } else {
-        const region = await this.changeService.findOneWithChange(
+        const region = await this.changeService.findRefWithChange(
           change,
           Region,
           { id: input.region_id },
@@ -323,7 +323,7 @@ export class VariantService {
           }
           variant.orgs.add(ref(orgEntity))
         } else {
-          const orgEntity = await this.changeService.findOneWithChange(
+          const orgEntity = await this.changeService.findRefWithChange(
             change,
             Org,
             { id: org.id },
@@ -341,7 +341,7 @@ export class VariantService {
           const orgEntity = await this.em.findOneOrFail(Org, { id: org.id })
           variant.orgs.remove(ref(orgEntity))
         } else {
-          const orgEntity = await this.changeService.findOneWithChange(
+          const orgEntity = await this.changeService.findRefWithChange(
             change,
             Org,
             { id: org.id },
@@ -386,7 +386,7 @@ export class VariantService {
           }
           variant.components.add(ref(comp))
         } else {
-          const comp = await this.changeService.findOneWithChange(
+          const comp = await this.changeService.findRefWithChange(
             change,
             Component,
             { id: component.id },
@@ -403,7 +403,7 @@ export class VariantService {
           })
           variant.components.remove(ref(comp))
         } else {
-          const comp = await this.changeService.findOneWithChange(
+          const comp = await this.changeService.findRefWithChange(
             change,
             Component,
             { id: component.id },

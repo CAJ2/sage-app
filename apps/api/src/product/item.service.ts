@@ -179,7 +179,7 @@ export class ItemService {
           item.categories.add(cat)
           continue
         }
-        const cat = await this.changeService.findOneWithChange(
+        const cat = await this.changeService.findRefWithChange(
           change,
           Category,
           { id: category.id },
@@ -194,7 +194,7 @@ export class ItemService {
           item.categories.remove(cat)
           continue
         }
-        const cat = await this.changeService.findOneWithChange(
+        const cat = await this.changeService.findRefWithChange(
           change,
           Category,
           { id: category.id },

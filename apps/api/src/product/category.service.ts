@@ -11,7 +11,6 @@ import {
   CategoryTree,
 } from './category.entity'
 import { CreateCategoryInput, UpdateCategoryInput } from './category.model'
-import { CategorySchemaService } from './category.schema'
 import { Item } from './item.entity'
 
 @Injectable()
@@ -19,7 +18,6 @@ export class CategoryService {
   constructor(
     private readonly em: EntityManager,
     private readonly changeService: ChangeService,
-    private readonly categorySchemaService: CategorySchemaService, // inject schema service
   ) {}
 
   async find(opts: CursorOptions<Category>) {
@@ -195,20 +193,6 @@ export class CategoryService {
     }
     if (input.image_url) {
       category.image_url = input.image_url
-    }
-  }
-
-  getCreateSchema() {
-    return {
-      schema: this.categorySchemaService.CreateCategoryInputJSONSchema,
-      uischema: this.categorySchemaService.CreateCategoryInputUISchema,
-    }
-  }
-
-  getUpdateSchema() {
-    return {
-      schema: this.categorySchemaService.UpdateCategoryInputJSONSchema,
-      uischema: this.categorySchemaService.UpdateCategoryInputUISchema,
     }
   }
 }

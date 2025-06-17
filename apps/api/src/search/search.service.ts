@@ -50,9 +50,6 @@ export class SearchService {
     limit?: number,
     offset?: number,
   ) {
-    if (!query) {
-      return null
-    }
     const idxs =
       types?.map((t) => this.mapTypeToIndex(t)) ||
       ([
@@ -63,6 +60,9 @@ export class SearchService {
         SearchIndex.ORGS,
         SearchIndex.PLACES,
       ] as SearchIndex[])
+    if (!query && !idxs.find((i) => i === SearchIndex.PLACES)) {
+      return null
+    }
     const filters = []
     if (latLong && latLong.length === 2) {
       const geoFilter = `_geoRadius(${latLong[0]}, ${latLong[1]}, 10000)`

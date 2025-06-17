@@ -261,6 +261,8 @@ input CreateProcessInput {
   change_id: ID
   desc: String
   desc_tr: [TranslatedInput!]
+  efficiency: JSONObject
+  instructions: JSONObject
   intent: String!
   lang: String
   material: ID
@@ -270,6 +272,7 @@ input CreateProcessInput {
   place: ID
   region: ID
   remove_sources: [ID!]
+  rules: JSONObject
   variant: ID
 }
 
@@ -343,6 +346,7 @@ type DeleteSourceOutput {
 
 type Edit {
   changes: EditModel
+  changes_create: JSONObject
   changes_update: JSONObject
   entity_name: String!
   id: ID
@@ -428,6 +432,10 @@ type MaterialsPage {
   totalCount: Int!
 }
 
+type MergeChangeOutput {
+  change: Change
+}
+
 type ModelEditSchema {
   create: ModelSchema
   delete: ModelSchema
@@ -452,6 +460,7 @@ type Mutation {
   deleteChange(id: ID!): DeleteChangeOutput
   deleteSource(id: ID!): DeleteSourceOutput
   markSourceProcessed(id: ID!): MarkSourceProcessedOutput
+  mergeChange(id: ID!): MergeChangeOutput
   updateCategory(input: UpdateCategoryInput!): UpdateCategoryOutput
   updateChange(input: UpdateChangeInput!): UpdateChangeOutput
   updateComponent(input: UpdateComponentInput!): UpdateComponentOutput
@@ -548,6 +557,7 @@ type PlacesPage {
 type Process implements Named {
   created_at: DateTime!
   desc: String
+  efficiency: ProcessEfficiency
   history: [ProcessHistory!]!
 
   """The ID of the model"""
@@ -565,6 +575,12 @@ type Process implements Named {
 type ProcessEdge {
   cursor: String!
   node: Process!
+}
+
+type ProcessEfficiency {
+  efficiency: Float
+  equivalency: Float
+  value_ratio: Float
 }
 
 type ProcessHistory {
@@ -914,7 +930,9 @@ input UpdateProcessInput {
   change_id: ID
   desc: String
   desc_tr: [TranslatedInput!]
+  efficiency: JSONObject
   id: ID!
+  instructions: JSONObject
   intent: String
   lang: String
   material: ID
@@ -924,6 +942,7 @@ input UpdateProcessInput {
   place: ID
   region: ID
   remove_sources: [ID!]
+  rules: JSONObject
   variant: ID
 }
 
