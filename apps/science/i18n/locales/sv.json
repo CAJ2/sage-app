@@ -1,0 +1,17 @@
+{
+  "tabs": {
+    "explore": "Utforska",
+    "places": "Platser",
+    "search": "Sök",
+    "contribute": "Bidraga",
+    "profile": "Profil"
+  },
+  "contribute": {
+    "title": "Bidra"
+  },
+  "settings": {
+    "language": {
+      "select_title": "Välj språk"
+    }
+  }
+}

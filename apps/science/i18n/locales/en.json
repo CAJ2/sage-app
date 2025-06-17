@@ -1,0 +1,17 @@
+{
+  "tabs": {
+    "explore": "Explore",
+    "places": "Places",
+    "search": "Search",
+    "contribute": "Contribute",
+    "profile": "Profile"
+  },
+  "contribute": {
+    "title": "Contribute"
+  },
+  "settings": {
+    "language": {
+      "select_title": "Select Language"
+    }
+  }
+}

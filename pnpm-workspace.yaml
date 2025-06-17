@@ -2,5 +2,6 @@ packages:
   - packages/ui
   - apps/api
   - apps/frontend
+  - apps/science
 syncInjectedDepsAfterScripts:
   - build
