@@ -358,15 +358,18 @@ export type CreateProcessInput = {
   change_id?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  efficiency?: InputMaybe<Scalars['JSONObject']['input']>;
+  instructions?: InputMaybe<Scalars['JSONObject']['input']>;
   intent: Scalars['String']['input'];
   lang?: InputMaybe<Scalars['String']['input']>;
   material?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   name_tr?: InputMaybe<Array<TranslatedInput>>;
   org?: InputMaybe<Scalars['ID']['input']>;
   place?: InputMaybe<Scalars['ID']['input']>;
   region?: InputMaybe<Scalars['ID']['input']>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  rules?: InputMaybe<Scalars['JSONObject']['input']>;
   variant?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -442,6 +445,7 @@ export type DeleteSourceOutput = {
 export type Edit = {
   __typename?: 'Edit';
   changes?: Maybe<EditModel>;
+  changes_create?: Maybe<Scalars['JSONObject']['output']>;
   changes_update?: Maybe<Scalars['JSONObject']['output']>;
   entity_name: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
@@ -609,6 +613,11 @@ export type MaterialsPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type MergeChangeOutput = {
+  __typename?: 'MergeChangeOutput';
+  change?: Maybe<Change>;
+};
+
 export type ModelEditSchema = {
   __typename?: 'ModelEditSchema';
   create?: Maybe<ModelSchema>;
@@ -636,6 +645,7 @@ export type Mutation = {
   deleteChange?: Maybe<DeleteChangeOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
   markSourceProcessed?: Maybe<MarkSourceProcessedOutput>;
+  mergeChange?: Maybe<MergeChangeOutput>;
   updateCategory?: Maybe<UpdateCategoryOutput>;
   updateChange?: Maybe<UpdateChangeOutput>;
   updateComponent?: Maybe<UpdateComponentOutput>;
@@ -704,6 +714,11 @@ export type MutationDeleteSourceArgs = {
 
 
 export type MutationMarkSourceProcessedArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationMergeChangeArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -852,6 +867,7 @@ export type Process = Named & {
   __typename?: 'Process';
   created_at: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  efficiency?: Maybe<ProcessEfficiency>;
   history: Array<ProcessHistory>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
@@ -869,6 +885,13 @@ export type ProcessEdge = {
   __typename?: 'ProcessEdge';
   cursor: Scalars['String']['output'];
   node: Process;
+};
+
+export type ProcessEfficiency = {
+  __typename?: 'ProcessEfficiency';
+  efficiency?: Maybe<Scalars['Float']['output']>;
+  equivalency?: Maybe<Scalars['Float']['output']>;
+  value_ratio?: Maybe<Scalars['Float']['output']>;
 };
 
 export type ProcessHistory = {
@@ -1415,7 +1438,9 @@ export type UpdateProcessInput = {
   change_id?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  efficiency?: InputMaybe<Scalars['JSONObject']['input']>;
   id: Scalars['ID']['input'];
+  instructions?: InputMaybe<Scalars['JSONObject']['input']>;
   intent?: InputMaybe<Scalars['String']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
   material?: InputMaybe<Scalars['ID']['input']>;
@@ -1425,6 +1450,7 @@ export type UpdateProcessInput = {
   place?: InputMaybe<Scalars['ID']['input']>;
   region?: InputMaybe<Scalars['ID']['input']>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  rules?: InputMaybe<Scalars['JSONObject']['input']>;
   variant?: InputMaybe<Scalars['ID']['input']>;
 };
 

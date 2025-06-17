@@ -5,29 +5,37 @@
     :is-focused="isFocused"
     :applied-options="appliedOptions"
   >
-    <select
+    <Select
       :id="control.id + '-input'"
       :class="styles.control.select"
-      :value="control.data"
+      :model-value="control.data"
       :disabled="!control.enabled"
       :autofocus="appliedOptions.focus"
-      @change="onChange"
+      @update:model-value="
+        (value: any) => onChange({ target: { value } } as unknown as Event)
+      "
       @focus="isFocused = true"
       @blur="isFocused = false"
     >
-      <option key="empty" value="" :class="styles.control.option" />
-      <option
-        v-for="optionElement in control.options"
-        :key="optionElement.value"
-        :value="optionElement.value"
-        :label="
-          optionElement.label ||
-          control.schema.oneOf?.find((o) => o.const === optionElement.value)
-            ?.title
-        "
-        :class="styles.control.option"
-      ></option>
-    </select>
+      <SelectTrigger>
+        <SelectValue placeholder="Select an option" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectItem
+            v-for="optionElement in control.options"
+            :key="optionElement.value"
+            :value="optionElement.value"
+            :label="
+              optionElement.label ||
+              control.schema.oneOf?.find((o) => o.const === optionElement.value)
+                ?.title
+            "
+            :class="styles.control.option"
+          ></SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   </control-wrapper>
 </template>
 

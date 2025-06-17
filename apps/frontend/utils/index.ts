@@ -51,6 +51,7 @@ export const sanitizeFormData = <T, U extends object>(
     useDefaults: true,
     validateFormats: false,
     removeAdditional: true,
+    keywords: ['name'],
   })
   let validate
   try {

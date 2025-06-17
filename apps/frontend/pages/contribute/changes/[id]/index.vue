@@ -21,6 +21,8 @@
                     changeData.getChange?.status === ChangeStatus.Draft,
                   'badge-info':
                     changeData.getChange?.status === ChangeStatus.Proposed,
+                  'badge-success':
+                    changeData.getChange?.status === ChangeStatus.Approved,
                 }"
               >
                 {{ changeData.getChange?.status }}
@@ -97,6 +99,17 @@
                 Revert to Draft
               </button>
               <button
+                v-if="changeData.getChange.status === ChangeStatus.Approved"
+                class="grow btn btn-primary btn-sm"
+                @click="mergeChange"
+              >
+                <font-awesome-icon
+                  icon="fa-solid fa-pencil"
+                  class="size-4 mr-2"
+                />
+                Merge Change
+              </button>
+              <button
                 v-if="
                   changeData.getChange.status !== ChangeStatus.Merged &&
                   changeData.getChange.status !== ChangeStatus.Rejected
@@ -124,10 +137,19 @@
                       {{ edit.entity_name }}
                     </div>
                     <div class="flex-1 px-2">
-                      <span class="">{{
-                        (edit.changes as any).name_req ||
-                        (edit.changes as any).name
-                      }}</span>
+                      <span
+                        :class="{
+                          italic: !(
+                            (edit.changes as any).name_req ||
+                            (edit.changes as any).name
+                          ),
+                        }"
+                        >{{
+                          (edit.changes as any).name_req ||
+                          (edit.changes as any).name ||
+                          'Unnamed Edit'
+                        }}</span
+                      >
                     </div>
                     <div>
                       <font-awesome-icon
@@ -206,6 +228,15 @@ const changeQuery = graphql(`
             ... on Category {
               name_req: name
             }
+            ... on Place {
+              name
+            }
+            ... on Item {
+              name
+            }
+            ... on Process {
+              name
+            }
           }
           changes {
             ... on Variant {
@@ -216,6 +247,15 @@ const changeQuery = graphql(`
             }
             ... on Category {
               name_req: name
+            }
+            ... on Place {
+              name
+            }
+            ... on Item {
+              name
+            }
+            ... on Process {
+              name
             }
           }
         }
@@ -236,8 +276,8 @@ const entityToPage: Record<string, string> = {
   Component: 'components',
   Place: 'places',
   Category: 'categories',
-  Region: 'regions',
   Item: 'items',
+  Process: 'processes',
 }
 
 const getEditSubLink = (edit: Edit) => {
@@ -304,5 +344,28 @@ const submitTitleForm = async (data: {
     },
   })
   await refetchChangeData()
+}
+
+const changeMergeMutation = graphql(`
+  mutation ChangeMergeMutation($id: ID!) {
+    mergeChange(id: $id) {
+      change {
+        id
+      }
+    }
+  }
+`)
+const changeMerge = useMutation(changeMergeMutation, {
+  variables: {
+    id: route.params.id as string,
+  },
+})
+const mergeChange = async () => {
+  const result = await changeMerge.mutate()
+  if (result?.data) {
+    await refetchChangeData()
+  } else {
+    console.error('Failed to merge change:', result)
+  }
 }
 </script>

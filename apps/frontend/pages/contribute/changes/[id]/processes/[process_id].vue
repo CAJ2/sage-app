@@ -33,6 +33,7 @@ import type {
 } from '~/gql/types.generated'
 
 const route = useRoute()
+const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
 const processID = route.params.process_id as string
 
@@ -107,6 +108,9 @@ const processCreateMutation = graphql(`
       change {
         id
       }
+      process {
+        id
+      }
     }
   }
 `)
@@ -136,34 +140,59 @@ const processUpdate = useMutation(processUpdateMutation, {
   },
 })
 
-const saveStatus = ref<'saving' | 'saved' | 'error'>('saved')
+const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
 const onChange = async (event: JsonFormsChangeEvent) => {
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
       console.error('Form errors:', event.errors)
-      saveStatus.value = 'error'
+      saveStatus.value = 'not_saved'
       return
     }
     saveStatus.value = 'saving'
     if (processID === 'new') {
       createData.value = event.data
-      await processCreate.mutate({
-        input: {
-          change_id: changeID,
-          ...createData.value,
-        } as CreateProcessInput,
-      })
+      await processCreate
+        .mutate({
+          input: {
+            change_id: changeID,
+            ...createData.value,
+          } as CreateProcessInput,
+        })
+        .then((process) => {
+          saveStatus.value = 'saved'
+          // Redirect to the new process page
+          if (process?.data?.createProcess?.process?.id) {
+            navigateTo(
+              localeRoute(
+                `/contribute/changes/${changeID}/processes/${process?.data?.createProcess?.process?.id}`,
+              ),
+            )
+          }
+        })
+        .catch((error) => {
+          console.error('Error creating process:', error)
+          saveStatus.value = 'error'
+          return
+        })
     } else {
       updateData.value = event.data
-      await processUpdate.mutate({
-        input: {
-          change_id: changeID,
-          id: processID,
-          ...updateData.value,
-        },
-      })
+      await processUpdate
+        .mutate({
+          input: {
+            change_id: changeID,
+            id: processID,
+            ...updateData.value,
+          },
+        })
+        .then(() => {
+          saveStatus.value = 'saved'
+        })
+        .catch((error) => {
+          console.error('Error updating process:', error)
+          saveStatus.value = 'error'
+          return
+        })
     }
-    saveStatus.value = 'saved'
   }
 }
 </script>

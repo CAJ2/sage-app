@@ -10,27 +10,30 @@ export default defineNuxtRouteMiddleware((to, from) => {
     from.meta.pageTransition = { name }
   }
 
-  if (toDepth === 1 && fromDepth === 1) {
-    const toSeg = to.path.split('/')[1]
-    const fromSeg = from.path.split('/')[1]
+  const toSeg = to.path.split('/')[1]
+  const fromSeg = from.path.split('/')[1]
+  const lastToSeg = to.path.split('/').slice(-1)[0]
+  const lastFromSeg = from.path.split('/').slice(-1)[0]
+  if (toSeg !== fromSeg) {
+    // We are changing tabs, so transition based on tab position
     setTransition('page-left')
     if (fromSeg === 'explore') {
       setTransition('page-left')
-    } else if (fromSeg === 'places') {
-      if (toSeg === 'explore') {
-        setTransition('page-right')
-      }
-    } else if (fromSeg === 'search') {
-      if (toSeg === 'explore' || toSeg === 'places') {
-        setTransition('page-right')
-      }
-    } else if (fromSeg === 'contribute') {
-      if (toSeg !== 'profile') {
-        setTransition('page-right')
-      }
+    } else if (fromSeg === 'places' && toSeg === 'explore') {
+      setTransition('page-right')
+    } else if (
+      fromSeg === 'search' &&
+      (toSeg === 'explore' || toSeg === 'places')
+    ) {
+      setTransition('page-right')
+    } else if (fromSeg === 'contribute' && toSeg !== 'profile') {
+      setTransition('page-right')
     } else if (fromSeg === 'profile') {
       setTransition('page-right')
     }
+  } else if (lastFromSeg === 'new' && lastToSeg !== 'new') {
+    // We just created a new model, so do not show a transition
+    setTransition('none')
   } else if (toDepth > fromDepth) {
     to.meta.pageTransition = { name: 'page-left' }
     from.meta.pageTransition = { name: 'page-left' }

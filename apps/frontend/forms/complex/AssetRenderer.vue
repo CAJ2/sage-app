@@ -28,8 +28,8 @@ import {
   rankWith,
   and,
   uiTypeIs,
-  schemaMatches,
   schemaTypeIs,
+  optionIs,
 } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
@@ -38,7 +38,7 @@ import { ControlWrapper } from '../controls'
 import { useVanillaControl } from '../util'
 
 const controlRenderer = defineComponent({
-  name: 'ReferenceRenderer',
+  name: 'AssetRenderer',
   components: {
     ControlWrapper,
   },
@@ -61,9 +61,7 @@ export const entry: JsonFormsRendererRegistryEntry = {
     2,
     and(
       uiTypeIs('Control'),
-      schemaMatches((schema) =>
-        Object.prototype.hasOwnProperty.call(schema, '$id'),
-      ),
+      optionIs('control', 'Asset'),
       schemaTypeIs('string'),
     ),
   ),

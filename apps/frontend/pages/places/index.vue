@@ -20,6 +20,39 @@
     <div class="map-wrap">
       <div ref="mapContainer" class="map"></div>
     </div>
+    <Drawer v-model:open="openDetails" :set-background-color-on-scale="false">
+      <DrawerContent class="min-h-[50vh] p-3">
+        <DrawerHeader class="text-left">
+          <DrawerTitle>{{ selectedPlace?.name }}</DrawerTitle>
+        </DrawerHeader>
+        <h3 class="text-md font-semibold">{{ selectedPlace?.desc }}</h3>
+        <p>{{ selectedPlace?.tags }}</p>
+        <NuxtLinkLocale :to="`/places/${selectedPlace?.id}`" class="p-4">
+          <Button class="w-full">View Details</Button>
+        </NuxtLinkLocale>
+        <a
+          :href="`https://maps.google.com/?q=${selectedPlace?.location?.latitude},${selectedPlace?.location?.longitude}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-4"
+        >
+          <Button class="w-full" variant="outline"
+            >Open in Maps
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="currentColor"
+                d="M14 3v2h3.59l-9.83 9.83l1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2z"
+              />
+            </svg>
+          </Button>
+        </a>
+      </DrawerContent>
+    </Drawer>
   </div>
 </template>
 
@@ -33,8 +66,11 @@ import maplibregl, {
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'
 import { graphql } from '~/gql'
+import type { Place } from '~/gql/types.generated'
 
 const searchInput = ref('')
+const openDetails = ref(false)
+const selectedPlace = ref<Place | null>(null)
 
 const regionStore = useRegionStore()
 const regionQuery = graphql(`
@@ -94,31 +130,40 @@ let markers: Pick<maplibregl.Marker, 'remove'>[] = []
 watch(
   () => search.result.value,
   () => {
+    console.log('Search result gotten')
     if (map.value && search.result.value && search.result.value.search.nodes) {
-      markers.forEach((marker) => marker.remove())
+      markers.forEach((marker) => {
+        marker.remove()
+      })
       markers = []
       search.result.value.search.nodes.forEach((place) => {
         if (place.__typename !== 'Place' || !place.location) {
           return
         }
-        const marker = new maplibregl.Marker({ color: '#005d58' })
+        const el = document.createElement('div')
+        el.className = 'text-primary'
+        el.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"/></svg>
+        `
+        const marker = new maplibregl.Marker({
+          color: '#005d58',
+          element: el,
+        })
           .setLngLat([place.location.longitude, place.location.latitude])
-          .setPopup(
-            new maplibregl.Popup().setHTML(
-              `<strong class="text-primary">${place.name}</strong><br>${place.address || ''}`,
-            ),
-          )
           .addTo(map.value!)
         markers.push(marker)
+        marker.getElement().addEventListener('click', (e: Event) => {
+          e.stopPropagation()
+          e.preventDefault()
+          openDetails.value = true
+          selectedPlace.value = place as Place
+        })
       })
     }
   },
 )
 
 const refreshSearch = async (newSearch: string) => {
-  if (!newSearch.trim()) {
-    return
-  }
   if (!mapBounds.value) {
     return
   }
