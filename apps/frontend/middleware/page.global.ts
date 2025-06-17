@@ -15,22 +15,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const lastToSeg = to.path.split('/').slice(-1)[0]
   const lastFromSeg = from.path.split('/').slice(-1)[0]
   if (toSeg !== fromSeg) {
-    // We are changing tabs, so transition based on tab position
-    setTransition('page-left')
-    if (fromSeg === 'explore') {
-      setTransition('page-left')
-    } else if (fromSeg === 'places' && toSeg === 'explore') {
-      setTransition('page-right')
-    } else if (
-      fromSeg === 'search' &&
-      (toSeg === 'explore' || toSeg === 'places')
-    ) {
-      setTransition('page-right')
-    } else if (fromSeg === 'contribute' && toSeg !== 'profile') {
-      setTransition('page-right')
-    } else if (fromSeg === 'profile') {
-      setTransition('page-right')
-    }
+    // We are changing tabs, no transition
+    setTransition('none')
   } else if (lastFromSeg === 'new' && lastToSeg !== 'new') {
     // We just created a new model, so do not show a transition
     setTransition('none')

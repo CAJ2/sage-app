@@ -40,7 +40,7 @@ useDark({
   top: 0;
   left: 0;
   right: 0;
-  transition: all 0.15s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  transition: all 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 .page-left-enter-from,
 .page-right-leave-to {
