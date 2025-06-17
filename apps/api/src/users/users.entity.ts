@@ -59,6 +59,9 @@ export class User extends IDCreatedUpdated {
   @Property({ type: 'timestamptz', nullable: true })
   ban_expires?: number
 
+  @Property()
+  role?: string
+
   @OneToMany({ mappedBy: 'user' })
   sessions = new Collection<Session>(this)
 

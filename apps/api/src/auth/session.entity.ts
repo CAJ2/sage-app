@@ -20,6 +20,9 @@ export class Session extends IDCreatedUpdated {
   @Property()
   active_organization_id?: string
 
+  @Property()
+  impersonated_by?: string
+
   @ManyToOne(() => User)
   @Index()
   user!: User

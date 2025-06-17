@@ -1808,6 +1808,16 @@
           "nullable": true,
           "length": 6,
           "mappedType": "datetime"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "users",
@@ -2145,6 +2155,16 @@
         },
         "active_organization_id": {
           "name": "active_organization_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "impersonated_by": {
+          "name": "impersonated_by",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
