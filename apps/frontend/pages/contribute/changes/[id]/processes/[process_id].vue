@@ -14,6 +14,7 @@
           :data="updateData || createData"
           :ajv="ajv"
           :renderers="renderers"
+          :readonly="readOnly"
           @change="onChange"
         />
       </div>
@@ -27,9 +28,10 @@ import { renderers } from '~/forms'
 import Ajv from 'ajv/dist/2020'
 import addFormats from 'ajv-formats'
 import { graphql } from '~/gql'
-import type {
-  CreateProcessInput,
-  UpdateProcessInput,
+import {
+  ChangeStatus,
+  type CreateProcessInput,
+  type UpdateProcessInput,
 } from '~/gql/types.generated'
 
 const route = useRoute()
@@ -63,6 +65,7 @@ const { data: formData } = await useAsyncQuery(processSchema)
 const processEditQuery = graphql(`
   query ChangesProcessEdit($id: ID!, $changeID: ID!) {
     getChange(id: $changeID) {
+      status
       edits(id: $id) {
         nodes {
           changes_update
@@ -86,6 +89,7 @@ const uiSchema = computed(() => {
 
 const createData = ref<CreateProcessInput | null>(null)
 const updateData = ref<UpdateProcessInput | null>(null)
+const changeStatus = ref<ChangeStatus | null>(null)
 if (processID !== 'new') {
   const { data } = await useAsyncQuery(processEditQuery, {
     id: processID,
@@ -100,7 +104,16 @@ if (processID !== 'new') {
       data.value.getChange.edits.nodes[0].changes_update,
     ) as UpdateProcessInput
   }
+  if (data?.value?.getChange?.status) {
+    changeStatus.value = data.value.getChange.status
+  }
 }
+const readOnly = computed<boolean | undefined>(() => {
+  if (changeStatus.value !== ChangeStatus.Merged) {
+    return undefined
+  }
+  return true
+})
 
 const processCreateMutation = graphql(`
   mutation ChangeProcessCreate($input: CreateProcessInput!) {
@@ -142,6 +155,9 @@ const processUpdate = useMutation(processUpdateMutation, {
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
 const onChange = async (event: JsonFormsChangeEvent) => {
+  if (changeStatus.value === ChangeStatus.Merged) {
+    return
+  }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
       console.error('Form errors:', event.errors)
@@ -190,7 +206,6 @@ const onChange = async (event: JsonFormsChangeEvent) => {
         .catch((error) => {
           console.error('Error updating process:', error)
           saveStatus.value = 'error'
-          return
         })
     }
   }

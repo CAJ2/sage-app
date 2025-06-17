@@ -168,7 +168,9 @@
             >
           </ul>
           <UiList
-            v-if="changeData"
+            v-if="
+              changeData && changeData.getChange?.status !== ChangeStatus.Merged
+            "
             class="pt-4"
             :items="[
               {
