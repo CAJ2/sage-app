@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import "maplibre-gl/dist/maplibre-gl.css";
 
-@source "../../../../packages/ui";
-
 @plugin 'daisyui';
 
 @font-face {

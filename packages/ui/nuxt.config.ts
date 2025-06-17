@@ -1,11 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
 import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
-  devtools: { enabled: true },
-
-  extends: ['../../packages/ui'],
-
   modules: [
     '@nuxtjs/apollo',
     '@nuxtjs/color-mode',
@@ -15,7 +12,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    ['reka-ui/nuxt', { prefix: 'reka' }],
+    'reka-ui/nuxt',
     'shadcn-nuxt',
   ],
 
@@ -77,12 +74,6 @@ export default defineNuxtConfig({
         }
       },
     },
-  },
-
-  runtimeConfig: {
-    public: {
-      apiurl: 'https://api.dev.sageleaf.app',
-    }
   },
 
   colorMode: {

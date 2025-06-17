@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { JsonForms, type JsonFormsChangeEvent } from '@jsonforms/vue'
-import { renderers } from '~/forms'
+import { renderers } from '@sageleaf/ui/forms'
 import Ajv from 'ajv/dist/2020'
 import addFormats from 'ajv-formats'
 import { graphql } from '~/gql'

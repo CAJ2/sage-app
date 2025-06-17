@@ -1,24 +1,16 @@
 {
-  "name": "frontend",
+  "name": "@sageleaf/ui",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "pnpm exec nuxi build",
     "dev": "pnpm exec nuxi dev",
-    "generate": "pnpm exec nuxi generate --dotenv=config/dev/.env",
-    "generate:prod": "pnpm exec nuxi generate --dotenv=config/production/.env",
+    "generate": "pnpm exec nuxi generate",
     "preview": "pnpm exec nuxi preview",
     "postinstall": "pnpm exec nuxi prepare",
     "lint": "pnpm exec eslint --fix",
     "lint:ci": "pnpm exec eslint . --max-warnings 0",
-    "codegen": "graphql-codegen --config codegen.ts",
-    "sync": "pnpm exec cap sync",
-    "android:open": "pnpm exec cap open android",
-    "android:build": "pnpm exec cap build android",
-    "android:run": "pnpm exec cap run android",
-    "ios:open": "pnpm exec cap open ios",
-    "ios:build": "pnpm exec cap build ios",
-    "ios:run": "pnpm exec cap run ios"
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0",
@@ -43,7 +35,6 @@
     "vue-tsc": "^2.2.10"
   },
   "dependencies": {
-    "@sageleaf/ui": "workspace:^",
     "@apollo/client": "^3.13.8",
     "@capacitor/android": "^7.0.0",
     "@capacitor/app": "^7.0.1",
