@@ -173,6 +173,9 @@ export class CategoryResolver {
   ): Promise<UpdateCategoryOutput> {
     const updated = await this.categoryService.update(input, user.id)
     const model = await this.transform.entityToModel(updated.category, Category)
+    if (!updated.change) {
+      return { category: model }
+    }
     const change = await this.transform.entityToModel(updated.change, Change)
     return { category: model, change }
   }

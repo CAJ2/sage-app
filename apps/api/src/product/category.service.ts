@@ -139,16 +139,21 @@ export class CategoryService {
   }
 
   async update(input: UpdateCategoryInput, userID: string) {
-    const category = await this.em.findOneOrFail(
-      Category,
-      { id: input.id },
-      { disableIdentityMap: input.useChange() },
-    )
-    const change = await this.changeService.findOneOrCreate(
-      input.change_id,
-      input.change,
-      userID,
-    )
+    const { entity: category, change } =
+      await this.changeService.findOneWithChangeInput(input, userID, Category, {
+        id: input.id,
+      })
+    if (!category) {
+      throw new Error(`Category with ID "${input.id}" not found`)
+    }
+    if (!input.useChange()) {
+      await this.setFields(category, input)
+      await this.em.persistAndFlush(category)
+      return {
+        category,
+        change: null,
+      }
+    }
     await this.changeService.beginUpdateEntityEdit(change, category)
     await this.setFields(category, input, change)
     await this.changeService.updateEntityEdit(change, category)

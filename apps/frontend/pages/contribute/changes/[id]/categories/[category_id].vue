@@ -10,13 +10,10 @@
           v-if="!readOnly"
           :status="saveStatus"
         ></FormChangeSaveStatus>
-        <JsonForms
-          v-if="jsonSchema && uiSchema"
+        <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
           :data="updateData || createData"
-          :ajv="ajv"
-          :renderers="renderers"
           :readonly="readOnly"
           @change="onChange"
         />
@@ -26,10 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { JsonForms, type JsonFormsChangeEvent } from '@jsonforms/vue'
-import { renderers } from '@sageleaf/ui/forms'
-import Ajv from 'ajv/dist/2020'
-import addFormats from 'ajv-formats'
+import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import { graphql } from '~/gql'
 import {
   ChangeStatus,
@@ -41,14 +35,6 @@ const route = useRoute()
 const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
 const categoryID = route.params.category_id as string
-
-const ajv = new Ajv({
-  allErrors: true,
-  verbose: true,
-  strict: false,
-  validateFormats: true,
-})
-addFormats(ajv)
 
 const categorySchema = graphql(`
   query ChangesCategorySchema {
