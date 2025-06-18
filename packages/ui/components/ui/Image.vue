@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import 'iconify-icon'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
+import { cn } from '../lib/utils'
 
 const props = defineProps<{
   src?: string | null

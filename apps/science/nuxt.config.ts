@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    ['reka-ui/nuxt', { prefix: 'reka' }],
+    ['reka-ui/nuxt', { components: false }],
   ],
 
   app: {

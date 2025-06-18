@@ -13,7 +13,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     'reka-ui/nuxt',
-    'shadcn-nuxt',
   ],
 
   app: {
@@ -78,11 +77,6 @@ export default defineNuxtConfig({
 
   colorMode: {
     classSuffix: '',
-  },
-
-  shadcn: {
-    prefix: '',
-    componentDir: 'components/shadcn',
   },
 
   compatibilityDate: '2025-02-12',
