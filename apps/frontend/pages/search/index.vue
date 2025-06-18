@@ -2,21 +2,21 @@
   <div>
     <div class="flex justify-center">
       <div class="w-full p-5 mb-[64px] max-w-2xl">
-        <TabsRoot
+        <RekaTabsRoot
           v-model:model-value="activeTab"
           class="flex flex-col w-full"
           default-value="search"
         >
-          <TabsList
+          <RekaTabsList
             class="relative shrink-0 flex border-b border-primary mb-5"
             aria-label="Manage your account"
           >
-            <TabsIndicator
+            <RekaTabsIndicator
               class="absolute px-8 left-0 h-[2px] bottom-0 w-[--reka-tabs-indicator-size] translate-x-[--reka-tabs-indicator-position] translate-y-[1px] rounded-full transition-[width,transform] duration-300"
             >
               <div class="bg-primary w-full h-full" />
-            </TabsIndicator>
-            <TabsTrigger
+            </RekaTabsIndicator>
+            <RekaTabsTrigger
               class="px-5 h-[45px] flex-1 flex items-center justify-center text-sm leading-none select-none rounded-tl-md hover:text-primary data-[state=active]:text-primary outline-none cursor-default focus-visible:relative focus-visible:shadow-[0_0_0_2px] focus-visible:shadow-black"
               value="search"
             >
@@ -25,8 +25,8 @@
                 class="w-4 h-4 mr-2"
               />
               Search
-            </TabsTrigger>
-            <TabsTrigger
+            </RekaTabsTrigger>
+            <RekaTabsTrigger
               class="px-5 h-[45px] flex-1 flex items-center justify-center text-sm leading-none select-none rounded-tl-md hover:text-primary data-[state=active]:text-primary outline-none cursor-default focus-visible:relative focus-visible:shadow-[0_0_0_2px] focus-visible:shadow-black"
               value="scan"
             >
@@ -35,9 +35,9 @@
                 class="w-4 h-4 mr-2"
               />
               Scan
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="search">
+            </RekaTabsTrigger>
+          </RekaTabsList>
+          <RekaTabsContent value="search">
             <div class="relative items-center">
               <FormInput
                 id="search"
@@ -130,11 +130,11 @@
                 <div class="text-neutral-500">Search for anything</div>
               </li>
             </ul>
-          </TabsContent>
-          <TabsContent value="scan">
+          </RekaTabsContent>
+          <RekaTabsContent value="scan">
             <SearchScanner></SearchScanner>
-          </TabsContent>
-        </TabsRoot>
+          </RekaTabsContent>
+        </RekaTabsRoot>
       </div>
     </div>
   </div>
