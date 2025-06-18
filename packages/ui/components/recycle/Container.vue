@@ -40,15 +40,10 @@
 import { useElementSize } from '@vueuse/core'
 import type { ComponentRecycle } from '~/gql/types.generated'
 
-const { image, recycle } = withDefaults(
-  defineProps<{
-    image?: string | null
-    recycle: ComponentRecycle
-  }>(),
-  {
-    image: null,
-  },
-)
+const { image, recycle } = defineProps<{
+  image?: string | null
+  recycle: ComponentRecycle
+}>()
 
 const containerImage = useTemplateRef<HTMLImageElement>('containerImage')
 const compImage = useTemplateRef<HTMLImageElement>('compImage')

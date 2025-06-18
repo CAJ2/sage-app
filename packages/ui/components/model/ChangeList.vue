@@ -52,25 +52,19 @@
 <script setup lang="ts">
 import { ChangeStatus } from '~/gql/types.generated'
 import type { Change } from '~/gql/types.generated'
-const { data } = withDefaults(
-  defineProps<{
-    status?: string
-    data?: {
-      nodes?:
-        | (Pick<
-            Change,
-            'id' | 'status' | 'title' | 'description' | 'updated_at'
-          > & {
-            edits?: {
-              totalCount: number
-            }
-          })[]
-        | null
-    }
-  }>(),
-  {
-    status: 'pending',
-    data: undefined,
-  },
-)
+const { data } = defineProps<{
+  status?: string
+  data?: {
+    nodes?:
+      | (Pick<
+          Change,
+          'id' | 'status' | 'title' | 'description' | 'updated_at'
+        > & {
+          edits?: {
+            totalCount: number
+          }
+        })[]
+      | null
+  }
+}>()
 </script>

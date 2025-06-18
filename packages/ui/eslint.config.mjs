@@ -34,4 +34,17 @@ const prettier = [
   },
 ]
 
-export default withNuxt([...baseConfig, eslintPluginPrettier, ...prettier])
+const disabledRules = [
+  {
+    rules: {
+      'vue/require-default-prop': 'off',
+    },
+  },
+]
+
+export default withNuxt([
+  ...baseConfig,
+  eslintPluginPrettier,
+  ...prettier,
+  ...disabledRules,
+])

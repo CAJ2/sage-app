@@ -16,7 +16,6 @@ defineOptions({
 })
 
 const props = withDefaults(
-  // eslint-disable-next-line vue/require-default-prop
   defineProps<SelectContentProps & { class?: HTMLAttributes['class'] }>(),
   {
     position: 'popper',

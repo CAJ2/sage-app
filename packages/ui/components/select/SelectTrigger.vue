@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils'
 const props = withDefaults(
   defineProps<
     SelectTriggerProps & {
-      // eslint-disable-next-line vue/require-default-prop
       class?: HTMLAttributes['class']
       size?: 'sm' | 'default'
     }
