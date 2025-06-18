@@ -26,7 +26,10 @@
         "^production"
       ],
       "outputs": [
-        "{projectRoot}/dist"
+        "{projectRoot}/dist",
+        "{projectRoot}/temp",
+        "{projectRoot}/.nuxt",
+        "{projectRoot}/.output"
       ],
       "dependsOn": [
         "^build"
@@ -37,17 +40,31 @@
       "inputs": [
         "default",
         "^production"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "lint:ci": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "dependsOn": [
+        "^build"
       ]
     },
     "test": {
-      "cache": false,
+      "cache": true,
       "inputs": [
         "default",
         "^default",
         "{workspaceRoot}/jest.preset.js"
       ],
       "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
+        "{workspaceRoot}/coverage/{projectRoot}",
+        "{projectRoot}/coverage"
       ],
       "executor": "@nx/jest:jest"
     }
