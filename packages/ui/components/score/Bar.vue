@@ -7,20 +7,28 @@ import {
 } from 'reka-ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-const { size, score, scoreSlide, rating, ratingFmt } = defineProps<{
-  size: 'small' | 'medium' | 'large'
-  score?: number | null
-  scoreSlide?: boolean | null
-  rating?:
-    | 'POOR'
-    | 'FAIR'
-    | 'GOOD'
-    | 'VERY_GOOD'
-    | 'EXCELLENT'
-    | 'UNKNOWN'
-    | null
-  ratingFmt?: string | null
-}>()
+const { size, score, scoreSlide, rating, ratingFmt } = withDefaults(
+  defineProps<{
+    size: 'small' | 'medium' | 'large'
+    score?: number | null
+    scoreSlide?: boolean | null
+    rating?:
+      | 'POOR'
+      | 'FAIR'
+      | 'GOOD'
+      | 'VERY_GOOD'
+      | 'EXCELLENT'
+      | 'UNKNOWN'
+      | null
+    ratingFmt?: string | null
+  }>(),
+  {
+    score: null,
+    scoreSlide: false,
+    rating: 'UNKNOWN',
+    ratingFmt: null,
+  },
+)
 
 const progressValue = ref(0)
 const timer = ref()

@@ -58,12 +58,18 @@
 
 <script setup lang="ts">
 import type { Category } from '~/gql/types.generated'
-const { data } = defineProps<{
-  status?: string
-  data?: {
-    nodes?:
-      | Pick<Category, 'id' | 'name' | 'desc_short' | 'desc' | 'image_url'>[]
-      | null
-  }
-}>()
+const { data } = withDefaults(
+  defineProps<{
+    status?: string
+    data?: {
+      nodes?:
+        | Pick<Category, 'id' | 'name' | 'desc_short' | 'desc' | 'image_url'>[]
+        | null
+    }
+  }>(),
+  {
+    status: 'pending',
+    data: undefined,
+  },
+)
 </script>
