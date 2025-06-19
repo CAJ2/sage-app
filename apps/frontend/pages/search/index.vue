@@ -2,42 +2,31 @@
   <div>
     <div class="flex justify-center">
       <div class="w-full p-5 mb-[64px] max-w-2xl">
-        <RekaTabsRoot
+        <Tabs
           v-model:model-value="activeTab"
-          class="flex flex-col w-full"
+          class="w-full"
           default-value="search"
         >
-          <RekaTabsList
-            class="relative shrink-0 flex border-b border-primary mb-5"
+          <TabsList
             aria-label="Manage your account"
+            class="grid w-full grid-cols-2"
           >
-            <RekaTabsIndicator
-              class="absolute px-8 left-0 h-[2px] bottom-0 w-[--reka-tabs-indicator-size] translate-x-[--reka-tabs-indicator-position] translate-y-[1px] rounded-full transition-[width,transform] duration-300"
-            >
-              <div class="bg-primary w-full h-full" />
-            </RekaTabsIndicator>
-            <RekaTabsTrigger
-              class="px-5 h-[45px] flex-1 flex items-center justify-center text-sm leading-none select-none rounded-tl-md hover:text-primary data-[state=active]:text-primary outline-none cursor-default focus-visible:relative focus-visible:shadow-[0_0_0_2px] focus-visible:shadow-black"
-              value="search"
-            >
+            <TabsTrigger value="search">
               <font-awesome-icon
                 icon="fa-solid fa-magnifying-glass"
                 class="w-4 h-4 mr-2"
               />
               Search
-            </RekaTabsTrigger>
-            <RekaTabsTrigger
-              class="px-5 h-[45px] flex-1 flex items-center justify-center text-sm leading-none select-none rounded-tl-md hover:text-primary data-[state=active]:text-primary outline-none cursor-default focus-visible:relative focus-visible:shadow-[0_0_0_2px] focus-visible:shadow-black"
-              value="scan"
-            >
+            </TabsTrigger>
+            <TabsTrigger value="scan">
               <font-awesome-icon
                 icon="fa-solid fa-qrcode"
                 class="w-4 h-4 mr-2"
               />
               Scan
-            </RekaTabsTrigger>
-          </RekaTabsList>
-          <RekaTabsContent value="search">
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="search">
             <div class="relative items-center">
               <FormInput
                 id="search"
@@ -65,15 +54,8 @@
                 <div class="skeleton h-4 w-full"></div>
               </li>
 
-              <div
-                v-if="data && status !== 'pending'"
-                class="divide-y border-neutral-200"
-              >
-                <li
-                  v-for="res in data.search.nodes"
-                  :key="res.id"
-                  class="border-neutral-200"
-                >
+              <div v-if="data && status !== 'pending'">
+                <li v-for="res in data.search.nodes" :key="res.id">
                   <div
                     v-if="res.id"
                     class="list-row flex flex-col gap-0 pt-2 pb-3"
@@ -130,11 +112,11 @@
                 <div class="text-neutral-500">Search for anything</div>
               </li>
             </ul>
-          </RekaTabsContent>
-          <RekaTabsContent value="scan">
+          </TabsContent>
+          <TabsContent value="scan">
             <SearchScanner></SearchScanner>
-          </RekaTabsContent>
-        </RekaTabsRoot>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   </div>
