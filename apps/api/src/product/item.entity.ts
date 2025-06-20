@@ -14,14 +14,19 @@ import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import { flattenTr, TranslatedField } from '@src/db/i18n'
 import { Tag } from '@src/process/tag.entity'
 import { User } from '@src/users/users.entity'
+import { z } from 'zod/v4'
 import { Category } from './category.entity'
 import { Variant } from './variant.entity'
 
-export interface ItemFiles {
-  [key: string]: {
-    url: string
-  }
-}
+export const ItemFilesSchema = z.object({
+  images: z.array(
+    z.object({
+      url: z.string(),
+    }),
+  ),
+})
+
+export type ItemFiles = z.infer<typeof ItemFilesSchema>
 
 @Entity({ tableName: 'items', schema: 'public' })
 export class Item extends IDCreatedUpdated implements Searchable {

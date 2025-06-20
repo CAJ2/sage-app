@@ -26,6 +26,35 @@ export const zToSchema = (
   })
 }
 
+export const TranslatedInputSchema = z.object({
+  lang: z
+    .string()
+    .regex(/^[a-z]{2,3}(-[A-Z]{2,8}(-[^-]{2,8})?)?$/)
+    .meta({
+      id: 'lang',
+      title: 'Language Code',
+    }),
+  text: z.string().optional(),
+  auto: z.boolean().default(false),
+})
+export const TrArraySchema = z
+  .array(TranslatedInputSchema)
+  .optional()
+  .default([
+    {
+      lang: 'en',
+      text: '',
+      auto: false,
+    },
+  ])
+export const ImageOrIconSchema = z
+  .url({ protocol: /^(https|iconify):\/\// })
+  .optional()
+  .default('')
+export const RelMetaSchema = z
+  .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+  .optional()
+
 @Injectable()
 export class BaseSchemaService {
   ajv: Ajv2020

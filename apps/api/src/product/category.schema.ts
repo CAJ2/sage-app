@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common'
 import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { ChangeService } from '@src/changes/change.service'
-import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import {
+  BaseSchemaService,
+  ImageOrIconSchema,
+  TrArraySchema,
+  zToSchema,
+} from '@src/common/base.schema'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ImageOrIconSchema, TrArraySchema } from '@src/graphql/base.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'

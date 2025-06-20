@@ -12,6 +12,7 @@ import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ModelEditSchema } from '@src/graphql/base.model'
 import { Component, ComponentsPage } from '@src/process/component.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Org, OrgsPage } from '@src/users/org.model'
@@ -30,6 +31,7 @@ import {
   VariantsPage,
   VariantTagsArgs,
 } from './variant.model'
+import { VariantSchemaService } from './variant.schema'
 import { VariantService } from './variant.service'
 
 @Resolver(() => Variant)
@@ -37,6 +39,7 @@ export class VariantResolver {
   constructor(
     private readonly variantService: VariantService,
     private readonly transform: TransformService,
+    private readonly variantSchemaService: VariantSchemaService,
   ) {}
 
   @Query(() => VariantsPage, { name: 'getVariants' })
@@ -56,6 +59,20 @@ export class VariantResolver {
     }
     const result = this.transform.entityToModel(variant, Variant)
     return result
+  }
+
+  @Query(() => ModelEditSchema, { nullable: true })
+  async getVariantSchema(): Promise<ModelEditSchema> {
+    return {
+      create: {
+        schema: this.variantSchemaService.CreateJSONSchema,
+        uischema: this.variantSchemaService.CreateUISchema,
+      },
+      update: {
+        schema: this.variantSchemaService.UpdateJSONSchema,
+        uischema: this.variantSchemaService.UpdateUISchema,
+      },
+    }
   }
 
   @ResolveField()

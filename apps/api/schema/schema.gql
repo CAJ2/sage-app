@@ -608,6 +608,7 @@ type Query {
   getComponentSchema: ModelEditSchema
   getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
   getItem(id: ID!): Item
+  getItemSchema: ModelEditSchema
   getItems(after: String, before: String, first: Int, last: Int): ItemsPage!
   getMaterial(id: ID!): Material
   getMaterials(after: String, before: String, first: Int, last: Int): MaterialsPage!
@@ -625,6 +626,7 @@ type Query {
   getTags(after: String, before: String, first: Int, last: Int): TagPage!
   getUser(id: ID!): User
   getVariant(id: ID!): Variant
+  getVariantSchema: ModelEditSchema
   getVariants(after: String, before: String, first: Int, last: Int): VariantsPage!
   rootCategory: Category!
   rootMaterial: Material!

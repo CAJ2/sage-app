@@ -165,9 +165,11 @@ export class ItemService {
     }
     if (input.image_url) {
       if (!item.files) {
-        item.files = {}
+        item.files = {
+          images: [],
+        }
       }
-      item.files['image'] = { url: input.image_url }
+      item.files.images.push({ url: input.image_url })
     }
     if (!item.source) {
       item.source = {}

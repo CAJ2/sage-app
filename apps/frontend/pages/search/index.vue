@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-center">
-      <div class="w-full p-5 mb-[64px] max-w-2xl">
+      <div class="w-full p-5 max-w-2xl">
         <Tabs
           v-model:model-value="activeTab"
           class="w-full"
@@ -56,46 +56,46 @@
 
               <div v-if="data && status !== 'pending'">
                 <li v-for="res in data.search.nodes" :key="res.id">
-                  <div
-                    v-if="res.id"
-                    class="list-row flex flex-col gap-0 pt-2 pb-3"
-                  >
-                    <p class="text-xs text-neutral-500 uppercase pb-2">
-                      {{ formatType(res.__typename) }}
-                    </p>
-                    <div class="flex items-center gap-2">
-                      <img
-                        v-if="res.image_url"
-                        class="size-12 rounded-box"
-                        :src="res.image_url"
-                      />
-                      <span
-                        v-else
-                        class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
-                      >
-                        <font-awesome-icon
-                          :icon="placeholderIcon(res.__typename)"
-                          class="size-6 h-6! p-1"
+                  <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
+                    <div
+                      v-if="res.id"
+                      class="list-row flex flex-col gap-0 pt-2 pb-3"
+                    >
+                      <p class="text-xs text-neutral-500 uppercase pb-2">
+                        {{ formatType(res.__typename) }}
+                      </p>
+                      <div class="flex items-center gap-2">
+                        <img
+                          v-if="res.image_url"
+                          class="size-12 rounded-box"
+                          :src="res.image_url"
                         />
-                      </span>
-                      <div class="flex-1 px-2">
-                        <div class="text-bold">
-                          {{ res.name || res.name_null }}
+                        <span
+                          v-else
+                          class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
+                        >
+                          <font-awesome-icon
+                            :icon="placeholderIcon(res.__typename)"
+                            class="size-6 h-6! p-1"
+                          />
+                        </span>
+                        <div class="flex-1 px-2">
+                          <div class="text-bold">
+                            {{ res.name || res.name_null }}
+                          </div>
+                          <div class="text-xs opacity-70">
+                            {{ res.desc_short }}
+                          </div>
                         </div>
-                        <div class="text-xs opacity-70">
-                          {{ res.desc_short }}
-                        </div>
-                      </div>
-                      <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
                         <button class="btn btn-square btn-ghost">
                           <font-awesome-icon
                             icon="fa-solid fa-angle-right"
                             class="size-[1.2em]"
                           />
                         </button>
-                      </NuxtLinkLocale>
+                      </div>
                     </div>
-                  </div>
+                  </NuxtLinkLocale>
                 </li>
               </div>
 

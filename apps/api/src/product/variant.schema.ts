@@ -1,13 +1,21 @@
 import { Injectable } from '@nestjs/common'
+import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import { ChangeService } from '@src/changes/change.service'
+import {
+  BaseSchemaService,
+  ImageOrIconSchema,
+  TrArraySchema,
+  zToSchema,
+} from '@src/common/base.schema'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { ImageOrIconSchema, TrArraySchema } from '@src/graphql/base.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { ComponentIDSchema } from '@src/process/component.schema'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { OrgIDSchema } from '@src/users/org.schema'
+import { ValidateFunction } from 'ajv'
+import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 import { ItemIDSchema } from './item.schema'
@@ -42,18 +50,21 @@ export const VariantComponentsInputSchema = z.strictObject({
 
 @Injectable()
 export class VariantSchemaService {
-  CreateVariantInputSchema: z.ZodObject<any>
-  CreateVariantInputJSONSchema: z.core.JSONSchema.BaseSchema
-  CreateVariantInputUISchema: UISchemaElement
-  UpdateVariantInputSchema: z.ZodObject<any>
-  UpdateVariantInputJSONSchema: z.core.JSONSchema.BaseSchema
-  UpdateVariantInputUISchema: UISchemaElement
+  CreateSchema: z.ZodObject
+  CreateJSONSchema: z.core.JSONSchema.BaseSchema
+  CreateValidator: ValidateFunction
+  CreateUISchema: UISchemaElement
+  UpdateSchema: z.ZodObject
+  UpdateJSONSchema: z.core.JSONSchema.BaseSchema
+  UpdateValidator: ValidateFunction
+  UpdateUISchema: UISchemaElement
 
   constructor(
     private readonly i18n: I18nService<I18nTranslations>,
     private readonly baseSchema: BaseSchemaService,
+    private readonly changeService: ChangeService,
   ) {
-    this.CreateVariantInputSchema = ChangeInputWithLangSchema.extend({
+    this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
       name_tr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
@@ -68,9 +79,9 @@ export class VariantSchemaService {
       components: z.array(VariantComponentsInputSchema).optional(),
     })
 
-    this.CreateVariantInputJSONSchema = zToSchema(this.CreateVariantInputSchema)
+    this.CreateJSONSchema = zToSchema(this.CreateSchema)
 
-    this.CreateVariantInputUISchema = {
+    this.CreateUISchema = {
       type: 'VerticalLayout',
       elements: [
         {
@@ -119,30 +130,35 @@ export class VariantSchemaService {
       ],
     }
 
-    this.UpdateVariantInputSchema = ChangeInputWithLangSchema.extend({
+    this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: VariantIDSchema,
       name: z.string().max(1024).optional(),
       name_tr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
       desc_tr: TrArraySchema,
       image_url: ImageOrIconSchema,
+      items: z.array(VariantItemsInputSchema).optional(),
       add_items: z.array(VariantItemsInputSchema).optional(),
       remove_items: z.array(VariantItemsInputSchema).optional(),
       region_id: RegionIDSchema.optional(),
+      regions: z.array(VariantRegionsInputSchema).optional(),
       add_regions: z.array(VariantRegionsInputSchema).optional(),
       remove_regions: z.array(VariantRegionsInputSchema).optional(),
       code: z.string().max(1024).optional(),
+      orgs: z.array(VariantOrgsInputSchema).optional(),
       add_orgs: z.array(VariantOrgsInputSchema).optional(),
       remove_orgs: z.array(VariantOrgsInputSchema).optional(),
+      tags: z.array(VariantTagsInputSchema).optional(),
       add_tags: z.array(VariantTagsInputSchema).optional(),
       remove_tags: z.array(VariantTagsInputSchema).optional(),
+      components: z.array(VariantComponentsInputSchema).optional(),
       add_components: z.array(VariantComponentsInputSchema).optional(),
       remove_components: z.array(VariantComponentsInputSchema).optional(),
     })
 
-    this.UpdateVariantInputJSONSchema = zToSchema(this.UpdateVariantInputSchema)
+    this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
 
-    this.UpdateVariantInputUISchema = {
+    this.UpdateUISchema = {
       type: 'VerticalLayout',
       elements: [
         {
@@ -170,11 +186,7 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/add_items',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/remove_items',
+          scope: '#/properties/items',
         },
         {
           type: 'Control',
@@ -182,11 +194,7 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/add_regions',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/remove_regions',
+          scope: '#/properties/regions',
         },
         {
           type: 'Control',
@@ -194,29 +202,43 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/add_orgs',
+          scope: '#/properties/orgs',
         },
         {
           type: 'Control',
-          scope: '#/properties/remove_orgs',
+          scope: '#/properties/tags',
         },
         {
           type: 'Control',
-          scope: '#/properties/add_tags',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/remove_tags',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/add_components',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/remove_components',
+          scope: '#/properties/components',
         },
       ],
     }
+    this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
+    this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
+    this.changeService.registerEditValidator(
+      'Variant',
+      'create',
+      this.variantCreateEdit.bind(this),
+    )
+    this.changeService.registerEditValidator(
+      'Variant',
+      'update',
+      this.variantUpdateEdit.bind(this),
+    )
+  }
+
+  async variantCreateEdit(edit: Edit) {
+    const data = _.cloneDeep(edit.changes)
+    this.CreateValidator(data)
+    this.baseSchema.flattenRefs(data)
+    return data
+  }
+
+  async variantUpdateEdit(edit: Edit) {
+    const data = _.cloneDeep(edit.changes)
+    this.UpdateValidator(data)
+    this.baseSchema.flattenRefs(data)
+    return data
   }
 }

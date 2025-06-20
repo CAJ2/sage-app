@@ -4,7 +4,6 @@ import { IsNanoID } from '@src/common/validator.model'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
 import type { Loaded } from '@mikro-orm/core'
 
 export const ModelRegistry: Record<string, new () => BaseModel<any>> = {}
@@ -90,32 +89,6 @@ export class TranslatedInput {
   @Field(() => Boolean)
   auto: boolean = false
 }
-
-export const TranslatedInputSchema = z.object({
-  lang: z
-    .string()
-    .regex(/^[a-z]{2,3}(-[A-Z]{2,8}(-[^-]{2,8})?)?$/)
-    .meta({
-      id: 'lang',
-      title: 'Language Code',
-    }),
-  text: z.string().optional(),
-  auto: z.boolean().default(false),
-})
-export const TrArraySchema = z
-  .array(TranslatedInputSchema)
-  .optional()
-  .default([
-    {
-      lang: 'en',
-      text: '',
-      auto: false,
-    },
-  ])
-export const ImageOrIconSchema = z
-  .url({ protocol: /^(https|iconify):\/\// })
-  .optional()
-  .default('')
 
 @InputType()
 export class InputWithLang {

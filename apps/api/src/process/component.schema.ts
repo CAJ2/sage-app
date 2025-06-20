@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import {
+  BaseSchemaService,
+  ImageOrIconSchema,
+  RelMetaSchema,
+  TrArraySchema,
+  zToSchema,
+} from '@src/common/base.schema'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { TrArraySchema } from '@src/graphql/base.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
+import {
+  ComponentPhysicalSchema,
+  ComponentVisualSchema,
+} from './component.entity'
 import { MaterialIDSchema } from './material.model'
 import { TagDefinitionIDSchema } from './tag.model'
 
@@ -47,7 +56,7 @@ export class ComponentSchemaService {
 
     this.ComponentTagsInputSchema = z.strictObject({
       id: TagDefinitionIDSchema,
-      meta: z.record(z.string(), z.json()).optional(),
+      meta: RelMetaSchema,
     })
 
     this.ComponentRegionInputSchema = z.strictObject({
@@ -63,12 +72,11 @@ export class ComponentSchemaService {
       desc_tr: TrArraySchema.meta({
         title: this.i18n.t('schemas.components.desc_tr.title'),
       }),
-      image_url: z
-        .string()
-        .optional()
-        .meta({
-          title: this.i18n.t('schemas.components.image_url.title'),
-        }),
+      image_url: ImageOrIconSchema.meta({
+        title: this.i18n.t('schemas.components.image_url.title'),
+      }),
+      visual: ComponentVisualSchema.optional(),
+      physical: ComponentPhysicalSchema.optional(),
       primary_material: this.ComponentMaterialInputSchema.optional(),
       materials: this.ComponentMaterialInputSchema.array()
         .optional()
@@ -102,14 +110,17 @@ export class ComponentSchemaService {
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
-          type: 'Group',
+          type: 'Control',
+          scope: '#/properties/visual',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/physical',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/primary_material',
           label: this.i18n.t('schemas.components.primary_material.title'),
-          elements: [
-            {
-              type: 'Control',
-              scope: '#/properties/primary_material/properties/id',
-            },
-          ],
         },
         {
           type: 'Control',
@@ -136,9 +147,14 @@ export class ComponentSchemaService {
       desc_tr: TrArraySchema.meta({
         title: this.i18n.t('schemas.components.desc_tr.title'),
       }),
-      image_url: z.string().optional(),
+      image_url: ImageOrIconSchema.meta({
+        title: this.i18n.t('schemas.components.image_url.title'),
+      }),
+      visual: ComponentVisualSchema.optional(),
+      physical: ComponentPhysicalSchema.optional(),
       primary_material: this.ComponentMaterialInputSchema.optional(),
       materials: this.ComponentMaterialInputSchema.array().optional(),
+      tags: this.ComponentTagsInputSchema.array().optional(),
       add_tags: this.ComponentTagsInputSchema.array().optional(),
       remove_tags: this.ComponentTagsInputSchema.array().optional(),
       region: this.ComponentRegionInputSchema.optional(),
@@ -176,7 +192,15 @@ export class ComponentSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/primary_material/properties/id',
+          scope: '#/properties/visual',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/physical',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/primary_material',
         },
         {
           type: 'Control',
@@ -184,11 +208,7 @@ export class ComponentSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/add_tags',
-        },
-        {
-          type: 'Control',
-          scope: '#/properties/remove_tags',
+          scope: '#/properties/tags',
         },
         {
           type: 'Control',

@@ -12,6 +12,7 @@ import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { CategoriesPage, Category } from './category.model'
 import {
@@ -26,6 +27,7 @@ import {
   UpdateItemInput,
   UpdateItemOutput,
 } from './item.model'
+import { ItemSchemaService } from './item.schema'
 import { ItemService } from './item.service'
 import { Variant, VariantsPage } from './variant.model'
 
@@ -34,6 +36,7 @@ export class ItemResolver {
   constructor(
     private readonly itemService: ItemService,
     private readonly transform: TransformService,
+    private readonly itemSchemaService: ItemSchemaService,
   ) {}
 
   @Query(() => ItemsPage, { name: 'getItems' })
@@ -51,6 +54,20 @@ export class ItemResolver {
     }
     const result = this.transform.entityToModel(item, Item)
     return result
+  }
+
+  @Query(() => ModelEditSchema, { nullable: true })
+  async getItemSchema(): Promise<ModelEditSchema> {
+    return {
+      create: {
+        schema: this.itemSchemaService.CreateJSONSchema,
+        uischema: this.itemSchemaService.CreateUISchema,
+      },
+      update: {
+        schema: this.itemSchemaService.UpdateJSONSchema,
+        uischema: this.itemSchemaService.UpdateUISchema,
+      },
+    }
   }
 
   @ResolveField()

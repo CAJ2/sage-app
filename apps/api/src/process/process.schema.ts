@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { ChangeService } from '@src/changes/change.service'
-import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import {
+  BaseSchemaService,
+  TrArraySchema,
+  zToSchema,
+} from '@src/common/base.schema'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { PlaceIDSchema } from '@src/geo/place.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { TranslatedInputSchema } from '@src/graphql/base.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { VariantIDSchema } from '@src/product/variant.schema'
 import { OrgIDSchema } from '@src/users/org.schema'
@@ -45,8 +48,8 @@ export class ProcessSchemaService {
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       intent: z.enum(ProcessIntent),
-      name_tr: z.array(TranslatedInputSchema).optional(),
-      desc_tr: z.array(TranslatedInputSchema).optional(),
+      name_tr: TrArraySchema.optional(),
+      desc_tr: TrArraySchema.optional(),
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
       rules: ProcessRulesSchema.optional(),
@@ -112,8 +115,8 @@ export class ProcessSchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: ProcessIDSchema,
       intent: z.enum(ProcessIntent).optional(),
-      name_tr: z.array(TranslatedInputSchema).optional(),
-      desc_tr: z.array(TranslatedInputSchema).optional(),
+      name_tr: TrArraySchema.optional(),
+      desc_tr: TrArraySchema.optional(),
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
       rules: ProcessRulesSchema.optional(),

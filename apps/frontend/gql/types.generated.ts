@@ -922,6 +922,7 @@ export type Query = {
   getComponentSchema?: Maybe<ModelEditSchema>;
   getComponents: ComponentsPage;
   getItem?: Maybe<Item>;
+  getItemSchema?: Maybe<ModelEditSchema>;
   getItems: ItemsPage;
   getMaterial?: Maybe<Material>;
   getMaterials: MaterialsPage;
@@ -939,6 +940,7 @@ export type Query = {
   getTags: TagPage;
   getUser?: Maybe<User>;
   getVariant?: Maybe<Variant>;
+  getVariantSchema?: Maybe<ModelEditSchema>;
   getVariants: VariantsPage;
   rootCategory: Category;
   rootMaterial: Material;
