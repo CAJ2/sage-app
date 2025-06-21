@@ -1,7 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
 import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
@@ -22,14 +22,26 @@ import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 export class VariantService {
   constructor(
     private readonly em: EntityManager,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly streamService: StreamService,
     private readonly i18n: I18nService,
   ) {}
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Variant, { id })
+    return await this.em.findOne(
+      Variant,
+      { id },
+      {
+        populate: [
+          'variant_sources',
+          'variant_items',
+          'variant_tags',
+          'variants_components',
+          'orgs',
+        ],
+      },
+    )
   }
 
   async find(opts: CursorOptions<Variant>) {
@@ -145,15 +157,15 @@ export class VariantService {
       await this.em.persistAndFlush(variant)
       return { variant }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
     await this.setFields(variant, input, change)
-    await this.changeService.createEntityEdit(change, variant)
+    await this.editService.createEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return { variant, change }
   }
 
@@ -181,16 +193,16 @@ export class VariantService {
       await this.em.persistAndFlush(variant)
       return { variant }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    await this.changeService.beginUpdateEntityEdit(change, variant)
+    await this.editService.beginUpdateEntityEdit(change, variant)
     await this.setFields(variant, input, change)
-    await this.changeService.updateEntityEdit(change, variant)
+    await this.editService.updateEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return { variant, change }
   }
 
@@ -244,7 +256,7 @@ export class VariantService {
           }
           variant.items.add(ref(itemEntity))
         } else {
-          const itemEntity = await this.changeService.findRefWithChange(
+          const itemEntity = await this.editService.findRefWithChange(
             change,
             Item,
             { id: item.id },
@@ -264,7 +276,7 @@ export class VariantService {
             variant.items.remove(ref(itemEntity))
           }
         } else {
-          const itemEntity = await this.changeService.findRefWithChange(
+          const itemEntity = await this.editService.findRefWithChange(
             change,
             Item,
             { id: item.id },
@@ -282,7 +294,7 @@ export class VariantService {
         })
         variant.region = ref(region)
       } else {
-        const region = await this.changeService.findRefWithChange(
+        const region = await this.editService.findRefWithChange(
           change,
           Region,
           { id: input.region_id },
@@ -323,7 +335,7 @@ export class VariantService {
           }
           variant.orgs.add(ref(orgEntity))
         } else {
-          const orgEntity = await this.changeService.findRefWithChange(
+          const orgEntity = await this.editService.findRefWithChange(
             change,
             Org,
             { id: org.id },
@@ -341,7 +353,7 @@ export class VariantService {
           const orgEntity = await this.em.findOneOrFail(Org, { id: org.id })
           variant.orgs.remove(ref(orgEntity))
         } else {
-          const orgEntity = await this.changeService.findRefWithChange(
+          const orgEntity = await this.editService.findRefWithChange(
             change,
             Org,
             { id: org.id },
@@ -386,7 +398,7 @@ export class VariantService {
           }
           variant.components.add(ref(comp))
         } else {
-          const comp = await this.changeService.findRefWithChange(
+          const comp = await this.editService.findRefWithChange(
             change,
             Component,
             { id: component.id },
@@ -403,7 +415,7 @@ export class VariantService {
           })
           variant.components.remove(ref(comp))
         } else {
-          const comp = await this.changeService.findRefWithChange(
+          const comp = await this.editService.findRefWithChange(
             change,
             Component,
             { id: component.id },

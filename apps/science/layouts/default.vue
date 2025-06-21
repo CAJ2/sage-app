@@ -3,8 +3,10 @@
     <SidebarProvider v-model:open="sidebarOpen">
       <Sidebar>
         <SidebarHeader>
-          <NuxtLink :to="'/'" class="flex items-center">
-            <div class="p-3"><img src="/favicon-32x32.png" /></div>
+          <div class="flex items-center">
+            <NuxtLinkLocale :to="'/'">
+              <div class="p-3"><img src="/favicon-32x32.png" /></div>
+            </NuxtLinkLocale>
             <div class="grow px-2 text-lg text-bold text-base-content">
               Sage
             </div>
@@ -12,7 +14,7 @@
               v-if="sidebarOpen"
               class="self-start text-base-content/70"
             />
-          </NuxtLink>
+          </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -195,7 +197,7 @@ const sidebarOpen = ref(true)
 const showSignIn = ref(false)
 
 const menuItems = [
-  { title: 'Home', url: '/', icon: 'iconify://mdi:home' },
+  { title: 'Dashboard', url: '/dashboard', icon: 'iconify://mdi:home' },
   {
     title: 'Categories',
     url: '/categories',

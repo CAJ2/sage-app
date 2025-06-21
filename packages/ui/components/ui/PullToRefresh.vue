@@ -126,7 +126,6 @@ function onTouchmove(e: TouchEvent | MouseEvent) {
   if (refreshing.value || !touching.value || props.disabled) return
   const touchY =
     'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
-  console.log('Touch Y:', touchY, 'Touch Start Y:', touchstartY)
   if (scrollParents.length && !scrollParents[0].scrollTop) {
     touchDiff.value = touchY - touchstartY
   }
@@ -149,7 +148,6 @@ function onTouchend(_e: TouchEvent | MouseEvent) {
 
 onMounted(() => {
   scrollParents = getScrollParents(containerRef.value)
-  console.log('Scroll parents:', scrollParents)
 })
 
 watch([topOffset, refreshing], () => {

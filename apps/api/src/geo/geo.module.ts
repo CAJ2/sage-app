@@ -8,5 +8,6 @@ import { RegionService } from './region.service'
 @Module({
   imports: [CommonModule],
   providers: [RegionResolver, RegionService, PlaceResolver, PlaceService],
+  exports: [RegionService, PlaceService],
 })
 export class GeoModule {}

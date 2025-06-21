@@ -1,7 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { AuthModule } from '@src/auth/auth.module'
-import { ChangesModule } from '@src/changes/changes.module'
+import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
 import { ClsModule } from 'nestjs-cls'
 import { ComponentResolver } from './component.resolver'
@@ -22,7 +22,7 @@ import { TagService } from './tag.service'
     MikroOrmModule.forFeature([]),
     AuthModule.registerAsync(),
     ClsModule.forFeature(),
-    ChangesModule,
+    EditsModule,
   ],
   providers: [
     MaterialResolver,
@@ -37,6 +37,14 @@ import { TagService } from './tag.service'
     TagService,
     StreamService,
   ],
-  exports: [TagService, StreamService],
+  exports: [
+    TagService,
+    StreamService,
+    ComponentService,
+    ComponentSchemaService,
+    ProcessService,
+    ProcessSchemaService,
+    MaterialService,
+  ],
 })
 export class ProcessModule {}

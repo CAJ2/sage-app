@@ -43,6 +43,22 @@ export default defineNuxtModule<ModuleOptions>({
         silent: true,
         ...config,
       })
+
+      // Run generation for any codegen.ts files from extended Nuxt layers
+      const codegenFiles = nuxt.options._layers
+        .filter((layer) => layer.cwd !== nuxt.options.srcDir)
+        .map((layer) => layer.config.srcDir)
+      for (const dir of codegenFiles) {
+        console.info(`NuxtCodegen: Found codegen file in layer: ${dir}`)
+        const { config } = await loadCodegenConfig({
+          configFilePath: dir,
+        })
+        await generate({
+          silent: true,
+          cwd: dir,
+          ...config,
+        })
+      }
       const time = Date.now() - start
 
       console.info(

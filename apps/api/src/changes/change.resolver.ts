@@ -22,11 +22,14 @@ import {
   CreateChangeInput,
   CreateChangeOutput,
   DeleteChangeOutput,
+  DirectEdit,
+  DirectEditArgs,
   MergeChangeOutput,
   UpdateChangeInput,
   UpdateChangeOutput,
 } from './change.model'
 import { ChangeService } from './change.service'
+import { EditService } from './edit.service'
 import { Source, SourcesPage } from './source.model'
 
 @Resolver(() => Change)
@@ -34,6 +37,7 @@ export class ChangeResolver {
   constructor(
     private readonly changeService: ChangeService,
     private readonly transform: TransformService,
+    private readonly editService: EditService,
   ) {}
 
   @Query(() => ChangesPage)
@@ -50,6 +54,18 @@ export class ChangeResolver {
       throw NotFoundErr('Change not found')
     }
     return this.transform.entityToModel(change, Change)
+  }
+
+  @Query(() => DirectEdit, { nullable: true })
+  async getDirectEdit(@Args() args: DirectEditArgs) {
+    const directEdit = await this.changeService.directEdit(
+      args.id,
+      args.entity_name,
+    )
+    if (!directEdit) {
+      throw NotFoundErr('Direct edit not found')
+    }
+    return directEdit
   }
 
   @Mutation(() => CreateChangeOutput, { nullable: true })
@@ -93,7 +109,7 @@ export class ChangeResolver {
   async mergeChange(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<MergeChangeOutput> {
-    const result = await this.changeService.mergeID(id)
+    const result = await this.editService.mergeID(id)
     if (!result) {
       throw NotFoundErr('Change not found or already merged')
     }

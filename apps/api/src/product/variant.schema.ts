@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import { ChangeService } from '@src/changes/change.service'
 import {
   BaseSchemaService,
   ImageOrIconSchema,
@@ -62,7 +61,6 @@ export class VariantSchemaService {
   constructor(
     private readonly i18n: I18nService<I18nTranslations>,
     private readonly baseSchema: BaseSchemaService,
-    private readonly changeService: ChangeService,
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
@@ -216,16 +214,6 @@ export class VariantSchemaService {
     }
     this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
-    this.changeService.registerEditValidator(
-      'Variant',
-      'create',
-      this.variantCreateEdit.bind(this),
-    )
-    this.changeService.registerEditValidator(
-      'Variant',
-      'update',
-      this.variantUpdateEdit.bind(this),
-    )
   }
 
   async variantCreateEdit(edit: Edit) {

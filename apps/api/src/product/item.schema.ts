@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import {
   BaseSchemaService,
   RelMetaSchema,
@@ -39,7 +39,7 @@ export class ItemSchemaService {
   constructor(
     private readonly i18n: I18nService<I18nTranslations>,
     private readonly baseSchema: BaseSchemaService,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
   ) {
     this.ItemCategoriesInputSchema = z.strictObject({
       id: CategoryIDSchema,
@@ -50,7 +50,7 @@ export class ItemSchemaService {
     })
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
-      name: z.string().min(1).max(100),
+      name: z.string().min(1).max(100).optional(),
       name_tr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
       desc_tr: TrArraySchema,
@@ -136,16 +136,6 @@ export class ItemSchemaService {
     }
     this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
-    this.changeService.registerEditValidator(
-      'Item',
-      'create',
-      this.itemCreateEdit.bind(this),
-    )
-    this.changeService.registerEditValidator(
-      'Item',
-      'update',
-      this.itemUpdateEdit.bind(this),
-    )
   }
 
   async itemCreateEdit(edit: Edit) {

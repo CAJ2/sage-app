@@ -2,9 +2,11 @@
   <div :class="styles.arrayList.item">
     <div :class="toolbarClasses" @click="expandClicked">
       <div :class="styles.arrayList.itemLabel">
-        <span :class="{ 'text-base-content/50': !label, italic: !label }">{{
-          label || 'Empty'
-        }}</span>
+        <span
+          class="line-clamp-2"
+          :class="{ 'text-base-content/50': !label, italic: !label }"
+          >{{ label || 'Empty' }}</span
+        >
       </div>
       <button
         v-if="moveShown"

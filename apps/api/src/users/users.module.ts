@@ -1,7 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { AuthModule } from '@src/auth/auth.module'
-import { ChangesModule } from '@src/changes/changes.module'
+import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
 import { OrgResolver } from './org.resolver'
 import { OrgService } from './org.service'
@@ -13,7 +13,7 @@ import { UsersService } from './users.service'
     MikroOrmModule.forFeature([]),
     CommonModule,
     AuthModule.registerAsync(),
-    ChangesModule,
+    EditsModule,
   ],
   providers: [UsersService, UsersResolver, OrgService, OrgResolver],
   exports: [UsersService, OrgService],

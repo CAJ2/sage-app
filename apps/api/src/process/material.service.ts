@@ -24,7 +24,11 @@ export class MaterialService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Material, { id })
+    return await this.em.findOne(
+      Material,
+      { id },
+      { populate: ['parents', 'children'] },
+    )
   }
 
   async findRoot() {

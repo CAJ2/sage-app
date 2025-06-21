@@ -44,6 +44,7 @@ export const sanitizeFormData = <T, U extends object>(
     return {}
   }
   data = _.cloneDeep(data)
+  data = _.omitBy(data, _.isNull) as U
   const ajv = new Ajv({
     allErrors: true,
     strict: true,

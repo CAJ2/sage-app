@@ -19,7 +19,11 @@ export class PlaceService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Place, { id })
+    return await this.em.findOne(
+      Place,
+      { id },
+      { populate: ['org', 'place_tags'] },
+    )
   }
 
   async tags(placeID: string) {

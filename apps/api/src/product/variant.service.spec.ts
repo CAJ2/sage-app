@@ -2,7 +2,9 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
+import { EditsModule } from '@src/changes/edits.module'
 import { ProcessModule } from '@src/process/process.module'
+import { ClsModule } from 'nestjs-cls'
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -33,7 +35,11 @@ describe('VariantService', () => {
           ],
         }),
         AuthModule.registerAsync(),
+        ClsModule.forRoot({
+          global: true,
+        }),
         ChangesModule,
+        EditsModule,
         ProcessModule,
       ],
       providers: [VariantService],

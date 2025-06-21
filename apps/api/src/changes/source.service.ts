@@ -18,7 +18,7 @@ export class SourceService {
     }
   }
 
-  async findOne(id: string) {
+  async findOneByID(id: string) {
     const source = await this.em.findOne(
       Source,
       { id },
@@ -41,21 +41,21 @@ export class SourceService {
   }
 
   async update(input: UpdateSourceInput) {
-    const source = await this.findOne(input.id)
+    const source = await this.findOneByID(input.id)
     await this.setFields(source, input)
     await this.em.persistAndFlush(source)
     return source
   }
 
   async markProcessed(id: string) {
-    const source = await this.findOne(id)
+    const source = await this.findOneByID(id)
     source.processed_at = new Date()
     await this.em.persistAndFlush(source)
     return source
   }
 
   async remove(id: string) {
-    const source = await this.findOne(id)
+    const source = await this.findOneByID(id)
     await this.em.removeAndFlush(source)
     return true
   }

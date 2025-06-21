@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import {
@@ -17,7 +17,7 @@ import { Item } from './item.entity'
 export class CategoryService {
   constructor(
     private readonly em: EntityManager,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
   ) {}
 
   async find(opts: CursorOptions<Category>) {
@@ -30,7 +30,11 @@ export class CategoryService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Category, { id })
+    return await this.em.findOne(
+      Category,
+      { id },
+      { populate: ['parents', 'children'] },
+    )
   }
 
   async findRoot() {
@@ -123,15 +127,15 @@ export class CategoryService {
 
   async create(input: CreateCategoryInput, userID: string) {
     const category = new Category()
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
     await this.setFields(category, input, change)
-    await this.changeService.createEntityEdit(change, category)
+    await this.editService.createEntityEdit(change, category)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return {
       change,
       category,
@@ -140,7 +144,7 @@ export class CategoryService {
 
   async update(input: UpdateCategoryInput, userID: string) {
     const { entity: category, change } =
-      await this.changeService.findOneWithChangeInput(input, userID, Category, {
+      await this.editService.findOneWithChangeInput(input, userID, Category, {
         id: input.id,
       })
     if (!category) {
@@ -154,11 +158,11 @@ export class CategoryService {
         change: null,
       }
     }
-    await this.changeService.beginUpdateEntityEdit(change, category)
+    await this.editService.beginUpdateEntityEdit(change, category)
     await this.setFields(category, input, change)
-    await this.changeService.updateEntityEdit(change, category)
+    await this.editService.updateEntityEdit(change, category)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return {
       change,
       category,

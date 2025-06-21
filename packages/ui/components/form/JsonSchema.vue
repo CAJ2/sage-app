@@ -21,8 +21,9 @@ import type { JsonSchema, UISchemaElement } from '@jsonforms/core'
 const ajv = new Ajv({
   allErrors: true,
   verbose: true,
-  strict: false,
+  strictTypes: false,
   validateFormats: true,
+  keywords: ['name'],
 })
 addFormats(ajv)
 

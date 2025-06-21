@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import { mapOrderBy } from '@src/common/db.utils'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
@@ -17,16 +17,21 @@ import { Variant } from './variant.entity'
 export class ItemService {
   constructor(
     private readonly em: EntityManager,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly searchService: MeiliService,
   ) {}
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Item, { id })
+    return await this.em.findOne(
+      Item,
+      { id },
+      { populate: ['categories', 'item_tags'] },
+    )
   }
 
   async find(opts: CursorOptions<Item>) {
+    opts.options.populate = ['categories', 'item_tags']
     const items = await this.em.find(Item, opts.where, opts.options)
     const count = await this.em.count(Item, opts.where)
     return {
@@ -104,20 +109,20 @@ export class ItemService {
   async create(input: CreateItemInput, userID: string) {
     const item = new Item()
     if (!input.useChange()) {
-      this.setFields(item, input)
+      await this.setFields(item, input)
       await this.em.persistAndFlush(item)
       await this.searchService.addDocs(item)
       return { item }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
     await this.setFields(item, input, change)
-    await this.changeService.createEntityEdit(change, item)
+    await this.editService.createEntityEdit(change, item)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return { item, change }
   }
 
@@ -134,21 +139,21 @@ export class ItemService {
       throw new Error('Item not found')
     }
     if (!input.useChange()) {
-      this.setFields(item, input)
+      await this.setFields(item, input)
       await this.em.persistAndFlush(item)
       await this.searchService.addDocs(item)
       return { item }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    await this.changeService.beginUpdateEntityEdit(change, item)
+    await this.editService.beginUpdateEntityEdit(change, item)
     await this.setFields(item, input, change)
-    await this.changeService.updateEntityEdit(change, item)
+    await this.editService.updateEntityEdit(change, item)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return { item, change }
   }
 
@@ -160,8 +165,14 @@ export class ItemService {
     if (input.name) {
       item.name = addTrReq(item.name, input.lang, input.name)
     }
+    if (input.name_tr) {
+      item.name = addTrReq(item.name, input.lang, input.name_tr)
+    }
     if (input.desc) {
       item.desc = addTr(item.desc, input.lang, input.desc)
+    }
+    if (input.desc_tr) {
+      item.desc = addTr(item.desc, input.lang, input.desc_tr)
     }
     if (input.image_url) {
       if (!item.files) {
@@ -175,34 +186,19 @@ export class ItemService {
       item.source = {}
     }
     if (input.categories || input.add_categories) {
-      for (const category of input.categories || input.add_categories || []) {
-        if (!change) {
-          const cat = await this.em.findOneOrFail(Category, { id: category.id })
-          item.categories.add(cat)
-          continue
-        }
-        const cat = await this.changeService.findRefWithChange(
-          change,
-          Category,
-          { id: category.id },
-        )
-        item.categories.add(cat)
-      }
+      item.categories = await this.editService.setOrAddCollection(
+        item.categories,
+        Category,
+        input.categories,
+        input.add_categories,
+      )
     }
     if (input.remove_categories) {
-      for (const category of input.remove_categories) {
-        if (!change) {
-          const cat = await this.em.findOneOrFail(Category, { id: category.id })
-          item.categories.remove(cat)
-          continue
-        }
-        const cat = await this.changeService.findRefWithChange(
-          change,
-          Category,
-          { id: category.id },
-        )
-        item.categories.remove(cat)
-      }
+      item.categories = await this.editService.removeFromCollection(
+        item.categories,
+        Category,
+        input.remove_categories,
+      )
     }
     if (input.tags || input.add_tags) {
       for (const tag of input.tags || input.add_tags || []) {
@@ -212,6 +208,9 @@ export class ItemService {
         tagInst.tag = tagEntity
         tagInst.item = item
         tagInst.meta = tagDef.meta
+        if (input.tags) {
+          item.item_tags.set([])
+        }
         if (item.item_tags.contains(tagInst)) {
           item.item_tags.remove(tagInst)
         }
@@ -219,10 +218,11 @@ export class ItemService {
       }
     }
     if (input.remove_tags) {
-      for (const tag of input.remove_tags) {
-        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
-        item.tags.remove(tagEntity)
-      }
+      item.tags = await this.editService.removeFromCollection(
+        item.tags,
+        Tag,
+        input.remove_tags,
+      )
     }
   }
 }

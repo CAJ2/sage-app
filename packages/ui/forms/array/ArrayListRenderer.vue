@@ -21,6 +21,7 @@
       :class="styles.arrayList.itemWrapper"
     >
       <array-list-element
+        v-if="!isRefList"
         :move-shown="
           !control.uischema.options || control.uischema.options.showSortButtons
         "
@@ -42,6 +43,22 @@
           :cells="control.cells"
         />
       </array-list-element>
+      <array-list-ref-element
+        v-if="isRefList"
+        :delete-enabled="control.enabled && !minItemsReached"
+        :delete="removeItems ? removeItems(control.path, [index]) : undefined"
+        :label="childLabelForIndex(index)"
+        :styles="styles"
+      >
+        <dispatch-renderer
+          :schema="control.schema"
+          :uischema="childUiSchema"
+          :path="composePaths(control.path, `${index}`)"
+          :enabled="control.enabled"
+          :renderers="control.renderers"
+          :cells="control.cells"
+        />
+      </array-list-ref-element>
     </div>
     <div v-if="noData" :class="styles.arrayList.noData">
       {{ translations.noDataMessage }}
@@ -75,11 +92,14 @@ import {
 } from '@jsonforms/vue'
 import { useVanillaArrayControl } from '../util'
 import ArrayListElement from './ArrayListElement.vue'
+import ArrayListRefElement from './ArrayListRefElement.vue'
+import _ from 'lodash'
 
 const controlRenderer = defineComponent({
   name: 'ArrayListRenderer',
   components: {
     ArrayListElement,
+    ArrayListRefElement,
     DispatchRenderer,
   },
   props: {
@@ -123,6 +143,17 @@ const controlRenderer = defineComponent({
         arrayDefaultTranslations,
         this.control.i18nKeyPrefix,
         this.control.label,
+      )
+    },
+    isRefList(): boolean | undefined {
+      return (
+        this.arraySchema !== undefined &&
+        this.arraySchema.items &&
+        _.isObjectLike(this.arraySchema.items) &&
+        (this.arraySchema.items as JsonSchema).type === 'object' &&
+        _.keys((this.arraySchema.items as JsonSchema).properties).length ===
+          1 &&
+        _.has(this.arraySchema.items, 'properties.id.$ref')
       )
     },
   },

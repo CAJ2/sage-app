@@ -223,9 +223,11 @@ input CreateItemInput {
   change: CreateChangeInput
   change_id: ID
   desc: String
+  desc_tr: [TranslatedInput!]
   image_url: String
   lang: String
   name: String
+  name_tr: [TranslatedInput!]
   remove_sources: [ID!]
   tags: [ItemTagsInput!]
 }
@@ -342,6 +344,13 @@ type DeleteChangeOutput {
 
 type DeleteSourceOutput {
   success: Boolean
+}
+
+type DirectEdit {
+  entity_name: String!
+  id: ID
+  model_create: JSONObject
+  model_update: JSONObject
 }
 
 type Edit {
@@ -607,6 +616,7 @@ type Query {
   getComponent(id: ID!): Component
   getComponentSchema: ModelEditSchema
   getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  getDirectEdit(entity_name: String, id: ID): DirectEdit
   getItem(id: ID!): Item
   getItemSchema: ModelEditSchema
   getItems(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -888,16 +898,20 @@ input UpdateItemInput {
   add_sources: [ID!]
   add_tags: [ItemTagsInput!]
   apply: Boolean
+  categories: [ItemCategoriesInput!]
   change: CreateChangeInput
   change_id: ID
   desc: String
+  desc_tr: [TranslatedInput!]
   id: ID!
   image_url: String
   lang: String
   name: String
+  name_tr: [TranslatedInput!]
   remove_categories: [ItemCategoriesInput!]
   remove_sources: [ID!]
   remove_tags: [ItemTagsInput!]
+  tags: [ItemTagsInput!]
 }
 
 type UpdateItemOutput {

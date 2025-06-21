@@ -1,7 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
@@ -17,7 +17,7 @@ import { CreateProcessInput, UpdateProcessInput } from './process.model'
 export class ProcessService {
   constructor(
     private readonly em: EntityManager,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
   ) {}
 
   async find(opts: CursorOptions<Process>) {
@@ -30,7 +30,20 @@ export class ProcessService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Process, { id })
+    return await this.em.findOne(
+      Process,
+      { id },
+      {
+        populate: [
+          'material',
+          'variant',
+          'org',
+          'process_sources',
+          'region',
+          'place',
+        ],
+      },
+    )
   }
 
   async create(input: CreateProcessInput, userID: string) {
@@ -43,15 +56,15 @@ export class ProcessService {
         change: null,
       }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
     await this.setFields(process, input, change)
-    await this.changeService.createEntityEdit(change, process)
+    await this.editService.createEntityEdit(change, process)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return {
       process,
       change,
@@ -60,7 +73,7 @@ export class ProcessService {
 
   async update(input: UpdateProcessInput, userID: string) {
     const { entity: process, change } =
-      await this.changeService.findOneWithChangeInput(input, userID, Process, {
+      await this.editService.findOneWithChangeInput(input, userID, Process, {
         id: input.id,
       })
     if (!process) {
@@ -74,11 +87,11 @@ export class ProcessService {
         change: null,
       }
     }
-    await this.changeService.beginUpdateEntityEdit(change, process)
+    await this.editService.beginUpdateEntityEdit(change, process)
     await this.setFields(process, input, change)
-    await this.changeService.updateEntityEdit(change, process)
+    await this.editService.updateEntityEdit(change, process)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return {
       process,
       change,

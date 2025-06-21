@@ -3,7 +3,11 @@ import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
-import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
+import {
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
@@ -100,10 +104,16 @@ export class CreateItemInput extends ChangeInputWithLang() {
   @MaxLength(1000)
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(100_000)
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -128,10 +138,16 @@ export class UpdateItemInput extends ChangeInputWithLang() {
   @MaxLength(1000)
   name?: string
 
+  @Field(() => [TranslatedInput], { nullable: true })
+  name_tr?: TranslatedInput[]
+
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(100_000)
   desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  desc_tr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -139,10 +155,16 @@ export class UpdateItemInput extends ChangeInputWithLang() {
   image_url?: string
 
   @Field(() => [ItemCategoriesInput], { nullable: true })
+  categories?: ItemCategoriesInput[]
+
+  @Field(() => [ItemCategoriesInput], { nullable: true })
   add_categories?: ItemCategoriesInput[]
 
   @Field(() => [ItemCategoriesInput], { nullable: true })
   remove_categories?: ItemCategoriesInput[]
+
+  @Field(() => [ItemTagsInput], { nullable: true })
+  tags?: ItemTagsInput[]
 
   @Field(() => [ItemTagsInput], { nullable: true })
   add_tags?: ItemTagsInput[]

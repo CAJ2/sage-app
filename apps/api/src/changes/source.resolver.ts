@@ -35,7 +35,7 @@ export class SourceResolver {
   @Query(() => Source, { name: 'getSource', nullable: true })
   @UseGuards(AuthGuard)
   async getSource(@Args('id', { type: () => ID }) id: string) {
-    const source = await this.sourceService.findOne(id)
+    const source = await this.sourceService.findOneByID(id)
     return this.transform.entityToModel(source, Source)
   }
 

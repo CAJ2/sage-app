@@ -318,9 +318,11 @@ export type CreateItemInput = {
   change?: InputMaybe<CreateChangeInput>;
   change_id?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
   image_url?: InputMaybe<Scalars['String']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<ItemTagsInput>>;
 };
@@ -440,6 +442,14 @@ export type DeleteChangeOutput = {
 export type DeleteSourceOutput = {
   __typename?: 'DeleteSourceOutput';
   success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DirectEdit = {
+  __typename?: 'DirectEdit';
+  entity_name: Scalars['String']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
+  model_create?: Maybe<Scalars['JSONObject']['output']>;
+  model_update?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type Edit = {
@@ -921,7 +931,9 @@ export type Query = {
   getComponent?: Maybe<Component>;
   getComponentSchema?: Maybe<ModelEditSchema>;
   getComponents: ComponentsPage;
+  getDirectEdit?: Maybe<DirectEdit>;
   getItem?: Maybe<Item>;
+  getItemSchema?: Maybe<ModelEditSchema>;
   getItems: ItemsPage;
   getMaterial?: Maybe<Material>;
   getMaterials: MaterialsPage;
@@ -939,6 +951,7 @@ export type Query = {
   getTags: TagPage;
   getUser?: Maybe<User>;
   getVariant?: Maybe<Variant>;
+  getVariantSchema?: Maybe<ModelEditSchema>;
   getVariants: VariantsPage;
   rootCategory: Category;
   rootMaterial: Material;
@@ -985,6 +998,12 @@ export type QueryGetComponentsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetDirectEditArgs = {
+  entity_name?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -1392,16 +1411,20 @@ export type UpdateItemInput = {
   add_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   add_tags?: InputMaybe<Array<ItemTagsInput>>;
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  categories?: InputMaybe<Array<ItemCategoriesInput>>;
   change?: InputMaybe<CreateChangeInput>;
   change_id?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
+  desc_tr?: InputMaybe<Array<TranslatedInput>>;
   id: Scalars['ID']['input'];
   image_url?: InputMaybe<Scalars['String']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  name_tr?: InputMaybe<Array<TranslatedInput>>;
   remove_categories?: InputMaybe<Array<ItemCategoriesInput>>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_tags?: InputMaybe<Array<ItemTagsInput>>;
+  tags?: InputMaybe<Array<ItemTagsInput>>;
 };
 
 export type UpdateItemOutput = {

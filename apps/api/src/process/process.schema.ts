@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import { ChangeService } from '@src/changes/change.service'
 import {
   BaseSchemaService,
   TrArraySchema,
@@ -44,7 +43,6 @@ export class ProcessSchemaService {
   constructor(
     private readonly i18n: I18nService<I18nTranslations>,
     private readonly baseSchema: BaseSchemaService,
-    private readonly changeService: ChangeService,
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       intent: z.enum(ProcessIntent),
@@ -180,16 +178,6 @@ export class ProcessSchemaService {
     }
     this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
-    this.changeService.registerEditValidator(
-      'Process',
-      'create',
-      this.processCreateEdit.bind(this),
-    )
-    this.changeService.registerEditValidator(
-      'Process',
-      'update',
-      this.processUpdateEdit.bind(this),
-    )
   }
 
   async processCreateEdit(edit: Edit) {

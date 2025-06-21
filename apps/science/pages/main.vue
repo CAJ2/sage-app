@@ -3,7 +3,11 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
+
 definePageMeta({
   alias: ['/'],
 })
+
+router.replace('/dashboard')
 </script>

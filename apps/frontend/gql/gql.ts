@@ -16,6 +16,11 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
 type Documents = {
     "\n  query RegionSelectQuery($id: ID!) {\n    getRegion(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": typeof types.RegionSelectQueryDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": typeof types.RegionSelectSearchDocument,
+    "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": typeof types.ChangesGetEditDocument,
+    "\n  query DirectGetEdit($id: ID!) {\n    getDirectEdit(id: $id) {\n      entity_name\n      id\n      model_update\n    }\n  }\n": typeof types.DirectGetEditDocument,
+    "\n    query RefCategoryQuery($id: ID!) {\n      getCategory(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  ": typeof types.RefCategoryQueryDocument,
+    "\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n": typeof types.ListCategoryFragmentFragmentDoc,
+    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    ": typeof types.RefSearchQueryDocument,
     "\n  query ChangesCategorySchema {\n    getCategorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.ChangesCategorySchemaDocument,
     "\n  query ChangesCategoryEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": typeof types.ChangesCategoryEditDocument,
     "\n  mutation ChangeCategoryCreate($input: CreateCategoryInput!) {\n    createCategory(input: $input) {\n      change {\n        id\n      }\n      category {\n        id\n      }\n    }\n  }\n": typeof types.ChangeCategoryCreateDocument,
@@ -51,6 +56,11 @@ type Documents = {
 const documents: Documents = {
     "\n  query RegionSelectQuery($id: ID!) {\n    getRegion(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": types.RegionSelectQueryDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": types.RegionSelectSearchDocument,
+    "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": types.ChangesGetEditDocument,
+    "\n  query DirectGetEdit($id: ID!) {\n    getDirectEdit(id: $id) {\n      entity_name\n      id\n      model_update\n    }\n  }\n": types.DirectGetEditDocument,
+    "\n    query RefCategoryQuery($id: ID!) {\n      getCategory(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  ": types.RefCategoryQueryDocument,
+    "\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n": types.ListCategoryFragmentFragmentDoc,
+    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    ": types.RefSearchQueryDocument,
     "\n  query ChangesCategorySchema {\n    getCategorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.ChangesCategorySchemaDocument,
     "\n  query ChangesCategoryEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": types.ChangesCategoryEditDocument,
     "\n  mutation ChangeCategoryCreate($input: CreateCategoryInput!) {\n    createCategory(input: $input) {\n      change {\n        id\n      }\n      category {\n        id\n      }\n    }\n  }\n": types.ChangeCategoryCreateDocument,
@@ -106,6 +116,26 @@ export function graphql(source: "\n  query RegionSelectQuery($id: ID!) {\n    ge
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n"): (typeof documents)["\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query DirectGetEdit($id: ID!) {\n    getDirectEdit(id: $id) {\n      entity_name\n      id\n      model_update\n    }\n  }\n"): (typeof documents)["\n  query DirectGetEdit($id: ID!) {\n    getDirectEdit(id: $id) {\n      entity_name\n      id\n      model_update\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query RefCategoryQuery($id: ID!) {\n      getCategory(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefCategoryQuery($id: ID!) {\n      getCategory(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

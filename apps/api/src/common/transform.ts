@@ -36,7 +36,7 @@ export interface CursorOptions<T> {
   // Where clause for the query
   where: ObjectQuery<T>
   // Options for the query
-  options: FindOptions<T>
+  options: FindOptions<T, any>
 }
 
 @Injectable()
@@ -310,4 +310,30 @@ export function transformUnion(
     }
     return instance
   }
+}
+
+export function entityToModelRegistry(
+  entity: string,
+  obj: object,
+  lang: string[],
+) {
+  if (!obj) {
+    return {}
+  }
+  const constr = ModelRegistry[entity]
+  if (!constr) {
+    throw new Error(`Model ${entity} not found in registry`)
+  }
+  ;(obj as any)._lang = lang
+  const instance = plainToInstance(constr, obj)
+  // Transform special cases like translation objects
+  _.each(obj, (value, key) => {
+    if (key.endsWith('_tr')) {
+      ;(instance as any)[key] = value
+    }
+  })
+  if ((instance as any).transform) {
+    ;(instance as any).transform(obj)
+  }
+  return instance
 }

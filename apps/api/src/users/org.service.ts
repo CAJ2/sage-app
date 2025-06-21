@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
@@ -14,7 +14,7 @@ import { User } from './users.entity'
 export class OrgService {
   constructor(
     private readonly em: EntityManager,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
     private readonly searchService: MeiliService,
   ) {}
 
@@ -47,15 +47,15 @@ export class OrgService {
       await this.searchService.addDocs(org)
       return { org }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
     await this.setFields(org, input, change)
-    await this.changeService.createEntityEdit(change, org)
+    await this.editService.createEntityEdit(change, org)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return { org, change }
   }
 
@@ -74,16 +74,16 @@ export class OrgService {
       await this.searchService.addDocs(org)
       return { org }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    await this.changeService.beginUpdateEntityEdit(change, org)
+    await this.editService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
-    await this.changeService.updateEntityEdit(change, org)
+    await this.editService.updateEntityEdit(change, org)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return { org, change }
   }
 

@@ -1,7 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
-import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
@@ -16,7 +16,7 @@ import { TagService } from './tag.service'
 export class ComponentService {
   constructor(
     private readonly em: EntityManager,
-    private readonly changeService: ChangeService,
+    private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly i18n: I18nService,
     private readonly streamService: StreamService,
@@ -32,7 +32,20 @@ export class ComponentService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Component, { id })
+    return await this.em.findOne(
+      Component,
+      { id },
+      {
+        populate: [
+          'region',
+          'primary_material',
+          'materials',
+          'component_sources',
+          'component_tags',
+          'component_materials',
+        ],
+      },
+    )
   }
 
   async primary_material(id: string, component?: Component) {
@@ -80,15 +93,15 @@ export class ComponentService {
         change: null,
       }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
     await this.setFields(component, input, change)
-    await this.changeService.createEntityEdit(change, component)
+    await this.editService.createEntityEdit(change, component)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return {
       component,
       change,
@@ -112,16 +125,16 @@ export class ComponentService {
         change: null,
       }
     }
-    const change = await this.changeService.findOneOrCreate(
+    const change = await this.editService.findOneOrCreate(
       input.change_id,
       input.change,
       userID,
     )
-    await this.changeService.beginUpdateEntityEdit(change, component)
+    await this.editService.beginUpdateEntityEdit(change, component)
     await this.setFields(component, input, change)
-    await this.changeService.updateEntityEdit(change, component)
+    await this.editService.updateEntityEdit(change, component)
     await this.em.persistAndFlush(change)
-    await this.changeService.checkMerge(change, input)
+    await this.editService.checkMerge(change, input)
     return {
       component,
       change,

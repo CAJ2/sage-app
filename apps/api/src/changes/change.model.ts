@@ -35,6 +35,25 @@ export class Edit {
 }
 
 @ObjectType()
+export class DirectEdit {
+  @Field(() => String)
+  entity_name!: string
+
+  @Field(() => ID, { nullable: true })
+  id?: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  model_create?: Record<string, any>
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  model_update?: Record<string, any>
+
+  // Not exposed in GraphQL
+  original?: typeof EditModel
+  changes?: typeof EditModel
+}
+
+@ObjectType()
 export class ChangeEditsPage extends Paginated(Edit) {}
 
 @ObjectType()
@@ -80,6 +99,15 @@ export class ChangeSourcesArgs extends PaginationBasicArgs {}
 export class ChangeEditsArgs {
   @Field(() => ID, { nullable: true })
   id?: string
+}
+
+@ArgsType()
+export class DirectEditArgs {
+  @Field(() => ID, { nullable: true })
+  id?: string
+
+  @Field(() => String, { nullable: true })
+  entity_name?: string
 }
 
 @InputType()

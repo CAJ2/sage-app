@@ -10,7 +10,7 @@ export class UsersService {
   constructor(private readonly em: EntityManager) {}
 
   async findOneByID(id: string) {
-    return await this.em.findOne(User, { id })
+    return await this.em.findOne(User, { id }, { populate: ['orgs'] })
   }
 
   async findByUsernameOrEmail(usernameOrEmail: string) {
