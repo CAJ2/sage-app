@@ -3,12 +3,13 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS build
-RUN corepack enable && corepack install --global pnpm@10.8.0
+RUN corepack enable && corepack install --global pnpm@10.12.1
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN pnpm add -g nx@latest
 COPY package.json pnpm-*.yaml nx.json /usr/src/app/
 COPY apps/api/package.json /usr/src/app/apps/api/
 COPY apps/frontend/package.json /usr/src/app/apps/frontend/
+COPY apps/science/package.json /usr/src/app/apps/science/
 COPY packages/ui/package.json /usr/src/app/packages/ui/
 WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
@@ -36,5 +37,19 @@ FROM base AS frontend
 COPY --from=frontend-build /prod/frontend /prod/frontend
 ENV NODE_ENV=production
 WORKDIR /prod/frontend
+EXPOSE 3000
+CMD [ "node", ".output/server/index.mjs" ]
+
+FROM build AS science-build
+COPY apps/science /usr/src/app/apps/science
+COPY packages/ui /usr/src/app/packages/ui/
+COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
+RUN nx run-many -p science -t build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --filter=...science --prod /prod/science
+
+FROM base AS science
+COPY --from=science-build /prod/science /prod/science
+ENV NODE_ENV=production
+WORKDIR /prod/science
 EXPOSE 3000
 CMD [ "node", ".output/server/index.mjs" ]
