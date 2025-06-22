@@ -18,6 +18,17 @@
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton as-child class="h-12 px-4">
+                    <SidebarChangeSelector />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup>
             <SidebarGroupLabel>Pages</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -209,14 +220,14 @@ const menuItems = [
     icon: 'iconify://qlementine-icons:items-grid-16',
   },
   {
+    title: 'Variants',
+    url: '/variants',
+    icon: 'iconify://qlementine-icons:items-grid-16',
+  },
+  {
     title: 'Sources',
     url: '/sources',
     icon: 'iconify://ic:outline-source',
-  },
-  {
-    title: 'Changes',
-    url: '/changes',
-    icon: 'iconify://mdi:source-branch',
   },
 ]
 

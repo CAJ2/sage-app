@@ -1,18 +1,18 @@
 <template>
   <li class="list-row">
     <div>
-      <UiImage class="size-10" :src="category.image_url"></UiImage>
+      <UiImage class="size-10" :src="item.image_url"></UiImage>
     </div>
     <div>
-      <div class="text-bold">{{ category.name_req }}</div>
+      <div class="text-bold">{{ item.name }}</div>
       <div class="text-xs opacity-70">
-        {{ category.desc_short }}
+        {{ item.desc }}
       </div>
     </div>
     <button
       v-if="buttons && buttons.includes('select')"
       class="btn btn-square btn-ghost"
-      @click.prevent.stop="() => emits('button', 'select', category.id)"
+      @click.prevent.stop="() => emits('button', 'select', item.id)"
     >
       <font-awesome-icon icon="fa-solid fa-check" class="size-[1.2em]" />
     </button>
@@ -22,17 +22,17 @@
 <script setup lang="ts">
 import { graphql, useFragment, type FragmentType } from '~/gql'
 
-const ListCategoryFragment = graphql(`
-  fragment ListCategoryFragment on Category {
+const ListItemFragment = graphql(`
+  fragment ListItemFragment on Item {
     id
-    name_req: name
-    desc_short
+    name
+    desc
     image_url
   }
 `)
 
 const props = defineProps<{
-  category: FragmentType<typeof ListCategoryFragment>
+  item: FragmentType<typeof ListItemFragment>
   buttons?: ('select' | 'edit' | 'delete')[]
 }>()
 
@@ -40,7 +40,5 @@ const emits = defineEmits<{
   (e: 'button', btn: string, id: string): void
 }>()
 
-const category = computed(() =>
-  useFragment(ListCategoryFragment, props.category),
-)
+const item = computed(() => useFragment(ListItemFragment, props.item))
 </script>

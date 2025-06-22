@@ -160,8 +160,8 @@ export class UpdateItemInput extends ChangeInputWithLang() {
   @Field(() => [ItemCategoriesInput], { nullable: true })
   add_categories?: ItemCategoriesInput[]
 
-  @Field(() => [ItemCategoriesInput], { nullable: true })
-  remove_categories?: ItemCategoriesInput[]
+  @Field(() => [ID], { nullable: true })
+  remove_categories?: string[]
 
   @Field(() => [ItemTagsInput], { nullable: true })
   tags?: ItemTagsInput[]
@@ -169,8 +169,8 @@ export class UpdateItemInput extends ChangeInputWithLang() {
   @Field(() => [ItemTagsInput], { nullable: true })
   add_tags?: ItemTagsInput[]
 
-  @Field(() => [ItemTagsInput], { nullable: true })
-  remove_tags?: ItemTagsInput[]
+  @Field(() => [ID], { nullable: true })
+  remove_tags?: string[]
 }
 
 @ObjectType()

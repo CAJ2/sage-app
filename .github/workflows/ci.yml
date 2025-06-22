@@ -82,7 +82,7 @@ jobs:
     name: 'Build frontend images'
     uses: ./.github/workflows/oci-build-image.yml
     if: github.event_name != 'pull_request'
-    needs: test
+    needs: build-image-api
     permissions:
       contents: read
       packages: write

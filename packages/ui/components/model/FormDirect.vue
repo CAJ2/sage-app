@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="w-full p-5 mb-5">
+    <div class="w-full px-5 mb-10">
       <FormChangeSaveStatus :status="saveStatus"></FormChangeSaveStatus>
       <FormJsonSchema
         v-if="jsonSchema && uiSchema"
@@ -124,7 +124,10 @@ const update = useMutation(updateMutation, {
   },
 })
 
-const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
+const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
+  modelId === 'new' ? 'not_saved' : 'saved',
+)
+let firstChange = false
 const onChange = async (event: JsonFormsChangeEvent) => {
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
@@ -132,7 +135,12 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       saveStatus.value = 'error'
       return
     }
-    saveStatus.value = 'not_saved'
+    if (firstChange) {
+      saveStatus.value = 'not_saved'
+    }
+    if (!firstChange) {
+      firstChange = true
+    }
     if (modelId === 'new') {
       createData.value = event.data
     } else {

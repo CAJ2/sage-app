@@ -42,7 +42,6 @@
     "vue-tsc": "^2.2.10"
   },
   "dependencies": {
-    "@sageleaf/ui": "workspace:^0.1.0",
     "@apollo/client": "^3.13.8",
     "@capacitor/android": "^7.0.0",
     "@capacitor/app": "^7.0.1",
@@ -64,8 +63,10 @@
     "@jsonforms/vue": "^3.5.1",
     "@nuxt/kit": "^3.17.5",
     "@pinia/nuxt": "^0.10.1",
+    "@sageleaf/ui": "workspace:^0.1.0",
     "@tailwindcss/vite": "~4.0.17",
     "@tanstack/vue-form": "^1.11.2",
+    "@vue/apollo-composable": "^4.2.2",
     "@vueuse/core": "^13.3.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",

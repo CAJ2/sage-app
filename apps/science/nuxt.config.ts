@@ -73,7 +73,7 @@ export default defineNuxtConfig({
         httpEndpoint: () => useRuntimeConfig().public.apiurl + '/graphql',
         httpLinkOptions: {
           credentials: 'include',
-        }
+        },
       },
     },
   },

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -10,6 +11,8 @@ import {
 import { UISchemaElement } from '@src/common/ui.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
+import { ValidateFunction } from 'ajv'
+import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 import {
@@ -29,12 +32,14 @@ export class ComponentSchemaService {
   ComponentMaterialInputSchema: z.ZodObject
   ComponentTagsInputSchema: z.ZodObject
   ComponentRegionInputSchema: z.ZodObject
-  CreateComponentInputSchema: z.ZodObject
-  CreateComponentInputJSONSchema: z.core.JSONSchema.BaseSchema
-  CreateComponentInputUISchema: UISchemaElement
-  UpdateComponentInputSchema: z.ZodObject
-  UpdateComponentInputJSONSchema: z.core.JSONSchema.BaseSchema
-  UpdateComponentInputUISchema: UISchemaElement
+  CreateSchema: z.ZodObject
+  CreateJSONSchema: z.core.JSONSchema.BaseSchema
+  CreateValidator: ValidateFunction
+  CreateUISchema: UISchemaElement
+  UpdateSchema: z.ZodObject
+  UpdateJSONSchema: z.core.JSONSchema.BaseSchema
+  UpdateValidator: ValidateFunction
+  UpdateUISchema: UISchemaElement
 
   constructor(
     private readonly i18n: I18nService<I18nTranslations>,
@@ -63,7 +68,7 @@ export class ComponentSchemaService {
       id: RegionIDSchema,
     })
 
-    this.CreateComponentInputSchema = ChangeInputWithLangSchema.extend({
+    this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024),
       name_tr: TrArraySchema.meta({
         title: this.i18n.t('schemas.components.name_tr.title'),
@@ -87,11 +92,9 @@ export class ComponentSchemaService {
       region: this.ComponentRegionInputSchema.optional(),
     })
 
-    this.CreateComponentInputJSONSchema = zToSchema(
-      this.CreateComponentInputSchema,
-    )
+    this.CreateJSONSchema = zToSchema(this.CreateSchema)
 
-    this.CreateComponentInputUISchema = {
+    this.CreateUISchema = {
       type: 'VerticalLayout',
       elements: [
         {
@@ -137,7 +140,7 @@ export class ComponentSchemaService {
       ],
     }
 
-    this.UpdateComponentInputSchema = ChangeInputWithLangSchema.extend({
+    this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: z.string(),
       name: z.string().max(1024).optional(),
       name_tr: TrArraySchema.meta({
@@ -156,15 +159,13 @@ export class ComponentSchemaService {
       materials: this.ComponentMaterialInputSchema.array().optional(),
       tags: this.ComponentTagsInputSchema.array().optional(),
       add_tags: this.ComponentTagsInputSchema.array().optional(),
-      remove_tags: this.ComponentTagsInputSchema.array().optional(),
+      remove_tags: TagDefinitionIDSchema.array().optional(),
       region: this.ComponentRegionInputSchema.optional(),
     })
 
-    this.UpdateComponentInputJSONSchema = zToSchema(
-      this.UpdateComponentInputSchema,
-    )
+    this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
 
-    this.UpdateComponentInputUISchema = {
+    this.UpdateUISchema = {
       type: 'VerticalLayout',
       elements: [
         {
@@ -216,5 +217,21 @@ export class ComponentSchemaService {
         },
       ],
     }
+    this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
+    this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
+  }
+
+  async componentCreateEdit(edit: Edit) {
+    const data = _.cloneDeep(edit.changes)
+    this.CreateValidator(data)
+    this.baseSchema.flattenRefs(data)
+    return data
+  }
+
+  async componentUpdateEdit(edit: Edit) {
+    const data = _.cloneDeep(edit.changes)
+    this.UpdateValidator(data)
+    this.baseSchema.flattenRefs(data)
+    return data
   }
 }

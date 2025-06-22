@@ -95,6 +95,36 @@ export class ProcessPage extends Paginated(Process) {}
 export class ProcessArgs extends PaginationBasicArgs {}
 
 @InputType()
+export class ProcessMaterialInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@InputType()
+export class ProcessVariantInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@InputType()
+export class ProcessOrgInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@InputType()
+export class ProcessRegionInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@InputType()
+export class ProcessPlaceInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@InputType()
 export class CreateProcessInput extends ChangeInputWithLang() {
   @Field(() => String)
   @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
@@ -121,20 +151,20 @@ export class CreateProcessInput extends ChangeInputWithLang() {
   @Field(() => JSONObjectResolver, { nullable: true })
   rules?: Record<string, any>
 
-  @Field(() => ID, { nullable: true })
-  material?: string
+  @Field(() => ProcessMaterialInput, { nullable: true })
+  material?: ProcessMaterialInput
 
-  @Field(() => ID, { nullable: true })
-  variant?: string
+  @Field(() => ProcessVariantInput, { nullable: true })
+  variant?: ProcessVariantInput
 
-  @Field(() => ID, { nullable: true })
-  org?: string
+  @Field(() => ProcessOrgInput, { nullable: true })
+  org?: ProcessOrgInput
 
-  @Field(() => ID, { nullable: true })
-  region?: string
+  @Field(() => ProcessRegionInput, { nullable: true })
+  region?: ProcessRegionInput
 
-  @Field(() => ID, { nullable: true })
-  place?: string
+  @Field(() => ProcessPlaceInput, { nullable: true })
+  place?: ProcessPlaceInput
 }
 
 @InputType()
@@ -168,20 +198,20 @@ export class UpdateProcessInput extends ChangeInputWithLang() {
   @Field(() => JSONObjectResolver, { nullable: true })
   rules?: Record<string, any>
 
-  @Field(() => ID, { nullable: true })
-  material?: string
+  @Field(() => ProcessMaterialInput, { nullable: true })
+  material?: ProcessMaterialInput
 
-  @Field(() => ID, { nullable: true })
-  variant?: string
+  @Field(() => ProcessVariantInput, { nullable: true })
+  variant?: ProcessVariantInput
 
-  @Field(() => ID, { nullable: true })
-  org?: string
+  @Field(() => ProcessOrgInput, { nullable: true })
+  org?: ProcessOrgInput
 
-  @Field(() => ID, { nullable: true })
-  region?: string
+  @Field(() => ProcessRegionInput, { nullable: true })
+  region?: ProcessRegionInput
 
-  @Field(() => ID, { nullable: true })
-  place?: string
+  @Field(() => ProcessPlaceInput, { nullable: true })
+  place?: ProcessPlaceInput
 }
 
 @ObjectType()

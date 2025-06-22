@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common'
+import { ComponentSchemaService } from '@src/process/component.schema'
+import { ComponentService } from '@src/process/component.service'
+import { ProcessSchemaService } from '@src/process/process.schema'
+import { ProcessService } from '@src/process/process.service'
 import { CategorySchemaService } from '@src/product/category.schema'
 import { CategoryService } from '@src/product/category.service'
 import { ItemSchemaService } from '@src/product/item.schema'
 import { ItemService } from '@src/product/item.service'
+import { VariantSchemaService } from '@src/product/variant.schema'
+import { VariantService } from '@src/product/variant.service'
 import _ from 'lodash'
 import { Edit as EditModel } from './change.model'
 import type { Loaded } from '@mikro-orm/postgresql'
@@ -24,6 +30,12 @@ export class ChangeMapService {
     private readonly categorySchema: CategorySchemaService,
     private readonly itemService: ItemService,
     private readonly itemSchema: ItemSchemaService,
+    private readonly variantService: VariantService,
+    private readonly variantSchema: VariantSchemaService,
+    private readonly componentService: ComponentService,
+    private readonly componentSchema: ComponentSchemaService,
+    private readonly processService: ProcessService,
+    private readonly processSchema: ProcessSchemaService,
   ) {
     this.serviceMap['Category'] = this.categoryService as IEntityService
     this.createEditFns['Category'] =
@@ -36,6 +48,25 @@ export class ChangeMapService {
     )
     this.updateEditFns['Item'] = this.itemSchema.itemUpdateEdit.bind(
       this.itemSchema,
+    )
+    this.serviceMap['Variant'] = this.variantService as IEntityService
+    this.createEditFns['Variant'] = this.variantSchema.variantCreateEdit.bind(
+      this.variantSchema,
+    )
+    this.updateEditFns['Variant'] = this.variantSchema.variantUpdateEdit.bind(
+      this.variantSchema,
+    )
+    this.serviceMap['Component'] = this.componentService as IEntityService
+    this.createEditFns['Component'] =
+      this.componentSchema.componentCreateEdit.bind(this.componentSchema)
+    this.updateEditFns['Component'] =
+      this.componentSchema.componentUpdateEdit.bind(this.componentSchema)
+    this.serviceMap['Process'] = this.processService as IEntityService
+    this.createEditFns['Process'] = this.processSchema.processCreateEdit.bind(
+      this.processSchema,
+    )
+    this.updateEditFns['Process'] = this.processSchema.processUpdateEdit.bind(
+      this.processSchema,
     )
   }
 

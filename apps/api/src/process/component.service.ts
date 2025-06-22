@@ -203,7 +203,7 @@ export class ComponentService {
     if (input.remove_tags) {
       for (const tag of input.remove_tags) {
         const componentTag = await this.em.findOne(ComponentsTags, {
-          tag: { id: tag.id },
+          tag: { id: tag },
           component: { id: component.id },
         })
         if (componentTag) {

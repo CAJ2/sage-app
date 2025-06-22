@@ -137,21 +137,21 @@ export class VariantSchemaService {
       image_url: ImageOrIconSchema,
       items: z.array(VariantItemsInputSchema).optional(),
       add_items: z.array(VariantItemsInputSchema).optional(),
-      remove_items: z.array(VariantItemsInputSchema).optional(),
+      remove_items: z.array(ItemIDSchema).optional(),
       region_id: RegionIDSchema.optional(),
       regions: z.array(VariantRegionsInputSchema).optional(),
       add_regions: z.array(VariantRegionsInputSchema).optional(),
-      remove_regions: z.array(VariantRegionsInputSchema).optional(),
+      remove_regions: z.array(RegionIDSchema).optional(),
       code: z.string().max(1024).optional(),
       orgs: z.array(VariantOrgsInputSchema).optional(),
       add_orgs: z.array(VariantOrgsInputSchema).optional(),
-      remove_orgs: z.array(VariantOrgsInputSchema).optional(),
+      remove_orgs: z.array(OrgIDSchema).optional(),
       tags: z.array(VariantTagsInputSchema).optional(),
       add_tags: z.array(VariantTagsInputSchema).optional(),
-      remove_tags: z.array(VariantTagsInputSchema).optional(),
+      remove_tags: z.array(TagDefinitionIDSchema).optional(),
       components: z.array(VariantComponentsInputSchema).optional(),
       add_components: z.array(VariantComponentsInputSchema).optional(),
-      remove_components: z.array(VariantComponentsInputSchema).optional(),
+      remove_components: z.array(ComponentIDSchema).optional(),
     })
 
     this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
@@ -159,14 +159,6 @@ export class VariantSchemaService {
     this.UpdateUISchema = {
       type: 'VerticalLayout',
       elements: [
-        {
-          type: 'Control',
-          scope: '#/properties/id',
-          label: 'ID',
-          options: {
-            readonly: true,
-          },
-        },
         {
           type: 'Control',
           scope: '#/properties/name_tr',

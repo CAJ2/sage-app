@@ -190,26 +190,22 @@ export class EditService {
     return collection
   }
 
-  async removeFromCollection<
-    T extends object & { id: string },
-    U extends { id: string },
-  >(
+  async removeFromCollection<T extends object & { id: string }>(
     collection: Collection<T>,
     entity: EntityName<T>,
-    toRemove?: U | U[],
+    toRemove?: string | string[],
   ): Promise<Collection<T>> {
     if (toRemove) {
       if (Array.isArray(toRemove)) {
         const foundItems = await this.em.find(
           entity,
-          { id: { $in: toRemove.map((item) => item.id) } } as any,
+          { id: { $in: toRemove } } as any,
           { populate: false },
         )
         if (foundItems.length !== toRemove.length) {
           const foundIds = foundItems.map((item) => item.id)
           throw NotFoundErr(
             `No ${entity} found for IDs: ${toRemove
-              .map((item) => item.id)
               .filter((id) => !_.includes(foundIds, id))
               .join(', ')}`,
           )
@@ -218,11 +214,11 @@ export class EditService {
       } else {
         const foundItem = await this.em.findOne(
           entity,
-          { id: toRemove.id } as any,
+          { id: toRemove } as any,
           { populate: false },
         )
         if (!foundItem) {
-          throw NotFoundErr(`No ${entity} found for ID: ${toRemove.id}`)
+          throw NotFoundErr(`No ${entity} found for ID: ${toRemove}`)
         }
         collection.remove(foundItem)
       }

@@ -61,12 +61,12 @@ export class ComponentResolver {
   async getComponentSchema(): Promise<ModelEditSchema> {
     return {
       create: {
-        schema: this.componentSchemaService.CreateComponentInputJSONSchema,
-        uischema: this.componentSchemaService.CreateComponentInputUISchema,
+        schema: this.componentSchemaService.CreateJSONSchema,
+        uischema: this.componentSchemaService.CreateUISchema,
       },
       update: {
-        schema: this.componentSchemaService.UpdateComponentInputJSONSchema,
-        uischema: this.componentSchemaService.UpdateComponentInputUISchema,
+        schema: this.componentSchemaService.UpdateJSONSchema,
+        uischema: this.componentSchemaService.UpdateUISchema,
       },
     }
   }

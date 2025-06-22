@@ -1,5 +1,5 @@
 <template>
-  <div :data-ag-theme-mode="isDark ? 'dark' : 'light'">
+  <div :data-ag-theme-mode="getThemeMode">
     <ag-grid-vue
       :row-data="rowData"
       :column-defs="colDefs"
@@ -15,11 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDark } from '@vueuse/core'
 import { AgGridVue } from 'ag-grid-vue3'
 import { graphql } from '~/gql'
-
-const isDark = useDark()
 
 const rowData = ref([
   { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },

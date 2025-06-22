@@ -17,19 +17,43 @@ type Documents = {
     "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": typeof types.ChangesGetEditDocument,
     "\n  query DirectGetEdit($id: ID!) {\n    getDirectEdit(id: $id) {\n      entity_name\n      id\n      model_update\n    }\n  }\n": typeof types.DirectGetEditDocument,
     "\n    query RefCategoryQuery($id: ID!) {\n      getCategory(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  ": typeof types.RefCategoryQueryDocument,
-    "\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n": typeof types.ListCategoryFragmentFragmentDoc,
+    "\n    query RefItemQuery($id: ID!) {\n      getItem(id: $id) {\n        ...ListItemFragment\n      }\n    }\n  ": typeof types.RefItemQueryDocument,
+    "\n    query RefVariantQuery($id: ID!) {\n      getVariant(id: $id) {\n        ...ListVariantFragment\n      }\n    }\n  ": typeof types.RefVariantQueryDocument,
+    "\n    query RefComponentQuery($id: ID!) {\n      getComponent(id: $id) {\n        ...ListComponentFragment\n      }\n    }\n  ": typeof types.RefComponentQueryDocument,
+    "\n    query RefOrgQuery($id: ID!) {\n      getOrg(id: $id) {\n        ...ListOrgFragment\n      }\n    }\n  ": typeof types.RefOrgQueryDocument,
+    "\n    query RefRegionQuery($id: ID!) {\n      getRegion(id: $id) {\n        ...ListRegionFragment\n      }\n    }\n  ": typeof types.RefRegionQueryDocument,
+    "\n    query RefPlaceQuery($id: ID!) {\n      getPlace(id: $id) {\n        ...ListPlaceFragment\n      }\n    }\n  ": typeof types.RefPlaceQueryDocument,
+    "\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n": typeof types.ListCategoryFragmentFragmentDoc,
+    "\n  fragment ListComponentFragment on Component {\n    id\n    name\n    desc\n    image_url\n  }\n": typeof types.ListComponentFragmentFragmentDoc,
+    "\n  fragment ListItemFragment on Item {\n    id\n    name\n    desc\n    image_url\n  }\n": typeof types.ListItemFragmentFragmentDoc,
+    "\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n": typeof types.ListOrgFragmentFragmentDoc,
+    "\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n": typeof types.ListPlaceFragmentFragmentDoc,
+    "\n  fragment ListRegionFragment on Region {\n    id\n    name\n  }\n": typeof types.ListRegionFragmentFragmentDoc,
+    "\n  fragment ListVariantFragment on Variant {\n    id\n    name\n    desc\n    image_url\n  }\n": typeof types.ListVariantFragmentFragmentDoc,
     "\n  query RegionSelectQuery($id: ID!) {\n    getRegion(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": typeof types.RegionSelectQueryDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": typeof types.RegionSelectSearchDocument,
-    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    ": typeof types.RefSearchQueryDocument,
+    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    ": typeof types.RefSearchQueryDocument,
 };
 const documents: Documents = {
     "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    getChange(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          changes_update\n        }\n      }\n    }\n  }\n": types.ChangesGetEditDocument,
     "\n  query DirectGetEdit($id: ID!) {\n    getDirectEdit(id: $id) {\n      entity_name\n      id\n      model_update\n    }\n  }\n": types.DirectGetEditDocument,
     "\n    query RefCategoryQuery($id: ID!) {\n      getCategory(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  ": types.RefCategoryQueryDocument,
-    "\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n": types.ListCategoryFragmentFragmentDoc,
+    "\n    query RefItemQuery($id: ID!) {\n      getItem(id: $id) {\n        ...ListItemFragment\n      }\n    }\n  ": types.RefItemQueryDocument,
+    "\n    query RefVariantQuery($id: ID!) {\n      getVariant(id: $id) {\n        ...ListVariantFragment\n      }\n    }\n  ": types.RefVariantQueryDocument,
+    "\n    query RefComponentQuery($id: ID!) {\n      getComponent(id: $id) {\n        ...ListComponentFragment\n      }\n    }\n  ": types.RefComponentQueryDocument,
+    "\n    query RefOrgQuery($id: ID!) {\n      getOrg(id: $id) {\n        ...ListOrgFragment\n      }\n    }\n  ": types.RefOrgQueryDocument,
+    "\n    query RefRegionQuery($id: ID!) {\n      getRegion(id: $id) {\n        ...ListRegionFragment\n      }\n    }\n  ": types.RefRegionQueryDocument,
+    "\n    query RefPlaceQuery($id: ID!) {\n      getPlace(id: $id) {\n        ...ListPlaceFragment\n      }\n    }\n  ": types.RefPlaceQueryDocument,
+    "\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n": types.ListCategoryFragmentFragmentDoc,
+    "\n  fragment ListComponentFragment on Component {\n    id\n    name\n    desc\n    image_url\n  }\n": types.ListComponentFragmentFragmentDoc,
+    "\n  fragment ListItemFragment on Item {\n    id\n    name\n    desc\n    image_url\n  }\n": types.ListItemFragmentFragmentDoc,
+    "\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n": types.ListOrgFragmentFragmentDoc,
+    "\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n": types.ListPlaceFragmentFragmentDoc,
+    "\n  fragment ListRegionFragment on Region {\n    id\n    name\n  }\n": types.ListRegionFragmentFragmentDoc,
+    "\n  fragment ListVariantFragment on Variant {\n    id\n    name\n    desc\n    image_url\n  }\n": types.ListVariantFragmentFragmentDoc,
     "\n  query RegionSelectQuery($id: ID!) {\n    getRegion(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": types.RegionSelectQueryDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": types.RegionSelectSearchDocument,
-    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    ": types.RefSearchQueryDocument,
+    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    ": types.RefSearchQueryDocument,
 };
 
 /**
@@ -61,7 +85,55 @@ export function graphql(source: "\n    query RefCategoryQuery($id: ID!) {\n     
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListCategoryFragment on Category {\n    id\n    name\n    desc_short\n    image_url\n  }\n"];
+export function graphql(source: "\n    query RefItemQuery($id: ID!) {\n      getItem(id: $id) {\n        ...ListItemFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefItemQuery($id: ID!) {\n      getItem(id: $id) {\n        ...ListItemFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query RefVariantQuery($id: ID!) {\n      getVariant(id: $id) {\n        ...ListVariantFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefVariantQuery($id: ID!) {\n      getVariant(id: $id) {\n        ...ListVariantFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query RefComponentQuery($id: ID!) {\n      getComponent(id: $id) {\n        ...ListComponentFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefComponentQuery($id: ID!) {\n      getComponent(id: $id) {\n        ...ListComponentFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query RefOrgQuery($id: ID!) {\n      getOrg(id: $id) {\n        ...ListOrgFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefOrgQuery($id: ID!) {\n      getOrg(id: $id) {\n        ...ListOrgFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query RefRegionQuery($id: ID!) {\n      getRegion(id: $id) {\n        ...ListRegionFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefRegionQuery($id: ID!) {\n      getRegion(id: $id) {\n        ...ListRegionFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query RefPlaceQuery($id: ID!) {\n      getPlace(id: $id) {\n        ...ListPlaceFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefPlaceQuery($id: ID!) {\n      getPlace(id: $id) {\n        ...ListPlaceFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListComponentFragment on Component {\n    id\n    name\n    desc\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListComponentFragment on Component {\n    id\n    name\n    desc\n    image_url\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListItemFragment on Item {\n    id\n    name\n    desc\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListItemFragment on Item {\n    id\n    name\n    desc\n    image_url\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n"): (typeof documents)["\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n"): (typeof documents)["\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListRegionFragment on Region {\n    id\n    name\n  }\n"): (typeof documents)["\n  fragment ListRegionFragment on Region {\n    id\n    name\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListVariantFragment on Variant {\n    id\n    name\n    desc\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListVariantFragment on Variant {\n    id\n    name\n    desc\n    image_url\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -73,7 +145,7 @@ export function graphql(source: "\n  query RegionSelectSearch($query: String!) {
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n          }\n        }\n      }\n    "];
+export function graphql(source: "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    "];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

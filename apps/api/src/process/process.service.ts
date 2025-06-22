@@ -128,37 +128,37 @@ export class ProcessService {
       process.rules = input.rules
     }
     if (input.material) {
-      const material = await this.em.findOne(Material, input.material)
+      const material = await this.em.findOne(Material, input.material.id)
       if (!material) {
-        throw NotFoundErr(`Material with ID "${input.material}" not found`)
+        throw NotFoundErr(`Material with ID "${input.material.id}" not found`)
       }
       process.material = ref(Material, material.id)
     }
     if (input.variant) {
-      const variant = await this.em.findOne(Variant, { id: input.variant })
+      const variant = await this.em.findOne(Variant, { id: input.variant.id })
       if (!variant) {
-        throw NotFoundErr(`Variant with ID "${input.variant}" not found`)
+        throw NotFoundErr(`Variant with ID "${input.variant.id}" not found`)
       }
       process.variant = ref(Variant, variant.id)
     }
     if (input.org) {
-      const org = await this.em.findOne(Org, { id: input.org })
+      const org = await this.em.findOne(Org, { id: input.org.id })
       if (!org) {
-        throw NotFoundErr(`Org with ID "${input.org}" not found`)
+        throw NotFoundErr(`Org with ID "${input.org.id}" not found`)
       }
       process.org = ref(Org, org.id)
     }
     if (input.region) {
-      const region = await this.em.findOne(Region, { id: input.region })
+      const region = await this.em.findOne(Region, { id: input.region.id })
       if (!region) {
-        throw NotFoundErr(`Region with ID "${input.region}" not found`)
+        throw NotFoundErr(`Region with ID "${input.region.id}" not found`)
       }
       process.region = ref(Region, region.id)
     }
     if (input.place) {
-      const place = await this.em.findOne(Place, { id: input.place })
+      const place = await this.em.findOne(Place, { id: input.place.id })
       if (!place) {
-        throw NotFoundErr(`Place with ID "${input.place}" not found`)
+        throw NotFoundErr(`Place with ID "${input.place.id}" not found`)
       }
       process.place = ref(Place, place.id)
     }

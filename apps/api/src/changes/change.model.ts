@@ -125,8 +125,8 @@ export class CreateChangeInput {
   @Field(() => ChangeStatus, { nullable: true })
   status?: ChangeStatus & {}
 
-  @Field(() => [ID])
-  sources: string[] = []
+  @Field(() => [ID], { nullable: true })
+  sources?: string[]
 }
 
 @InputType()
@@ -182,13 +182,29 @@ export interface MergeInput {
   apply?: boolean
 }
 
+export interface ISourceInput {
+  id: string
+  meta?: Record<string, any>
+}
+
 export interface IChangeInputWithLang {
   change_id?: string
   change?: CreateChangeInput & {}
-  add_sources?: string[]
+  add_sources?: ISourceInput[]
   remove_sources?: string[]
   apply?: boolean
   useChange(): boolean
+}
+
+@InputType()
+class SourceInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  @IsOptional()
+  meta?: Record<string, any>
 }
 
 export function ChangeInputWithLang() {
@@ -202,8 +218,8 @@ export function ChangeInputWithLang() {
     @Field(() => CreateChangeInput, { nullable: true })
     change?: CreateChangeInput & {}
 
-    @Field(() => [ID], { nullable: true })
-    add_sources?: string[]
+    @Field(() => [SourceInput], { nullable: true })
+    add_sources?: SourceInput[]
 
     @Field(() => [ID], { nullable: true })
     remove_sources?: string[]

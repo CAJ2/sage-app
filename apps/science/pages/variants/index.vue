@@ -4,17 +4,17 @@
       <Button
         @click="
           () => {
-            editItemId = 'new'
-            showEditItem = true
+            editId = 'new'
+            showEdit = true
           }
         "
       >
         <font-awesome-icon icon="fa-solid fa-plus" />
-        Add Item
+        Add Variant
       </Button>
     </div>
     <ag-grid-vue
-      :row-data="items"
+      :row-data="variants"
       :column-defs="colDefs"
       :default-col-def="{
         flex: 1,
@@ -23,18 +23,18 @@
       }"
       style="height: 100vh"
     ></ag-grid-vue>
-    <Dialog v-model:open="showEditItem">
+    <Dialog v-model:open="showEdit">
       <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
         <DialogTitle>
-          <span v-if="editItemId === 'new'">Create Item</span>
-          <span v-else>Edit Item</span>
+          <span v-if="editId === 'new'">Create Variant</span>
+          <span v-else>Edit Variant</span>
         </DialogTitle>
         <ModelFormDirect
-          :model-id="editItemId"
-          :schema-query="itemSchema"
-          :create-mutation="createItemMutation"
-          :update-mutation="updateItemMutation"
-          :create-model-key="'item'"
+          :model-id="editId"
+          :schema-query="variantSchema"
+          :create-mutation="createVariantMutation"
+          :update-mutation="updateVariantMutation"
+          :create-model-key="'variant'"
           @saved="onSaved"
         />
       </DialogContent>
@@ -46,11 +46,11 @@
 import { GridEditActions } from '#components'
 import { AgGridVue } from 'ag-grid-vue3'
 import { graphql } from '~/gql'
-import type { Item } from '~/gql/graphql'
+import type { Variant } from '~/gql/graphql'
 
-const updateAction = (data: Item) => {
-  editItemId.value = data.id
-  showEditItem.value = true
+const updateAction = (data: Variant) => {
+  editId.value = data.id
+  showEdit.value = true
 }
 const colDefs = ref([
   { field: 'id' },
@@ -63,9 +63,9 @@ const colDefs = ref([
   },
 ])
 
-const itemsQuery = graphql(`
-  query ItemsQuery {
-    getItems(first: 10) {
+const variantsQuery = graphql(`
+  query VariantsQuery {
+    getVariants(first: 10) {
       nodes {
         id
         name
@@ -78,13 +78,14 @@ const itemsQuery = graphql(`
     }
   }
 `)
-const { result: itemsData, refetch: refetchItems } = useQuery(itemsQuery)
-refetchItems()
-const items = computed(() => itemsData.value?.getItems?.nodes || [])
+const { result: variantsData, refetch: refetchVariants } =
+  useQuery(variantsQuery)
+refetchVariants()
+const variants = computed(() => variantsData.value?.getVariants?.nodes || [])
 
-const itemSchema = graphql(`
-  query ItemsSchema {
-    getItemSchema {
+const variantSchema = graphql(`
+  query VariantsSchema {
+    getVariantSchema {
       create {
         schema
         uischema
@@ -96,20 +97,20 @@ const itemSchema = graphql(`
     }
   }
 `)
-const createItemMutation = graphql(`
-  mutation CreateItem($input: CreateItemInput!) {
-    createItem(input: $input) {
-      item {
+const createVariantMutation = graphql(`
+  mutation CreateVariant($input: CreateVariantInput!) {
+    createVariant(input: $input) {
+      variant {
         id
         name
       }
     }
   }
 `)
-const updateItemMutation = graphql(`
-  mutation UpdateItem($input: UpdateItemInput!) {
-    updateItem(input: $input) {
-      item {
+const updateVariantMutation = graphql(`
+  mutation UpdateVariant($input: UpdateVariantInput!) {
+    updateVariant(input: $input) {
+      variant {
         id
         name
       }
@@ -117,11 +118,11 @@ const updateItemMutation = graphql(`
   }
 `)
 
-const showEditItem = ref(false)
-const editItemId = ref<string>('new')
+const showEdit = ref(false)
+const editId = ref<string>('new')
 const onSaved = () => {
-  showEditItem.value = false
-  editItemId.value = 'new'
-  refetchItems()
+  showEdit.value = false
+  editId.value = 'new'
+  refetchVariants()
 }
 </script>

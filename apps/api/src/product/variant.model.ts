@@ -230,9 +230,9 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @IsOptional()
   add_items?: VariantItemsInput[]
 
-  @Field(() => [VariantItemsInput], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_items?: VariantItemsInput[]
+  remove_items?: string[]
 
   @Field(() => ID, { nullable: true })
   @IsOptional()
@@ -242,9 +242,9 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @IsOptional()
   add_regions?: VariantRegionsInput[]
 
-  @Field(() => [VariantRegionsInput], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_regions?: VariantRegionsInput[]
+  remove_regions?: string[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -255,25 +255,25 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @IsOptional()
   add_orgs?: VariantOrgsInput[]
 
-  @Field(() => [VariantOrgsInput], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_orgs?: VariantOrgsInput[]
+  remove_orgs?: string[]
 
   @Field(() => [VariantTagsInput], { nullable: true })
   @IsOptional()
   add_tags?: VariantTagsInput[]
 
-  @Field(() => [VariantTagsInput], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_tags?: VariantTagsInput[]
+  remove_tags?: string[]
 
   @Field(() => [VariantComponentsInput], { nullable: true })
   @IsOptional()
   add_components?: VariantComponentsInput[]
 
-  @Field(() => [VariantComponentsInput], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_components?: VariantComponentsInput[]
+  remove_components?: string[]
 }
 
 @ObjectType()

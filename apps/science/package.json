@@ -49,6 +49,7 @@
     "@sageleaf/ui": "workspace:^0.1.0",
     "@tailwindcss/vite": "~4.0.17",
     "@tanstack/vue-form": "^1.11.2",
+    "@vue/apollo-composable": "^4.2.2",
     "@vueuse/core": "^13.3.0",
     "ag-grid-community": "^33.3.2",
     "ag-grid-vue3": "^33.3.2",

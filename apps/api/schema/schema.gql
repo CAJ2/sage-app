@@ -162,7 +162,7 @@ type ContainerShape {
 }
 
 input CreateCategoryInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
@@ -184,7 +184,7 @@ type CreateCategoryOutput {
 
 input CreateChangeInput {
   description: String
-  sources: [ID!]! = []
+  sources: [ID!]
   status: ChangeStatus
   title: String
 }
@@ -194,7 +194,7 @@ type CreateChangeOutput {
 }
 
 input CreateComponentInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
@@ -217,7 +217,7 @@ type CreateComponentOutput {
 }
 
 input CreateItemInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   categories: [ItemCategoriesInput!]
   change: CreateChangeInput
@@ -238,7 +238,7 @@ type CreateItemOutput {
 }
 
 input CreateOrgInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   avatar_url: String
   change: CreateChangeInput
@@ -257,7 +257,7 @@ type CreateOrgOutput {
 }
 
 input CreateProcessInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
@@ -267,15 +267,15 @@ input CreateProcessInput {
   instructions: JSONObject
   intent: String!
   lang: String
-  material: ID
+  material: ProcessMaterialInput
   name: String
   name_tr: [TranslatedInput!]
-  org: ID
-  place: ID
-  region: ID
+  org: ProcessOrgInput
+  place: ProcessPlaceInput
+  region: ProcessRegionInput
   remove_sources: [ID!]
   rules: JSONObject
-  variant: ID
+  variant: ProcessVariantInput
 }
 
 type CreateProcessOutput {
@@ -309,7 +309,7 @@ type CreateTagDefinitionOutput {
 }
 
 input CreateVariantInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
@@ -533,7 +533,7 @@ type Place implements Named {
   location: PlaceLocation
   name: String
   org: Org
-  tags: [Tag!]!
+  tags: TagPage!
   updated_at: DateTime!
 }
 
@@ -600,11 +600,31 @@ type ProcessHistory {
   user: User!
 }
 
+input ProcessMaterialInput {
+  id: ID!
+}
+
+input ProcessOrgInput {
+  id: ID!
+}
+
 type ProcessPage {
   edges: [ProcessEdge!]
   nodes: [Process!]
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+input ProcessPlaceInput {
+  id: ID!
+}
+
+input ProcessRegionInput {
+  id: ID!
+}
+
+input ProcessVariantInput {
+  id: ID!
 }
 
 type Query {
@@ -716,6 +736,11 @@ type Source {
 type SourceEdge {
   cursor: String!
   node: Source!
+}
+
+input SourceInput {
+  id: ID!
+  meta: JSONObject
 }
 
 """Type of source data"""
@@ -835,7 +860,7 @@ type TranslatedOutput {
 }
 
 input UpdateCategoryInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
@@ -869,7 +894,7 @@ type UpdateChangeOutput {
 }
 
 input UpdateComponentInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   add_tags: [ComponentTagsInput!]
   apply: Boolean
   change: CreateChangeInput
@@ -885,7 +910,7 @@ input UpdateComponentInput {
   primary_material: ComponentMaterialInput
   region: ComponentRegionInput
   remove_sources: [ID!]
-  remove_tags: [ComponentTagsInput!]
+  remove_tags: [ID!]
 }
 
 type UpdateComponentOutput {
@@ -895,7 +920,7 @@ type UpdateComponentOutput {
 
 input UpdateItemInput {
   add_categories: [ItemCategoriesInput!]
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   add_tags: [ItemTagsInput!]
   apply: Boolean
   categories: [ItemCategoriesInput!]
@@ -908,9 +933,9 @@ input UpdateItemInput {
   lang: String
   name: String
   name_tr: [TranslatedInput!]
-  remove_categories: [ItemCategoriesInput!]
+  remove_categories: [ID!]
   remove_sources: [ID!]
-  remove_tags: [ItemTagsInput!]
+  remove_tags: [ID!]
   tags: [ItemTagsInput!]
 }
 
@@ -920,7 +945,7 @@ type UpdateItemOutput {
 }
 
 input UpdateOrgInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   avatar_url: String
   change: CreateChangeInput
@@ -940,7 +965,7 @@ type UpdateOrgOutput {
 }
 
 input UpdateProcessInput {
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
   change_id: ID
@@ -951,15 +976,15 @@ input UpdateProcessInput {
   instructions: JSONObject
   intent: String
   lang: String
-  material: ID
+  material: ProcessMaterialInput
   name: String
   name_tr: [TranslatedInput!]
-  org: ID
-  place: ID
-  region: ID
+  org: ProcessOrgInput
+  place: ProcessPlaceInput
+  region: ProcessRegionInput
   remove_sources: [ID!]
   rules: JSONObject
-  variant: ID
+  variant: ProcessVariantInput
 }
 
 type UpdateProcessOutput {
@@ -999,7 +1024,7 @@ input UpdateVariantInput {
   add_items: [VariantItemsInput!]
   add_orgs: [VariantOrgsInput!]
   add_regions: [VariantRegionsInput!]
-  add_sources: [ID!]
+  add_sources: [SourceInput!]
   add_tags: [VariantTagsInput!]
   apply: Boolean
   change: CreateChangeInput
@@ -1012,12 +1037,12 @@ input UpdateVariantInput {
   name: String
   name_tr: [TranslatedInput!]
   region_id: ID
-  remove_components: [VariantComponentsInput!]
-  remove_items: [VariantItemsInput!]
-  remove_orgs: [VariantOrgsInput!]
-  remove_regions: [VariantRegionsInput!]
+  remove_components: [ID!]
+  remove_items: [ID!]
+  remove_orgs: [ID!]
+  remove_regions: [ID!]
   remove_sources: [ID!]
-  remove_tags: [VariantTagsInput!]
+  remove_tags: [ID!]
 }
 
 type UpdateVariantOutput {

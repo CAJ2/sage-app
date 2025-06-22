@@ -229,7 +229,7 @@ export class VariantService {
     if (!change && input.add_sources) {
       for (const source of input.add_sources) {
         const sourceEntity = await this.em.findOneOrFail(Source, {
-          id: source,
+          id: source.id,
         })
         if (variant.sources.contains(ref(sourceEntity))) {
           variant.sources.remove(ref(sourceEntity))
@@ -271,7 +271,7 @@ export class VariantService {
     if (input.remove_items) {
       for (const item of input.remove_items) {
         if (!change) {
-          const itemEntity = await this.em.findOneOrFail(Item, { id: item.id })
+          const itemEntity = await this.em.findOneOrFail(Item, { id: item })
           if (variant.items.contains(ref(itemEntity))) {
             variant.items.remove(ref(itemEntity))
           }
@@ -279,7 +279,7 @@ export class VariantService {
           const itemEntity = await this.editService.findRefWithChange(
             change,
             Item,
-            { id: item.id },
+            { id: item },
           )
           if (variant.items.contains(itemEntity)) {
             variant.items.remove(itemEntity)
@@ -319,7 +319,7 @@ export class VariantService {
     if (input.remove_regions) {
       for (const region of input.remove_regions) {
         const regionEntity = await this.em.findOneOrFail(Region, {
-          id: region.id,
+          id: region,
         })
         if (variant.regions && variant.regions.includes(regionEntity.id)) {
           variant.regions = variant.regions.filter((r) => r !== regionEntity.id)
@@ -350,13 +350,13 @@ export class VariantService {
     if (input.remove_orgs) {
       for (const org of input.remove_orgs) {
         if (!change) {
-          const orgEntity = await this.em.findOneOrFail(Org, { id: org.id })
+          const orgEntity = await this.em.findOneOrFail(Org, { id: org })
           variant.orgs.remove(ref(orgEntity))
         } else {
           const orgEntity = await this.editService.findRefWithChange(
             change,
             Org,
-            { id: org.id },
+            { id: org },
           )
           if (variant.orgs.contains(orgEntity)) {
             variant.orgs.remove(orgEntity)
@@ -383,7 +383,7 @@ export class VariantService {
     }
     if (input.remove_tags) {
       for (const tag of input.remove_tags) {
-        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
+        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag })
         variant.tags.remove(ref(tagEntity))
       }
     }
@@ -411,14 +411,14 @@ export class VariantService {
       for (const component of input.remove_components) {
         if (!change) {
           const comp = await this.em.findOneOrFail(Component, {
-            id: component.id,
+            id: component,
           })
           variant.components.remove(ref(comp))
         } else {
           const comp = await this.editService.findRefWithChange(
             change,
             Component,
-            { id: component.id },
+            { id: component },
           )
           variant.components.remove(comp)
         }

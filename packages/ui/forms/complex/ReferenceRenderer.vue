@@ -47,14 +47,68 @@
             </li>
 
             <div
-              v-if="searchData?.search.nodes && !searchLoading"
+              v-if="searchNodes && !searchLoading"
               class="divide-y border-neutral-200"
             >
-              <div v-if="searchData.search.nodes[0].__typename === 'Category'">
+              <div v-if="refType === 'Category'">
                 <ModelListCategory
-                  v-for="(category, i) in searchData.search.nodes"
+                  v-for="(category, i) in searchNodes"
                   :key="i"
-                  :category="category as any"
+                  :category="category"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
+              <div v-if="refType === 'Item'">
+                <ModelListItem
+                  v-for="(item, i) in searchNodes"
+                  :key="i"
+                  :item="item"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
+              <div v-if="refType === 'Variant'">
+                <ModelListVariant
+                  v-for="(variant, i) in searchNodes"
+                  :key="i"
+                  :variant="variant"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
+              <div v-if="refType === 'Component'">
+                <ModelListComponent
+                  v-for="(component, i) in searchNodes"
+                  :key="i"
+                  :component="component"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
+              <div v-if="refType === 'Org'">
+                <ModelListOrg
+                  v-for="(org, i) in searchNodes"
+                  :key="i"
+                  :org="org"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
+              <div v-if="refType === 'Region'">
+                <ModelListRegion
+                  v-for="(region, i) in searchNodes"
+                  :key="i"
+                  :region="region"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
+              <div v-if="refType === 'Place'">
+                <ModelListPlace
+                  v-for="(place, i) in searchNodes"
+                  :key="i"
+                  :place="place"
                   :buttons="['select']"
                   @button="selected"
                 />
@@ -63,8 +117,8 @@
 
             <li
               v-if="
-                searchData?.search.nodes &&
-                searchData?.search.nodes.length === 0 &&
+                searchNodes &&
+                searchNodes.length === 0 &&
                 searchInput.length > 0
               "
               class="list-row"
@@ -108,6 +162,16 @@ import { graphql } from '~/gql'
 import { watchDebounced } from '@vueuse/core'
 import { SearchType } from '~/gql/graphql'
 
+const supportedTypes = [
+  'Category',
+  'Item',
+  'Variant',
+  'Component',
+  'Place',
+  'Region',
+  'Org',
+]
+
 const controlRenderer = defineComponent({
   name: 'ReferenceRenderer',
   components: {
@@ -124,6 +188,12 @@ const controlRenderer = defineComponent({
     }
     const filterTypes: Record<string, SearchType> = {
       Category: SearchType.Category,
+      Item: SearchType.Item,
+      Variant: SearchType.Variant,
+      Component: SearchType.Component,
+      Place: SearchType.Place,
+      Region: SearchType.Region,
+      Org: SearchType.Org,
     }
     const searchQuery = graphql(`
       query RefSearchQuery($input: String!, $type: SearchType!) {
@@ -131,6 +201,12 @@ const controlRenderer = defineComponent({
           totalCount
           nodes {
             ...ListCategoryFragment
+            ...ListItemFragment
+            ...ListVariantFragment
+            ...ListComponentFragment
+            ...ListOrgFragment
+            ...ListRegionFragment
+            ...ListPlaceFragment
           }
         }
       }
@@ -171,6 +247,10 @@ const controlRenderer = defineComponent({
         dialogOpen.value = false
       }
     }
+    const searchNodes = computed(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (searchData.value?.search.nodes || []) as any[]
+    })
 
     return useVanillaControl(
       {
@@ -182,6 +262,7 @@ const controlRenderer = defineComponent({
         searchInput,
         selected,
         selectedId,
+        searchNodes,
       },
       (target) => target.value || undefined,
     )
@@ -200,7 +281,7 @@ export const entry: JsonFormsRendererRegistryEntry = {
         const sch = schema as { $id: string }
         return (
           Object.prototype.hasOwnProperty.call(schema, '$id') &&
-          ['Category'].includes(sch.$id)
+          supportedTypes.includes(sch.$id)
         )
       }),
       schemaTypeIs('string'),

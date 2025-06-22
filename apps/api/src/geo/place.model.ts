@@ -1,21 +1,40 @@
-import { ArgsType, Field, ID, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
-import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
+import {
+  CreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Tag } from '@src/process/tag.model'
+import { TagPage } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
 import { Transform } from 'class-transformer'
+import {
+  IsLatitude,
+  IsLongitude,
+  IsNumber,
+  IsOptional,
+  MaxLength,
+  Validate,
+} from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { Place as PlaceEntity } from './place.entity'
 
 @ObjectType()
 export class PlaceLocation {
   @Field(() => Number)
+  @IsNumber()
+  @IsLatitude()
   latitude!: number
 
   @Field(() => Number)
+  @IsNumber()
+  @IsLongitude()
   longitude!: number
 }
 
@@ -62,8 +81,8 @@ export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Field(() => PlaceLocation, { nullable: true })
   location?: PlaceLocation
 
-  @Field(() => [Tag])
-  tags: Tag[] = []
+  @Field(() => TagPage)
+  tags!: TagPage
 
   @Field(() => Org, { nullable: true })
   org?: Org & {}
@@ -93,3 +112,148 @@ export class PlacesPage extends Paginated(Place) {}
 
 @ArgsType()
 export class PlacesArgs extends PaginationBasicArgs {}
+
+@InputType()
+export class PlaceTagsInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  @IsOptional()
+  meta?: Record<string, any>
+}
+
+@InputType()
+export class PlaceOrgInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+}
+
+@InputType()
+export class PlaceLocationInput {
+  @Field(() => Number)
+  @IsNumber()
+  @IsLatitude()
+  latitude!: number
+
+  @Field(() => Number)
+  @IsNumber()
+  @IsLongitude()
+  longitude!: number
+}
+
+@InputType()
+export class CreatePlaceInput extends ChangeInputWithLang() {
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(1024)
+  name?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  name_tr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(100_000)
+  desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  desc_tr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(2048)
+  address?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  address_tr?: TranslatedInput[]
+
+  @Field(() => PlaceLocationInput, { nullable: true })
+  @IsOptional()
+  location?: PlaceLocationInput
+
+  @Field(() => PlaceOrgInput, { nullable: true })
+  @IsOptional()
+  org?: PlaceOrgInput
+
+  @Field(() => [PlaceTagsInput], { nullable: true })
+  @IsOptional()
+  tags?: PlaceTagsInput[]
+}
+
+@InputType()
+export class UpdatePlaceInput extends ChangeInputWithLang() {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(1024)
+  name?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  name_tr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(100_000)
+  desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  desc_tr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @MaxLength(2048)
+  address?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  @IsOptional()
+  address_tr?: TranslatedInput[]
+
+  @Field(() => PlaceLocationInput, { nullable: true })
+  @IsOptional()
+  location?: PlaceLocationInput
+
+  @Field(() => PlaceOrgInput, { nullable: true })
+  @IsOptional()
+  org?: PlaceOrgInput
+
+  @Field(() => [PlaceTagsInput], { nullable: true })
+  @IsOptional()
+  tags?: PlaceTagsInput[]
+
+  @Field(() => [PlaceTagsInput], { nullable: true })
+  @IsOptional()
+  add_tags?: PlaceTagsInput[]
+
+  @Field(() => [ID], { nullable: true })
+  @IsOptional()
+  remove_tags?: string[]
+}
+
+@ObjectType()
+export class CreatePlaceOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Place, { nullable: true })
+  place?: Place & {}
+}
+
+@ObjectType()
+export class UpdatePlaceOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Place, { nullable: true })
+  place?: Place & {}
+}

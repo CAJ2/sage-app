@@ -211,8 +211,8 @@ export class UpdateComponentInput extends ChangeInputWithLang() {
   @Field(() => [ComponentTagsInput], { nullable: true })
   add_tags?: ComponentTagsInput[]
 
-  @Field(() => [ComponentTagsInput], { nullable: true })
-  remove_tags?: ComponentTagsInput[]
+  @Field(() => [ID], { nullable: true })
+  remove_tags?: string[]
 
   @Field(() => ComponentRegionInput, { nullable: true })
   region?: ComponentRegionInput
