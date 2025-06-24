@@ -92,7 +92,13 @@ export class ProcessHistory {
 export class ProcessPage extends Paginated(Process) {}
 
 @ArgsType()
-export class ProcessArgs extends PaginationBasicArgs {}
+export class ProcessArgs extends PaginationBasicArgs {
+  @Field(() => String, { nullable: true })
+  region?: string
+
+  @Field(() => String, { nullable: true })
+  material?: string
+}
 
 @InputType()
 export class ProcessMaterialInput {

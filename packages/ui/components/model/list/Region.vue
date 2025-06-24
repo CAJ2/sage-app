@@ -3,13 +3,12 @@
     <div>
       <div class="text-bold">{{ region.name }}</div>
     </div>
-    <button
-      v-if="buttons && buttons.includes('select')"
-      class="btn btn-square btn-ghost justify-self-end"
-      @click.prevent.stop="() => emits('button', 'select', region.id)"
-    >
-      <font-awesome-icon icon="fa-solid fa-check" class="size-[1.2em]" />
-    </button>
+    <ModelListActionButtons
+      v-if="buttons && buttons.length"
+      :id="region.id"
+      :buttons="buttons"
+      @button="(btn: string) => emits('button', btn, region.id)"
+    />
   </li>
 </template>
 

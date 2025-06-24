@@ -33,8 +33,17 @@
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem v-for="item in menuItems" :key="item.title">
-                  <SidebarMenuButton as-child class="h-12 px-4">
-                    <NuxtLinkLocale :to="item.url" class="flex content-center">
+                  <SidebarMenuButton
+                    as-child
+                    class="h-12 px-4 hover:bg-primary/30 hover:text-primary"
+                    :class="{
+                      'text-primary dark:text-accent': activeTab === item.url,
+                    }"
+                  >
+                    <NuxtLinkLocale
+                      :to="item.url"
+                      class="flex content-center items-center"
+                    >
                       <UiImage
                         :src="item.icon"
                         :width="6"
@@ -185,19 +194,9 @@
           <DialogTitle>Sign In</DialogTitle>
           <DialogDescription> Sign in to your account </DialogDescription>
         </DialogHeader>
-        <div class="grid gap-4 py-4">
-          <div class="grid grid-cols-4 items-center gap-4">
-            <label for="name" class="text-right"> Email </label>
-            <FormInput id="name" class="col-span-3" />
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <label for="username" class="text-right"> Password </label>
-            <FormInput id="username" class="col-span-3" />
-          </div>
+        <div class="grid w-full max-w-sm grid-cols-1 gap-8">
+          <AuthSignIn @sign-in="signIn" />
         </div>
-        <DialogFooter>
-          <Button type="submit" class="btn btn-block"> Sign In </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   </div>
@@ -217,12 +216,17 @@ const menuItems = [
   {
     title: 'Items',
     url: '/items',
-    icon: 'iconify://qlementine-icons:items-grid-16',
+    icon: 'iconify://material-symbols:list-rounded',
   },
   {
     title: 'Variants',
     url: '/variants',
     icon: 'iconify://qlementine-icons:items-grid-16',
+  },
+  {
+    title: 'Processes',
+    url: '/processes',
+    icon: 'iconify://clarity:process-on-vm-line',
   },
   {
     title: 'Sources',
@@ -234,9 +238,26 @@ const menuItems = [
 const router = useRouter()
 const auth = useAuthClient()
 const session = useAuthSession()
+const route = useRoute()
+const localePath = useLocalePath()
+
+const activeTab = computed(() => {
+  const currentPath = localePath(route.path, 'en')
+  const currentTab = menuItems.find((tab) => {
+    return currentPath.startsWith(tab.url)
+  })
+  return currentTab ? currentTab.url : null
+})
+
+const signIn = async () => {
+  session.value = await auth.getSession()
+  if (session.value.data) {
+    showSignIn.value = false
+  }
+}
 
 const signOut = async () => {
-  auth.signOut().then(() => {
+  await auth.signOut().then(() => {
     router.push('/')
   })
 }

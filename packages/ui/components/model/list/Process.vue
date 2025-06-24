@@ -1,19 +1,17 @@
 <template>
   <li class="list-row">
+    <div></div>
     <div>
-      <UiImage class="size-10" :src="component.image_url"></UiImage>
-    </div>
-    <div>
-      <div class="text-bold">{{ component.name }}</div>
+      <div class="text-bold">{{ process.name }}</div>
       <div class="text-xs opacity-70">
-        {{ component.desc }}
+        {{ process.desc }}
       </div>
     </div>
     <ModelListActionButtons
       v-if="buttons && buttons.length"
-      :id="component.id"
+      :id="process.id"
       :buttons="buttons"
-      @button="(btn: string) => emits('button', btn, component.id)"
+      @button="(btn: string) => emits('button', btn, process.id)"
     />
   </li>
 </template>
@@ -21,17 +19,16 @@
 <script setup lang="ts">
 import { graphql, useFragment, type FragmentType } from '~/gql'
 
-const ListComponentFragment = graphql(`
-  fragment ListComponentFragment on Component {
+const ListProcessFragment = graphql(`
+  fragment ListProcessFragment on Process {
     id
     name
     desc
-    image_url
   }
 `)
 
 const props = defineProps<{
-  component: FragmentType<typeof ListComponentFragment>
+  process: FragmentType<typeof ListProcessFragment>
   buttons?: ('select' | 'edit' | 'delete')[]
 }>()
 
@@ -39,7 +36,5 @@ const emits = defineEmits<{
   (e: 'button', btn: string, id: string): void
 }>()
 
-const component = computed(() =>
-  useFragment(ListComponentFragment, props.component),
-)
+const process = computed(() => useFragment(ListProcessFragment, props.process))
 </script>

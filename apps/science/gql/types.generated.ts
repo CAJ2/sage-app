@@ -549,6 +549,7 @@ export type Material = Named & {
   parents: MaterialsPage;
   primary_components: ComponentsPage;
   processes: ProcessPage;
+  shape?: Maybe<Scalars['String']['output']>;
   technical: Scalars['Boolean']['output'];
   updated_at: Scalars['DateTime']['output'];
 };
@@ -1081,6 +1082,8 @@ export type QueryGetProcessesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  material?: InputMaybe<Scalars['String']['input']>;
+  region?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1193,7 +1196,7 @@ export type RegionsPage = {
   totalCount: Scalars['Int']['output'];
 };
 
-export type SearchResultItem = Category | Component | Item | Org | Place | Region | Variant;
+export type SearchResultItem = Category | Component | Item | Material | Org | Place | Region | Variant;
 
 export type SearchResultItemEdge = {
   __typename?: 'SearchResultItemEdge';
@@ -1214,6 +1217,7 @@ export enum SearchType {
   Category = 'CATEGORY',
   Component = 'COMPONENT',
   Item = 'ITEM',
+  Material = 'MATERIAL',
   Org = 'ORG',
   Place = 'PLACE',
   Region = 'REGION',

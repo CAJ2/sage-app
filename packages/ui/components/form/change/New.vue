@@ -74,7 +74,7 @@
               :disabled="!canSubmit"
               class="btn btn-primary btn-block"
             >
-              {{ isSubmitting ? '...' : 'Sign In' }}
+              {{ isSubmitting ? '...' : 'Create Change' }}
             </button>
           </template>
         </form.Subscribe>

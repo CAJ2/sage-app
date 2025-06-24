@@ -425,6 +425,7 @@ type Material implements Named {
   parents(after: String, before: String, first: Int, last: Int): MaterialsPage!
   primary_components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   processes(after: String, before: String, first: Int, last: Int): ProcessPage!
+  shape: String
   technical: Boolean!
   updated_at: DateTime!
 }
@@ -647,7 +648,7 @@ type Query {
   getPlaces(after: String, before: String, first: Int, last: Int): PlacesPage!
   getProcess(id: ID!): Process
   getProcessSchema: ModelEditSchema
-  getProcesses(after: String, before: String, first: Int, last: Int): ProcessPage!
+  getProcesses(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
   getRegion(id: ID!): Region
   getRegions(after: String, before: String, first: Int, last: Int): RegionsPage!
   getSource(id: ID!): Source
@@ -694,7 +695,7 @@ type RegionsPage {
   totalCount: Int!
 }
 
-union SearchResultItem = Category | Component | Item | Org | Place | Region | Variant
+union SearchResultItem = Category | Component | Item | Material | Org | Place | Region | Variant
 
 type SearchResultItemEdge {
   cursor: String!
@@ -713,6 +714,7 @@ enum SearchType {
   CATEGORY
   COMPONENT
   ITEM
+  MATERIAL
   ORG
   PLACE
   REGION

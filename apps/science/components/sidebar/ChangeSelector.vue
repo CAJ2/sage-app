@@ -36,7 +36,7 @@ const { result, load, refetch } = useLazyQuery(ChangeSelectorQuery, {
 watch(
   selectedChange,
   async (newId) => {
-    if (newId && !result.value) {
+    if (newId) {
       await (load(ChangeSelectorQuery, { id: newId }) || refetch({ id: newId }))
     }
   },

@@ -13,65 +13,66 @@
         Add Change
       </Button>
     </div>
-    <ag-grid-vue
-      :row-data="changes"
-      :column-defs="colDefs"
-      :default-col-def="{
-        flex: 1,
-        filter: true,
-        sortable: true,
-      }"
-      style="height: 100vh"
-    ></ag-grid-vue>
+    <Card class="m-3 bg-base-100 border-0 shadow-md">
+      <CardHeader>
+        <CardTitle>Changes</CardTitle>
+        <CardDescription></CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul v-if="changes" class="list">
+          <div v-for="(change, i) in changes" :key="i" class="list-item">
+            <ModelListChange
+              :change="change"
+              :buttons="['select', 'edit']"
+              @button="selectChange"
+            />
+          </div>
+        </ul>
+      </CardContent>
+    </Card>
     <Dialog v-model:open="showEdit">
-      <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
+      <DialogContent class="max-h-[80vh] overflow-auto">
         <DialogTitle>
           <span v-if="editId === 'new'">Create Change</span>
           <span v-else>Edit Change</span>
         </DialogTitle>
+        <FormChangeNew />
       </DialogContent>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { GridEditActions } from '#components'
-import { AgGridVue } from 'ag-grid-vue3'
 import { graphql } from '~/gql'
-import type { Change } from '~/gql/graphql'
 
-const updateAction = (data: Change) => {
-  editId.value = data.id
-  showEdit.value = true
+const { setChange } = useChangeStore()
+
+const selectChange = (btn: string, id: string) => {
+  if (btn === 'select') {
+    setChange(id)
+    return
+  } else if (btn === 'edit') {
+    editId.value = id
+    showEdit.value = true
+  }
 }
-const colDefs = ref([
-  { field: 'id' },
-  { field: 'title' },
-  { field: 'description' },
-  {
-    colId: 'actions',
-    cellRenderer: GridEditActions,
-    cellRendererParams: { actions: { update: updateAction } },
-  },
-])
 
 const changesQuery = graphql(`
-  query ChangesQuery {
-    getChanges(first: 10) {
+  query ChangesQuery($first: Int, $last: Int, $before: String, $after: String) {
+    getChanges(first: $first, last: $last, before: $before, after: $after) {
       nodes {
-        id
-        title
-        description
+        ...ListChangeFragment
       }
       pageInfo {
+        hasPreviousPage
         hasNextPage
+        startCursor
         endCursor
       }
     }
   }
 `)
-const { result: changesData, refetch: refetchChanges } = useQuery(changesQuery)
-refetchChanges()
+const { result: changesData } = useQuery(changesQuery)
 const changes = computed(() => changesData.value?.getChanges?.nodes || [])
 
 const _createChangeMutation = graphql(`

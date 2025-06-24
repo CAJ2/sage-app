@@ -20,7 +20,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     configFile: 'codegen.ts',
-    devOnly: true,
+    devOnly: false,
     extensions: ['.graphql', '.gql', '.vue'],
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {

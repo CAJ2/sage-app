@@ -10,17 +10,17 @@
         "
       >
         <font-awesome-icon icon="fa-solid fa-plus" />
-        Add Variant
+        Add Process
       </Button>
     </div>
     <GridModel
-      title="Variants"
-      :query="variantsQuery"
-      :query-name="'getVariants'"
+      title="Processes"
+      :query="processQuery"
+      :query-name="'getProcesses'"
     >
       <template #default="{ node }">
-        <ModelListVariant
-          :variant="node"
+        <ModelListProcess
+          :process="node"
           :buttons="['edit']"
           @button="actionButton"
         />
@@ -29,15 +29,15 @@
     <Dialog v-model:open="showEdit">
       <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
         <DialogTitle>
-          <span v-if="editId === 'new'">Create Variant</span>
-          <span v-else>Edit Variant</span>
+          <span v-if="editId === 'new'">Create Process</span>
+          <span v-else>Edit Process</span>
         </DialogTitle>
         <ModelFormDirect
           :model-id="editId"
-          :schema-query="variantSchema"
-          :create-mutation="createVariantMutation"
-          :update-mutation="updateVariantMutation"
-          :create-model-key="'variant'"
+          :schema-query="processSchema"
+          :create-mutation="createProcessMutation"
+          :update-mutation="updateProcessMutation"
+          :create-model-key="'process'"
           @saved="onSaved"
         />
       </DialogContent>
@@ -55,16 +55,16 @@ const actionButton = (btn: string, id: string) => {
   }
 }
 
-const variantsQuery = graphql(`
-  query VariantsQuery(
+const processQuery = graphql(`
+  query ProcessesQuery(
     $first: Int
     $last: Int
     $before: String
     $after: String
   ) {
-    getVariants(first: $first, last: $last, before: $before, after: $after) {
+    getProcesses(first: $first, last: $last, before: $before, after: $after) {
       nodes {
-        ...ListVariantFragment
+        ...ListProcessFragment
       }
       pageInfo {
         hasNextPage
@@ -76,9 +76,9 @@ const variantsQuery = graphql(`
   }
 `)
 
-const variantSchema = graphql(`
-  query VariantsSchema {
-    getVariantSchema {
+const processSchema = graphql(`
+  query ProcessesSchema {
+    getProcessSchema {
       create {
         schema
         uischema
@@ -90,20 +90,20 @@ const variantSchema = graphql(`
     }
   }
 `)
-const createVariantMutation = graphql(`
-  mutation CreateVariant($input: CreateVariantInput!) {
-    createVariant(input: $input) {
-      variant {
+const createProcessMutation = graphql(`
+  mutation MainCreateProcess($input: CreateProcessInput!) {
+    createProcess(input: $input) {
+      process {
         id
         name
       }
     }
   }
 `)
-const updateVariantMutation = graphql(`
-  mutation UpdateVariant($input: UpdateVariantInput!) {
-    updateVariant(input: $input) {
-      variant {
+const updateProcessMutation = graphql(`
+  mutation UpdateProcess($input: UpdateProcessInput!) {
+    updateProcess(input: $input) {
+      process {
         id
         name
       }

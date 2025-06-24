@@ -113,6 +113,15 @@
                   @button="selected"
                 />
               </div>
+              <div v-if="refType === 'Material'">
+                <ModelListMaterial
+                  v-for="(material, i) in searchNodes"
+                  :key="i"
+                  :material="material"
+                  :buttons="['select']"
+                  @button="selected"
+                />
+              </div>
             </div>
 
             <li
@@ -170,6 +179,7 @@ const supportedTypes = [
   'Place',
   'Region',
   'Org',
+  'Material',
 ]
 
 const controlRenderer = defineComponent({
@@ -194,6 +204,7 @@ const controlRenderer = defineComponent({
       Place: SearchType.Place,
       Region: SearchType.Region,
       Org: SearchType.Org,
+      Material: SearchType.Material,
     }
     const searchQuery = graphql(`
       query RefSearchQuery($input: String!, $type: SearchType!) {
@@ -207,6 +218,7 @@ const controlRenderer = defineComponent({
             ...ListOrgFragment
             ...ListRegionFragment
             ...ListPlaceFragment
+            ...ListMaterialFragment
           }
         }
       }

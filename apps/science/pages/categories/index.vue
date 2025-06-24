@@ -1,5 +1,5 @@
 <template>
-  <div :data-ag-theme-mode="getThemeMode">
+  <div>
     <div class="p-3">
       <Button
         @click="
@@ -10,17 +10,17 @@
         "
       >
         <font-awesome-icon icon="fa-solid fa-plus" />
-        Add Variant
+        Add Category
       </Button>
     </div>
     <GridModel
-      title="Variants"
-      :query="variantsQuery"
-      :query-name="'getVariants'"
+      title="Categories"
+      :query="categoriesQuery"
+      :query-name="'getCategories'"
     >
       <template #default="{ node }">
-        <ModelListVariant
-          :variant="node"
+        <ModelListCategory
+          :category="node"
           :buttons="['edit']"
           @button="actionButton"
         />
@@ -29,15 +29,15 @@
     <Dialog v-model:open="showEdit">
       <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
         <DialogTitle>
-          <span v-if="editId === 'new'">Create Variant</span>
-          <span v-else>Edit Variant</span>
+          <span v-if="editId === 'new'">Create Category</span>
+          <span v-else>Edit Category</span>
         </DialogTitle>
         <ModelFormDirect
           :model-id="editId"
-          :schema-query="variantSchema"
-          :create-mutation="createVariantMutation"
-          :update-mutation="updateVariantMutation"
-          :create-model-key="'variant'"
+          :schema-query="categorySchema"
+          :create-mutation="createCategoryMutation"
+          :update-mutation="updateCategoryMutation"
+          :create-model-key="'category'"
           @saved="onSaved"
         />
       </DialogContent>
@@ -55,20 +55,20 @@ const actionButton = (btn: string, id: string) => {
   }
 }
 
-const variantsQuery = graphql(`
-  query VariantsQuery(
+const categoriesQuery = graphql(`
+  query GridCategoriesQuery(
     $first: Int
     $last: Int
-    $before: String
     $after: String
+    $before: String
   ) {
-    getVariants(first: $first, last: $last, before: $before, after: $after) {
+    getCategories(first: $first, last: $last, after: $after, before: $before) {
       nodes {
-        ...ListVariantFragment
+        ...ListCategoryFragment
       }
       pageInfo {
-        hasNextPage
         hasPreviousPage
+        hasNextPage
         startCursor
         endCursor
       }
@@ -76,9 +76,9 @@ const variantsQuery = graphql(`
   }
 `)
 
-const variantSchema = graphql(`
-  query VariantsSchema {
-    getVariantSchema {
+const categorySchema = graphql(`
+  query CategoriesSchema {
+    getCategorySchema {
       create {
         schema
         uischema
@@ -90,20 +90,20 @@ const variantSchema = graphql(`
     }
   }
 `)
-const createVariantMutation = graphql(`
-  mutation CreateVariant($input: CreateVariantInput!) {
-    createVariant(input: $input) {
-      variant {
+const createCategoryMutation = graphql(`
+  mutation CreateCategory($input: CreateCategoryInput!) {
+    createCategory(input: $input) {
+      category {
         id
         name
       }
     }
   }
 `)
-const updateVariantMutation = graphql(`
-  mutation UpdateVariant($input: UpdateVariantInput!) {
-    updateVariant(input: $input) {
-      variant {
+const updateCategoryMutation = graphql(`
+  mutation UpdateCategory($input: UpdateCategoryInput!) {
+    updateCategory(input: $input) {
+      category {
         id
         name
       }

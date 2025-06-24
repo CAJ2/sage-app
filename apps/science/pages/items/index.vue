@@ -13,16 +13,15 @@
         Add Item
       </Button>
     </div>
-    <ag-grid-vue
-      :row-data="items"
-      :column-defs="colDefs"
-      :default-col-def="{
-        flex: 1,
-        filter: true,
-        sortable: true,
-      }"
-      style="height: 100vh"
-    ></ag-grid-vue>
+    <GridModel title="Items" :query="itemsQuery" :query-name="'getItems'">
+      <template #default="{ node }">
+        <ModelListItem
+          :item="node"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
+      </template>
+    </GridModel>
     <Dialog v-model:open="showEditItem">
       <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
         <DialogTitle>
@@ -43,44 +42,30 @@
 </template>
 
 <script setup lang="ts">
-import { GridEditActions } from '#components'
-import { AgGridVue } from 'ag-grid-vue3'
 import { graphql } from '~/gql'
-import type { Item } from '~/gql/graphql'
 
-const updateAction = (data: Item) => {
-  editItemId.value = data.id
-  showEditItem.value = true
+const actionButton = (btn: string, id: string) => {
+  if (btn === 'edit') {
+    editItemId.value = id
+    showEditItem.value = true
+  }
 }
-const colDefs = ref([
-  { field: 'id' },
-  { field: 'name' },
-  { field: 'desc' },
-  {
-    colId: 'actions',
-    cellRenderer: GridEditActions,
-    cellRendererParams: { actions: { update: updateAction } },
-  },
-])
 
 const itemsQuery = graphql(`
-  query ItemsQuery {
-    getItems(first: 10) {
+  query ItemsQuery($first: Int, $last: Int, $before: String, $after: String) {
+    getItems(first: $first, last: $last, before: $before, after: $after) {
       nodes {
-        id
-        name
-        desc
+        ...ListItemFragment
       }
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
     }
   }
 `)
-const { result: itemsData, refetch: refetchItems } = useQuery(itemsQuery)
-refetchItems()
-const items = computed(() => itemsData.value?.getItems?.nodes || [])
 
 const itemSchema = graphql(`
   query ItemsSchema {
@@ -122,6 +107,5 @@ const editItemId = ref<string>('new')
 const onSaved = () => {
   showEditItem.value = false
   editItemId.value = 'new'
-  refetchItems()
 }
 </script>

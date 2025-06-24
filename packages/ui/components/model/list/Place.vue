@@ -6,13 +6,12 @@
         {{ place.desc }}
       </div>
     </div>
-    <button
-      v-if="buttons && buttons.includes('select')"
-      class="btn btn-square btn-ghost"
-      @click.prevent.stop="() => emits('button', 'select', place.id)"
-    >
-      <font-awesome-icon icon="fa-solid fa-check" class="size-[1.2em]" />
-    </button>
+    <ModelListActionButtons
+      v-if="buttons && buttons.length"
+      :id="place.id"
+      :buttons="buttons"
+      @button="(btn: string) => emits('button', btn, place.id)"
+    />
   </li>
 </template>
 

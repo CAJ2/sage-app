@@ -15,15 +15,22 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  */
 type Documents = {
     "\n  query ChangeSelector($id: ID!) {\n    getChange(id: $id) {\n      id\n      title\n      description\n    }\n  }\n": typeof types.ChangeSelectorDocument,
-    "\n  query ChangesQuery {\n    getChanges(first: 10) {\n      nodes {\n        id\n        title\n        description\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": typeof types.ChangesQueryDocument,
+    "\n  query GridCategoriesQuery(\n    $first: Int\n    $last: Int\n    $after: String\n    $before: String\n  ) {\n    getCategories(first: $first, last: $last, after: $after, before: $before) {\n      nodes {\n        ...ListCategoryFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": typeof types.GridCategoriesQueryDocument,
+    "\n  query CategoriesSchema {\n    getCategorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.CategoriesSchemaDocument,
+    "\n  mutation CreateCategory($input: CreateCategoryInput!) {\n    createCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n": typeof types.CreateCategoryDocument,
+    "\n  mutation UpdateCategory($input: UpdateCategoryInput!) {\n    updateCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n": typeof types.UpdateCategoryDocument,
+    "\n  query ChangesQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getChanges(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListChangeFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": typeof types.ChangesQueryDocument,
     "\n  mutation CreateChange($input: CreateChangeInput!) {\n    createChange(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": typeof types.CreateChangeDocument,
     "\n  mutation UpdateChange($input: UpdateChangeInput!) {\n    updateChange(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": typeof types.UpdateChangeDocument,
-    "\n  query TestQuery {\n    rootCategory {\n      id\n    }\n  }\n": typeof types.TestQueryDocument,
-    "\n  query ItemsQuery {\n    getItems(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": typeof types.ItemsQueryDocument,
+    "\n  query ItemsQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getItems(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListItemFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": typeof types.ItemsQueryDocument,
     "\n  query ItemsSchema {\n    getItemSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.ItemsSchemaDocument,
     "\n  mutation CreateItem($input: CreateItemInput!) {\n    createItem(input: $input) {\n      item {\n        id\n        name\n      }\n    }\n  }\n": typeof types.CreateItemDocument,
     "\n  mutation UpdateItem($input: UpdateItemInput!) {\n    updateItem(input: $input) {\n      item {\n        id\n        name\n      }\n    }\n  }\n": typeof types.UpdateItemDocument,
-    "\n  query VariantsQuery {\n    getVariants(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": typeof types.VariantsQueryDocument,
+    "\n  query ProcessesQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getProcesses(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListProcessFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": typeof types.ProcessesQueryDocument,
+    "\n  query ProcessesSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.ProcessesSchemaDocument,
+    "\n  mutation MainCreateProcess($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n": typeof types.MainCreateProcessDocument,
+    "\n  mutation UpdateProcess($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n": typeof types.UpdateProcessDocument,
+    "\n  query VariantsQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getVariants(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListVariantFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": typeof types.VariantsQueryDocument,
     "\n  query VariantsSchema {\n    getVariantSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.VariantsSchemaDocument,
     "\n  mutation CreateVariant($input: CreateVariantInput!) {\n    createVariant(input: $input) {\n      variant {\n        id\n        name\n      }\n    }\n  }\n": typeof types.CreateVariantDocument,
     "\n  mutation UpdateVariant($input: UpdateVariantInput!) {\n    updateVariant(input: $input) {\n      variant {\n        id\n        name\n      }\n    }\n  }\n": typeof types.UpdateVariantDocument,
@@ -36,28 +43,39 @@ type Documents = {
     "\n    query RefOrgQuery($id: ID!) {\n      getOrg(id: $id) {\n        ...ListOrgFragment\n      }\n    }\n  ": typeof types.RefOrgQueryDocument,
     "\n    query RefRegionQuery($id: ID!) {\n      getRegion(id: $id) {\n        ...ListRegionFragment\n      }\n    }\n  ": typeof types.RefRegionQueryDocument,
     "\n    query RefPlaceQuery($id: ID!) {\n      getPlace(id: $id) {\n        ...ListPlaceFragment\n      }\n    }\n  ": typeof types.RefPlaceQueryDocument,
+    "\n    query RefMaterialQuery($id: ID!) {\n      getMaterial(id: $id) {\n        ...ListMaterialFragment\n      }\n    }\n  ": typeof types.RefMaterialQueryDocument,
     "\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n": typeof types.ListCategoryFragmentFragmentDoc,
+    "\n  fragment ListChangeFragment on Change {\n    id\n    title\n    description\n    status\n  }\n": typeof types.ListChangeFragmentFragmentDoc,
     "\n  fragment ListComponentFragment on Component {\n    id\n    name\n    desc\n    image_url\n  }\n": typeof types.ListComponentFragmentFragmentDoc,
     "\n  fragment ListItemFragment on Item {\n    id\n    name\n    desc\n    image_url\n  }\n": typeof types.ListItemFragmentFragmentDoc,
+    "\n  fragment ListMaterialFragment on Material {\n    id\n    name\n    desc\n    shape\n  }\n": typeof types.ListMaterialFragmentFragmentDoc,
     "\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n": typeof types.ListOrgFragmentFragmentDoc,
     "\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n": typeof types.ListPlaceFragmentFragmentDoc,
+    "\n  fragment ListProcessFragment on Process {\n    id\n    name\n    desc\n  }\n": typeof types.ListProcessFragmentFragmentDoc,
     "\n  fragment ListRegionFragment on Region {\n    id\n    name\n  }\n": typeof types.ListRegionFragmentFragmentDoc,
     "\n  fragment ListVariantFragment on Variant {\n    id\n    name\n    desc\n    image_url\n  }\n": typeof types.ListVariantFragmentFragmentDoc,
     "\n  query RegionSelectQuery($id: ID!) {\n    getRegion(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": typeof types.RegionSelectQueryDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": typeof types.RegionSelectSearchDocument,
-    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    ": typeof types.RefSearchQueryDocument,
+    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n            ...ListMaterialFragment\n          }\n        }\n      }\n    ": typeof types.RefSearchQueryDocument,
 };
 const documents: Documents = {
     "\n  query ChangeSelector($id: ID!) {\n    getChange(id: $id) {\n      id\n      title\n      description\n    }\n  }\n": types.ChangeSelectorDocument,
-    "\n  query ChangesQuery {\n    getChanges(first: 10) {\n      nodes {\n        id\n        title\n        description\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": types.ChangesQueryDocument,
+    "\n  query GridCategoriesQuery(\n    $first: Int\n    $last: Int\n    $after: String\n    $before: String\n  ) {\n    getCategories(first: $first, last: $last, after: $after, before: $before) {\n      nodes {\n        ...ListCategoryFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": types.GridCategoriesQueryDocument,
+    "\n  query CategoriesSchema {\n    getCategorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.CategoriesSchemaDocument,
+    "\n  mutation CreateCategory($input: CreateCategoryInput!) {\n    createCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n": types.CreateCategoryDocument,
+    "\n  mutation UpdateCategory($input: UpdateCategoryInput!) {\n    updateCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n": types.UpdateCategoryDocument,
+    "\n  query ChangesQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getChanges(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListChangeFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": types.ChangesQueryDocument,
     "\n  mutation CreateChange($input: CreateChangeInput!) {\n    createChange(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": types.CreateChangeDocument,
     "\n  mutation UpdateChange($input: UpdateChangeInput!) {\n    updateChange(input: $input) {\n      change {\n        id\n      }\n    }\n  }\n": types.UpdateChangeDocument,
-    "\n  query TestQuery {\n    rootCategory {\n      id\n    }\n  }\n": types.TestQueryDocument,
-    "\n  query ItemsQuery {\n    getItems(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": types.ItemsQueryDocument,
+    "\n  query ItemsQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getItems(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListItemFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": types.ItemsQueryDocument,
     "\n  query ItemsSchema {\n    getItemSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.ItemsSchemaDocument,
     "\n  mutation CreateItem($input: CreateItemInput!) {\n    createItem(input: $input) {\n      item {\n        id\n        name\n      }\n    }\n  }\n": types.CreateItemDocument,
     "\n  mutation UpdateItem($input: UpdateItemInput!) {\n    updateItem(input: $input) {\n      item {\n        id\n        name\n      }\n    }\n  }\n": types.UpdateItemDocument,
-    "\n  query VariantsQuery {\n    getVariants(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": types.VariantsQueryDocument,
+    "\n  query ProcessesQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getProcesses(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListProcessFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": types.ProcessesQueryDocument,
+    "\n  query ProcessesSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.ProcessesSchemaDocument,
+    "\n  mutation MainCreateProcess($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n": types.MainCreateProcessDocument,
+    "\n  mutation UpdateProcess($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n": types.UpdateProcessDocument,
+    "\n  query VariantsQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getVariants(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListVariantFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n": types.VariantsQueryDocument,
     "\n  query VariantsSchema {\n    getVariantSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.VariantsSchemaDocument,
     "\n  mutation CreateVariant($input: CreateVariantInput!) {\n    createVariant(input: $input) {\n      variant {\n        id\n        name\n      }\n    }\n  }\n": types.CreateVariantDocument,
     "\n  mutation UpdateVariant($input: UpdateVariantInput!) {\n    updateVariant(input: $input) {\n      variant {\n        id\n        name\n      }\n    }\n  }\n": types.UpdateVariantDocument,
@@ -70,16 +88,20 @@ const documents: Documents = {
     "\n    query RefOrgQuery($id: ID!) {\n      getOrg(id: $id) {\n        ...ListOrgFragment\n      }\n    }\n  ": types.RefOrgQueryDocument,
     "\n    query RefRegionQuery($id: ID!) {\n      getRegion(id: $id) {\n        ...ListRegionFragment\n      }\n    }\n  ": types.RefRegionQueryDocument,
     "\n    query RefPlaceQuery($id: ID!) {\n      getPlace(id: $id) {\n        ...ListPlaceFragment\n      }\n    }\n  ": types.RefPlaceQueryDocument,
+    "\n    query RefMaterialQuery($id: ID!) {\n      getMaterial(id: $id) {\n        ...ListMaterialFragment\n      }\n    }\n  ": types.RefMaterialQueryDocument,
     "\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n": types.ListCategoryFragmentFragmentDoc,
+    "\n  fragment ListChangeFragment on Change {\n    id\n    title\n    description\n    status\n  }\n": types.ListChangeFragmentFragmentDoc,
     "\n  fragment ListComponentFragment on Component {\n    id\n    name\n    desc\n    image_url\n  }\n": types.ListComponentFragmentFragmentDoc,
     "\n  fragment ListItemFragment on Item {\n    id\n    name\n    desc\n    image_url\n  }\n": types.ListItemFragmentFragmentDoc,
+    "\n  fragment ListMaterialFragment on Material {\n    id\n    name\n    desc\n    shape\n  }\n": types.ListMaterialFragmentFragmentDoc,
     "\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n": types.ListOrgFragmentFragmentDoc,
     "\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n": types.ListPlaceFragmentFragmentDoc,
+    "\n  fragment ListProcessFragment on Process {\n    id\n    name\n    desc\n  }\n": types.ListProcessFragmentFragmentDoc,
     "\n  fragment ListRegionFragment on Region {\n    id\n    name\n  }\n": types.ListRegionFragmentFragmentDoc,
     "\n  fragment ListVariantFragment on Variant {\n    id\n    name\n    desc\n    image_url\n  }\n": types.ListVariantFragmentFragmentDoc,
     "\n  query RegionSelectQuery($id: ID!) {\n    getRegion(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": types.RegionSelectQueryDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": types.RegionSelectSearchDocument,
-    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    ": types.RefSearchQueryDocument,
+    "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n            ...ListMaterialFragment\n          }\n        }\n      }\n    ": types.RefSearchQueryDocument,
 };
 
 /**
@@ -103,7 +125,23 @@ export function graphql(source: "\n  query ChangeSelector($id: ID!) {\n    getCh
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query ChangesQuery {\n    getChanges(first: 10) {\n      nodes {\n        id\n        title\n        description\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query ChangesQuery {\n    getChanges(first: 10) {\n      nodes {\n        id\n        title\n        description\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query GridCategoriesQuery(\n    $first: Int\n    $last: Int\n    $after: String\n    $before: String\n  ) {\n    getCategories(first: $first, last: $last, after: $after, before: $before) {\n      nodes {\n        ...ListCategoryFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query GridCategoriesQuery(\n    $first: Int\n    $last: Int\n    $after: String\n    $before: String\n  ) {\n    getCategories(first: $first, last: $last, after: $after, before: $before) {\n      nodes {\n        ...ListCategoryFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CategoriesSchema {\n    getCategorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n"): (typeof documents)["\n  query CategoriesSchema {\n    getCategorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateCategory($input: CreateCategoryInput!) {\n    createCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateCategory($input: CreateCategoryInput!) {\n    createCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateCategory($input: UpdateCategoryInput!) {\n    updateCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateCategory($input: UpdateCategoryInput!) {\n    updateCategory(input: $input) {\n      category {\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ChangesQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getChanges(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListChangeFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query ChangesQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getChanges(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListChangeFragment\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -115,11 +153,7 @@ export function graphql(source: "\n  mutation UpdateChange($input: UpdateChangeI
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query TestQuery {\n    rootCategory {\n      id\n    }\n  }\n"): (typeof documents)["\n  query TestQuery {\n    rootCategory {\n      id\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  query ItemsQuery {\n    getItems(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query ItemsQuery {\n    getItems(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query ItemsQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getItems(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListItemFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query ItemsQuery($first: Int, $last: Int, $before: String, $after: String) {\n    getItems(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListItemFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -135,7 +169,23 @@ export function graphql(source: "\n  mutation UpdateItem($input: UpdateItemInput
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query VariantsQuery {\n    getVariants(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query VariantsQuery {\n    getVariants(first: 10) {\n      nodes {\n        id\n        name\n        desc\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query ProcessesQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getProcesses(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListProcessFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query ProcessesQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getProcesses(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListProcessFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ProcessesSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n"): (typeof documents)["\n  query ProcessesSchema {\n    getProcessSchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation MainCreateProcess($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation MainCreateProcess($input: CreateProcessInput!) {\n    createProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateProcess($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateProcess($input: UpdateProcessInput!) {\n    updateProcess(input: $input) {\n      process {\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query VariantsQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getVariants(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListVariantFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query VariantsQuery(\n    $first: Int\n    $last: Int\n    $before: String\n    $after: String\n  ) {\n    getVariants(first: $first, last: $last, before: $before, after: $after) {\n      nodes {\n        ...ListVariantFragment\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -187,7 +237,15 @@ export function graphql(source: "\n    query RefPlaceQuery($id: ID!) {\n      ge
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n    query RefMaterialQuery($id: ID!) {\n      getMaterial(id: $id) {\n        ...ListMaterialFragment\n      }\n    }\n  "): (typeof documents)["\n    query RefMaterialQuery($id: ID!) {\n      getMaterial(id: $id) {\n        ...ListMaterialFragment\n      }\n    }\n  "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n"): (typeof documents)["\n  fragment ListCategoryFragment on Category {\n    id\n    name_req: name\n    desc_short\n    image_url\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListChangeFragment on Change {\n    id\n    title\n    description\n    status\n  }\n"): (typeof documents)["\n  fragment ListChangeFragment on Change {\n    id\n    title\n    description\n    status\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -199,11 +257,19 @@ export function graphql(source: "\n  fragment ListItemFragment on Item {\n    id
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  fragment ListMaterialFragment on Material {\n    id\n    name\n    desc\n    shape\n  }\n"): (typeof documents)["\n  fragment ListMaterialFragment on Material {\n    id\n    name\n    desc\n    shape\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n"): (typeof documents)["\n  fragment ListOrgFragment on Org {\n    id\n    name_req: name\n    desc\n    avatar_url\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n"): (typeof documents)["\n  fragment ListPlaceFragment on Place {\n    id\n    name\n    desc\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ListProcessFragment on Process {\n    id\n    name\n    desc\n  }\n"): (typeof documents)["\n  fragment ListProcessFragment on Process {\n    id\n    name\n    desc\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -223,7 +289,7 @@ export function graphql(source: "\n  query RegionSelectSearch($query: String!) {
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n          }\n        }\n      }\n    "];
+export function graphql(source: "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n            ...ListMaterialFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n            ...ListMaterialFragment\n          }\n        }\n      }\n    "];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

@@ -13,6 +13,11 @@ import { Material } from './material.entity'
 import { Process } from './process.entity'
 import { CreateProcessInput, UpdateProcessInput } from './process.model'
 
+export interface FindProcessFilter {
+  region?: string
+  material?: string
+}
+
 @Injectable()
 export class ProcessService {
   constructor(
@@ -20,7 +25,13 @@ export class ProcessService {
     private readonly editService: EditService,
   ) {}
 
-  async find(opts: CursorOptions<Process>) {
+  async find(opts: CursorOptions<Process>, filter?: FindProcessFilter) {
+    if (filter?.region) {
+      opts.where.region = ref(Region, filter.region)
+    }
+    if (filter?.material) {
+      opts.where.material = ref(Material, filter.material)
+    }
     const processes = await this.em.find(Process, opts.where, opts.options)
     const count = await this.em.count(Process, opts.where)
     return {

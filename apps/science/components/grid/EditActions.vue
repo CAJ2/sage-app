@@ -1,22 +1,28 @@
 <template>
-  <Button @click="triggerAction('update')"
-    ><font-awesome-icon icon="fa-solid fa-pencil"
-  /></Button>
+  <Button
+    v-for="btn in btns"
+    :key="btn.action"
+    variant="outline"
+    @click="triggerAction(btn.action)"
+    ><font-awesome-icon v-if="btn.icon" :icon="btn.icon" />
+    {{ btn.text }}
+  </Button>
 </template>
 
 <script setup lang="ts">
-import type { ICellRendererParams } from 'ag-grid-community'
+type Btns = {
+  action: string
+  icon?: string
+  text?: string
+}[]
+const { btns } = defineProps<{
+  btns?: Btns
+}>()
 
-const { params } = defineProps<{
-  params: ICellRendererParams
+const emits = defineEmits<{
+  (e: 'action', action: string): void
 }>()
 const triggerAction = (action: string) => {
-  type ActionFn = (data: ICellRendererParams['data']) => void
-  const actionFns: Record<string, ActionFn> | undefined = (
-    params as ICellRendererParams & { actions: Record<string, ActionFn> }
-  ).actions
-  if (actionFns && actionFns[action]) {
-    actionFns[action](params.data)
-  }
+  emits('action', action)
 }
 </script>

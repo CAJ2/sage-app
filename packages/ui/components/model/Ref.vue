@@ -7,6 +7,7 @@
     <ModelListOrg v-if="type === 'Org' && data" :org="data" />
     <ModelListRegion v-if="type === 'Region' && data" :region="data" />
     <ModelListPlace v-if="type === 'Place' && data" :place="data" />
+    <ModelListMaterial v-if="type === 'Material' && data" :material="data" />
   </ul>
 </template>
 
@@ -215,6 +216,36 @@ if (type === 'Category') {
     (result) => {
       if (result && result.getPlace) {
         data.value = result.getPlace
+      }
+    },
+    {
+      immediate: true,
+    },
+  )
+  watch(
+    () => id,
+    async (newId) => {
+      if (newId) {
+        await refetch({ id: newId })
+      }
+    },
+  )
+} else if (type === 'Material') {
+  const RefMaterialQuery = graphql(`
+    query RefMaterialQuery($id: ID!) {
+      getMaterial(id: $id) {
+        ...ListMaterialFragment
+      }
+    }
+  `)
+  const { result, refetch } = useQuery(RefMaterialQuery, {
+    id,
+  })
+  watch(
+    result,
+    (result) => {
+      if (result && result.getMaterial) {
+        data.value = result.getMaterial
       }
     },
     {

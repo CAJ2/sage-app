@@ -39,6 +39,9 @@ export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   @Field(() => Boolean)
   technical: boolean = false
 
+  @Field(() => String, { nullable: true })
+  shape?: string
+
   @Field(() => MaterialsPage)
   parents!: MaterialsPage & {}
 

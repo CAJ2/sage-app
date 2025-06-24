@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center">
-    <div class="w-full p-5">
+  <div class="flex flex-col justify-center">
+    <div class="w-full px-5 mb-10">
       <FormChangeSaveStatus
         v-if="!readOnly"
         :status="saveStatus"
@@ -44,11 +44,10 @@ const {
   >
   createMutation: TypedDocumentNode<
     { [key: string]: unknown },
-    Exact<{
-      input: {
-        [key: string]: unknown
-      }
-    }>
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      input: any
+    }
   >
   updateMutation: TypedDocumentNode<
     { [key: string]: unknown },

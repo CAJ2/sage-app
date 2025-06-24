@@ -34,11 +34,10 @@ const { modelId, schemaQuery, createMutation, updateMutation, createModelKey } =
     >
     createMutation: TypedDocumentNode<
       { [key: string]: unknown },
-      Exact<{
-        input: {
-          [key: string]: unknown
-        }
-      }>
+      {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        input: any
+      }
     >
     updateMutation: TypedDocumentNode<
       { [key: string]: unknown },

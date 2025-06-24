@@ -22,6 +22,7 @@ export class SearchService {
     [SearchType.ORG]: SearchIndex.ORGS,
     [SearchType.PLACE]: SearchIndex.PLACES,
     [SearchType.REGION]: SearchIndex.REGIONS,
+    [SearchType.MATERIAL]: SearchIndex.MATERIALS,
   }
 
   indexModelMap: Record<SearchIndex, any> = {
@@ -30,9 +31,9 @@ export class SearchService {
     [SearchIndex.VARIANTS]: Variant,
     [SearchIndex.COMPONENTS]: Component,
     [SearchIndex.ORGS]: Org,
-    [SearchIndex.MATERIALS]: Material,
     [SearchIndex.PLACES]: Place,
     [SearchIndex.REGIONS]: Region,
+    [SearchIndex.MATERIALS]: Material,
   }
 
   mapTypeToIndex(type: SearchType): SearchIndex {
@@ -56,7 +57,6 @@ export class SearchService {
         SearchIndex.CATEGORIES,
         SearchIndex.ITEMS,
         SearchIndex.VARIANTS,
-        SearchIndex.COMPONENTS,
         SearchIndex.ORGS,
         SearchIndex.PLACES,
       ] as SearchIndex[])
