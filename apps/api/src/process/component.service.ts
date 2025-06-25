@@ -6,7 +6,11 @@ import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { I18nService } from 'nestjs-i18n'
-import { Component, ComponentsTags } from './component.entity'
+import {
+  Component,
+  ComponentsMaterials,
+  ComponentsTags,
+} from './component.entity'
 import { CreateComponentInput, UpdateComponentInput } from './component.model'
 import { Material } from './material.entity'
 import { StreamService } from './stream.service'
@@ -31,7 +35,7 @@ export class ComponentService {
     }
   }
 
-  async findOneByID(id: string) {
+  async findOneByID(id: string, withChange?: string) {
     return await this.em.findOne(
       Component,
       { id },
@@ -65,6 +69,23 @@ export class ComponentService {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
     return component.materials.getItems()
+  }
+
+  async tags(componentId: string) {
+    const component = await this.em.findOne(
+      Component,
+      { id: componentId },
+      { populate: ['component_tags', 'component_tags.tag'] },
+    )
+    if (!component) {
+      throw new Error(`Component with ID "${componentId}" not found`)
+    }
+    return component.component_tags.getItems().map((tag) => {
+      return {
+        ...tag.tag,
+        meta: tag.meta,
+      }
+    })
   }
 
   async recycle(componentId: string, regionId?: string) {
@@ -109,11 +130,10 @@ export class ComponentService {
   }
 
   async update(input: UpdateComponentInput, userID: string) {
-    const component = await this.em.findOne(
-      Component,
-      { id: input.id },
-      { disableIdentityMap: input.useChange() },
-    )
+    const { entity: component, change } =
+      await this.editService.findOneWithChangeInput(input, userID, Component, {
+        id: input.id,
+      })
     if (!component) {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
@@ -125,11 +145,6 @@ export class ComponentService {
         change: null,
       }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.change_id,
-      input.change,
-      userID,
-    )
     await this.editService.beginUpdateEntityEdit(change, component)
     await this.setFields(component, input, change)
     await this.editService.updateEntityEdit(change, component)
@@ -149,8 +164,14 @@ export class ComponentService {
     if (input.name) {
       component.name = addTrReq(component.name, input.lang, input.name)
     }
+    if (input.name_tr) {
+      component.name = addTrReq(component.name, input.lang, input.name_tr)
+    }
     if (input.desc) {
       component.desc = addTr(component.desc, input.lang, input.desc)
+    }
+    if (input.desc_tr) {
+      component.desc = addTr(component.desc, input.lang, input.desc_tr)
     }
     if (input.image_url) {
       component.visual = { image: input.image_url }
@@ -167,49 +188,37 @@ export class ComponentService {
       component.primary_material = ref(Material, material.id)
     }
     if (input.materials) {
-      const materials = await this.em.find(Material, {
-        id: { $in: input.materials.map((m) => m.id) },
-      })
-      if (materials.length !== input.materials.length) {
-        throw new Error(
-          `Materials with IDs "${input.materials
-            .map((m) => m.id)
-            .filter((id) => !materials.find((m) => m.id === id))
-            .join(', ')}" not found`,
-        )
-      }
-      component.materials.set(materials)
+      component.materials = await this.editService.setOrAddPivot(
+        component.id,
+        change?.id,
+        component.materials,
+        Component,
+        ComponentsMaterials,
+        input.materials,
+      )
     }
-    if (input.tags) {
-      for (const tag of input.tags) {
-        const tagDef = await this.tagService.validateTagInput(tag)
-        const componentTag = new ComponentsTags()
-        componentTag.tag = tagDef
-        componentTag.component = component
-        componentTag.meta = tag.meta
-        component.component_tags.add(componentTag)
+    if (input.tags || input.add_tags) {
+      for (const tag of input.tags || input.add_tags || []) {
+        await this.tagService.validateTagInput(tag)
       }
-    }
-    if (input.add_tags) {
-      for (const tag of input.add_tags) {
-        const tagDef = await this.tagService.validateTagInput(tag)
-        const componentTag = new ComponentsTags()
-        componentTag.tag = tagDef
-        componentTag.component = component
-        componentTag.meta = tag.meta
-        component.component_tags.add(componentTag)
-      }
+      component.component_tags = await this.editService.setOrAddPivot(
+        component.id,
+        change?.id,
+        component.component_tags,
+        Component,
+        ComponentsTags,
+        input.tags,
+        input.add_tags,
+      )
     }
     if (input.remove_tags) {
-      for (const tag of input.remove_tags) {
-        const componentTag = await this.em.findOne(ComponentsTags, {
-          tag: { id: tag },
-          component: { id: component.id },
-        })
-        if (componentTag) {
-          component.component_tags.remove(componentTag)
-        }
-      }
+      component.component_tags = await this.editService.removeFromPivot(
+        change?.id,
+        component.component_tags,
+        Component,
+        ComponentsTags,
+        input.remove_tags,
+      )
     }
     if (input.region) {
       const region = await this.em.findOne(Region, { id: input.region.id })

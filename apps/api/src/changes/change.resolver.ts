@@ -124,7 +124,7 @@ export class ChangeResolver {
     @Parent() change: Change,
     @Args() args: ChangeEditsArgs,
   ): Promise<ChangeEditsPage> {
-    const edits = await this.changeService.edits(change.id, args.id)
+    const edits = await this.changeService.edits(change.id, args.id, args.type)
     return this.transform.objectsToPaginated(
       { items: edits, count: edits.length },
       ChangeEditsPage,

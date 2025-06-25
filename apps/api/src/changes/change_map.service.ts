@@ -25,6 +25,8 @@ export class ChangeMapService {
 
   private updateEditFns: Record<string, (edit: EditModel) => Promise<any>> = {}
 
+  private populateCache: Record<string, string[]> = {}
+
   constructor(
     private readonly categoryService: CategoryService,
     private readonly categorySchema: CategorySchemaService,

@@ -1,5 +1,5 @@
 <template>
-  <div :data-ag-theme-mode="getThemeMode">
+  <div>
     <div class="p-3">
       <Button
         @click="
@@ -23,7 +23,7 @@
           <div v-for="(change, i) in changes" :key="i" class="list-item">
             <ModelListChange
               :change="change"
-              :buttons="['select', 'edit']"
+              :buttons="visibleButtons(change as ListChangeFragmentFragment)"
               @button="selectChange"
             />
           </div>
@@ -44,6 +44,8 @@
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
+import type { ListChangeFragmentFragment } from '~/gql/graphql'
+import { ChangeStatus } from '~/gql/types.generated'
 
 const { setChange } = useChangeStore()
 
@@ -96,4 +98,16 @@ const _updateChangeMutation = graphql(`
 
 const showEdit = ref(false)
 const editId = ref<string>('new')
+
+const visibleButtons = (
+  change: ListChangeFragmentFragment,
+): ('select' | 'edit' | 'delete')[] => {
+  if (
+    change.status === ChangeStatus.Merged ||
+    change.status === ChangeStatus.Rejected
+  ) {
+    return ['edit']
+  }
+  return ['select', 'edit', 'delete']
+}
 </script>

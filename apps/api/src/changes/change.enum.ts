@@ -28,3 +28,19 @@ export const EditModel = createUnionType({
       Variant,
     ] as const,
 })
+
+export enum EditModelType {
+  Place = 'Place',
+  Region = 'Region',
+  Component = 'Component',
+  Material = 'Material',
+  Process = 'Process',
+  Category = 'Category',
+  Item = 'Item',
+  Variant = 'Variant',
+}
+
+registerEnumType(EditModelType, {
+  name: 'EditModelType',
+  description: 'Type of the model being edited',
+})

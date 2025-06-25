@@ -25,6 +25,7 @@ import {
 import { ComponentSchemaService } from './component.schema'
 import { ComponentService } from './component.service'
 import { ComponentsArgs, Material } from './material.model'
+import { Tag } from './tag.model'
 
 @Resolver(() => Component)
 export class ComponentResolver {
@@ -49,6 +50,8 @@ export class ComponentResolver {
   @Query(() => Component, { name: 'getComponent', nullable: true })
   async getComponent(
     @Args('id', { type: () => ID }) id: string,
+    @Args('with_change', { type: () => ID, nullable: true })
+    withChange?: string,
   ): Promise<Component> {
     const component = await this.componentService.findOneByID(id)
     if (!component) {
@@ -87,6 +90,12 @@ export class ComponentResolver {
   async materials(@Parent() component: Component) {
     const materials = await this.componentService.materials(component.id)
     return this.transform.entitiesToModels(materials, Material)
+  }
+
+  @ResolveField()
+  async tags(@Parent() component: Component) {
+    const tags = await this.componentService.tags(component.id)
+    return this.transform.objectsToModels(tags, Tag)
   }
 
   @ResolveField()

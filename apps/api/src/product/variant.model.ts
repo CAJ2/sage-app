@@ -10,10 +10,10 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { ComponentsPage } from '@src/process/component.model'
+import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
-import { OrgsPage } from '@src/users/org.model'
+import { Org } from '@src/users/org.model'
 import { Transform } from 'class-transformer'
 import {
   IsOptional,
@@ -50,8 +50,8 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => ItemsPage)
   items!: ItemsPage
 
-  @Field(() => OrgsPage)
-  orgs!: OrgsPage & {}
+  @Field(() => VariantOrgsPage)
+  orgs!: VariantOrgsPage & {}
 
   @Field(() => TagPage)
   tags!: TagPage
@@ -59,8 +59,8 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => StreamScore, { nullable: true })
   recycle_score?: StreamScore
 
-  @Field(() => ComponentsPage)
-  components!: ComponentsPage & {}
+  @Field(() => VariantComponentsPage)
+  components!: VariantComponentsPage & {}
 }
 registerModel('Variant', Variant)
 
@@ -80,7 +80,34 @@ export class VariantHistory {
 }
 
 @ObjectType()
+export class VariantOrg {
+  @Field(() => Org)
+  org!: Org & {}
+
+  @Field(() => String, { nullable: true })
+  role?: string
+}
+
+@ObjectType()
+export class VariantComponent {
+  @Field(() => Component)
+  component!: Component & {}
+
+  @Field(() => Number, { nullable: true })
+  quantity?: number
+
+  @Field(() => String, { nullable: true })
+  unit?: string
+}
+
+@ObjectType()
 export class VariantsPage extends Paginated(Variant) {}
+
+@ObjectType()
+export class VariantOrgsPage extends Paginated(VariantOrg) {}
+
+@ObjectType()
+export class VariantComponentsPage extends Paginated(VariantComponent) {}
 
 @ArgsType()
 export class VariantsArgs extends PaginationBasicArgs {}

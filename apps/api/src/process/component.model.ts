@@ -113,6 +113,9 @@ export class ComponentsPage extends Paginated(Component) {}
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {
   @Field(() => ID, { nullable: true })
+  with_change?: string
+
+  @Field(() => ID, { nullable: true })
   @IsOptional()
   region_id?: string
 }
@@ -153,8 +156,8 @@ export class ComponentRegionInput {
 
 @InputType()
 export class CreateComponentInput extends ChangeInputWithLang() {
-  @Field(() => String)
-  name!: string
+  @Field(() => String, { nullable: true })
+  name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
   name_tr?: TranslatedInput[]
@@ -207,6 +210,9 @@ export class UpdateComponentInput extends ChangeInputWithLang() {
 
   @Field(() => [ComponentMaterialInput], { nullable: true })
   materials?: ComponentMaterialInput[]
+
+  @Field(() => [ComponentTagsInput], { nullable: true })
+  tags?: ComponentTagsInput[]
 
   @Field(() => [ComponentTagsInput], { nullable: true })
   add_tags?: ComponentTagsInput[]

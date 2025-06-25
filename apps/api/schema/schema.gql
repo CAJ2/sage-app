@@ -42,7 +42,7 @@ type CategoryEdge {
 type Change {
   created_at: DateTime!
   description: String
-  edits(id: ID): ChangeEditsPage!
+  edits(after: String, before: String, first: Int, id: ID, last: Int, type: EditModelType): ChangeEditsPage!
   id: ID!
   sources(after: String, before: String, first: Int, last: Int): SourcesPage!
   status: ChangeStatus!
@@ -203,7 +203,7 @@ input CreateComponentInput {
   image_url: String
   lang: String
   materials: [ComponentMaterialInput!]
-  name: String!
+  name: String
   name_tr: [TranslatedInput!]
   primary_material: ComponentMaterialInput
   region: ComponentRegionInput
@@ -368,6 +368,18 @@ type EditEdge {
 }
 
 union EditModel = Category | Component | Item | Material | Place | Process | Region | Variant
+
+"""Type of the model being edited"""
+enum EditModelType {
+  Category
+  Component
+  Item
+  Material
+  Place
+  Process
+  Region
+  Variant
+}
 
 type Item implements Named {
   categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
@@ -634,7 +646,7 @@ type Query {
   getCategorySchema: ModelEditSchema
   getChange(id: ID!): Change
   getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
-  getComponent(id: ID!): Component
+  getComponent(id: ID!, with_change: ID): Component
   getComponentSchema: ModelEditSchema
   getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
   getDirectEdit(entity_name: String, id: ID): DirectEdit
@@ -913,6 +925,7 @@ input UpdateComponentInput {
   region: ComponentRegionInput
   remove_sources: [ID!]
   remove_tags: [ID!]
+  tags: [ComponentTagsInput!]
 }
 
 type UpdateComponentOutput {
@@ -1083,7 +1096,7 @@ type UserProfile {
 }
 
 type Variant implements Named {
-  components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  components(after: String, before: String, first: Int, last: Int): VariantComponentsPage!
   created_at: DateTime!
   desc: String
 
@@ -1092,16 +1105,34 @@ type Variant implements Named {
   image_url: String
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String
-  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): VariantOrgsPage!
   recycle_score(region_id: ID): StreamScore
   tags(after: String, before: String, first: Int, last: Int): TagPage!
   updated_at: DateTime!
+}
+
+type VariantComponent {
+  component: Component!
+  quantity: Float
+  unit: String
+}
+
+type VariantComponentEdge {
+  cursor: String!
+  node: VariantComponent!
 }
 
 input VariantComponentsInput {
   id: ID!
   quantity: Float
   unit: String
+}
+
+type VariantComponentsPage {
+  edges: [VariantComponentEdge!]
+  nodes: [VariantComponent!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type VariantEdge {
@@ -1113,8 +1144,25 @@ input VariantItemsInput {
   id: ID!
 }
 
+type VariantOrg {
+  org: Org!
+  role: String
+}
+
+type VariantOrgEdge {
+  cursor: String!
+  node: VariantOrg!
+}
+
 input VariantOrgsInput {
   id: ID!
+}
+
+type VariantOrgsPage {
+  edges: [VariantOrgEdge!]
+  nodes: [VariantOrg!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 input VariantRegionsInput {

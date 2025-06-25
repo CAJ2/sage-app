@@ -1,4 +1,4 @@
-import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
+import { BaseEntity, EntityManager, ref, rel } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { User } from '@src/users/users.entity'
@@ -25,6 +25,10 @@ import type {
 export interface IEntityService {
   findOneByID<T extends BaseEntity>(id: string): Promise<T | null>
 }
+
+type PivotInput =
+  | { id: string; [key: string]: any }
+  | { id: string; [key: string]: any }[]
 
 @Injectable()
 export class EditService {
@@ -69,6 +73,21 @@ export class EditService {
 
     const newChange = await this.create(input!, userID)
     return newChange
+  }
+
+  async findEntityEdits<T extends BaseEntity>(
+    changeID: string,
+    entity: EntityName<T>,
+  ): Promise<Edit[]> {
+    const change = await this.em.findOne(
+      Change,
+      { id: changeID },
+      { populate: ['edits'] },
+    )
+    if (!change) {
+      throw NotFoundErr(`Change with ID "${changeID}" not found`)
+    }
+    return change.edits.filter((edit) => edit.entity_name === entity.toString())
   }
 
   async create(input: CreateChangeInput, userID: string) {
@@ -221,6 +240,237 @@ export class EditService {
           throw NotFoundErr(`No ${entity} found for ID: ${toRemove}`)
         }
         collection.remove(foundItem)
+      }
+    }
+    return collection
+  }
+
+  async setOrAddPivot<U extends object & { id: string }, T extends object>(
+    id: string,
+    changeID: string | undefined,
+    collection: Collection<T>,
+    collEntity: EntityName<U>,
+    pivotEntity: EntityName<T>,
+    toSet?: PivotInput,
+    toAdd?: PivotInput,
+  ): Promise<Collection<T>> {
+    const pivotMeta = this.em.getMetadata().get(pivotEntity)
+    const pivotEntityStr = pivotMeta.name
+    const collEntityStr = this.em.getMetadata().get(collEntity).name
+    if (!pivotEntityStr || !collEntityStr) {
+      throw new Error(`Bad pivot entities: ${pivotEntityStr}, ${collEntityStr}`)
+    }
+    let collField: string | undefined
+    let relField: string | undefined
+    let relEntity: EntityName<U> | undefined
+    for (const prop of pivotMeta.primaryKeys) {
+      const target = pivotMeta.properties[prop].targetMeta
+      if (!target) {
+        throw new Error(`No target meta found for property: ${prop}`)
+      }
+      if (target.name !== collEntityStr) {
+        relField = prop
+        relEntity = target.className as EntityName<U>
+      } else {
+        collField = prop
+      }
+    }
+    if (!collField || !relField || !relEntity) {
+      throw new Error(
+        `Could not determine collection field or relation field for pivot entity: ${pivotEntityStr}`,
+      )
+    }
+    if (toSet) {
+      if (Array.isArray(toSet)) {
+        const foundItems = await this.em.find(
+          relEntity,
+          { id: { $in: toSet.map((item) => item.id) } } as any,
+          { populate: false },
+        )
+        if (foundItems.length !== toSet.length) {
+          const foundIds = foundItems.map((item) => item.id)
+          throw NotFoundErr(
+            `No ${relEntity} found for IDs: ${toSet
+              .map((item) => item.id)
+              .filter((id) => !_.includes(foundIds, id))
+              .join(', ')}`,
+          )
+        }
+        const toSetEntities = toSet.map((item) => {
+          const newEntity = this.em.create(
+            pivotEntity,
+            {
+              [collField]: id,
+              [relField]: item.id,
+              ..._.omit(item, 'id'),
+            } as any,
+            {
+              managed: !!changeID,
+              persist: !changeID,
+            },
+          )
+          if (!changeID) {
+            this.em.persist(newEntity)
+          }
+          return newEntity
+        })
+        collection.set(toSetEntities)
+      } else {
+        const foundItem = await this.em.findOne(
+          relEntity,
+          { id: toSet.id } as any,
+          { populate: false },
+        )
+        if (!foundItem) {
+          throw NotFoundErr(`No ${relEntity} found for ID: ${toSet.id}`)
+        }
+        const toSetEntity = this.em.create(
+          pivotEntity,
+          {
+            [collField]: id,
+            [relField]: foundItem.id,
+            ..._.omit(toSet, 'id'),
+          } as any,
+          {
+            managed: !!changeID,
+            persist: !changeID,
+          },
+        )
+        if (!changeID) {
+          this.em.persist(toSetEntity)
+        }
+        collection.set([toSetEntity])
+      }
+    }
+    if (toAdd) {
+      if (Array.isArray(toAdd)) {
+        const foundItems = await this.em.find(
+          relEntity,
+          { id: { $in: toAdd.map((item) => item.id) } } as any,
+          { populate: false },
+        )
+        if (foundItems.length !== toAdd.length) {
+          const foundIds = foundItems.map((item) => item.id)
+          throw NotFoundErr(
+            `No ${relEntity} found for IDs: ${toAdd
+              .map((item) => item.id)
+              .filter((id) => !_.includes(foundIds, id))
+              .join(', ')}`,
+          )
+        }
+        const toAddEntities = toAdd.map((item) => {
+          const newEntity = this.em.create(
+            pivotEntity,
+            {
+              [collField]: id,
+              [relField]: item.id,
+              ..._.omit(item, 'id'),
+            } as any,
+            {
+              managed: !!changeID,
+              persist: !changeID,
+            },
+          )
+          console.log(`Created new entity for ${pivotEntity}:`, newEntity)
+          if (!changeID) {
+            this.em.persist(newEntity)
+          }
+          return newEntity
+        })
+        collection.add(toAddEntities)
+      } else {
+        const foundItem = await this.em.findOne(
+          relEntity,
+          { id: toAdd.id } as any,
+          { populate: false },
+        )
+        if (!foundItem) {
+          throw NotFoundErr(`No ${relEntity} found for ID: ${toAdd.id}`)
+        }
+        const toAddEntity = this.em.create(
+          pivotEntity,
+          {
+            [collField]: id,
+            [relField]: foundItem.id,
+            ..._.omit(toAdd, 'id'),
+          } as any,
+          {
+            managed: !!changeID,
+            persist: !changeID,
+          },
+        )
+        if (!changeID) {
+          this.em.persist(toAddEntity)
+        }
+        collection.add([toAddEntity])
+      }
+    }
+    return collection
+  }
+
+  async removeFromPivot<U extends object & { id: string }, T extends object>(
+    changeID: string | undefined,
+    collection: Collection<T>,
+    collEntity: EntityName<U>,
+    pivotEntity: EntityName<T>,
+    toRemove?: string | string[],
+  ): Promise<Collection<T>> {
+    const pivotMeta = this.em.getMetadata().get(pivotEntity)
+    const pivotEntityStr = pivotMeta.name
+    const collEntityStr = this.em.getMetadata().get(collEntity).name
+    if (!pivotEntityStr || !collEntityStr) {
+      throw new Error(`Bad pivot entities: ${pivotEntityStr}, ${collEntityStr}`)
+    }
+    let collField: string | undefined
+    let relField: string | undefined
+    let relEntity: EntityName<U> | undefined
+    for (const prop of pivotMeta.primaryKeys) {
+      const target = pivotMeta.properties[prop].targetMeta
+      if (!target) {
+        throw new Error(`No target meta found for property: ${prop}`)
+      }
+      if (target.name !== collEntityStr) {
+        relField = prop
+        relEntity = target.className as EntityName<U>
+      } else {
+        collField = prop
+      }
+    }
+    if (!collField || !relField || !relEntity) {
+      throw new Error(
+        `Could not determine collection field or relation field for pivot entity: ${pivotEntityStr}`,
+      )
+    }
+    if (toRemove) {
+      if (Array.isArray(toRemove)) {
+        const foundItems = await this.em.find(
+          relEntity,
+          { id: { $in: toRemove } } as any,
+          { populate: false },
+        )
+        if (foundItems.length !== toRemove.length) {
+          const foundIds = foundItems.map((item) => item.id)
+          throw NotFoundErr(
+            `No ${relEntity} found for IDs: ${toRemove
+              .filter((id) => !_.includes(foundIds, id))
+              .join(', ')}`,
+          )
+        }
+        collection.remove(
+          toRemove.map((id) => rel(pivotMeta.class, { [relField]: id } as any)),
+        )
+      } else {
+        const foundItem = await this.em.findOne(
+          relEntity,
+          { id: toRemove } as any,
+          { populate: false },
+        )
+        if (!foundItem) {
+          throw NotFoundErr(`No ${relEntity} found for ID: ${toRemove}`)
+        }
+        collection.remove(
+          rel(pivotMeta.class, { [collField]: foundItem.id } as any),
+        )
       }
     }
     return collection

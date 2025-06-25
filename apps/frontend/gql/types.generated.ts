@@ -111,7 +111,12 @@ export type Change = {
 
 
 export type ChangeEditsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<EditModelType>;
 };
 
 
@@ -297,7 +302,7 @@ export type CreateComponentInput = {
   image_url?: InputMaybe<Scalars['String']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
   materials?: InputMaybe<Array<ComponentMaterialInput>>;
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   name_tr?: InputMaybe<Array<TranslatedInput>>;
   primary_material?: InputMaybe<ComponentMaterialInput>;
   region?: InputMaybe<ComponentRegionInput>;
@@ -469,6 +474,18 @@ export type EditEdge = {
 };
 
 export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
+
+/** Type of the model being edited */
+export enum EditModelType {
+  Category = 'Category',
+  Component = 'Component',
+  Item = 'Item',
+  Material = 'Material',
+  Place = 'Place',
+  Process = 'Process',
+  Region = 'Region',
+  Variant = 'Variant'
+}
 
 export type Item = Named & {
   __typename?: 'Item';
@@ -1011,6 +1028,7 @@ export type QueryGetChangesArgs = {
 
 export type QueryGetComponentArgs = {
   id: Scalars['ID']['input'];
+  with_change?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -1427,6 +1445,7 @@ export type UpdateComponentInput = {
   region?: InputMaybe<ComponentRegionInput>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_tags?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<ComponentTagsInput>>;
 };
 
 export type UpdateComponentOutput = {
@@ -1617,7 +1636,7 @@ export type UserProfile = {
 
 export type Variant = Named & {
   __typename?: 'Variant';
-  components: ComponentsPage;
+  components: VariantComponentsPage;
   created_at: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** The ID of the model */
@@ -1625,7 +1644,7 @@ export type Variant = Named & {
   image_url?: Maybe<Scalars['String']['output']>;
   items: ItemsPage;
   name?: Maybe<Scalars['String']['output']>;
-  orgs: OrgsPage;
+  orgs: VariantOrgsPage;
   recycle_score?: Maybe<StreamScore>;
   tags: TagPage;
   updated_at: Scalars['DateTime']['output'];
@@ -1668,10 +1687,31 @@ export type VariantTagsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type VariantComponent = {
+  __typename?: 'VariantComponent';
+  component: Component;
+  quantity?: Maybe<Scalars['Float']['output']>;
+  unit?: Maybe<Scalars['String']['output']>;
+};
+
+export type VariantComponentEdge = {
+  __typename?: 'VariantComponentEdge';
+  cursor: Scalars['String']['output'];
+  node: VariantComponent;
+};
+
 export type VariantComponentsInput = {
   id: Scalars['ID']['input'];
   quantity?: InputMaybe<Scalars['Float']['input']>;
   unit?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type VariantComponentsPage = {
+  __typename?: 'VariantComponentsPage';
+  edges?: Maybe<Array<VariantComponentEdge>>;
+  nodes?: Maybe<Array<VariantComponent>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type VariantEdge = {
@@ -1684,8 +1724,28 @@ export type VariantItemsInput = {
   id: Scalars['ID']['input'];
 };
 
+export type VariantOrg = {
+  __typename?: 'VariantOrg';
+  org: Org;
+  role?: Maybe<Scalars['String']['output']>;
+};
+
+export type VariantOrgEdge = {
+  __typename?: 'VariantOrgEdge';
+  cursor: Scalars['String']['output'];
+  node: VariantOrg;
+};
+
 export type VariantOrgsInput = {
   id: Scalars['ID']['input'];
+};
+
+export type VariantOrgsPage = {
+  __typename?: 'VariantOrgsPage';
+  edges?: Maybe<Array<VariantOrgEdge>>;
+  nodes?: Maybe<Array<VariantOrg>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type VariantRegionsInput = {

@@ -69,7 +69,7 @@ export class ComponentSchemaService {
     })
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
-      name: z.string().max(1024),
+      name: z.string().max(1024).optional(),
       name_tr: TrArraySchema.meta({
         title: this.i18n.t('schemas.components.name_tr.title'),
       }),
@@ -168,14 +168,6 @@ export class ComponentSchemaService {
     this.UpdateUISchema = {
       type: 'VerticalLayout',
       elements: [
-        {
-          type: 'Control',
-          scope: '#/properties/id',
-          label: 'ID',
-          options: {
-            readonly: true,
-          },
-        },
         {
           type: 'Control',
           scope: '#/properties/name_tr',

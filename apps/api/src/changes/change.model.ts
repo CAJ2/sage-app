@@ -9,7 +9,7 @@ import { Transform } from 'class-transformer'
 import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { Change as ChangeEntity, ChangeStatus } from './change.entity'
-import { EditModel } from './change.enum'
+import { EditModel, EditModelType } from './change.enum'
 
 @ObjectType()
 export class Edit {
@@ -96,9 +96,12 @@ export class ChangesArgs extends PaginationBasicArgs {
 export class ChangeSourcesArgs extends PaginationBasicArgs {}
 
 @ArgsType()
-export class ChangeEditsArgs {
+export class ChangeEditsArgs extends PaginationBasicArgs {
   @Field(() => ID, { nullable: true })
   id?: string
+
+  @Field(() => EditModelType, { nullable: true })
+  type?: EditModelType
 }
 
 @ArgsType()

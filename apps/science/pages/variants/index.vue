@@ -1,5 +1,5 @@
 <template>
-  <div :data-ag-theme-mode="getThemeMode">
+  <div>
     <div class="p-3">
       <Button
         @click="

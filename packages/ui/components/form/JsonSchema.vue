@@ -22,7 +22,7 @@ const ajv = new Ajv({
   allErrors: true,
   verbose: true,
   strictTypes: false,
-  validateFormats: true,
+  validateFormats: false,
   keywords: ['name'],
 })
 addFormats(ajv)

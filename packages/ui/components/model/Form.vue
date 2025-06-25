@@ -13,6 +13,12 @@
         :readonly="readOnly"
         @change="onChange"
       />
+      <Button
+        v-if="!autoSave || !changeId"
+        class="btn-block sticky bottom-0"
+        @click="saveForm"
+        >Save</Button
+      >
     </div>
   </div>
 </template>
@@ -33,8 +39,9 @@ const {
   createMutation,
   updateMutation,
   createModelKey,
+  autoSave,
 } = defineProps<{
-  changeId: string
+  changeId: string | undefined
   modelId: string
   schemaQuery: TypedDocumentNode<
     SchemaQuery,
@@ -59,6 +66,7 @@ const {
     }>
   >
   createModelKey: string
+  autoSave?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -102,25 +110,58 @@ const editQuery = graphql(`
     }
   }
 `)
-if (modelId !== 'new') {
+const directEditQuery = graphql(`
+  query DirectGetEdit($id: ID!) {
+    getDirectEdit(id: $id) {
+      entity_name
+      id
+      model_update
+    }
+  }
+`)
+if (modelId !== 'new' && changeId) {
   const { result } = useQuery(editQuery, {
     id: modelId,
     changeID: changeId,
   })
-  watch(result, (result) => {
-    if (
-      result?.getChange?.edits.nodes &&
-      result.getChange.edits.nodes.length > 0
-    ) {
-      updateData.value = sanitizeFormData(
-        jsonSchema.value as JSONSchemaType<unknown>,
-        result.getChange.edits.nodes[0].changes_update,
-      )
-    }
-    if (result?.getChange?.status) {
-      changeStatus.value = result.getChange.status
-    }
+  watch(
+    result,
+    (result) => {
+      if (
+        result?.getChange?.edits.nodes &&
+        result.getChange.edits.nodes.length > 0
+      ) {
+        updateData.value = sanitizeFormData(
+          jsonSchema.value as JSONSchemaType<unknown>,
+          result.getChange.edits.nodes[0].changes_update,
+        )
+      }
+      if (result?.getChange?.status) {
+        changeStatus.value = result.getChange.status
+      }
+    },
+    {
+      immediate: true,
+    },
+  )
+} else if (modelId !== 'new') {
+  const { result } = useQuery(directEditQuery, {
+    id: modelId,
   })
+  watch(
+    result,
+    (result) => {
+      if (result?.getDirectEdit?.id) {
+        updateData.value = sanitizeFormData(
+          jsonSchema.value as JSONSchemaType<unknown>,
+          result.getDirectEdit.model_update,
+        )
+      }
+    },
+    {
+      immediate: true,
+    },
+  )
 }
 const readOnly = computed<boolean | undefined>(() => {
   if (changeStatus.value !== ChangeStatus.Merged) {
@@ -146,7 +187,10 @@ const update = useMutation(updateMutation, {
   },
 })
 
-const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
+const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
+  modelId === 'new' ? 'not_saved' : 'saved',
+)
+let firstChange = false
 const onChange = async (event: JsonFormsChangeEvent) => {
   if (changeStatus.value === ChangeStatus.Merged) {
     return
@@ -157,58 +201,126 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       saveStatus.value = 'error'
       return
     }
-    saveStatus.value = 'saving'
+    if (firstChange) {
+      saveStatus.value = 'not_saved'
+    }
+    if (!firstChange) {
+      firstChange = true
+    }
     if (modelId === 'new') {
       createData.value = event.data
-      await create
-        .mutate({
-          input: {
-            change_id: changeId,
-            ...createData.value,
-          },
-        })
-        .then((modelResult) => {
-          if (!modelResult?.data) {
-            console.error('Create model failed:', modelResult)
-            saveStatus.value = 'error'
-            return
-          }
-          saveStatus.value = 'saved'
-          const data = modelResult.data as { [key: string]: never }
-          const createKey = Object.keys(data)[0]
-          const modelReturned = data[createKey]?.[createModelKey] as {
-            id: string
-          } | null
-          if (modelReturned?.id) {
-            // Emit the created event with the new model ID
-            emits('created', modelReturned.id)
-            emits('saved', modelReturned.id)
-          }
-        })
-        .catch((error) => {
-          console.error('Error creating model:', error)
-          saveStatus.value = 'error'
-          return
-        })
     } else {
       updateData.value = event.data
-      await update
-        .mutate({
-          input: {
-            change_id: changeId,
-            id: modelId,
-            ...updateData.value,
-          },
-        })
-        .then(() => {
-          saveStatus.value = 'saved'
-          emits('saved', modelId)
-        })
-        .catch((error) => {
-          console.error('Error updating model:', error)
-          saveStatus.value = 'error'
-        })
     }
+  }
+}
+if (changeId && autoSave && modelId === 'new') {
+  watch(createData, async (newData) => {
+    createData.value = newData
+    await create
+      .mutate({
+        input: {
+          change_id: changeId,
+          ...createData.value,
+        },
+      })
+      .then((modelResult) => {
+        if (!modelResult?.data) {
+          console.error('Create model failed:', modelResult)
+          saveStatus.value = 'error'
+          return
+        }
+        saveStatus.value = 'saved'
+        const data = modelResult.data as { [key: string]: never }
+        const createKey = Object.keys(data)[0]
+        const modelReturned = data[createKey]?.[createModelKey] as {
+          id: string
+        } | null
+        if (modelReturned?.id) {
+          // Emit the created event with the new model ID
+          emits('created', modelReturned.id)
+          emits('saved', modelReturned.id)
+        }
+      })
+      .catch((error) => {
+        console.error('Error creating model:', error)
+        saveStatus.value = 'error'
+        return
+      })
+  })
+} else if (changeId && autoSave && modelId !== 'new') {
+  watch(updateData, async (newData) => {
+    updateData.value = newData
+    await update
+      .mutate({
+        input: {
+          change_id: changeId,
+          id: modelId,
+          ...updateData.value,
+        },
+      })
+      .then(() => {
+        saveStatus.value = 'saved'
+        emits('saved', modelId)
+      })
+      .catch((error) => {
+        console.error('Error updating model:', error)
+        saveStatus.value = 'error'
+      })
+  })
+}
+const saveForm = async () => {
+  if (saveStatus.value === 'error') {
+    return
+  }
+  if (modelId === 'new') {
+    await create
+      .mutate({
+        input: {
+          change_id: changeId || undefined,
+          ...createData.value,
+        },
+      })
+      .then((modelResult) => {
+        if (!modelResult?.data) {
+          console.error('Create model failed:', modelResult)
+          saveStatus.value = 'error'
+          return
+        }
+        saveStatus.value = 'saved'
+        const data = modelResult.data as { [key: string]: never }
+        const createKey = Object.keys(data)[0]
+        const modelReturned = data[createKey]?.[createModelKey] as {
+          id: string
+        } | null
+        if (modelReturned?.id) {
+          // Emit the created event with the new model ID
+          emits('created', modelReturned.id)
+          emits('saved', modelReturned.id)
+        }
+      })
+      .catch((error) => {
+        console.error('Error creating model:', error)
+        saveStatus.value = 'error'
+        return
+      })
+  } else {
+    await update
+      .mutate({
+        input: {
+          change_id: changeId || undefined,
+          id: modelId,
+          ...updateData.value,
+        },
+      })
+      .then(() => {
+        saveStatus.value = 'saved'
+        emits('saved', modelId)
+      })
+      .catch((error) => {
+        console.error('Error updating model:', error)
+        saveStatus.value = 'error'
+      })
   }
 }
 </script>

@@ -2,7 +2,9 @@
   <div>
     <NavTopbar
       :title="data?.getVariant?.name || 'Product'"
-      :subtitle="data?.getVariant?.orgs.nodes?.map((o) => o.name).join(', ')"
+      :subtitle="
+        data?.getVariant?.orgs.nodes?.map((o) => o.org.name).join(', ')
+      "
       :use-image="true"
       :image="data?.getVariant?.image_url || undefined"
       back="true"
@@ -84,34 +86,34 @@
           >
             <div
               v-for="component in recyclingResult.getVariant.components.nodes"
-              :key="component.id"
+              :key="component.component.id"
             >
               <li class="list-row">
                 <div>
                   <UiImage
                     class="size-10 rounded-box"
-                    :src="component.image_url || undefined"
+                    :src="component.component.image_url || undefined"
                   />
                 </div>
                 <div>
-                  <div class="text-bold">{{ component.name }}</div>
+                  <div class="text-bold">{{ component.component.name }}</div>
                   <div class="text-xs opacity-70">
-                    {{ component.desc }}
+                    {{ component.component.desc }}
                   </div>
                 </div>
               </li>
               <div class="px-3">
                 <ScoreBar
                   size="small"
-                  :score="component.recycle_score?.score"
-                  :rating="component.recycle_score?.rating"
-                  :rating-fmt="component.recycle_score?.rating_f"
+                  :score="component.component.recycle_score?.score"
+                  :rating="component.component.recycle_score?.rating"
+                  :rating-fmt="component.component.recycle_score?.rating_f"
                 ></ScoreBar>
               </div>
               <RecycleContainer
-                v-for="recycle in component.recycle"
+                v-for="recycle in component.component.recycle"
                 :key="recycle.stream?.name || undefined"
-                :image="component.image_url"
+                :image="component.component.image_url"
                 :recycle="recycle"
               ></RecycleContainer>
             </div>
@@ -143,18 +145,22 @@ const variantQuery = graphql(`
       image_url
       orgs {
         nodes {
-          id
-          name
-          desc
-          avatar_url
+          org {
+            id
+            name
+            desc
+            avatar_url
+          }
         }
       }
       components {
         nodes {
-          id
-          name
-          desc
-          image_url
+          component {
+            id
+            name
+            desc
+            image_url
+          }
         }
       }
     }
@@ -172,37 +178,39 @@ const variantRecycling = graphql(`
       }
       components {
         nodes {
-          id
-          name
-          desc
-          image_url
-          recycle_score(region_id: $region) {
-            score
-            rating
-            rating_f
-          }
-          recycle(region_id: $region) {
-            context {
-              key
-              desc
+          component {
+            id
+            name
+            desc
+            image_url
+            recycle_score(region_id: $region) {
+              score
+              rating
+              rating_f
             }
-            stream {
-              name
-              desc
-              container {
-                type
-                access
-                shape {
-                  width
-                  height
-                  depth
-                }
-                color
-                image
-                image_entry_point {
-                  x
-                  y
-                  side
+            recycle(region_id: $region) {
+              context {
+                key
+                desc
+              }
+              stream {
+                name
+                desc
+                container {
+                  type
+                  access
+                  shape {
+                    width
+                    height
+                    depth
+                  }
+                  color
+                  image
+                  image_entry_point {
+                    x
+                    y
+                    side
+                  }
                 }
               }
             }

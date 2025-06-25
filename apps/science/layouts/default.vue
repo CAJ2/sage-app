@@ -224,6 +224,11 @@ const menuItems = [
     icon: 'iconify://qlementine-icons:items-grid-16',
   },
   {
+    title: 'Components',
+    url: '/components',
+    icon: 'iconify://uiw:component',
+  },
+  {
     title: 'Processes',
     url: '/processes',
     icon: 'iconify://clarity:process-on-vm-line',

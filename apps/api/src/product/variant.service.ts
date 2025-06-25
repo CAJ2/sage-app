@@ -170,21 +170,10 @@ export class VariantService {
   }
 
   async update(input: UpdateVariantInput, userID: string) {
-    const variant = await this.em.findOne(
-      Variant,
-      { id: input.id },
-      {
-        disableIdentityMap: input.useChange(),
-        populate: [
-          'items',
-          'orgs',
-          'region',
-          'tags',
-          'variant_tags',
-          'components',
-        ],
-      },
-    )
+    const { entity: variant, change } =
+      await this.editService.findOneWithChangeInput(input, userID, Variant, {
+        id: input.id,
+      })
     if (!variant) {
       throw new Error('Variant not found')
     }
@@ -193,11 +182,6 @@ export class VariantService {
       await this.em.persistAndFlush(variant)
       return { variant }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.change_id,
-      input.change,
-      userID,
-    )
     await this.editService.beginUpdateEntityEdit(change, variant)
     await this.setFields(variant, input, change)
     await this.editService.updateEntityEdit(change, variant)

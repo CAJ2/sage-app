@@ -60,11 +60,10 @@ export class OrgService {
   }
 
   async update(input: UpdateOrgInput, userID: string) {
-    const org = await this.em.findOne(
-      Org,
-      { id: input.id },
-      { disableIdentityMap: input.useChange(), populate: ['users'] },
-    )
+    const { entity: org, change } =
+      await this.editService.findOneWithChangeInput(input, userID, Org, {
+        id: input.id,
+      })
     if (!org) {
       throw NotFoundErr('ORG_NOT_FOUND', `Org with id ${input.id} not found`)
     }
@@ -74,11 +73,6 @@ export class OrgService {
       await this.searchService.addDocs(org)
       return { org }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.change_id,
-      input.change,
-      userID,
-    )
     await this.editService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
     await this.editService.updateEntityEdit(change, org)

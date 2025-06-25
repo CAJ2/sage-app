@@ -127,14 +127,10 @@ export class ItemService {
   }
 
   async update(input: UpdateItemInput, userID: string) {
-    const item = await this.em.findOne(
-      Item,
-      { id: input.id },
-      {
-        disableIdentityMap: input.useChange(),
-        populate: ['categories', 'item_tags'],
-      },
-    )
+    const { entity: item, change } =
+      await this.editService.findOneWithChangeInput(input, userID, Item, {
+        id: input.id,
+      })
     if (!item) {
       throw new Error('Item not found')
     }
@@ -144,11 +140,6 @@ export class ItemService {
       await this.searchService.addDocs(item)
       return { item }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.change_id,
-      input.change,
-      userID,
-    )
     await this.editService.beginUpdateEntityEdit(change, item)
     await this.setFields(item, input, change)
     await this.editService.updateEntityEdit(change, item)

@@ -9,8 +9,12 @@
       </div>
     </div>
     <div v-else class="grow text-md opacity-70">No Change Selected</div>
-    <Button variant="outline">
-      <font-awesome-icon icon="fa-solid fa-repeat" width="5" height="5" />
+    <Button
+      v-if="selectedChange"
+      variant="ghost"
+      @click.stop.prevent="clearChange"
+    >
+      <font-awesome-icon icon="fa-solid fa-xmark" width="5" height="5" />
     </Button>
   </NuxtLinkLocale>
 </template>
@@ -42,4 +46,8 @@ watch(
   },
   { immediate: true },
 )
+
+const clearChange = () => {
+  changeStore.setChange('')
+}
 </script>

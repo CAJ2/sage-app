@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div v-if="selectedChange">
     <Card class="m-3 bg-base-100 border-0 shadow-md">
       <CardHeader class="pb-2">
         <CardTitle class="flex justify-between">
-          <span>{{ title }}</span>
+          <span>Current Edits</span>
           <div class="flex justify-end gap-3">
             <Button
               :disabled="!hasPreviousPage"
@@ -40,50 +40,60 @@
 
 <script setup lang="ts">
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import type { EditModelType } from '~/gql/graphql'
 
-const { title, desc, query, queryName, pageSize } = defineProps<{
-  title?: string
-  desc?: string
-  query: TypedDocumentNode
-  queryName: string
-  pageSize?: number
-}>()
-
-const fetchCount = pageSize || 20
 type CursorVars = {
+  change_id: string
+  type?: EditModelType
   first?: number
   last?: number
   before: string | null
   after: string | null
 }
+const { desc, query, type, pageSize } = defineProps<{
+  desc?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: TypedDocumentNode<Record<string, any>, CursorVars>
+  type: EditModelType
+  pageSize?: number
+}>()
+
+const changeStore = useChangeStore()
+const { selectedChange } = storeToRefs(changeStore)
+
+const fetchCount = pageSize || 5
 const { result, refetch } = useQuery(query, {
+  change_id: selectedChange.value,
+  type,
   first: fetchCount,
   last: undefined,
   after: null,
   before: null,
 } as CursorVars)
-const nodes = computed(() => result.value?.[queryName]?.nodes || [])
+const nodes = computed(() => result.value?.getChange?.edits.nodes || [])
 const hasPreviousPage = computed(() => {
-  return result.value?.[queryName]?.pageInfo?.hasPreviousPage || false
+  return result.value?.getChange?.edits.pageInfo?.hasPreviousPage || false
 })
 const hasNextPage = computed(() => {
-  return result.value?.[queryName]?.pageInfo?.hasNextPage || false
+  return result.value?.getChange?.edits.pageInfo?.hasNextPage || false
 })
 
 const prevPage = async () => {
   await refetch({
+    change_id: selectedChange.value,
     first: undefined,
     last: fetchCount,
     after: null,
-    before: result.value?.[queryName]?.pageInfo?.startCursor || null,
+    before: result.value?.getChange?.edits.pageInfo?.startCursor || null,
   })
 }
 const nextPage = async () => {
   await refetch({
+    change_id: selectedChange.value,
     first: fetchCount,
     last: undefined,
     before: null,
-    after: result.value?.[queryName]?.pageInfo?.endCursor || null,
+    after: result.value?.getChange?.edits.pageInfo?.endCursor || null,
   })
 }
 </script>

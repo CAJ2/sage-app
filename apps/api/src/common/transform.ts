@@ -100,6 +100,18 @@ export class TransformService {
     return models
   }
 
+  async objectsToModels<T, S extends object>(
+    objects: T[],
+    model: new () => S,
+  ): Promise<S[]> {
+    const models: S[] = []
+    for (const obj of objects) {
+      const inst = await this.objectToModel(obj, model)
+      models.push(inst)
+    }
+    return models
+  }
+
   paginationArgs(args: PaginationArgsType) {
     args.validate()
     const where: ObjectQuery<any> = {}

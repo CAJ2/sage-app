@@ -9,7 +9,7 @@ import {
 import { User } from '@src/users/users.entity'
 import { ClsService } from 'nestjs-cls'
 import { Change, ChangeStatus } from './change.entity'
-import { EditModel as EditEnum } from './change.enum'
+import { EditModel as EditEnum, EditModelType } from './change.enum'
 import {
   CreateChangeInput,
   DirectEdit,
@@ -51,7 +51,7 @@ export class ChangeService {
     return change
   }
 
-  async edits(changeID: string, editID?: string) {
+  async edits(changeID: string, editID?: string, editType?: EditModelType) {
     const change = await this.em.findOne(
       Change,
       { id: changeID },
@@ -60,6 +60,11 @@ export class ChangeService {
     if (!change) {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
+    if (editType) {
+      change.edits = change.edits.filter(
+        (edit) => edit.entity_name === editType,
+      )
+    }
     if (editID) {
       const edit = change.edits.find((e) => e.id === editID)
       if (!edit) {
@@ -67,6 +72,7 @@ export class ChangeService {
       }
       edit._type = EditModel
       const editModel = await this.transform.objectToModel(edit, EditModel)
+      console.log('editModel', editModel)
       editModel.changes_create = await this.changeMapService.createEdit(
         edit.entity_name,
         editModel,
