@@ -23,7 +23,7 @@ const data = ref<any>()
 if (type === 'Category') {
   const RefCategoryQuery = graphql(`
     query RefCategoryQuery($id: ID!) {
-      getCategory(id: $id) {
+      category(id: $id) {
         ...ListCategoryFragment
       }
     }
@@ -34,8 +34,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getCategory) {
-        data.value = result.getCategory
+      if (result && result.category) {
+        data.value = result.category
       }
     },
     {
@@ -53,7 +53,7 @@ if (type === 'Category') {
 } else if (type === 'Item') {
   const RefItemQuery = graphql(`
     query RefItemQuery($id: ID!) {
-      getItem(id: $id) {
+      item(id: $id) {
         ...ListItemFragment
       }
     }
@@ -64,8 +64,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getItem) {
-        data.value = result.getItem
+      if (result && result.item) {
+        data.value = result.item
       }
     },
     {
@@ -83,7 +83,7 @@ if (type === 'Category') {
 } else if (type === 'Variant') {
   const RefVariantQuery = graphql(`
     query RefVariantQuery($id: ID!) {
-      getVariant(id: $id) {
+      variant(id: $id) {
         ...ListVariantFragment
       }
     }
@@ -94,8 +94,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getVariant) {
-        data.value = result.getVariant
+      if (result && result.variant) {
+        data.value = result.variant
       }
     },
     {
@@ -113,7 +113,7 @@ if (type === 'Category') {
 } else if (type === 'Component') {
   const RefComponentQuery = graphql(`
     query RefComponentQuery($id: ID!) {
-      getComponent(id: $id) {
+      component(id: $id) {
         ...ListComponentFragment
       }
     }
@@ -124,8 +124,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getComponent) {
-        data.value = result.getComponent
+      if (result && result.component) {
+        data.value = result.component
       }
     },
     {
@@ -143,7 +143,7 @@ if (type === 'Category') {
 } else if (type === 'Org') {
   const RefOrgQuery = graphql(`
     query RefOrgQuery($id: ID!) {
-      getOrg(id: $id) {
+      org(id: $id) {
         ...ListOrgFragment
       }
     }
@@ -154,8 +154,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getOrg) {
-        data.value = result.getOrg
+      if (result && result.org) {
+        data.value = result.org
       }
     },
     {
@@ -173,7 +173,7 @@ if (type === 'Category') {
 } else if (type === 'Region') {
   const RefRegionQuery = graphql(`
     query RefRegionQuery($id: ID!) {
-      getRegion(id: $id) {
+      region(id: $id) {
         ...ListRegionFragment
       }
     }
@@ -184,8 +184,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getRegion) {
-        data.value = result.getRegion
+      if (result && result.region) {
+        data.value = result.region
       }
     },
     {
@@ -203,7 +203,7 @@ if (type === 'Category') {
 } else if (type === 'Place') {
   const RefPlaceQuery = graphql(`
     query RefPlaceQuery($id: ID!) {
-      getPlace(id: $id) {
+      place(id: $id) {
         ...ListPlaceFragment
       }
     }
@@ -214,8 +214,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getPlace) {
-        data.value = result.getPlace
+      if (result && result.place) {
+        data.value = result.place
       }
     },
     {
@@ -233,7 +233,7 @@ if (type === 'Category') {
 } else if (type === 'Material') {
   const RefMaterialQuery = graphql(`
     query RefMaterialQuery($id: ID!) {
-      getMaterial(id: $id) {
+      material(id: $id) {
         ...ListMaterialFragment
       }
     }
@@ -244,8 +244,8 @@ if (type === 'Category') {
   watch(
     result,
     (result) => {
-      if (result && result.getMaterial) {
-        data.value = result.getMaterial
+      if (result && result.material) {
+        data.value = result.material
       }
     },
     {

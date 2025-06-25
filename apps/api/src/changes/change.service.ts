@@ -197,7 +197,7 @@ export class ChangeService {
   }
 
   async update(input: UpdateChangeInput) {
-    const userID = this.authUser.getUserID()
+    const userID = this.authUser.userID()
     const change = await this.findOne(input.id)
     if (change.user.id !== userID) {
       throw BadRequestErr('You can only update your own changes')

@@ -21,15 +21,15 @@ export class TagResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => TagPage, { name: 'getTags' })
-  async getTags(@Args() args: TagArgs): Promise<TagPage> {
+  @Query(() => TagPage, { name: 'tags' })
+  async tags(@Args() args: TagArgs): Promise<TagPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.tagService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Tag, TagPage)
   }
 
-  @Query(() => Tag, { name: 'getTag', nullable: true })
-  async getTag(@Args('id', { type: () => ID }) id: string): Promise<Tag> {
+  @Query(() => Tag, { name: 'tag', nullable: true })
+  async tag(@Args('id', { type: () => ID }) id: string): Promise<Tag> {
     const tag = await this.tagService.findOneByID(id)
     if (!tag) {
       throw NotFoundErr('Tag not found')

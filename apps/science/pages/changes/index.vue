@@ -61,7 +61,7 @@ const selectChange = (btn: string, id: string) => {
 
 const changesQuery = graphql(`
   query ChangesQuery($first: Int, $last: Int, $before: String, $after: String) {
-    getChanges(first: $first, last: $last, before: $before, after: $after) {
+    changes(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListChangeFragment
       }
@@ -75,7 +75,7 @@ const changesQuery = graphql(`
   }
 `)
 const { result: changesData } = useQuery(changesQuery)
-const changes = computed(() => changesData.value?.getChanges?.nodes || [])
+const changes = computed(() => changesData.value?.changes?.nodes || [])
 
 const _createChangeMutation = graphql(`
   mutation CreateChange($input: CreateChangeInput!) {

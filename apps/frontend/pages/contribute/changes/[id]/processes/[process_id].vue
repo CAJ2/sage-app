@@ -35,7 +35,7 @@ const processID = route.params.process_id as string
 
 const processSchema = graphql(`
   query ChangesProcessSchema {
-    getProcessSchema {
+    processSchema {
       create {
         schema
         uischema
@@ -50,7 +50,7 @@ const processSchema = graphql(`
 const { data: formData } = await useAsyncQuery(processSchema)
 const processEditQuery = graphql(`
   query ChangesProcessEdit($id: ID!, $changeID: ID!) {
-    getChange(id: $changeID) {
+    change(id: $changeID) {
       status
       edits(id: $id) {
         nodes {
@@ -62,15 +62,15 @@ const processEditQuery = graphql(`
 `)
 const jsonSchema = computed(() => {
   if (processID === 'new') {
-    return formData.value?.getProcessSchema?.create?.schema
+    return formData.value?.processSchema?.create?.schema
   }
-  return formData.value?.getProcessSchema?.update?.schema
+  return formData.value?.processSchema?.update?.schema
 })
 const uiSchema = computed(() => {
   if (processID === 'new') {
-    return formData.value?.getProcessSchema?.create?.uischema
+    return formData.value?.processSchema?.create?.uischema
   }
-  return formData.value?.getProcessSchema?.update?.uischema
+  return formData.value?.processSchema?.update?.uischema
 })
 
 const createData = ref<CreateProcessInput | null>(null)
@@ -82,16 +82,16 @@ if (processID !== 'new') {
     changeID: route.params.id as string,
   })
   if (
-    data?.value?.getChange?.edits.nodes &&
-    data.value.getChange.edits.nodes.length > 0
+    data?.value?.change?.edits.nodes &&
+    data.value.change.edits.nodes.length > 0
   ) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.getChange.edits.nodes[0].changes_update,
+      data.value.change.edits.nodes[0].changes_update,
     ) as UpdateProcessInput
   }
-  if (data?.value?.getChange?.status) {
-    changeStatus.value = data.value.getChange.status
+  if (data?.value?.change?.status) {
+    changeStatus.value = data.value.change.status
   }
 }
 const readOnly = computed<boolean | undefined>(() => {

@@ -18,7 +18,7 @@
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
-              v-for="change in result?.getChanges.nodes"
+              v-for="change in result?.changes.nodes"
               :key="change.id"
               class="pl-1 basis-1/2 md:basis-1/3 lg:basis-1/3"
             >
@@ -54,7 +54,7 @@
               </NuxtLinkLocale>
             </CarouselItem>
             <CarouselItem
-              v-if="!result?.getChanges.nodes?.length"
+              v-if="!result?.changes.nodes?.length"
               class="pl-1 basis-1/2 md:basis-1/3 lg:basis-1/3"
             >
               <div class="p-1">
@@ -84,7 +84,7 @@ const { t } = useI18n()
 
 const changeListQuery = graphql(`
   query ContributeIndexGetChanges($first: Int) {
-    getChanges(first: $first) {
+    changes(first: $first) {
       nodes {
         id
         status

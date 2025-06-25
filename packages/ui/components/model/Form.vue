@@ -100,7 +100,7 @@ const updateData = ref<object | null>(null)
 const changeStatus = ref<ChangeStatus | null>(null)
 const editQuery = graphql(`
   query ChangesGetEdit($id: ID!, $changeID: ID!) {
-    getChange(id: $changeID) {
+    change(id: $changeID) {
       status
       edits(id: $id) {
         nodes {
@@ -112,7 +112,7 @@ const editQuery = graphql(`
 `)
 const directEditQuery = graphql(`
   query DirectGetEdit($id: ID!) {
-    getDirectEdit(id: $id) {
+    directEdit(id: $id) {
       entity_name
       id
       model_update
@@ -127,17 +127,14 @@ if (modelId !== 'new' && changeId) {
   watch(
     result,
     (result) => {
-      if (
-        result?.getChange?.edits.nodes &&
-        result.getChange.edits.nodes.length > 0
-      ) {
+      if (result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.getChange.edits.nodes[0].changes_update,
+          result.change.edits.nodes[0].changes_update,
         )
       }
-      if (result?.getChange?.status) {
-        changeStatus.value = result.getChange.status
+      if (result?.change?.status) {
+        changeStatus.value = result.change.status
       }
     },
     {
@@ -151,10 +148,10 @@ if (modelId !== 'new' && changeId) {
   watch(
     result,
     (result) => {
-      if (result?.getDirectEdit?.id) {
+      if (result?.directEdit?.id) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.getDirectEdit.model_update,
+          result.directEdit.model_update,
         )
       }
     },

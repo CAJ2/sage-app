@@ -6,10 +6,10 @@ import type { EntityManager } from '@mikro-orm/core'
 export class BaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     // Create root category if it doesn't exist
-    const rootCategory = await em.findOne(Category, {
+    const categoryRoot = await em.findOne(Category, {
       id: CATEGORY_ROOT,
     })
-    if (!rootCategory) {
+    if (!categoryRoot) {
       em.create(Category, {
         id: CATEGORY_ROOT,
         name: {
@@ -21,10 +21,10 @@ export class BaseSeeder extends Seeder {
     }
 
     // Create root material if it doesn't exist
-    const rootMaterial = await em.findOne(Material, {
+    const materialRoot = await em.findOne(Material, {
       id: MATERIAL_ROOT,
     })
-    if (!rootMaterial) {
+    if (!materialRoot) {
       em.create(Material, {
         id: MATERIAL_ROOT,
         name: {

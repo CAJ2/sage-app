@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavTopbar :title="data?.getItem?.name || 'Item'" back="true"></NavTopbar>
+    <NavTopbar :title="data?.item?.name || 'Item'" back="true"></NavTopbar>
     <ul class="list bg-base-100 rounded-box shadow-md">
       <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Product</li>
       <li v-if="status === 'pending'" class="list-row">
@@ -22,7 +22,7 @@ import { graphql } from '~/gql'
 const route = useRoute()
 const itemQuery = graphql(`
   query GetItem($id: ID!) {
-    getItem(id: $id) {
+    item(id: $id) {
       id
       name
       desc

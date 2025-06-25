@@ -7,10 +7,10 @@
     ></NavTopbar>
     <ModelChangeList
       v-if="result"
-      :data="result.getChanges"
+      :data="result.changes"
       :total-edits="
-        result.getChanges.nodes
-          ? result.getChanges.nodes[0]?.edits?.totalCount
+        result.changes.nodes
+          ? result.changes.nodes[0]?.edits?.totalCount
           : undefined
       "
     />
@@ -22,7 +22,7 @@ import { graphql } from '~/gql'
 
 const changeListQuery = graphql(`
   query ChangesIndexGetChanges($first: Int) {
-    getChanges(first: $first) {
+    changes(first: $first) {
       nodes {
         id
         status

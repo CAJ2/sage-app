@@ -1,23 +1,21 @@
 <template>
   <div>
     <NavTopbar
-      :title="data?.getVariant?.name || 'Product'"
-      :subtitle="
-        data?.getVariant?.orgs.nodes?.map((o) => o.org.name).join(', ')
-      "
+      :title="data?.variant?.name || 'Product'"
+      :subtitle="data?.variant?.orgs.nodes?.map((o) => o.org.name).join(', ')"
       :use-image="true"
-      :image="data?.getVariant?.image_url || undefined"
+      :image="data?.variant?.image_url || undefined"
       back="true"
     ></NavTopbar>
     <div class="flex flex-col p-4">
       <UiImage
-        v-if="data?.getVariant?.image_url"
-        :src="data?.getVariant?.image_url"
+        v-if="data?.variant?.image_url"
+        :src="data?.variant?.image_url"
         class="rounded-box shadow-md w-32 h-32 object-cover mb-4"
       />
-      <h2 class="text-lg font-semibold mb-2">{{ data?.getVariant?.name }}</h2>
+      <h2 class="text-lg font-semibold mb-2">{{ data?.variant?.name }}</h2>
       <p class="text-sm text-center">
-        {{ data?.getVariant?.desc }}
+        {{ data?.variant?.desc }}
       </p>
     </div>
     <Collapsible v-model:open="reuseOpen">
@@ -66,7 +64,7 @@
         <div v-if="recyclingResult" class="px-3 pb-4">
           <ScoreBar
             size="medium"
-            :score="recyclingResult.getVariant?.recycle_score?.score"
+            :score="recyclingResult.variant?.recycle_score?.score"
           ></ScoreBar>
         </div>
         <ul class="list bg-base-100 rounded-box shadow-md">
@@ -80,12 +78,12 @@
 
           <div
             v-if="
-              recyclingResult?.getVariant?.components.nodes &&
-              recyclingResult.getVariant.components.nodes.length > 0
+              recyclingResult?.variant?.components.nodes &&
+              recyclingResult.variant.components.nodes.length > 0
             "
           >
             <div
-              v-for="component in recyclingResult.getVariant.components.nodes"
+              v-for="component in recyclingResult.variant.components.nodes"
               :key="component.component.id"
             >
               <li class="list-row">
@@ -138,7 +136,7 @@ const recyclingOpen = ref(true)
 
 const variantQuery = graphql(`
   query GetVariant($id: ID!) {
-    getVariant(id: $id) {
+    variant(id: $id) {
       id
       name
       desc
@@ -168,7 +166,7 @@ const variantQuery = graphql(`
 `)
 const variantRecycling = graphql(`
   query GetVariantRecycling($id: ID!, $region: ID!) {
-    getVariant(id: $id) {
+    variant(id: $id) {
       id
       name
       recycle_score(region_id: $region) {

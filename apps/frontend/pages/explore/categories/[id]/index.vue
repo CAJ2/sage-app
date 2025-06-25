@@ -1,19 +1,19 @@
 <template>
   <div>
     <NavTopbar
-      :title="data?.getCategory.name || 'Category'"
+      :title="data?.category.name || 'Category'"
       back="true"
     ></NavTopbar>
     <ModelCategoryChildren
       :status="status"
-      :data="data?.getCategory.children"
+      :data="data?.category.children"
     ></ModelCategoryChildren>
     <UiList
       v-if="sessionData && data"
       :items="[
         {
           id: 'edit',
-          link: `/explore/categories/${data.getCategory.id}/edit`,
+          link: `/explore/categories/${data.category.id}/edit`,
           title: 'Edit Category',
           icon: 'fa-solid fa-pen-to-square',
         },
@@ -27,7 +27,7 @@ const route = useRoute()
 const sessionData = useAuthSession()
 const categoriesQuery = gql`
   query CategoriesIDGetCategories($id: ID!) {
-    getCategory(id: $id) {
+    category(id: $id) {
       id
       name
       desc_short
@@ -50,7 +50,7 @@ const vars = {
 }
 
 type CategoryResult = {
-  getCategory: {
+  category: {
     id: string
     name: string
     desc_short: string

@@ -70,7 +70,7 @@
                 <div class="">
                   <h2>Region</h2>
                   <p class="text-xs opacity-70">
-                    {{ regionData?.getRegion.name || '' }}
+                    {{ regionData?.region.name || '' }}
                   </p>
                 </div>
               </div>
@@ -199,7 +199,7 @@ const signOut = async () => {
 
 const regionQuery = gql`
   query RegionQuery($id: ID!) {
-    getRegion(id: $id) {
+    region(id: $id) {
       id
       name
       placetype
@@ -207,7 +207,7 @@ const regionQuery = gql`
   }
 `
 type RegionResult = {
-  getRegion: {
+  region: {
     id: string
     name?: string
     placetype: string

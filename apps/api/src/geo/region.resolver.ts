@@ -16,15 +16,15 @@ export class RegionResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => RegionsPage, { name: 'getRegions' })
-  async getRegions(@Args() args: RegionsArgs): Promise<RegionsPage> {
+  @Query(() => RegionsPage, { name: 'regions' })
+  async regions(@Args() args: RegionsArgs): Promise<RegionsPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.regionService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Region, RegionsPage)
   }
 
-  @Query(() => Region, { name: 'getRegion', nullable: true })
-  async getRegion(@Args('id', { type: () => ID }) id: string) {
+  @Query(() => Region, { name: 'region', nullable: true })
+  async region(@Args('id', { type: () => ID }) id: string) {
     const region = await this.regionService.findOneByID(id)
     if (!region) {
       throw NotFoundErr('Region not found')

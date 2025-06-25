@@ -104,14 +104,6 @@ export class ChangeMapService {
     return updateFn(edit)
   }
 
-  getPopulateCache(entityName: string): string[] {
-    return this.populateCache[entityName] || []
-  }
-
-  getChangeOmitCache(entityName: string): string[] {
-    return this.changeOmitCache[entityName] || []
-  }
-
   private computePopulateCache(entityName: string) {
     const meta = this.em.getMetadata().get(entityName)
     if (!meta) {

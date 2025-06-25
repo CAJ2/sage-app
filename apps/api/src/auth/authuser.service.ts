@@ -6,7 +6,7 @@ import type { Session, User } from 'better-auth'
 export class AuthUserService {
   constructor(private readonly cls: ClsService) {}
 
-  getUserID(): string | null {
+  userID(): string | null {
     const session = this.getSession()
     if (!session) {
       return null

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavTopbar :title="data?.getPlace?.name || 'Place'" back="true"></NavTopbar>
+    <NavTopbar :title="data?.place?.name || 'Place'" back="true"></NavTopbar>
     <ul class="list bg-base-100 rounded-box shadow-md">
       <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Place</li>
       <li v-if="status === 'pending'" class="list-row">
@@ -22,7 +22,7 @@ import { graphql } from '~/gql'
 const route = useRoute()
 const placeQuery = graphql(`
   query GetPlace($id: ID!) {
-    getPlace(id: $id) {
+    place(id: $id) {
       id
       name
       desc

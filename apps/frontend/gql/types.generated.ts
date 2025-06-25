@@ -1012,44 +1012,44 @@ export type ProcessVariantInput = {
 
 export type Query = {
   __typename?: 'Query';
-  getCategories: CategoriesPage;
-  getCategory?: Maybe<Category>;
-  getCategorySchema?: Maybe<ModelEditSchema>;
-  getChange?: Maybe<Change>;
-  getChanges: ChangesPage;
-  getComponent?: Maybe<Component>;
-  getComponentSchema?: Maybe<ModelEditSchema>;
-  getComponents: ComponentsPage;
-  getDirectEdit?: Maybe<DirectEdit>;
-  getItem?: Maybe<Item>;
-  getItemSchema?: Maybe<ModelEditSchema>;
-  getItems: ItemsPage;
-  getMaterial?: Maybe<Material>;
-  getMaterials: MaterialsPage;
-  getOrg?: Maybe<Org>;
-  getPlace?: Maybe<Place>;
-  getPlaces: PlacesPage;
-  getProcess?: Maybe<Process>;
-  getProcessSchema?: Maybe<ModelEditSchema>;
-  getProcesses: ProcessPage;
-  getRegion?: Maybe<Region>;
-  getRegions: RegionsPage;
-  getSource?: Maybe<Source>;
-  getSources: SourcesPage;
-  getTag?: Maybe<Tag>;
-  getTags: TagPage;
-  getUser?: Maybe<User>;
-  getVariant?: Maybe<Variant>;
-  getVariantSchema?: Maybe<ModelEditSchema>;
-  getVariants: VariantsPage;
-  rootCategory: Category;
-  rootMaterial: Material;
+  categories: CategoriesPage;
+  category?: Maybe<Category>;
+  categoryRoot: Category;
+  categorySchema?: Maybe<ModelEditSchema>;
+  change?: Maybe<Change>;
+  changes: ChangesPage;
+  component?: Maybe<Component>;
+  componentSchema?: Maybe<ModelEditSchema>;
+  components: ComponentsPage;
+  directEdit?: Maybe<DirectEdit>;
+  item?: Maybe<Item>;
+  itemSchema?: Maybe<ModelEditSchema>;
+  items: ItemsPage;
+  material?: Maybe<Material>;
+  materialRoot: Material;
+  materials: MaterialsPage;
+  org?: Maybe<Org>;
+  place?: Maybe<Place>;
+  places: PlacesPage;
+  process?: Maybe<Process>;
+  processSchema?: Maybe<ModelEditSchema>;
+  processes: ProcessPage;
+  region?: Maybe<Region>;
+  regions: RegionsPage;
   search: SearchResultPage;
   searchRegionsByPoint: RegionsPage;
+  source?: Maybe<Source>;
+  sources: SourcesPage;
+  tag?: Maybe<Tag>;
+  tags: TagPage;
+  user?: Maybe<User>;
+  variant?: Maybe<Variant>;
+  variantSchema?: Maybe<ModelEditSchema>;
+  variants: VariantsPage;
 };
 
 
-export type QueryGetCategoriesArgs = {
+export type QueryCategoriesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1057,17 +1057,17 @@ export type QueryGetCategoriesArgs = {
 };
 
 
-export type QueryGetCategoryArgs = {
+export type QueryCategoryArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetChangeArgs = {
+export type QueryChangeArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetChangesArgs = {
+export type QueryChangesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1077,13 +1077,13 @@ export type QueryGetChangesArgs = {
 };
 
 
-export type QueryGetComponentArgs = {
+export type QueryComponentArgs = {
   id: Scalars['ID']['input'];
   with_change?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
-export type QueryGetComponentsArgs = {
+export type QueryComponentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1091,18 +1091,18 @@ export type QueryGetComponentsArgs = {
 };
 
 
-export type QueryGetDirectEditArgs = {
+export type QueryDirectEditArgs = {
   entity_name?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
-export type QueryGetItemArgs = {
+export type QueryItemArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetItemsArgs = {
+export type QueryItemsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1110,12 +1110,12 @@ export type QueryGetItemsArgs = {
 };
 
 
-export type QueryGetMaterialArgs = {
+export type QueryMaterialArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetMaterialsArgs = {
+export type QueryMaterialsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1123,17 +1123,17 @@ export type QueryGetMaterialsArgs = {
 };
 
 
-export type QueryGetOrgArgs = {
+export type QueryOrgArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetPlaceArgs = {
+export type QueryPlaceArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetPlacesArgs = {
+export type QueryPlacesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1141,12 +1141,12 @@ export type QueryGetPlacesArgs = {
 };
 
 
-export type QueryGetProcessArgs = {
+export type QueryProcessArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetProcessesArgs = {
+export type QueryProcessesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1156,57 +1156,12 @@ export type QueryGetProcessesArgs = {
 };
 
 
-export type QueryGetRegionArgs = {
+export type QueryRegionArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryGetRegionsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryGetSourceArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryGetSourcesArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  type?: InputMaybe<SourceType>;
-};
-
-
-export type QueryGetTagArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryGetTagsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryGetUserArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryGetVariantArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryGetVariantsArgs = {
+export type QueryRegionsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1229,6 +1184,51 @@ export type QuerySearchRegionsByPointArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
   lat_long: Array<Scalars['Float']['input']>;
+};
+
+
+export type QuerySourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QuerySourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<SourceType>;
+};
+
+
+export type QueryTagArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryVariantArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryVariantsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type RecyclingStream = {

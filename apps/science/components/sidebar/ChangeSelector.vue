@@ -2,10 +2,10 @@
   <NuxtLinkLocale to="/changes" class="flex content-center">
     <div v-if="isChangeSelected" class="grow flex flex-col">
       <div class="text-md font-bold">
-        {{ result?.getChange?.title || 'Loading...' }}
+        {{ result?.change?.title || 'Loading...' }}
       </div>
       <div class="text-sm opacity-70 line-clamp-1">
-        {{ result?.getChange?.description || '' }}
+        {{ result?.change?.description || '' }}
       </div>
     </div>
     <div v-else class="grow text-md opacity-70">No Change Selected</div>
@@ -27,7 +27,7 @@ const { selectedChange, isChangeSelected } = storeToRefs(changeStore)
 
 const ChangeSelectorQuery = graphql(`
   query ChangeSelector($id: ID!) {
-    getChange(id: $id) {
+    change(id: $id) {
       id
       title
       description

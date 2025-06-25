@@ -35,8 +35,8 @@ export class ComponentResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => ComponentsPage, { name: 'getComponents' })
-  async getComponents(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
+  @Query(() => ComponentsPage, { name: 'components' })
+  async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.componentService.find(filter)
     return this.transform.entityToPaginated(
@@ -47,8 +47,8 @@ export class ComponentResolver {
     )
   }
 
-  @Query(() => Component, { name: 'getComponent', nullable: true })
-  async getComponent(
+  @Query(() => Component, { name: 'component', nullable: true })
+  async component(
     @Args('id', { type: () => ID }) id: string,
     @Args('with_change', { type: () => ID, nullable: true })
     withChange?: string,
@@ -61,7 +61,7 @@ export class ComponentResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
-  async getComponentSchema(): Promise<ModelEditSchema> {
+  async componentSchema(): Promise<ModelEditSchema> {
     return {
       create: {
         schema: this.componentSchemaService.CreateJSONSchema,

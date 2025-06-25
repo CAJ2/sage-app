@@ -28,7 +28,7 @@
     <GridModel
       title="Processes"
       :query="processQuery"
-      :query-name="'getProcesses'"
+      :query-name="'processes'"
     >
       <template #default="{ node }">
         <ModelListProcess
@@ -79,7 +79,7 @@ const processQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getProcesses(first: $first, last: $last, before: $before, after: $after) {
+    processes(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListProcessFragment
       }
@@ -102,7 +102,7 @@ const processesChangesQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getChange(id: $change_id) {
+    change(id: $change_id) {
       edits(
         type: $type
         first: $first
@@ -128,7 +128,7 @@ const processesChangesQuery = graphql(`
 
 const processSchema = graphql(`
   query ProcessesSchema {
-    getProcessSchema {
+    processSchema {
       create {
         schema
         uischema

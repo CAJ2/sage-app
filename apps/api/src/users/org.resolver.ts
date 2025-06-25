@@ -30,8 +30,8 @@ export class OrgResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => Org, { name: 'getOrg', nullable: true })
-  async getOrg(@Args('id', { type: () => ID }) id: string) {
+  @Query(() => Org, { name: 'org', nullable: true })
+  async org(@Args('id', { type: () => ID }) id: string) {
     const org = await this.orgService.findOneByID(id)
     if (!org) {
       throw NotFoundErr('Org not found')

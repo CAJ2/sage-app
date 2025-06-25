@@ -27,8 +27,8 @@ export class MaterialResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => MaterialsPage, { name: 'getMaterials' })
-  async getMaterials(@Args() args: MaterialsArgs): Promise<MaterialsPage> {
+  @Query(() => MaterialsPage, { name: 'materials' })
+  async materials(@Args() args: MaterialsArgs): Promise<MaterialsPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.materialService.find(filter)
     return this.transform.entityToPaginated(
@@ -39,8 +39,8 @@ export class MaterialResolver {
     )
   }
 
-  @Query(() => Material, { name: 'getMaterial', nullable: true })
-  async getMaterial(
+  @Query(() => Material, { name: 'material', nullable: true })
+  async material(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Material> {
     const material = await this.materialService.findOneByID(id)
@@ -51,8 +51,8 @@ export class MaterialResolver {
     return model
   }
 
-  @Query(() => Material, { name: 'rootMaterial' })
-  async rootMaterial(): Promise<Material> {
+  @Query(() => Material, { name: 'materialRoot' })
+  async materialRoot(): Promise<Material> {
     const material = await this.materialService.findRoot()
     if (!material) {
       throw NotFoundErr('Root material not found')

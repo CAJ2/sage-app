@@ -75,7 +75,7 @@ const selectedPlace = ref<Place | null>(null)
 const regionStore = useRegionStore()
 const regionQuery = graphql(`
   query PlacesIndexRegionQuery($id: ID!) {
-    getRegion(id: $id) {
+    region(id: $id) {
       id
       name
       placetype
@@ -201,42 +201,32 @@ onMounted(() => {
   if (!mapContainer.value) {
     return
   }
-  const center: LngLatLike = regionData.value?.getRegion?.bbox
+  const center: LngLatLike = regionData.value?.region?.bbox
     ? [
-        (regionData.value.getRegion.bbox[0] +
-          regionData.value.getRegion.bbox[2]) /
-          2,
-        (regionData.value.getRegion.bbox[1] +
-          regionData.value.getRegion.bbox[3]) /
-          2,
+        (regionData.value.region.bbox[0] + regionData.value.region.bbox[2]) / 2,
+        (regionData.value.region.bbox[1] + regionData.value.region.bbox[3]) / 2,
       ]
     : [0, 0]
   map.value = new Map({
     container: mapContainer.value,
     style: 'map-style-light.json',
     center,
-    zoom: regionData.value?.getRegion?.min_zoom || 10,
+    zoom: regionData.value?.region?.min_zoom || 10,
     attributionControl: false,
   })
   map.value.addControl(new NavigationControl(), 'top-right')
   map.value.addControl(new maplibregl.AttributionControl(), 'bottom-left')
   if (
-    regionData.value?.getRegion?.bbox &&
-    regionData.value.getRegion.bbox[0] === regionData.value.getRegion.bbox[2]
+    regionData.value?.region?.bbox &&
+    regionData.value.region.bbox[0] === regionData.value.region.bbox[2]
   ) {
     map.value.setCenter(center)
   } else {
     map.value.fitBounds(
-      regionData.value?.getRegion?.bbox
+      regionData.value?.region?.bbox
         ? [
-            [
-              regionData.value.getRegion.bbox[0],
-              regionData.value.getRegion.bbox[1],
-            ],
-            [
-              regionData.value.getRegion.bbox[2],
-              regionData.value.getRegion.bbox[3],
-            ],
+            [regionData.value.region.bbox[0], regionData.value.region.bbox[1]],
+            [regionData.value.region.bbox[2], regionData.value.region.bbox[3]],
           ]
         : [
             [-180, -90],

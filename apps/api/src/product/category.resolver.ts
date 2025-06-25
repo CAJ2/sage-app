@@ -35,8 +35,8 @@ export class CategoryResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => CategoriesPage, { name: 'getCategories' })
-  async getCategories(@Args() args: CategoriesArgs): Promise<CategoriesPage> {
+  @Query(() => CategoriesPage, { name: 'categories' })
+  async categories(@Args() args: CategoriesArgs): Promise<CategoriesPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.categoryService.find(filter)
     return this.transform.entityToPaginated(
@@ -47,8 +47,8 @@ export class CategoryResolver {
     )
   }
 
-  @Query(() => Category, { name: 'getCategory', nullable: true })
-  async getCategory(
+  @Query(() => Category, { name: 'category', nullable: true })
+  async category(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Category> {
     const category = await this.categoryService.findOneByID(id)
@@ -59,8 +59,8 @@ export class CategoryResolver {
     return model
   }
 
-  @Query(() => Category, { name: 'rootCategory' })
-  async rootCategory(): Promise<Category> {
+  @Query(() => Category, { name: 'categoryRoot' })
+  async categoryRoot(): Promise<Category> {
     const category = await this.categoryService.findRoot()
     if (!category) {
       throw NotFoundErr('Root category not found')
@@ -70,7 +70,7 @@ export class CategoryResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
-  async getCategorySchema(): Promise<ModelEditSchema> {
+  async categorySchema(): Promise<ModelEditSchema> {
     return {
       create: {
         schema: this.categorySchemaService.CreateJSONSchema,

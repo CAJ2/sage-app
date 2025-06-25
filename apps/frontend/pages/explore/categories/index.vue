@@ -4,7 +4,7 @@
     <ModelCategoryChildren
       v-if="data"
       :status="status"
-      :data="data.rootCategory.children"
+      :data="data.categoryRoot.children"
     ></ModelCategoryChildren>
   </div>
 </template>
@@ -13,7 +13,7 @@
 import { graphql } from '~/gql'
 const categoriesQuery = graphql(`
   query CategoriesIndexGetCategories {
-    rootCategory {
+    categoryRoot {
       children {
         nodes {
           id

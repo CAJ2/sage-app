@@ -28,7 +28,7 @@
     <GridModel
       title="Categories"
       :query="categoriesQuery"
-      :query-name="'getCategories'"
+      :query-name="'categories'"
     >
       <template #default="{ node }">
         <ModelListCategory
@@ -79,7 +79,7 @@ const categoriesQuery = graphql(`
     $after: String
     $before: String
   ) {
-    getCategories(first: $first, last: $last, after: $after, before: $before) {
+    categories(first: $first, last: $last, after: $after, before: $before) {
       nodes {
         ...ListCategoryFragment
       }
@@ -102,7 +102,7 @@ const categoriesChangesQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getChange(id: $change_id) {
+    change(id: $change_id) {
       edits(
         type: $type
         first: $first
@@ -128,7 +128,7 @@ const categoriesChangesQuery = graphql(`
 
 const categorySchema = graphql(`
   query CategoriesSchema {
-    getCategorySchema {
+    categorySchema {
       create {
         schema
         uischema

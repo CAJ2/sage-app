@@ -38,7 +38,7 @@ const categoryID = route.params.category_id as string
 
 const categorySchema = graphql(`
   query ChangesCategorySchema {
-    getCategorySchema {
+    categorySchema {
       create {
         schema
         uischema
@@ -53,7 +53,7 @@ const categorySchema = graphql(`
 const { data: formData } = await useAsyncQuery(categorySchema)
 const categoryEditQuery = graphql(`
   query ChangesCategoryEdit($id: ID!, $changeID: ID!) {
-    getChange(id: $changeID) {
+    change(id: $changeID) {
       status
       edits(id: $id) {
         nodes {
@@ -65,15 +65,15 @@ const categoryEditQuery = graphql(`
 `)
 const jsonSchema = computed(() => {
   if (categoryID === 'new') {
-    return formData.value?.getCategorySchema?.create?.schema
+    return formData.value?.categorySchema?.create?.schema
   }
-  return formData.value?.getCategorySchema?.update?.schema
+  return formData.value?.categorySchema?.update?.schema
 })
 const uiSchema = computed(() => {
   if (categoryID === 'new') {
-    return formData.value?.getCategorySchema?.create?.uischema
+    return formData.value?.categorySchema?.create?.uischema
   }
-  return formData.value?.getCategorySchema?.update?.uischema
+  return formData.value?.categorySchema?.update?.uischema
 })
 
 const createData = ref<CreateCategoryInput | null>(null)
@@ -85,16 +85,16 @@ if (categoryID !== 'new') {
     changeID,
   })
   if (
-    data?.value?.getChange?.edits.nodes &&
-    data.value.getChange.edits.nodes.length > 0
+    data?.value?.change?.edits.nodes &&
+    data.value.change.edits.nodes.length > 0
   ) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.getChange.edits.nodes[0].changes_update,
+      data.value.change.edits.nodes[0].changes_update,
     ) as UpdateCategoryInput
   }
-  if (data?.value?.getChange?.status) {
-    changeStatus.value = data.value.getChange.status
+  if (data?.value?.change?.status) {
+    changeStatus.value = data.value.change.status
   }
 }
 const readOnly = computed<boolean | undefined>(() => {

@@ -81,7 +81,7 @@ const createData = ref<object | null>(null)
 const updateData = ref<object | null>(null)
 const editQuery = graphql(`
   query DirectGetEdit($id: ID!) {
-    getDirectEdit(id: $id) {
+    directEdit(id: $id) {
       entity_name
       id
       model_update
@@ -96,10 +96,10 @@ if (modelId !== 'new') {
   watch(
     result,
     (result) => {
-      if (result?.getDirectEdit?.id) {
+      if (result?.directEdit?.id) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.getDirectEdit.model_update,
+          result.directEdit.model_update,
         )
       }
     },

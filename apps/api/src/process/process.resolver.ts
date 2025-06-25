@@ -25,17 +25,15 @@ export class ProcessResolver {
     private readonly processSchemaService: ProcessSchemaService,
   ) {}
 
-  @Query(() => ProcessPage, { name: 'getProcesses' })
-  async getProcesses(@Args() args: ProcessArgs): Promise<ProcessPage> {
+  @Query(() => ProcessPage, { name: 'processes' })
+  async processes(@Args() args: ProcessArgs): Promise<ProcessPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.processService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Process, ProcessPage)
   }
 
-  @Query(() => Process, { name: 'getProcess', nullable: true })
-  async getProcess(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<Process> {
+  @Query(() => Process, { name: 'process', nullable: true })
+  async process(@Args('id', { type: () => ID }) id: string): Promise<Process> {
     const process = await this.processService.findOneByID(id)
     if (!process) {
       throw NotFoundErr('Process not found')
@@ -44,7 +42,7 @@ export class ProcessResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
-  async getProcessSchema(): Promise<ModelEditSchema> {
+  async processSchema(): Promise<ModelEditSchema> {
     return {
       create: {
         schema: this.processSchemaService.CreateJSONSchema,

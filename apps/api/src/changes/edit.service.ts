@@ -572,7 +572,7 @@ export class EditService {
     input: DeleteInput,
     model: EntityName<T>,
   ) {
-    const userID = this.authUser.getUserID()
+    const userID = this.authUser.userID()
     if (!userID) {
       throw BadRequestErr('User ID is required for delete operation')
     }

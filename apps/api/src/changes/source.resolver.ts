@@ -24,7 +24,7 @@ export class SourceResolver {
 
   @Query(() => SourcesPage)
   @UseGuards(AuthGuard)
-  async getSources(@Args() args: SourcesArgs) {
+  async sources(@Args() args: SourcesArgs) {
     const filter = this.transform.paginationArgs(args)
     if (args.type) filter.where.type = args.type
 
@@ -32,9 +32,9 @@ export class SourceResolver {
     return this.transform.entityToPaginated(cursor, args, Source, SourcesPage)
   }
 
-  @Query(() => Source, { name: 'getSource', nullable: true })
+  @Query(() => Source, { name: 'source', nullable: true })
   @UseGuards(AuthGuard)
-  async getSource(@Args('id', { type: () => ID }) id: string) {
+  async source(@Args('id', { type: () => ID }) id: string) {
     const source = await this.sourceService.findOneByID(id)
     return this.transform.entityToModel(source, Source)
   }

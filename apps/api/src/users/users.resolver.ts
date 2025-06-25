@@ -19,8 +19,8 @@ export class UsersResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => User, { name: 'getUser', nullable: true })
-  async getUser(@Args('id', { type: () => ID }) id: string) {
+  @Query(() => User, { name: 'user', nullable: true })
+  async user(@Args('id', { type: () => ID }) id: string) {
     const user = await this.usersService.findOneByID(id)
     if (!user) {
       throw NotFoundErr('User not found')

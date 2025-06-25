@@ -35,7 +35,7 @@ const componentID = route.params.component_id as string
 
 const formQuery = graphql(`
   query ChangesComponentSchema {
-    getComponentSchema {
+    componentSchema {
       create {
         schema
         uischema
@@ -50,7 +50,7 @@ const formQuery = graphql(`
 const { data: formData } = await useAsyncQuery(formQuery)
 const componentEditQuery = graphql(`
   query ChangesComponentEdit($id: ID!, $changeID: ID!) {
-    getChange(id: $changeID) {
+    change(id: $changeID) {
       status
       edits(id: $id) {
         nodes {
@@ -62,15 +62,15 @@ const componentEditQuery = graphql(`
 `)
 const jsonSchema = computed(() => {
   if (route.params.component_id === 'new') {
-    return formData.value?.getComponentSchema?.create?.schema
+    return formData.value?.componentSchema?.create?.schema
   }
-  return formData.value?.getComponentSchema?.update?.schema
+  return formData.value?.componentSchema?.update?.schema
 })
 const uiSchema = computed(() => {
   if (route.params.component_id === 'new') {
-    return formData.value?.getComponentSchema?.create?.uischema
+    return formData.value?.componentSchema?.create?.uischema
   }
-  return formData.value?.getComponentSchema?.update?.uischema
+  return formData.value?.componentSchema?.update?.uischema
 })
 
 const createData = ref<CreateComponentInput | null>(null)
@@ -82,16 +82,16 @@ if (componentID !== 'new') {
     changeID,
   })
   if (
-    data?.value?.getChange?.edits.nodes &&
-    data.value.getChange.edits.nodes.length > 0
+    data?.value?.change?.edits.nodes &&
+    data.value.change.edits.nodes.length > 0
   ) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.getChange.edits.nodes[0].changes_update,
+      data.value.change.edits.nodes[0].changes_update,
     ) as UpdateComponentInput
   }
-  if (data?.value?.getChange?.status) {
-    changeStatus.value = data.value.getChange.status
+  if (data?.value?.change?.status) {
+    changeStatus.value = data.value.change.status
   }
 }
 const readOnly = computed<boolean | undefined>(() => {

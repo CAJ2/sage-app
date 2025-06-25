@@ -15,7 +15,7 @@
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
-              v-for="category in data?.rootCategory.children.nodes"
+              v-for="category in data?.categoryRoot.children.nodes"
               :key="category.id"
               class="pl-1 basis-1/2 md:basis-1/3 lg:basis-1/3"
             >
@@ -52,7 +52,7 @@ import { graphql } from '~/gql'
 
 const categoriesQuery = graphql(`
   query GetCategories {
-    rootCategory {
+    categoryRoot {
       children {
         nodes {
           id

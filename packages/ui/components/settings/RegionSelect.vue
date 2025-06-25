@@ -6,7 +6,7 @@
         <h3 class="text-lg font-bold">
           {{
             regionStatus !== 'idle'
-              ? regionData?.getRegion.name
+              ? regionData?.region.name
               : 'No region selected'
           }}
         </h3>
@@ -116,7 +116,7 @@ const emit = defineEmits<{
 
 const regionQuery = gql`
   query RegionSelectQuery($id: ID!) {
-    getRegion(id: $id) {
+    region(id: $id) {
       id
       name
       placetype
@@ -124,7 +124,7 @@ const regionQuery = gql`
   }
 `
 type RegionResult = {
-  getRegion: {
+  region: {
     id: string
     name?: string
     placetype: string
@@ -209,7 +209,7 @@ const formatPlaceType = (type: string) => {
 }
 
 const placeType = computed(() => {
-  const placetype = regionData.value?.getRegion.placetype
+  const placetype = regionData.value?.region.placetype
   if (!placetype) return ''
   return formatPlaceType(placetype)
 })

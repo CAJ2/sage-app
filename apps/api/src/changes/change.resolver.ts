@@ -45,16 +45,16 @@ export class ChangeResolver {
   @Query(() => ChangesPage)
   @UseGuards(AuthGuard)
   @Optional()
-  async getChanges(@Args() args: ChangesArgs) {
+  async changes(@Args() args: ChangesArgs) {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.changeService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Change, ChangesPage)
   }
 
-  @Query(() => Change, { name: 'getChange', nullable: true })
+  @Query(() => Change, { name: 'change', nullable: true })
   @UseGuards(AuthGuard)
   @Optional()
-  async getChange(@Args('id', { type: () => ID }) id: string) {
+  async change(@Args('id', { type: () => ID }) id: string) {
     const change = await this.changeService.findOne(id)
     if (!change) {
       throw NotFoundErr('Change not found')
@@ -64,7 +64,7 @@ export class ChangeResolver {
 
   @Query(() => DirectEdit, { nullable: true })
   @UseGuards(AuthGuard)
-  async getDirectEdit(@Args() args: DirectEditArgs) {
+  async directEdit(@Args() args: DirectEditArgs) {
     const directEdit = await this.changeService.directEdit(
       args.id,
       args.entity_name,

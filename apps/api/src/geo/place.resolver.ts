@@ -20,15 +20,15 @@ export class PlaceResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => PlacesPage, { name: 'getPlaces' })
-  async getPlaces(@Args() args: PlacesArgs): Promise<PlacesPage> {
+  @Query(() => PlacesPage, { name: 'places' })
+  async places(@Args() args: PlacesArgs): Promise<PlacesPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.placeService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Place, PlacesPage)
   }
 
-  @Query(() => Place, { name: 'getPlace', nullable: true })
-  async getPlace(@Args('id', { type: () => ID }) id: string): Promise<Place> {
+  @Query(() => Place, { name: 'place', nullable: true })
+  async place(@Args('id', { type: () => ID }) id: string): Promise<Place> {
     const place = await this.placeService.findOneByID(id)
     if (!place) {
       throw NotFoundErr('Place not found')

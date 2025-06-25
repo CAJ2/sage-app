@@ -42,17 +42,15 @@ export class VariantResolver {
     private readonly variantSchemaService: VariantSchemaService,
   ) {}
 
-  @Query(() => VariantsPage, { name: 'getVariants' })
-  async getVariants(@Args() args: VariantsArgs): Promise<VariantsPage> {
+  @Query(() => VariantsPage, { name: 'variants' })
+  async variants(@Args() args: VariantsArgs): Promise<VariantsPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.variantService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Variant, VariantsPage)
   }
 
-  @Query(() => Variant, { name: 'getVariant', nullable: true })
-  async getVariant(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<Variant> {
+  @Query(() => Variant, { name: 'variant', nullable: true })
+  async variant(@Args('id', { type: () => ID }) id: string): Promise<Variant> {
     const variant = await this.variantService.findOneByID(id)
     if (!variant) {
       throw NotFoundErr('Variant not found')
@@ -62,7 +60,7 @@ export class VariantResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
-  async getVariantSchema(): Promise<ModelEditSchema> {
+  async variantSchema(): Promise<ModelEditSchema> {
     return {
       create: {
         schema: this.variantSchemaService.CreateJSONSchema,

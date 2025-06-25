@@ -13,7 +13,7 @@
         Add Item
       </Button>
     </div>
-    <GridModel title="Items" :query="itemsQuery" :query-name="'getItems'">
+    <GridModel title="Items" :query="itemsQuery" :query-name="'items'">
       <template #default="{ node }">
         <ModelListItem
           :item="node"
@@ -53,7 +53,7 @@ const actionButton = (btn: string, id: string) => {
 
 const itemsQuery = graphql(`
   query ItemsQuery($first: Int, $last: Int, $before: String, $after: String) {
-    getItems(first: $first, last: $last, before: $before, after: $after) {
+    items(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListItemFragment
       }
@@ -69,7 +69,7 @@ const itemsQuery = graphql(`
 
 const itemSchema = graphql(`
   query ItemsSchema {
-    getItemSchema {
+    itemSchema {
       create {
         schema
         uischema

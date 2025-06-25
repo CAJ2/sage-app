@@ -1,8 +1,8 @@
 <template>
   <div>
     <NavTopbar
-      :title="changeData?.getChange?.title || 'Change'"
-      :subtitle="changeData?.getChange?.description || undefined"
+      :title="changeData?.change?.title || 'Change'"
+      :subtitle="changeData?.change?.description || undefined"
       back="true"
     ></NavTopbar>
     <div class="flex justify-center">
@@ -14,27 +14,25 @@
                 class="badge badge-md"
                 :class="{
                   'badge-primary':
-                    changeData.getChange?.status === ChangeStatus.Merged,
+                    changeData.change?.status === ChangeStatus.Merged,
                   'badge-error':
-                    changeData.getChange?.status === ChangeStatus.Rejected,
+                    changeData.change?.status === ChangeStatus.Rejected,
                   'badge-warning':
-                    changeData.getChange?.status === ChangeStatus.Draft,
+                    changeData.change?.status === ChangeStatus.Draft,
                   'badge-info':
-                    changeData.getChange?.status === ChangeStatus.Proposed,
+                    changeData.change?.status === ChangeStatus.Proposed,
                   'badge-success':
-                    changeData.getChange?.status === ChangeStatus.Approved,
+                    changeData.change?.status === ChangeStatus.Approved,
                 }"
               >
-                {{ changeData.getChange?.status }}
+                {{ changeData.change?.status }}
               </div>
               <div class="px-4">
-                {{ changeData.getChange?.user.username }}
+                {{ changeData.change?.user.username }}
                 <span class="opacity-70"
                   >created on
                   {{
-                    new Date(
-                      changeData.getChange?.created_at,
-                    ).toLocaleDateString()
+                    new Date(changeData.change?.created_at).toLocaleDateString()
                   }}
                 </span>
               </div>
@@ -46,8 +44,8 @@
                 </DrawerHeader>
                 <FormChangeTitle
                   :data="{
-                    title: changeData.getChange?.title || '',
-                    description: changeData.getChange?.description || '',
+                    title: changeData.change?.title || '',
+                    description: changeData.change?.description || '',
                   }"
                   @submit="submitTitleForm"
                 ></FormChangeTitle>
@@ -56,28 +54,27 @@
             <div class="flex flex-col" @click="openEditTitle = true">
               <h2
                 class="text-lg font-bold"
-                :class="{ italic: !changeData.getChange?.title }"
+                :class="{ italic: !changeData.change?.title }"
               >
-                {{ changeData.getChange?.title || 'Untitled Change' }}
+                {{ changeData.change?.title || 'Untitled Change' }}
               </h2>
               <p
                 class="text-md opacity-70"
                 :class="{
-                  italic: !changeData.getChange?.description,
+                  italic: !changeData.change?.description,
                 }"
               >
                 {{
-                  changeData.getChange?.description ||
-                  'No description provided.'
+                  changeData.change?.description || 'No description provided.'
                 }}
               </p>
             </div>
             <div
-              v-if="changeData?.getChange"
+              v-if="changeData?.change"
               class="flex justify-center space-x-2 my-3"
             >
               <button
-                v-if="changeData.getChange.status === ChangeStatus.Draft"
+                v-if="changeData.change.status === ChangeStatus.Draft"
                 class="grow btn btn-primary btn-sm"
                 @click="setStatus(ChangeStatus.Proposed)"
               >
@@ -88,7 +85,7 @@
                 Publish Change
               </button>
               <button
-                v-if="changeData.getChange.status === ChangeStatus.Proposed"
+                v-if="changeData.change.status === ChangeStatus.Proposed"
                 class="grow btn btn-primary btn-sm"
                 @click="setStatus(ChangeStatus.Draft)"
               >
@@ -99,7 +96,7 @@
                 Revert to Draft
               </button>
               <button
-                v-if="changeData.getChange.status === ChangeStatus.Approved"
+                v-if="changeData.change.status === ChangeStatus.Approved"
                 class="grow btn btn-primary btn-sm"
                 @click="mergeChange"
               >
@@ -111,8 +108,8 @@
               </button>
               <button
                 v-if="
-                  changeData.getChange.status !== ChangeStatus.Merged &&
-                  changeData.getChange.status !== ChangeStatus.Rejected
+                  changeData.change.status !== ChangeStatus.Merged &&
+                  changeData.change.status !== ChangeStatus.Rejected
                 "
                 class="btn btn-danger btn-sm"
                 @click="deleteChange"
@@ -124,9 +121,9 @@
         </Card>
         <div class="mt-3">
           <h2 class="text-lg">Edits</h2>
-          <ul v-if="changeData?.getChange?.edits" class="divide-y-1">
+          <ul v-if="changeData?.change?.edits" class="divide-y-1">
             <li
-              v-for="edit in changeData.getChange.edits.nodes"
+              v-for="edit in changeData.change.edits.nodes"
               :key="edit.id || edit.entity_name"
               class="border-neutral-300"
             >
@@ -162,26 +159,26 @@
               </NuxtLinkLocale>
             </li>
             <span
-              v-if="changeData.getChange.edits.nodes?.length === 0"
+              v-if="changeData.change.edits.nodes?.length === 0"
               class="text-neutral-500 text-sm"
               >No edits found</span
             >
           </ul>
           <UiList
             v-if="
-              changeData && changeData.getChange?.status !== ChangeStatus.Merged
+              changeData && changeData.change?.status !== ChangeStatus.Merged
             "
             class="pt-4"
             :items="[
               {
                 id: 'new_category',
-                link: `/contribute/changes/${changeData.getChange?.id}/categories/new`,
+                link: `/contribute/changes/${changeData.change?.id}/categories/new`,
                 title: 'New Category',
                 icon: 'fa-solid fa-plus',
               },
               {
                 id: 'new_process',
-                link: `/contribute/changes/${changeData.getChange?.id}/processes/new`,
+                link: `/contribute/changes/${changeData.change?.id}/processes/new`,
                 title: 'New Process',
                 icon: 'fa-solid fa-plus',
               },
@@ -205,7 +202,7 @@ const openEditTitle = ref(false)
 
 const changeQuery = graphql(`
   query ChangeQuery($id: ID!) {
-    getChange(id: $id) {
+    change(id: $id) {
       id
       status
       title
@@ -283,7 +280,7 @@ const entityToPage: Record<string, string> = {
 }
 
 const getEditSubLink = (edit: Edit) => {
-  return `/contribute/changes/${changeData.value?.getChange?.id}/${entityToPage[edit.entity_name]}/${edit.id}`
+  return `/contribute/changes/${changeData.value?.change?.id}/${entityToPage[edit.entity_name]}/${edit.id}`
 }
 
 const changeEditMutation = graphql(`

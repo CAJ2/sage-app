@@ -660,40 +660,40 @@ input ProcessVariantInput {
 }
 
 type Query {
-  getCategories(after: String, before: String, first: Int, last: Int): CategoriesPage!
-  getCategory(id: ID!): Category
-  getCategorySchema: ModelEditSchema
-  getChange(id: ID!): Change
-  getChanges(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
-  getComponent(id: ID!, with_change: ID): Component
-  getComponentSchema: ModelEditSchema
-  getComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
-  getDirectEdit(entity_name: String, id: ID): DirectEdit
-  getItem(id: ID!): Item
-  getItemSchema: ModelEditSchema
-  getItems(after: String, before: String, first: Int, last: Int): ItemsPage!
-  getMaterial(id: ID!): Material
-  getMaterials(after: String, before: String, first: Int, last: Int): MaterialsPage!
-  getOrg(id: ID!): Org
-  getPlace(id: ID!): Place
-  getPlaces(after: String, before: String, first: Int, last: Int): PlacesPage!
-  getProcess(id: ID!): Process
-  getProcessSchema: ModelEditSchema
-  getProcesses(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
-  getRegion(id: ID!): Region
-  getRegions(after: String, before: String, first: Int, last: Int): RegionsPage!
-  getSource(id: ID!): Source
-  getSources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
-  getTag(id: ID!): Tag
-  getTags(after: String, before: String, first: Int, last: Int): TagPage!
-  getUser(id: ID!): User
-  getVariant(id: ID!): Variant
-  getVariantSchema: ModelEditSchema
-  getVariants(after: String, before: String, first: Int, last: Int): VariantsPage!
-  rootCategory: Category!
-  rootMaterial: Material!
+  categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  category(id: ID!): Category
+  categoryRoot: Category!
+  categorySchema: ModelEditSchema
+  change(id: ID!): Change
+  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
+  component(id: ID!, with_change: ID): Component
+  componentSchema: ModelEditSchema
+  components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  directEdit(entity_name: String, id: ID): DirectEdit
+  item(id: ID!): Item
+  itemSchema: ModelEditSchema
+  items(after: String, before: String, first: Int, last: Int): ItemsPage!
+  material(id: ID!): Material
+  materialRoot: Material!
+  materials(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  org(id: ID!): Org
+  place(id: ID!): Place
+  places(after: String, before: String, first: Int, last: Int): PlacesPage!
+  process(id: ID!): Process
+  processSchema: ModelEditSchema
+  processes(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
+  region(id: ID!): Region
+  regions(after: String, before: String, first: Int, last: Int): RegionsPage!
   search(lat_long: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
   searchRegionsByPoint(after: String, before: String, first: Int, last: Int, lat_long: [Float!]!): RegionsPage!
+  source(id: ID!): Source
+  sources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
+  tag(id: ID!): Tag
+  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  user(id: ID!): User
+  variant(id: ID!): Variant
+  variantSchema: ModelEditSchema
+  variants(after: String, before: String, first: Int, last: Int): VariantsPage!
 }
 
 type RecyclingStream {

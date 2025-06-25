@@ -28,7 +28,7 @@
     <GridModel
       title="Components"
       :query="componentQuery"
-      :query-name="'getComponents'"
+      :query-name="'components'"
     >
       <template #default="{ node }">
         <ModelListComponent
@@ -79,7 +79,7 @@ const componentQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getComponents(first: $first, last: $last, before: $before, after: $after) {
+    components(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListComponentFragment
       }
@@ -102,7 +102,7 @@ const componentChangesQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getChange(id: $change_id) {
+    change(id: $change_id) {
       edits(
         type: $type
         first: $first
@@ -128,7 +128,7 @@ const componentChangesQuery = graphql(`
 
 const componentSchema = graphql(`
   query ComponentsSchema {
-    getComponentSchema {
+    componentSchema {
       create {
         schema
         uischema

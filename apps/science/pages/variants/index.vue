@@ -25,11 +25,7 @@
         />
       </template>
     </GridModelChanges>
-    <GridModel
-      title="Variants"
-      :query="variantsQuery"
-      :query-name="'getVariants'"
-    >
+    <GridModel title="Variants" :query="variantsQuery" :query-name="'variants'">
       <template #default="{ node }">
         <ModelListVariant
           :variant="node"
@@ -79,7 +75,7 @@ const variantsQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getVariants(first: $first, last: $last, before: $before, after: $after) {
+    variants(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListVariantFragment
       }
@@ -102,7 +98,7 @@ const variantsChangesQuery = graphql(`
     $before: String
     $after: String
   ) {
-    getChange(id: $change_id) {
+    change(id: $change_id) {
       edits(
         type: $type
         first: $first
@@ -128,7 +124,7 @@ const variantsChangesQuery = graphql(`
 
 const variantSchema = graphql(`
   query VariantsSchema {
-    getVariantSchema {
+    variantSchema {
       create {
         schema
         uischema

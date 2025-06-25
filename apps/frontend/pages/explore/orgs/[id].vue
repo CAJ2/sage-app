@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavTopbar
-      :title="data?.getOrg?.name || 'Organization'"
+      :title="data?.org?.name || 'Organization'"
       back="true"
     ></NavTopbar>
     <ul class="list bg-base-100 rounded-box shadow-md">
@@ -25,7 +25,7 @@ import { graphql } from '~/gql'
 const route = useRoute()
 const orgQuery = graphql(`
   query GetOrg($id: ID!) {
-    getOrg(id: $id) {
+    org(id: $id) {
       id
       name
       desc

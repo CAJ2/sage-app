@@ -83,12 +83,12 @@ const { result, refetch } = useQuery(query, {
   after: null,
   before: null,
 } as CursorVars)
-const nodes = computed(() => result.value?.getChange?.edits.nodes || [])
+const nodes = computed(() => result.value?.change?.edits.nodes || [])
 const hasPreviousPage = computed(() => {
-  return result.value?.getChange?.edits.pageInfo?.hasPreviousPage || false
+  return result.value?.change?.edits.pageInfo?.hasPreviousPage || false
 })
 const hasNextPage = computed(() => {
-  return result.value?.getChange?.edits.pageInfo?.hasNextPage || false
+  return result.value?.change?.edits.pageInfo?.hasNextPage || false
 })
 
 const prevPage = async () => {
@@ -97,7 +97,7 @@ const prevPage = async () => {
     first: undefined,
     last: fetchCount,
     after: null,
-    before: result.value?.getChange?.edits.pageInfo?.startCursor || null,
+    before: result.value?.change?.edits.pageInfo?.startCursor || null,
   })
 }
 const nextPage = async () => {
@@ -106,7 +106,7 @@ const nextPage = async () => {
     first: fetchCount,
     last: undefined,
     before: null,
-    after: result.value?.getChange?.edits.pageInfo?.endCursor || null,
+    after: result.value?.change?.edits.pageInfo?.endCursor || null,
   })
 }
 

@@ -39,15 +39,15 @@ export class ItemResolver {
     private readonly itemSchemaService: ItemSchemaService,
   ) {}
 
-  @Query(() => ItemsPage, { name: 'getItems' })
-  async getItems(@Args() args: ItemsArgs): Promise<ItemsPage> {
+  @Query(() => ItemsPage, { name: 'items' })
+  async items(@Args() args: ItemsArgs): Promise<ItemsPage> {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.itemService.find(filter)
     return this.transform.entityToPaginated(cursor, args, Item, ItemsPage)
   }
 
-  @Query(() => Item, { name: 'getItem', nullable: true })
-  async getItem(@Args('id', { type: () => ID }) id: string): Promise<Item> {
+  @Query(() => Item, { name: 'item', nullable: true })
+  async item(@Args('id', { type: () => ID }) id: string): Promise<Item> {
     const item = await this.itemService.findOneByID(id)
     if (!item) {
       throw NotFoundErr('Item not found')
@@ -57,7 +57,7 @@ export class ItemResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
-  async getItemSchema(): Promise<ModelEditSchema> {
+  async itemSchema(): Promise<ModelEditSchema> {
     return {
       create: {
         schema: this.itemSchemaService.CreateJSONSchema,
