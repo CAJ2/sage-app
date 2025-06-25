@@ -13,6 +13,18 @@
         Add Variant
       </Button>
     </div>
+    <GridModelChanges
+      :query="variantsChangesQuery"
+      :type="EditModelType.Variant"
+    >
+      <template #default="{ node }">
+        <ModelListVariant
+          :variant="node.changes"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
+      </template>
+    </GridModelChanges>
     <GridModel
       title="Variants"
       :query="variantsQuery"
@@ -32,7 +44,8 @@
           <span v-if="editId === 'new'">Create Variant</span>
           <span v-else>Edit Variant</span>
         </DialogTitle>
-        <ModelFormDirect
+        <ModelForm
+          :change-id="selectedChange"
           :model-id="editId"
           :schema-query="variantSchema"
           :create-mutation="createVariantMutation"
@@ -47,6 +60,10 @@
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
+import { EditModelType } from '~/gql/graphql'
+
+const changeStore = useChangeStore()
+const { selectedChange } = storeToRefs(changeStore)
 
 const actionButton = (btn: string, id: string) => {
   if (btn === 'edit') {
@@ -71,6 +88,39 @@ const variantsQuery = graphql(`
         hasPreviousPage
         startCursor
         endCursor
+      }
+    }
+  }
+`)
+
+const variantsChangesQuery = graphql(`
+  query VariantsChangesQuery(
+    $change_id: ID!
+    $type: EditModelType
+    $first: Int
+    $last: Int
+    $before: String
+    $after: String
+  ) {
+    getChange(id: $change_id) {
+      edits(
+        type: $type
+        first: $first
+        last: $last
+        before: $before
+        after: $after
+      ) {
+        nodes {
+          changes {
+            ...ListVariantFragment
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
       }
     }
   }

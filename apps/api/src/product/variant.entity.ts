@@ -67,6 +67,9 @@ export class Variant extends IDCreatedUpdated {
   @ManyToMany({ entity: () => Org, pivotEntity: () => VariantsOrgs })
   orgs = new Collection<Org>(this)
 
+  @OneToMany(() => VariantsOrgs, (vo) => vo.variant)
+  variant_orgs = new Collection<VariantsOrgs>(this)
+
   @ManyToMany({ entity: () => Tag, pivotEntity: () => VariantsTags })
   tags = new Collection<Tag>(this)
 
@@ -84,7 +87,7 @@ export class Variant extends IDCreatedUpdated {
   components = new Collection<Component>(this)
 
   @OneToMany(() => VariantsComponents, (vc) => vc.variant)
-  variants_components = new Collection<VariantsComponents>(this)
+  variant_components = new Collection<VariantsComponents>(this)
 
   @OneToMany(() => VariantHistory, (history) => history.variant)
   history = new Collection<VariantHistory>(this)

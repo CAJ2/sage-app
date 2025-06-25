@@ -9,10 +9,10 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
-import { Change } from '@src/changes/change.model'
+import { Change, DeleteInput } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ModelEditSchema } from '@src/graphql/base.model'
+import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   CategoriesArgs,
   CategoriesPage,
@@ -178,5 +178,17 @@ export class CategoryResolver {
     }
     const change = await this.transform.entityToModel(updated.change, Change)
     return { category: model, change }
+  }
+
+  @Mutation(() => DeleteOutput, { name: 'deleteCategory', nullable: true })
+  @UseGuards(AuthGuard)
+  async deleteCategory(
+    @Args('input') input: DeleteInput,
+  ): Promise<DeleteOutput> {
+    const deleted = await this.categoryService.delete(input)
+    if (!deleted) {
+      throw NotFoundErr('Category not found')
+    }
+    return { success: true, id: deleted.id }
   }
 }

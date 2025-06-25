@@ -152,14 +152,19 @@ export class PlaceSchemaService {
   async placeCreateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.CreateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 
   async placeUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
+    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
+    if (data) {
+      data.tags = this.baseSchema.collectionToInput(
+        data.place_tags || [],
+        'place',
+        'tag',
+      )
+    }
     this.UpdateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 }

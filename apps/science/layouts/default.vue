@@ -207,36 +207,36 @@ const sidebarOpen = ref(true)
 const showSignIn = ref(false)
 
 const menuItems = [
-  { title: 'Dashboard', url: '/dashboard', icon: 'iconify://mdi:home' },
+  { title: 'Dashboard', url: '/dashboard', icon: 'icon://mdi:home' },
   {
     title: 'Categories',
     url: '/categories',
-    icon: 'iconify://material-symbols:category',
+    icon: 'icon://material-symbols:category',
   },
   {
     title: 'Items',
     url: '/items',
-    icon: 'iconify://material-symbols:list-rounded',
+    icon: 'icon://material-symbols:list-rounded',
   },
   {
     title: 'Variants',
     url: '/variants',
-    icon: 'iconify://qlementine-icons:items-grid-16',
+    icon: 'icon://qlementine-icons:items-grid-16',
   },
   {
     title: 'Components',
     url: '/components',
-    icon: 'iconify://uiw:component',
+    icon: 'icon://uiw:component',
   },
   {
     title: 'Processes',
     url: '/processes',
-    icon: 'iconify://clarity:process-on-vm-line',
+    icon: 'icon://clarity:process-on-vm-line',
   },
   {
     title: 'Sources',
     url: '/sources',
-    icon: 'iconify://ic:outline-source',
+    icon: 'icon://ic:outline-source',
   },
 ]
 

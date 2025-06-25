@@ -4,6 +4,7 @@ import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { EditService } from '@src/changes/edit.service'
 import {
   BaseSchemaService,
+  ImageOrIconSchema,
   RelMetaSchema,
   TrArraySchema,
   zToSchema,
@@ -16,7 +17,6 @@ import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 import { CategoryIDSchema } from './category.schema'
-import { ItemFilesSchema } from './item.entity'
 
 export const ItemIDSchema = z.string().meta({
   id: 'Item',
@@ -54,7 +54,7 @@ export class ItemSchemaService {
       name_tr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
       desc_tr: TrArraySchema,
-      files: ItemFilesSchema.optional(),
+      image_url: ImageOrIconSchema,
       categories: z.array(this.ItemCategoriesInputSchema).optional(),
       tags: z.array(this.ItemTagsInputSchema).optional(),
     })
@@ -77,8 +77,8 @@ export class ItemSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/files',
-          label: 'Files',
+          scope: '#/properties/image_url',
+          label: 'Image',
         },
         {
           type: 'Control',
@@ -97,7 +97,7 @@ export class ItemSchemaService {
       id: ItemIDSchema,
       name_tr: TrArraySchema.optional(),
       desc_tr: TrArraySchema.optional(),
-      files: ItemFilesSchema.optional(),
+      image_url: ImageOrIconSchema,
       categories: z.array(this.ItemCategoriesInputSchema).optional(),
       tags: z.array(this.ItemTagsInputSchema).optional(),
     })
@@ -119,8 +119,8 @@ export class ItemSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/files',
-          label: 'Files',
+          scope: '#/properties/image_url',
+          label: 'Image',
         },
         {
           type: 'Control',
@@ -141,14 +141,19 @@ export class ItemSchemaService {
   async itemCreateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.CreateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 
   async itemUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
+    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
+    if (data) {
+      data.tags = this.baseSchema.collectionToInput(
+        data.item_tags || [],
+        'item',
+        'tag',
+      )
+    }
     this.UpdateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 }

@@ -211,14 +211,34 @@ export class VariantSchemaService {
   async variantCreateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.CreateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 
   async variantUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
+    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
+    if (data) {
+      data.items = this.baseSchema.collectionToInput(
+        data.add_items || [],
+        'variant',
+        'item',
+      )
+      data.orgs = this.baseSchema.collectionToInput(
+        data.variant_orgs || [],
+        'variant',
+        'org',
+      )
+      data.tags = this.baseSchema.collectionToInput(
+        data.variant_tags || [],
+        'variant',
+        'tag',
+      )
+      data.components = this.baseSchema.collectionToInput(
+        data.variant_components || [],
+        'variant',
+        'component',
+      )
+    }
     this.UpdateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 }

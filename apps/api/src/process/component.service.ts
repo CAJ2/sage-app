@@ -1,6 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
+import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
@@ -156,6 +157,14 @@ export class ComponentService {
     }
   }
 
+  async delete(input: DeleteInput) {
+    const deleted = await this.editService.deleteOneWithChange(input, Component)
+    if (!deleted) {
+      throw new Error(`Component with ID "${input.id}" not found`)
+    }
+    return deleted
+  }
+
   async setFields(
     component: Component,
     input: Partial<CreateComponentInput & UpdateComponentInput>,
@@ -188,10 +197,10 @@ export class ComponentService {
       component.primary_material = ref(Material, material.id)
     }
     if (input.materials) {
-      component.materials = await this.editService.setOrAddPivot(
+      component.component_materials = await this.editService.setOrAddPivot(
         component.id,
         change?.id,
-        component.materials,
+        component.component_materials,
         Component,
         ComponentsMaterials,
         input.materials,

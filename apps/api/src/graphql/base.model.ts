@@ -95,3 +95,12 @@ export class InputWithLang {
   @Field(() => String, { nullable: true })
   lang?: string
 }
+
+@ObjectType()
+export class DeleteOutput {
+  @Field(() => Boolean)
+  success!: boolean
+
+  @Field(() => String, { nullable: true })
+  id?: string
+}

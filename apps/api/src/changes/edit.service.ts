@@ -1,11 +1,13 @@
 import { BaseEntity, EntityManager, ref, rel } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { AuthUserService } from '@src/auth/authuser.service'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { User } from '@src/users/users.entity'
 import _ from 'lodash'
 import { Change, ChangeStatus, Edit } from './change.entity'
 import {
   CreateChangeInput,
+  DeleteInput,
   IChangeInputWithLang,
   MergeInput,
   UpdateChangeInput,
@@ -32,7 +34,10 @@ type PivotInput =
 
 @Injectable()
 export class EditService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly authUser: AuthUserService,
+  ) {}
 
   async findOne(id: string) {
     const change = await this.em.findOne(
@@ -114,6 +119,9 @@ export class EditService {
 
   async update(input: UpdateChangeInput) {
     const change = await this.findOne(input.id)
+    if (!this.authUser.sameUserOrAdmin(change.user.id)) {
+      throw BadRequestErr('You can only update your own changes')
+    }
 
     if (input.title) change.title = input.title
     if (input.description) change.description = input.description
@@ -560,10 +568,73 @@ export class EditService {
     return { entity: entity as Loaded<T>, change }
   }
 
+  async deleteOneWithChange<T extends BaseEntity & { id: string }>(
+    input: DeleteInput,
+    model: EntityName<T>,
+  ) {
+    const userID = this.authUser.getUserID()
+    if (!userID) {
+      throw BadRequestErr('User ID is required for delete operation')
+    }
+    const change = await this.findOneOrCreate(
+      input.change_id,
+      input.change,
+      userID,
+    )
+    if (!this.authUser.sameUserOrAdmin(change.user.id)) {
+      throw BadRequestErr('You can only delete your own changes')
+    }
+    const meta = this.em.getMetadata().get(model)
+    if (!meta.name) {
+      throw NotFoundErr(`Entity "${model}" not found in metadata`)
+    }
+    // First check if it exists in the change
+    const edit = change.edits.find((e) => {
+      if (e.entity_name === meta.name && e.id === input.id) {
+        return true
+      }
+      return false
+    })
+    if (edit) {
+      if (!edit.original) {
+        // The edit is currently a create, so discard the edit entirely
+        change.edits = change.edits.filter((e) => e.id !== edit.id)
+      } else if (edit.changes) {
+        edit.changes = undefined // Turn the edit into a delete
+      }
+      await this.em.persistAndFlush(change)
+      return
+    }
+    // If not, check if it exists in the database
+    const options = { disableIdentityMap: input.useChange() }
+    const entity = await this.em.findOne<T>(
+      model,
+      { id: input.id } as FilterQuery<T>,
+      options,
+    )
+    if (!entity) {
+      throw NotFoundErr(`${meta.name} with ID "${input.id}" not found`)
+    }
+    change.edits.push({
+      entity_name: meta.name,
+      id: input.id,
+      original: this.entityToChangePOJO(
+        meta.name,
+        entity as BaseEntity & { id: string },
+      ),
+      changes: undefined,
+    })
+    await this.em.persistAndFlush(change)
+    return { id: input.id }
+  }
+
   async beginUpdateEntityEdit(
     change: Change,
     entity: BaseEntity & { id: string },
   ) {
+    if (!this.authUser.sameUserOrAdmin(change.user.id)) {
+      throw BadRequestErr('You can only update edits for your own changes')
+    }
     let edit = change.edits.find(
       (e) => e.entity_name === entity.constructor.name && e.id === entity.id,
     )
@@ -571,7 +642,7 @@ export class EditService {
       edit = {
         entity_name: entity.constructor.name,
         id: entity.id,
-        original: _.omit(entity.toPOJO(), ['history']),
+        original: this.entityToChangePOJO(entity.constructor.name, entity),
       }
       change.edits.push(edit)
     }
@@ -586,10 +657,13 @@ export class EditService {
         `Edit for entity "${entity.constructor.name}" with ID "${entity.id}" not found`,
       )
     }
-    edit.changes = _.omit(entity.toPOJO(), ['history'])
+    edit.changes = this.entityToChangePOJO(entity.constructor.name, entity)
   }
 
   async createEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
+    if (!this.authUser.sameUserOrAdmin(change.user.id)) {
+      throw BadRequestErr('You can only create edits for your own changes')
+    }
     const entityName = entity.constructor.name
     if (!entityName) {
       throw BadRequestErr('Entity name is required for edit creation')
@@ -696,5 +770,76 @@ export class EditService {
       original,
       changes,
     })
+  }
+
+  private entityToChangePOJO(
+    entityName: EntityName<any>,
+    entity: BaseEntity & { id: string },
+  ): EntityDTO<BaseEntity> {
+    const meta = this.em.getMetadata().get(entityName)
+    if (!meta) {
+      throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
+    }
+    const flattenRefs: { ref: string; fieldKey: string; foreignKey: string }[] =
+      []
+    const changeOmit: string[] = []
+    meta.relations.forEach((rel) => {
+      // Skip history and tree relations
+      if (
+        rel.name.startsWith('history') ||
+        ['ancestors', 'descendants'].includes(rel.name)
+      ) {
+        return
+      }
+      // Populate 1:m relations
+      if (!rel.pivotEntity && rel.kind === '1:m') {
+        const refMeta = rel.targetMeta
+        if (!refMeta) {
+          throw NotFoundErr(`Target meta for relation "${rel.name}" not found`)
+        }
+        flattenRefs.push({
+          ref: rel.name,
+          fieldKey: refMeta.primaryKeys[0],
+          foreignKey: refMeta.primaryKeys[1],
+        })
+      }
+      // Do not store m:n relations with pivot entities
+      // Instead the 1:m relation with pivot entity data is stored
+      if (rel.pivotEntity && rel.kind === 'm:n') {
+        changeOmit.push(rel.name)
+      }
+    })
+    const pojo: any = entity.toPOJO()
+    flattenRefs.forEach((ref) => {
+      if (pojo[ref.ref] && Array.isArray(pojo[ref.ref])) {
+        pojo[ref.ref] = pojo[ref.ref].map((item: any) => {
+          if (!item) return item
+          if (
+            !_.isString(item[ref.fieldKey]) &&
+            _.has(item[ref.fieldKey], 'id')
+          ) {
+            item[ref.fieldKey] = item[ref.fieldKey].id
+          }
+          if (
+            !_.isString(item[ref.foreignKey]) &&
+            _.has(item[ref.foreignKey], 'id')
+          ) {
+            item[ref.foreignKey] = item[ref.foreignKey].id
+          }
+          return item
+        })
+      } else if (pojo[ref.ref] && pojo[ref.ref][ref.fieldKey]) {
+        pojo[ref.ref] = {
+          [ref.fieldKey]: _.isString(pojo[ref.ref][ref.fieldKey])
+            ? pojo[ref.ref][ref.fieldKey]
+            : pojo[ref.ref][ref.fieldKey].id,
+          [ref.foreignKey]: _.isString(pojo[ref.ref][ref.foreignKey])
+            ? pojo[ref.ref][ref.foreignKey]
+            : pojo[ref.ref][ref.foreignKey].id,
+          ..._.omit(pojo[ref.ref], [ref.fieldKey, ref.foreignKey]),
+        }
+      }
+    })
+    return _.omit(pojo, changeOmit)
   }
 }

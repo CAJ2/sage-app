@@ -1,7 +1,9 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
+import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
+import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import {
@@ -167,6 +169,14 @@ export class CategoryService {
       change,
       category,
     }
+  }
+
+  async delete(input: DeleteInput) {
+    const deleted = await this.editService.deleteOneWithChange(input, Category)
+    if (!deleted) {
+      throw NotFoundErr(`Category with ID "${input.id}" not found`)
+    }
+    return deleted
   }
 
   async setFields(

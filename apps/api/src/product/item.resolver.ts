@@ -9,10 +9,10 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
-import { Change } from '@src/changes/change.model'
+import { Change, DeleteInput } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ModelEditSchema } from '@src/graphql/base.model'
+import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { CategoriesPage, Category } from './category.model'
 import {
@@ -124,5 +124,15 @@ export class ItemResolver {
     }
     const change = await this.transform.entityToModel(updated.change, Change)
     return { change, item: result }
+  }
+
+  @Mutation(() => DeleteOutput, { name: 'deleteItem', nullable: true })
+  @UseGuards(AuthGuard)
+  async deleteItem(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
+    const item = await this.itemService.delete(input)
+    if (!item) {
+      throw NotFoundErr(`Item with ID "${input.id}" not found`)
+    }
+    return { success: true, id: item.id }
   }
 }

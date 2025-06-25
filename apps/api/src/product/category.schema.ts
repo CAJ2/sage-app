@@ -116,14 +116,12 @@ export class CategorySchemaService {
   async categoryCreateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.CreateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 
   async categoryUpdateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.UpdateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 }

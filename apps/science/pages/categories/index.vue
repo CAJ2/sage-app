@@ -13,6 +13,18 @@
         Add Category
       </Button>
     </div>
+    <GridModelChanges
+      :query="categoriesChangesQuery"
+      :type="EditModelType.Category"
+    >
+      <template #default="{ node }">
+        <ModelListCategory
+          :category="node.changes"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
+      </template>
+    </GridModelChanges>
     <GridModel
       title="Categories"
       :query="categoriesQuery"
@@ -32,7 +44,8 @@
           <span v-if="editId === 'new'">Create Category</span>
           <span v-else>Edit Category</span>
         </DialogTitle>
-        <ModelFormDirect
+        <ModelForm
+          :change-id="selectedChange"
           :model-id="editId"
           :schema-query="categorySchema"
           :create-mutation="createCategoryMutation"
@@ -47,6 +60,10 @@
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
+import { EditModelType } from '~/gql/graphql'
+
+const changeStore = useChangeStore()
+const { selectedChange } = storeToRefs(changeStore)
 
 const actionButton = (btn: string, id: string) => {
   if (btn === 'edit') {
@@ -71,6 +88,39 @@ const categoriesQuery = graphql(`
         hasNextPage
         startCursor
         endCursor
+      }
+    }
+  }
+`)
+
+const categoriesChangesQuery = graphql(`
+  query CategoryChangesQuery(
+    $change_id: ID!
+    $type: EditModelType
+    $first: Int
+    $last: Int
+    $before: String
+    $after: String
+  ) {
+    getChange(id: $change_id) {
+      edits(
+        type: $type
+        first: $first
+        last: $last
+        before: $before
+        after: $after
+      ) {
+        nodes {
+          changes {
+            ...ListCategoryFragment
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
       }
     }
   }

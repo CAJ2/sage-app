@@ -1,5 +1,6 @@
 import { EntityManager, ref, wrap } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { AuthUserService } from '@src/auth/authuser.service'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import {
   CursorOptions,
@@ -26,6 +27,7 @@ export class ChangeService {
     private readonly transform: TransformService,
     private readonly cls: ClsService,
     private readonly changeMapService: ChangeMapService,
+    private readonly authUser: AuthUserService,
   ) {}
 
   async find(opts: CursorOptions<Change>) {
@@ -66,13 +68,26 @@ export class ChangeService {
       )
     }
     if (editID) {
-      const edit = change.edits.find((e) => e.id === editID)
+      let edit = change.edits.find((e) => e.id === editID)
       if (!edit) {
-        throw NotFoundErr(`Edit with ID "${editID}" not found in change`)
+        const directEdit = await this.directEdit(editID, editType)
+        if (!directEdit) {
+          throw NotFoundErr(`Edit or model with ID "${editID}" not found`)
+        }
+        edit = {
+          _type: EditModel,
+          id: directEdit.id,
+          entity_name: directEdit.entity_name,
+        }
+        const editModel = await this.transform.objectToModel(edit, EditModel)
+        editModel.original = directEdit.original
+        editModel.changes = directEdit.changes
+        editModel.changes_create = directEdit.model_create
+        editModel.changes_update = directEdit.model_update
+        return [editModel]
       }
       edit._type = EditModel
       const editModel = await this.transform.objectToModel(edit, EditModel)
-      console.log('editModel', editModel)
       editModel.changes_create = await this.changeMapService.createEdit(
         edit.entity_name,
         editModel,
@@ -182,7 +197,11 @@ export class ChangeService {
   }
 
   async update(input: UpdateChangeInput) {
+    const userID = this.authUser.getUserID()
     const change = await this.findOne(input.id)
+    if (change.user.id !== userID) {
+      throw BadRequestErr('You can only update your own changes')
+    }
 
     if (input.title) change.title = input.title
     if (input.description) change.description = input.description
@@ -211,5 +230,19 @@ export class ChangeService {
   async remove(id: string) {
     const change = await this.findOne(id)
     await this.em.removeAndFlush(change)
+  }
+
+  async discardEdit(changeID: string, editID: string) {
+    const change = await this.findOne(changeID)
+    if (!change) {
+      throw NotFoundErr('Change not found')
+    }
+    const edit = change.edits.find((e) => e.id === editID)
+    if (!edit) {
+      throw NotFoundErr('Edit not found')
+    }
+    change.edits = change.edits.filter((e) => e.id !== editID)
+    await this.em.persistAndFlush(change)
+    return editID
   }
 }

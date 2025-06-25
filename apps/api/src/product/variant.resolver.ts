@@ -9,10 +9,10 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
-import { Change } from '@src/changes/change.model'
+import { Change, DeleteInput } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ModelEditSchema } from '@src/graphql/base.model'
+import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Component, ComponentsPage } from '@src/process/component.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Org, OrgsPage } from '@src/users/org.model'
@@ -160,5 +160,17 @@ export class VariantResolver {
     }
     const change = await this.transform.entityToModel(updated.change, Change)
     return { change, variant: result }
+  }
+
+  @Mutation(() => DeleteOutput, { name: 'deleteVariant', nullable: true })
+  @UseGuards(AuthGuard)
+  async deleteVariant(
+    @Args('input') input: DeleteInput,
+  ): Promise<DeleteOutput> {
+    const variant = await this.variantService.delete(input)
+    if (!variant) {
+      throw NotFoundErr(`Variant with ID "${input.id}" not found`)
+    }
+    return { success: true, id: variant.id }
   }
 }

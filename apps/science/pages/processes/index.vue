@@ -13,6 +13,18 @@
         Add Process
       </Button>
     </div>
+    <GridModelChanges
+      :query="processesChangesQuery"
+      :type="EditModelType.Process"
+    >
+      <template #default="{ node }">
+        <ModelListProcess
+          :process="node.changes"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
+      </template>
+    </GridModelChanges>
     <GridModel
       title="Processes"
       :query="processQuery"
@@ -32,7 +44,8 @@
           <span v-if="editId === 'new'">Create Process</span>
           <span v-else>Edit Process</span>
         </DialogTitle>
-        <ModelFormDirect
+        <ModelForm
+          :change-id="selectedChange"
           :model-id="editId"
           :schema-query="processSchema"
           :create-mutation="createProcessMutation"
@@ -47,6 +60,10 @@
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
+import { EditModelType } from '~/gql/graphql'
+
+const changeStore = useChangeStore()
+const { selectedChange } = storeToRefs(changeStore)
 
 const actionButton = (btn: string, id: string) => {
   if (btn === 'edit') {
@@ -71,6 +88,39 @@ const processQuery = graphql(`
         hasPreviousPage
         startCursor
         endCursor
+      }
+    }
+  }
+`)
+
+const processesChangesQuery = graphql(`
+  query ProcessesChangesQuery(
+    $change_id: ID!
+    $type: EditModelType
+    $first: Int
+    $last: Int
+    $before: String
+    $after: String
+  ) {
+    getChange(id: $change_id) {
+      edits(
+        type: $type
+        first: $first
+        last: $last
+        before: $before
+        after: $after
+      ) {
+        nodes {
+          changes {
+            ...ListProcessFragment
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
       }
     }
   }

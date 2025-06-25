@@ -12,7 +12,7 @@ import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
 import { Transform } from 'class-transformer'
-import { IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
+import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { CategoriesPage } from './category.model'
@@ -35,7 +35,6 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUrl()
   image_url?: string
 
   @Field(() => CategoriesPage)
@@ -46,6 +45,10 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
 
   @Field(() => VariantsPage)
   variants!: VariantsPage & {}
+
+  transform(entity: ItemEntity) {
+    this.image_url = entity.files?.thumbnail
+  }
 }
 registerModel('Item', Item)
 
@@ -117,7 +120,6 @@ export class CreateItemInput extends ChangeInputWithLang() {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUrl()
   image_url?: string
 
   @Field(() => [ItemCategoriesInput], { nullable: true })
@@ -151,7 +153,6 @@ export class UpdateItemInput extends ChangeInputWithLang() {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsUrl()
   image_url?: string
 
   @Field(() => [ItemCategoriesInput], { nullable: true })

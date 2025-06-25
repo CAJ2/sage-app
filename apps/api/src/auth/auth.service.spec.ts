@@ -2,6 +2,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
 import { CommonModule } from '@src/common/common.module'
 import { UsersService } from '@src/users/users.service'
+import { ClsModule } from 'nestjs-cls'
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -22,6 +23,9 @@ describe('AuthService', () => {
         MikroOrmModule.forRoot(),
         AuthModule.registerAsync(),
         CommonModule,
+        ClsModule.forRoot({
+          global: true,
+        }),
         I18nModule.forRoot({
           fallbackLanguage: 'en',
           loaderOptions: {

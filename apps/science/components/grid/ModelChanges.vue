@@ -28,8 +28,20 @@
       <CardContent>
         <div>
           <ul class="list">
-            <div v-for="n in nodes" :key="n.id">
-              <slot :node="n" />
+            <div
+              v-for="n in nodes"
+              :key="n.changes.id"
+              class="flex items-center"
+            >
+              <div class="flex-1">
+                <slot :node="n" />
+              </div>
+              <button
+                class="btn btn-square btn-ghost"
+                @click="discardEdit(n.changes.id)"
+              >
+                <font-awesome-icon icon="fa-solid fa-trash-can" />
+              </button>
             </div>
           </ul>
         </div>
@@ -40,6 +52,7 @@
 
 <script setup lang="ts">
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import { graphql } from '~/gql'
 import type { EditModelType } from '~/gql/graphql'
 
 type CursorVars = {
@@ -95,5 +108,23 @@ const nextPage = async () => {
     before: null,
     after: result.value?.getChange?.edits.pageInfo?.endCursor || null,
   })
+}
+
+const discardEditMutation = graphql(`
+  mutation DiscardEditMutation($change_id: ID!, $edit_id: ID!) {
+    discardEdit(change_id: $change_id, edit_id: $edit_id) {
+      id
+    }
+  }
+`)
+
+const discardEdit = async (editId: string) => {
+  const { mutate } = useMutation(discardEditMutation, {
+    variables: {
+      change_id: selectedChange.value,
+      edit_id: editId,
+    },
+  })
+  await mutate()
 }
 </script>

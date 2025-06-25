@@ -216,14 +216,24 @@ export class ComponentSchemaService {
   async componentCreateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.CreateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 
   async componentUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
+    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
+    if (data) {
+      data.materials = this.baseSchema.collectionToInput(
+        data.component_materials || [],
+        'component',
+        'material',
+      )
+      data.tags = this.baseSchema.collectionToInput(
+        data.component_tags || [],
+        'component',
+        'tag',
+      )
+    }
     this.UpdateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 }

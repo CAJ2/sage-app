@@ -8,13 +8,11 @@
       placeholder
       :img-attrs="{ class: 'object-contain', style: widthHeightStyle }"
     />
-    <iconify-icon
+    <Icon
       v-if="src && srcType === 'icon'"
-      :icon="src.replace('iconify://', '')"
+      :name="iconName"
       :alt="alt"
-      :style="widthHeightStyle"
-      :width="'100%'"
-      :height="'100%'"
+      :style="iconStyle"
     />
     <div
       v-if="!src || srcType === 'unknown'"
@@ -27,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import 'iconify-icon'
 import type { HTMLAttributes } from 'vue'
 import { cn } from '../lib/utils'
 
@@ -46,10 +43,35 @@ const srcType = computed(() => {
   }
   if (props.src.startsWith('http')) {
     return 'img'
-  } else if (props.src.startsWith('iconify://')) {
+  } else if (props.src.startsWith('icon://')) {
     return 'icon'
   } else {
     return 'unknown'
+  }
+})
+
+const iconName = computed(() => {
+  if (props.src && props.src.startsWith('icon://')) {
+    return props.src.replace('icon://', '').split('?')[0]
+  }
+  return props.src || ''
+})
+
+const iconStyle = computed(() => {
+  if (props.src && props.src.startsWith('icon://')) {
+    const style: Record<string, string | null> = {
+      width: props.width ? `${props.width * 0.25}rem` : '100%',
+      height: props.height ? `${props.height * 0.25}rem` : '100%',
+    }
+    const params = new URLSearchParams(props.src.split('?')[1])
+    if (params.has('color')) {
+      style.color = '#' + params.get('color')
+    }
+    return style
+  }
+  return {
+    width: props.width ? `${props.width * 0.25}rem` : '100%',
+    height: props.height ? `${props.height * 0.25}rem` : '100%',
   }
 })
 
@@ -66,6 +88,9 @@ const widthHeightStyle = computed(() => {
       height: `${props.height * 0.25}rem`,
     }
   }
-  return {}
+  return {
+    width: '100%',
+    height: '100%',
+  }
 })
 </script>

@@ -1,10 +1,7 @@
 <template>
   <li class="list-row">
     <div>
-      <UiImage
-        class="size-10"
-        :src="'iconify://lets-icons:materials'"
-      ></UiImage>
+      <UiImage class="size-10" :src="'icon://lets-icons:materials'"></UiImage>
     </div>
     <div>
       <div class="text-bold">{{ material.name }}</div>

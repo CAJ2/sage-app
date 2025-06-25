@@ -1,6 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
+import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
@@ -107,6 +108,14 @@ export class ProcessService {
       process,
       change,
     }
+  }
+
+  async delete(input: DeleteInput) {
+    const deleted = await this.editService.deleteOneWithChange(input, Process)
+    if (!deleted) {
+      throw NotFoundErr(`Process with ID "${input.id}" not found`)
+    }
+    return deleted
   }
 
   async setFields(

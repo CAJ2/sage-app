@@ -1,9 +1,11 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
+import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
 import { mapOrderBy } from '@src/common/db.utils'
+import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
@@ -15,7 +17,7 @@ import { TagService } from '@src/process/tag.service'
 import { Org } from '@src/users/org.entity'
 import { I18nService } from 'nestjs-i18n'
 import { Item } from './item.entity'
-import { Variant, VariantsTags } from './variant.entity'
+import { Variant, VariantsOrgs, VariantsTags } from './variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 @Injectable()
@@ -37,7 +39,7 @@ export class VariantService {
           'variant_sources',
           'variant_items',
           'variant_tags',
-          'variants_components',
+          'variant_components',
           'orgs',
         ],
       },
@@ -190,6 +192,14 @@ export class VariantService {
     return { variant, change }
   }
 
+  async delete(input: DeleteInput) {
+    const deleted = await this.editService.deleteOneWithChange(input, Variant)
+    if (!deleted) {
+      throw NotFoundErr(`Variant with ID "${input.id}" not found`)
+    }
+    return deleted
+  }
+
   async setFields(
     variant: Variant,
     input: Partial<CreateVariantInput & UpdateVariantInput>,
@@ -271,17 +281,17 @@ export class VariantService {
         }
       }
     }
-    if (input.region_id) {
+    if (input.region) {
       if (!change) {
         const region = await this.em.findOneOrFail(Region, {
-          id: input.region_id,
+          id: input.region.id,
         })
         variant.region = ref(region)
       } else {
         const region = await this.editService.findRefWithChange(
           change,
           Region,
-          { id: input.region_id },
+          { id: input.region.id },
         )
         variant.region = region
       }
@@ -311,42 +321,24 @@ export class VariantService {
       }
     }
     if (input.orgs || input.add_orgs) {
-      for (const org of input.orgs || input.add_orgs || []) {
-        if (!change) {
-          const orgEntity = await this.em.findOneOrFail(Org, { id: org.id })
-          if (variant.orgs.contains(ref(orgEntity))) {
-            variant.orgs.remove(ref(orgEntity))
-          }
-          variant.orgs.add(ref(orgEntity))
-        } else {
-          const orgEntity = await this.editService.findRefWithChange(
-            change,
-            Org,
-            { id: org.id },
-          )
-          if (variant.orgs.contains(orgEntity)) {
-            variant.orgs.remove(orgEntity)
-          }
-          variant.orgs.add(orgEntity)
-        }
-      }
+      variant.orgs = await this.editService.setOrAddPivot(
+        variant.id,
+        change?.id,
+        variant.orgs,
+        Org,
+        VariantsOrgs,
+        input.orgs,
+        input.add_orgs,
+      )
     }
     if (input.remove_orgs) {
-      for (const org of input.remove_orgs) {
-        if (!change) {
-          const orgEntity = await this.em.findOneOrFail(Org, { id: org })
-          variant.orgs.remove(ref(orgEntity))
-        } else {
-          const orgEntity = await this.editService.findRefWithChange(
-            change,
-            Org,
-            { id: org },
-          )
-          if (variant.orgs.contains(orgEntity)) {
-            variant.orgs.remove(orgEntity)
-          }
-        }
-      }
+      variant.orgs = await this.editService.removeFromPivot(
+        change?.id,
+        variant.orgs,
+        Org,
+        VariantsOrgs,
+        input.remove_orgs,
+      )
     }
     if (input.tags || input.add_tags) {
       for (const tag of input.tags || input.add_tags || []) {

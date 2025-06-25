@@ -317,12 +317,13 @@ input CreateVariantInput {
   components: [VariantComponentsInput!]
   desc: String
   desc_tr: [TranslatedInput!]
+  image_url: String
   items: [VariantItemsInput!]
   lang: String
   name: String
   name_tr: [TranslatedInput!]
   orgs: [VariantOrgsInput!]
-  region_id: ID
+  region: VariantRegionsInput
   regions: [VariantRegionsInput!]
   remove_sources: [ID!]
   tags: [VariantTagsInput!]
@@ -342,6 +343,20 @@ type DeleteChangeOutput {
   success: Boolean
 }
 
+input DeleteInput {
+  add_sources: [SourceInput!]
+  apply: Boolean
+  change: CreateChangeInput
+  change_id: ID
+  id: ID!
+  remove_sources: [ID!]
+}
+
+type DeleteOutput {
+  id: String
+  success: Boolean!
+}
+
 type DeleteSourceOutput {
   success: Boolean
 }
@@ -351,6 +366,11 @@ type DirectEdit {
   id: ID
   model_create: JSONObject
   model_update: JSONObject
+}
+
+type DiscardEditOutput {
+  id: ID
+  success: Boolean
 }
 
 type Edit {
@@ -479,8 +499,14 @@ type Mutation {
   createSource(input: CreateSourceInput!): CreateSourceOutput
   createTagDefinition(input: CreateTagDefinitionInput!): CreateTagDefinitionOutput
   createVariant(input: CreateVariantInput!): CreateVariantOutput
+  deleteCategory(input: DeleteInput!): DeleteOutput
   deleteChange(id: ID!): DeleteChangeOutput
+  deleteComponent(input: DeleteInput!): DeleteOutput
+  deleteItem(input: DeleteInput!): DeleteOutput
+  deleteProcess(input: DeleteInput!): DeleteOutput
   deleteSource(id: ID!): DeleteSourceOutput
+  deleteVariant(input: DeleteInput!): DeleteOutput
+  discardEdit(change_id: ID!, edit_id: ID!): DiscardEditOutput
   markSourceProcessed(id: ID!): MarkSourceProcessedOutput
   mergeChange(id: ID!): MergeChangeOutput
   updateCategory(input: UpdateCategoryInput!): UpdateCategoryOutput
@@ -522,13 +548,6 @@ type Org implements Named {
 type OrgEdge {
   cursor: String!
   node: Org!
-}
-
-type OrgsPage {
-  edges: [OrgEdge!]
-  nodes: [Org!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 type PageInfo {
@@ -1045,19 +1064,23 @@ input UpdateVariantInput {
   change: CreateChangeInput
   change_id: ID
   code: String
+  components: [VariantComponentsInput!]
   desc: String
   desc_tr: [TranslatedInput!]
   id: ID!
+  image_url: String
   lang: String
   name: String
   name_tr: [TranslatedInput!]
-  region_id: ID
+  orgs: [VariantOrgsInput!]
+  region: VariantRegionsInput
   remove_components: [ID!]
   remove_items: [ID!]
   remove_orgs: [ID!]
   remove_regions: [ID!]
   remove_sources: [ID!]
   remove_tags: [ID!]
+  tags: [VariantTagsInput!]
 }
 
 type UpdateVariantOutput {
@@ -1073,7 +1096,7 @@ type User {
   id: ID!
   lang: String
   name: String
-  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): UserOrgsPage!
   profile: UserProfile
   updated_at: DateTime!
   username: String!
@@ -1082,6 +1105,23 @@ type User {
 type UserEdge {
   cursor: String!
   node: User!
+}
+
+type UserOrg {
+  org: Org!
+  role: String
+}
+
+type UserOrgEdge {
+  cursor: String!
+  node: UserOrg!
+}
+
+type UserOrgsPage {
+  edges: [UserOrgEdge!]
+  nodes: [UserOrg!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type UserPage {

@@ -199,13 +199,17 @@ export class CreateVariantInput extends ChangeInputWithLang() {
   @IsOptional()
   desc_tr?: TranslatedInput[]
 
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  image_url?: string
+
   @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
   items?: VariantItemsInput[]
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => VariantRegionsInput, { nullable: true })
   @IsOptional()
-  region_id?: string
+  region?: VariantRegionsInput
 
   @Field(() => [VariantRegionsInput], { nullable: true })
   @IsOptional()
@@ -253,6 +257,10 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @IsOptional()
   desc_tr?: TranslatedInput[]
 
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  image_url?: string
+
   @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
   add_items?: VariantItemsInput[]
@@ -261,9 +269,9 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
   @IsOptional()
   remove_items?: string[]
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => VariantRegionsInput, { nullable: true })
   @IsOptional()
-  region_id?: string
+  region?: VariantRegionsInput
 
   @Field(() => [VariantRegionsInput], { nullable: true })
   @IsOptional()
@@ -280,6 +288,10 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [VariantOrgsInput], { nullable: true })
   @IsOptional()
+  orgs?: VariantOrgsInput[]
+
+  @Field(() => [VariantOrgsInput], { nullable: true })
+  @IsOptional()
   add_orgs?: VariantOrgsInput[]
 
   @Field(() => [ID], { nullable: true })
@@ -288,11 +300,19 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [VariantTagsInput], { nullable: true })
   @IsOptional()
+  tags?: VariantTagsInput[]
+
+  @Field(() => [VariantTagsInput], { nullable: true })
+  @IsOptional()
   add_tags?: VariantTagsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
   remove_tags?: string[]
+
+  @Field(() => [VariantComponentsInput], { nullable: true })
+  @IsOptional()
+  components?: VariantComponentsInput[]
 
   @Field(() => [VariantComponentsInput], { nullable: true })
   @IsOptional()

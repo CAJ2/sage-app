@@ -80,8 +80,20 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      baseurl: 'https://science.dev.sageleaf.app',
       apiurl: 'https://api.dev.sageleaf.app',
     }
+  },
+
+  icon: {
+    mode: 'css',
+    cssLayer: 'base',
+    provider: 'server',
+    localApiEndpoint: '/api/icons',
+    fallbackToApi: true,
+    serverBundle: {
+      collections: ['material-symbols-light']
+    },
   },
 
   colorMode: {

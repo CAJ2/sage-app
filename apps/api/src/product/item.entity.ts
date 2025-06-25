@@ -19,11 +19,14 @@ import { Category } from './category.entity'
 import { Variant } from './variant.entity'
 
 export const ItemFilesSchema = z.object({
-  images: z.array(
-    z.object({
-      url: z.string(),
-    }),
-  ),
+  thumbnail: z.url().optional(),
+  images: z
+    .array(
+      z.object({
+        url: z.url(),
+      }),
+    )
+    .optional(),
 })
 
 export type ItemFiles = z.infer<typeof ItemFilesSchema>
@@ -47,6 +50,13 @@ export class Item extends IDCreatedUpdated implements Searchable {
 
   @ManyToMany({ entity: () => Category, pivotEntity: () => ItemsCategories })
   categories = new Collection<Category>(this)
+
+  @OneToMany({
+    entity: () => ItemsCategories,
+    mappedBy: (it) => it.item,
+    orphanRemoval: true,
+  })
+  item_categories = new Collection<ItemsCategories>(this)
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => ItemsTags })
   tags = new Collection<Tag>(this)

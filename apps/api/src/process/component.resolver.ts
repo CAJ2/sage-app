@@ -9,10 +9,10 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
-import { Change } from '@src/changes/change.model'
+import { Change, DeleteInput } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ModelEditSchema } from '@src/graphql/base.model'
+import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   Component,
   ComponentRecycleArgs,
@@ -168,5 +168,14 @@ export class ComponentResolver {
       return { component: model, change }
     }
     return { component: model }
+  }
+
+  @Mutation(() => DeleteOutput, { name: 'deleteComponent', nullable: true })
+  @UseGuards(AuthGuard)
+  async deleteComponent(
+    @Args('input') input: DeleteInput,
+  ): Promise<DeleteOutput> {
+    const component = await this.componentService.delete(input)
+    return { success: true, id: component.id }
   }
 }

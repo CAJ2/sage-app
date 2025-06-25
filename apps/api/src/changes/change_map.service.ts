@@ -1,3 +1,4 @@
+import { EntityManager } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
@@ -26,8 +27,10 @@ export class ChangeMapService {
   private updateEditFns: Record<string, (edit: EditModel) => Promise<any>> = {}
 
   private populateCache: Record<string, string[]> = {}
+  private changeOmitCache: Record<string, string[]> = {}
 
   constructor(
+    private readonly em: EntityManager,
     private readonly categoryService: CategoryService,
     private readonly categorySchema: CategorySchemaService,
     private readonly itemService: ItemService,
@@ -99,5 +102,44 @@ export class ChangeMapService {
       throw new Error(`No update function registered for entity: ${entity}`)
     }
     return updateFn(edit)
+  }
+
+  getPopulateCache(entityName: string): string[] {
+    return this.populateCache[entityName] || []
+  }
+
+  getChangeOmitCache(entityName: string): string[] {
+    return this.changeOmitCache[entityName] || []
+  }
+
+  private computePopulateCache(entityName: string) {
+    const meta = this.em.getMetadata().get(entityName)
+    if (!meta) {
+      throw new Error(`Entity ${entityName} not found in metadata`)
+    }
+    meta.relations.forEach((rel) => {
+      // Skip history and tree relations
+      if (
+        rel.name.startsWith('history') ||
+        ['ancestors', 'descendants'].includes(rel.name)
+      ) {
+        return
+      }
+      // Populate 1:m relations
+      if (!rel.pivotEntity && rel.kind === '1:m') {
+        if (!this.populateCache[entityName]) {
+          this.populateCache[entityName] = []
+        }
+        this.populateCache[entityName].push(rel.name)
+      }
+      // Do not store m:n relations with pivot entities
+      // Instead the 1:m relation with pivot entity data is stored
+      if (rel.pivotEntity && rel.kind === 'm:n') {
+        if (!this.changeOmitCache[entityName]) {
+          this.changeOmitCache[entityName] = []
+        }
+        this.changeOmitCache[entityName].push(rel.name)
+      }
+    })
   }
 }

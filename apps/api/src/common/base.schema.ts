@@ -48,7 +48,7 @@ export const TrArraySchema = z
     },
   ])
 export const ImageOrIconSchema = z
-  .url({ protocol: /^(https|iconify):\/\// })
+  .url({ protocol: /^(https|icon):\/\// })
   .optional()
   .default('')
 export const RelMetaSchema = z
@@ -71,6 +71,20 @@ export class BaseSchemaService {
         url: true,
         uri: true,
       },
+    })
+  }
+
+  collectionToInput(
+    collection: Record<string, string>[],
+    refField: string,
+    foreignField: string,
+  ) {
+    return collection.map((item) => {
+      const obj = {
+        id: item[foreignField],
+        ..._.omit(item, [refField, foreignField]),
+      }
+      return obj
     })
   }
 

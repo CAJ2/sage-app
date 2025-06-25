@@ -23,6 +23,7 @@ import { configureAuth } from './auth'
 import { AuthGuard } from './auth.guard'
 import { AuthResolver } from './auth.resolver'
 import { AuthService } from './auth.service'
+import { AuthUserService } from './authuser.service'
 import { SkipBodyParsingMiddleware } from './middlewares'
 import {
   AFTER_HOOK_KEY,
@@ -170,6 +171,7 @@ export class AuthModule implements NestModule, OnModuleInit {
         useValue: options,
       },
       AuthService,
+      AuthUserService,
     ]
 
     if (!options.disableExceptionFilter) {
@@ -192,6 +194,7 @@ export class AuthModule implements NestModule, OnModuleInit {
           useValue: options,
         },
         AuthService,
+        AuthUserService,
       ],
     }
   }

@@ -181,6 +181,15 @@ export class MergeChangeOutput {
   change?: Change
 }
 
+@ObjectType()
+export class DiscardEditOutput {
+  @Field(() => Boolean, { nullable: true })
+  success?: boolean
+
+  @Field(() => ID, { nullable: true })
+  id?: string
+}
+
 export interface MergeInput {
   apply?: boolean
 }
@@ -235,4 +244,32 @@ export function ChangeInputWithLang() {
     }
   }
   return ChangeInputWithLangCls
+}
+
+@InputType()
+export class DeleteInput {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @Validate(IsNanoID)
+  change_id?: string
+
+  @Field(() => CreateChangeInput, { nullable: true })
+  change?: CreateChangeInput & {}
+
+  @Field(() => [SourceInput], { nullable: true })
+  add_sources?: SourceInput[]
+
+  @Field(() => [ID], { nullable: true })
+  remove_sources?: string[]
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  apply?: boolean
+
+  useChange(): boolean {
+    return !!this.change_id || !!this.change
+  }
 }

@@ -31,6 +31,11 @@ export const ProcessIDSchema = z.string().meta({
 
 @Injectable()
 export class ProcessSchemaService {
+  ProcessMaterialInputSchema: z.ZodObject
+  ProcessVariantInputSchema: z.ZodObject
+  ProcessOrgInputSchema: z.ZodObject
+  ProcessRegionInputSchema: z.ZodObject
+  ProcessPlaceInputSchema: z.ZodObject
   CreateSchema: z.ZodObject<any>
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
@@ -44,6 +49,21 @@ export class ProcessSchemaService {
     private readonly i18n: I18nService<I18nTranslations>,
     private readonly baseSchema: BaseSchemaService,
   ) {
+    this.ProcessMaterialInputSchema = z.strictObject({
+      id: MaterialIDSchema,
+    })
+    this.ProcessVariantInputSchema = z.strictObject({
+      id: VariantIDSchema,
+    })
+    this.ProcessOrgInputSchema = z.strictObject({
+      id: OrgIDSchema,
+    })
+    this.ProcessRegionInputSchema = z.strictObject({
+      id: RegionIDSchema,
+    })
+    this.ProcessPlaceInputSchema = z.strictObject({
+      id: PlaceIDSchema,
+    })
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       intent: z.enum(ProcessIntent),
       name_tr: TrArraySchema.optional(),
@@ -51,11 +71,11 @@ export class ProcessSchemaService {
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
       rules: ProcessRulesSchema.optional(),
-      material: MaterialIDSchema.optional(),
-      variant: VariantIDSchema.optional(),
-      org: OrgIDSchema.optional(),
-      region: RegionIDSchema.optional(),
-      place: PlaceIDSchema.optional(),
+      material: this.ProcessMaterialInputSchema.optional(),
+      variant: this.ProcessVariantInputSchema.optional(),
+      org: this.ProcessOrgInputSchema.optional(),
+      region: this.ProcessRegionInputSchema.optional(),
+      place: this.ProcessPlaceInputSchema.optional(),
     })
     this.CreateJSONSchema = zToSchema(this.CreateSchema)
     this.CreateUISchema = {
@@ -118,11 +138,11 @@ export class ProcessSchemaService {
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
       rules: ProcessRulesSchema.optional(),
-      material: MaterialIDSchema.optional(),
-      variant: VariantIDSchema.optional(),
-      org: OrgIDSchema.optional(),
-      region: RegionIDSchema.optional(),
-      place: PlaceIDSchema.optional(),
+      material: this.ProcessMaterialInputSchema.optional(),
+      variant: this.ProcessVariantInputSchema.optional(),
+      org: this.ProcessOrgInputSchema.optional(),
+      region: this.ProcessRegionInputSchema.optional(),
+      place: this.ProcessPlaceInputSchema.optional(),
     })
     this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
     this.UpdateUISchema = {
@@ -183,14 +203,12 @@ export class ProcessSchemaService {
   async processCreateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.CreateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 
   async processUpdateEdit(edit: Edit) {
     const data = _.cloneDeep(edit.changes)
     this.UpdateValidator(data)
-    this.baseSchema.flattenRefs(data)
     return data
   }
 }

@@ -9,6 +9,7 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
+import { Optional } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.model'
@@ -24,6 +25,7 @@ import {
   DeleteChangeOutput,
   DirectEdit,
   DirectEditArgs,
+  DiscardEditOutput,
   MergeChangeOutput,
   UpdateChangeInput,
   UpdateChangeOutput,
@@ -41,6 +43,8 @@ export class ChangeResolver {
   ) {}
 
   @Query(() => ChangesPage)
+  @UseGuards(AuthGuard)
+  @Optional()
   async getChanges(@Args() args: ChangesArgs) {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.changeService.find(filter)
@@ -48,6 +52,8 @@ export class ChangeResolver {
   }
 
   @Query(() => Change, { name: 'getChange', nullable: true })
+  @UseGuards(AuthGuard)
+  @Optional()
   async getChange(@Args('id', { type: () => ID }) id: string) {
     const change = await this.changeService.findOne(id)
     if (!change) {
@@ -57,6 +63,7 @@ export class ChangeResolver {
   }
 
   @Query(() => DirectEdit, { nullable: true })
+  @UseGuards(AuthGuard)
   async getDirectEdit(@Args() args: DirectEditArgs) {
     const directEdit = await this.changeService.directEdit(
       args.id,
@@ -117,6 +124,19 @@ export class ChangeResolver {
     return {
       change: model,
     }
+  }
+
+  @Mutation(() => DiscardEditOutput, { nullable: true })
+  @UseGuards(AuthGuard)
+  async discardEdit(
+    @Args('change_id', { type: () => ID }) changeID: string,
+    @Args('edit_id', { type: () => ID }) editID: string,
+  ): Promise<DiscardEditOutput> {
+    const result = await this.changeService.discardEdit(changeID, editID)
+    if (!result) {
+      throw NotFoundErr('Edit not found or already discarded')
+    }
+    return { success: true, id: result }
   }
 
   @ResolveField(() => ChangeEditsPage, { nullable: true })

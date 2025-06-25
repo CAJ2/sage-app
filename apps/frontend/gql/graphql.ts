@@ -426,12 +426,13 @@ export type CreateVariantInput = {
   components?: InputMaybe<Array<VariantComponentsInput>>;
   desc?: InputMaybe<Scalars['String']['input']>;
   desc_tr?: InputMaybe<Array<TranslatedInput>>;
+  image_url?: InputMaybe<Scalars['String']['input']>;
   items?: InputMaybe<Array<VariantItemsInput>>;
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   name_tr?: InputMaybe<Array<TranslatedInput>>;
   orgs?: InputMaybe<Array<VariantOrgsInput>>;
-  region_id?: InputMaybe<Scalars['ID']['input']>;
+  region?: InputMaybe<VariantRegionsInput>;
   regions?: InputMaybe<Array<VariantRegionsInput>>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<VariantTagsInput>>;
@@ -448,6 +449,21 @@ export type DeleteChangeOutput = {
   success?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type DeleteInput = {
+  add_sources?: InputMaybe<Array<SourceInput>>;
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  change?: InputMaybe<CreateChangeInput>;
+  change_id?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
+  remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type DeleteOutput = {
+  __typename?: 'DeleteOutput';
+  id?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type DeleteSourceOutput = {
   __typename?: 'DeleteSourceOutput';
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -459,6 +475,12 @@ export type DirectEdit = {
   id?: Maybe<Scalars['ID']['output']>;
   model_create?: Maybe<Scalars['JSONObject']['output']>;
   model_update?: Maybe<Scalars['JSONObject']['output']>;
+};
+
+export type DiscardEditOutput = {
+  __typename?: 'DiscardEditOutput';
+  id?: Maybe<Scalars['ID']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type Edit = {
@@ -674,8 +696,14 @@ export type Mutation = {
   createSource?: Maybe<CreateSourceOutput>;
   createTagDefinition?: Maybe<CreateTagDefinitionOutput>;
   createVariant?: Maybe<CreateVariantOutput>;
+  deleteCategory?: Maybe<DeleteOutput>;
   deleteChange?: Maybe<DeleteChangeOutput>;
+  deleteComponent?: Maybe<DeleteOutput>;
+  deleteItem?: Maybe<DeleteOutput>;
+  deleteProcess?: Maybe<DeleteOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
+  deleteVariant?: Maybe<DeleteOutput>;
+  discardEdit?: Maybe<DiscardEditOutput>;
   markSourceProcessed?: Maybe<MarkSourceProcessedOutput>;
   mergeChange?: Maybe<MergeChangeOutput>;
   updateCategory?: Maybe<UpdateCategoryOutput>;
@@ -735,13 +763,44 @@ export type MutationCreateVariantArgs = {
 };
 
 
+export type MutationDeleteCategoryArgs = {
+  input: DeleteInput;
+};
+
+
 export type MutationDeleteChangeArgs = {
   id: Scalars['ID']['input'];
 };
 
 
+export type MutationDeleteComponentArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDeleteItemArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDeleteProcessArgs = {
+  input: DeleteInput;
+};
+
+
 export type MutationDeleteSourceArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteVariantArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDiscardEditArgs = {
+  change_id: Scalars['ID']['input'];
+  edit_id: Scalars['ID']['input'];
 };
 
 
@@ -834,14 +893,6 @@ export type OrgEdge = {
   __typename?: 'OrgEdge';
   cursor: Scalars['String']['output'];
   node: Org;
-};
-
-export type OrgsPage = {
-  __typename?: 'OrgsPage';
-  edges?: Maybe<Array<OrgEdge>>;
-  nodes?: Maybe<Array<Org>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type PageInfo = {
@@ -1575,19 +1626,23 @@ export type UpdateVariantInput = {
   change?: InputMaybe<CreateChangeInput>;
   change_id?: InputMaybe<Scalars['ID']['input']>;
   code?: InputMaybe<Scalars['String']['input']>;
+  components?: InputMaybe<Array<VariantComponentsInput>>;
   desc?: InputMaybe<Scalars['String']['input']>;
   desc_tr?: InputMaybe<Array<TranslatedInput>>;
   id: Scalars['ID']['input'];
+  image_url?: InputMaybe<Scalars['String']['input']>;
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   name_tr?: InputMaybe<Array<TranslatedInput>>;
-  region_id?: InputMaybe<Scalars['ID']['input']>;
+  orgs?: InputMaybe<Array<VariantOrgsInput>>;
+  region?: InputMaybe<VariantRegionsInput>;
   remove_components?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_items?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_orgs?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_regions?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_sources?: InputMaybe<Array<Scalars['ID']['input']>>;
   remove_tags?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<VariantTagsInput>>;
 };
 
 export type UpdateVariantOutput = {
@@ -1605,7 +1660,7 @@ export type User = {
   id: Scalars['ID']['output'];
   lang?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  orgs: OrgsPage;
+  orgs: UserOrgsPage;
   profile?: Maybe<UserProfile>;
   updated_at: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
@@ -1623,6 +1678,26 @@ export type UserEdge = {
   __typename?: 'UserEdge';
   cursor: Scalars['String']['output'];
   node: User;
+};
+
+export type UserOrg = {
+  __typename?: 'UserOrg';
+  org: Org;
+  role?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserOrgEdge = {
+  __typename?: 'UserOrgEdge';
+  cursor: Scalars['String']['output'];
+  node: UserOrg;
+};
+
+export type UserOrgsPage = {
+  __typename?: 'UserOrgsPage';
+  edges?: Maybe<Array<UserOrgEdge>>;
+  nodes?: Maybe<Array<UserOrg>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type UserPage = {

@@ -1,8 +1,10 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { Change } from '@src/changes/change.entity'
+import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { mapOrderBy } from '@src/common/db.utils'
+import { NotFoundErr } from '@src/common/exceptions'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
@@ -148,6 +150,14 @@ export class ItemService {
     return { item, change }
   }
 
+  async delete(input: DeleteInput) {
+    const deleted = await this.editService.deleteOneWithChange(input, Item)
+    if (!deleted) {
+      throw NotFoundErr(`Item with ID "${input.id}" not found`)
+    }
+    return deleted
+  }
+
   async setFields(
     item: Item,
     input: Partial<CreateItemInput & UpdateItemInput>,
@@ -167,11 +177,9 @@ export class ItemService {
     }
     if (input.image_url) {
       if (!item.files) {
-        item.files = {
-          images: [],
-        }
+        item.files = {}
       }
-      item.files.images.push({ url: input.image_url })
+      item.files.thumbnail = input.image_url
     }
     if (!item.source) {
       item.source = {}

@@ -42,20 +42,19 @@
                 class="w-full"
                 placeholder="Search for an icon"
               />
-              <ul class="list">
-                <li v-for="icon in iconResult?.icons || []" :key="icon">
-                  <div
-                    class="flex items-center gap-2 cursor-pointer"
-                    @click="onIconSelect(icon)"
-                  >
-                    <UiImage
-                      :icon="'iconify://' + icon"
-                      class="w-6 h-6"
-                      :alt="icon"
-                    />
-                  </div>
-                </li>
-              </ul>
+              <div class="grid grid-cols-4 my-4">
+                <div
+                  v-for="icon in iconResult?.icons || []"
+                  :key="icon"
+                  @click="onIconSelect(icon)"
+                >
+                  <UiImage
+                    :src="'icon://' + icon"
+                    class="w-12 h-12"
+                    :alt="icon"
+                  />
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </DialogContent>
@@ -93,7 +92,7 @@ import { useVanillaControl } from '../util'
 import { watchDebounced } from '@vueuse/core'
 
 const controlRenderer = defineComponent({
-  name: 'DatetimeControlRenderer',
+  name: 'ImageControlRenderer',
   components: {
     ControlWrapper,
   },
@@ -109,11 +108,16 @@ const controlRenderer = defineComponent({
       iconSearchInput,
       async (newValue) => {
         if (newValue) {
-          // iconResult.value = await $fetch(`/api/search`, {
-          //   method: 'GET',
-          //   query: { search: newValue, limit: 32 },
-          // })
-          iconResult.value = { icons: [] }
+          const icons = await $fetch(
+            // At some point host our local search API
+            //runtimeConfig.public.baseurl + `/api/icons/search`,
+            'https://api.iconify.design/search',
+            {
+              method: 'GET',
+              query: { query: newValue, limit: 32 },
+            },
+          )
+          iconResult.value = icons as { icons: string[] }
         }
       },
       {
@@ -121,7 +125,7 @@ const controlRenderer = defineComponent({
       },
     )
     const onIconSelect = (icon: string) => {
-      input.handleChange(input.control.value.path, `iconify://${icon}`)
+      input.handleChange(input.control.value.path, `icon://${icon}`)
       dialogOpen.value = false
     }
     return useVanillaControl(

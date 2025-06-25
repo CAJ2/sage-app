@@ -1,10 +1,10 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
-import { Change } from '@src/changes/change.model'
+import { Change, DeleteInput } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ModelEditSchema } from '@src/graphql/base.model'
+import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   CreateProcessInput,
   CreateProcessOutput,
@@ -91,5 +91,14 @@ export class ProcessResolver {
       return { process: model, change }
     }
     return { process: model }
+  }
+
+  @Mutation(() => DeleteOutput, { name: 'deleteProcess', nullable: true })
+  @UseGuards(AuthGuard)
+  async deleteProcess(
+    @Args('input') input: DeleteInput,
+  ): Promise<DeleteOutput> {
+    const process = await this.processService.delete(input)
+    return { success: true, id: process.id }
   }
 }
