@@ -1,17 +1,13 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
-import { MikroORM } from '@mikro-orm/postgresql'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
 import { EditsModule } from '@src/changes/edits.module'
-import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import {
   COMPONENT_IDS,
   ITEM_IDS,
-  TestVariantSeeder,
   VARIANT_IDS,
 } from '@src/db/seeds/TestVariantSeeder'
-import { clearDatabase } from '@src/db/test.utils'
 import { ProcessModule } from '@src/process/process.module'
 import { ClsModule } from 'nestjs-cls'
 import {
@@ -27,7 +23,7 @@ describe('VariantService', () => {
   let module: TestingModule
   let service: VariantService
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [
         MikroOrmModule.forRoot(),
@@ -54,11 +50,9 @@ describe('VariantService', () => {
     }).compile()
 
     service = module.get<VariantService>(VariantService)
-  })
+  }, 10000)
 
-  afterAll(async () => {
-    const orm = module.get<MikroORM>(MikroORM)
-    await clearDatabase(orm, 'public')
+  afterEach(async () => {
     await module.close()
   })
 
@@ -67,11 +61,6 @@ describe('VariantService', () => {
   })
 
   describe('Query', () => {
-    beforeAll(async () => {
-      const orm = module.get<MikroORM>(MikroORM)
-      await orm.getSeeder().seed(TestMaterialSeeder, TestVariantSeeder)
-    })
-
     it('should find one variant by ID', async () => {
       const result = await service.findOneByID(VARIANT_IDS[0])
       expect(result).toBeDefined()

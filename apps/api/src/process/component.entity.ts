@@ -146,7 +146,7 @@ export class ComponentsMaterials extends BaseEntity {
   component!: Component
 
   @ManyToOne({ primary: true })
-  material!: Material
+  material!: Material & {}
 
   @Property({ type: 'numeric', precision: 16, scale: 6, default: 0 })
   materialFraction!: number
