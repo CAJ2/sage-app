@@ -35,7 +35,7 @@ const ChangeSelectorQuery = graphql(`
   }
 `)
 const { result, load, refetch } = useLazyQuery(ChangeSelectorQuery, {
-  id: selectedChange.value,
+  id: selectedChange.value || '',
 })
 watch(
   selectedChange,
@@ -48,6 +48,6 @@ watch(
 )
 
 const clearChange = () => {
-  changeStore.setChange('')
+  changeStore.setChange(undefined)
 }
 </script>

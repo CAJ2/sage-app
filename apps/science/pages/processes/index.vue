@@ -14,6 +14,7 @@
       </Button>
     </div>
     <GridModelChanges
+      v-if="selectedChange"
       :query="processesChangesQuery"
       :type="EditModelType.Process"
     >

@@ -93,7 +93,7 @@ const hasNextPage = computed(() => {
 
 const prevPage = async () => {
   await refetch({
-    changeID: selectedChange.value,
+    changeID: selectedChange.value || '',
     first: undefined,
     last: fetchCount,
     after: null,
@@ -102,7 +102,7 @@ const prevPage = async () => {
 }
 const nextPage = async () => {
   await refetch({
-    changeID: selectedChange.value,
+    changeID: selectedChange.value || '',
     first: fetchCount,
     last: undefined,
     before: null,
@@ -121,7 +121,7 @@ const discardEditMutation = graphql(`
 const discardEdit = async (editId: string) => {
   const { mutate } = useMutation(discardEditMutation, {
     variables: {
-      changeID: selectedChange.value,
+      changeID: selectedChange.value || '',
       editID: editId,
     },
   })

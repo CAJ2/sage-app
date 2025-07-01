@@ -14,6 +14,7 @@
       </Button>
     </div>
     <GridModelChanges
+      v-if="selectedChange"
       :query="categoriesChangesQuery"
       :type="EditModelType.Category"
     >
