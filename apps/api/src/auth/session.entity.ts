@@ -9,19 +9,19 @@ export class Session extends IDCreatedUpdated {
   token!: string
 
   @Property()
-  expires_at!: Date
+  expiresAt!: Date
 
   @Property({ nullable: true, default: null })
-  ip_address?: string | null
+  ipAddress?: string | null
 
   @Property({ nullable: true, default: null })
-  user_agent?: string | null
+  userAgent?: string | null
 
   @Property()
-  active_organization_id?: string
+  activeOrganizationId?: string
 
   @Property()
-  impersonated_by?: string
+  impersonatedBy?: string
 
   @ManyToOne(() => User)
   @Index()

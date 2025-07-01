@@ -38,8 +38,8 @@ export class TestVariantSeeder extends Seeder {
         email: 'test@sageleaf.app',
         username: 'testuser',
         name: 'Test User',
-        display_username: 'Test User',
-        email_verified: true,
+        displayUsername: 'Test User',
+        emailVerified: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       })

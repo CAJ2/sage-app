@@ -5,28 +5,28 @@ import { User } from '@src/users/users.entity'
 @Entity({ tableName: 'accounts', schema: 'auth' })
 export class Account extends IDCreatedUpdated {
   @Property()
-  account_id!: string
+  accountId!: string
 
   @Property()
-  provider_id!: string
+  providerId!: string
 
   @Property()
-  access_token?: string
+  accessToken?: string
 
   @Property()
-  refresh_token?: string
+  refreshToken?: string
 
   @Property()
-  access_token_expires_at?: Date
+  accessTokenExpiresAt?: Date
 
   @Property()
-  refresh_token_expires_at?: Date
+  refreshTokenExpiresAt?: Date
 
   @Property()
   scope?: string
 
   @Property()
-  id_token?: string
+  idToken?: string
 
   @Property()
   password?: string

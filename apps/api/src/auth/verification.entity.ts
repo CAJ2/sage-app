@@ -11,5 +11,5 @@ export class Verification extends IDCreatedUpdated {
   value!: string
 
   @Property()
-  expires_at!: Date
+  expiresAt!: Date
 }

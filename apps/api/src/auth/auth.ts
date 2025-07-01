@@ -27,7 +27,6 @@ export const configureAuth = (orm: MikroORM) => {
             modelName: 'User',
             fields: {
               username: 'username',
-              displayUsername: 'display_username',
             },
           },
         },
@@ -38,7 +37,6 @@ export const configureAuth = (orm: MikroORM) => {
             modelName: 'Org',
             fields: {
               logo: 'avatarURL',
-              createdAt: 'created_at',
             },
           },
           member: {
@@ -46,7 +44,6 @@ export const configureAuth = (orm: MikroORM) => {
             fields: {
               userId: 'user',
               organizationId: 'org',
-              createdAt: 'created_at',
             },
           },
           invitation: {
@@ -54,8 +51,6 @@ export const configureAuth = (orm: MikroORM) => {
             fields: {
               inviterId: 'inviter',
               organizationId: 'org',
-              expiresAt: 'expires_at',
-              createdAt: 'created_at',
             },
           },
         },
@@ -67,9 +62,6 @@ export const configureAuth = (orm: MikroORM) => {
       fields: {
         emailVerified: 'email_verified',
         image: 'avatarURL',
-        displayUsername: 'display_username',
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
         organizations: 'orgs',
       },
       additionalFields: {
@@ -84,13 +76,6 @@ export const configureAuth = (orm: MikroORM) => {
       modelName: 'Session',
       fields: {
         userId: 'user',
-        expiresAt: 'expires_at',
-        ipAddress: 'ip_address',
-        userAgent: 'user_agent',
-        activeOrganizationId: 'active_organization_id',
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-        impersonatedBy: 'impersonated_by',
       },
       cookieCache: {
         enabled: true,
@@ -101,15 +86,6 @@ export const configureAuth = (orm: MikroORM) => {
       modelName: 'Account',
       fields: {
         userId: 'user',
-        accountId: 'account_id',
-        providerId: 'provider_id',
-        accessToken: 'access_token',
-        refreshToken: 'refresh_token',
-        accessTokenExpiresAt: 'access_token_expires_at',
-        refreshTokenExpiresAt: 'refresh_token_expires_at',
-        idToken: 'id_token',
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
       },
       accountLinking: {
         enabled: true,
@@ -118,11 +94,6 @@ export const configureAuth = (orm: MikroORM) => {
     },
     verification: {
       modelName: 'Verification',
-      fields: {
-        expiresAt: 'expires_at',
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-      },
     },
     emailAndPassword: {
       enabled: true,

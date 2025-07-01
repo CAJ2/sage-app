@@ -30,19 +30,19 @@ export class User extends IDCreatedUpdated {
   email: string
 
   @Property()
-  email_verified: boolean & Opt = false
+  emailVerified: boolean & Opt = false
 
   @Property({ unique: true, length: 64 })
   username: string
 
   @Property({ length: 64 })
-  display_username!: string
+  displayUsername!: string
 
   @Property()
   name: string
 
   @Property()
-  avatar_url?: string
+  avatarURL?: string
 
   @Property()
   lang?: string
@@ -54,10 +54,10 @@ export class User extends IDCreatedUpdated {
   banned: boolean & Opt = false
 
   @Property()
-  ban_reason?: string
+  banReason?: string
 
   @Property({ type: 'timestamptz', nullable: true })
-  ban_expires?: number
+  banExpires?: number
 
   @Property()
   role?: string
