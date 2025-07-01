@@ -21,7 +21,7 @@ export class StreamService {
     const component = await this.em.findOne(
       Component,
       { id: componentId },
-      { populate: ['primary_material', 'materials'] },
+      { populate: ['primaryMaterial', 'materials'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${componentId}" not found`)
@@ -33,7 +33,7 @@ export class StreamService {
     const regionSearch = region.hierarchyIDs()
 
     const materialSearch: string[] = []
-    materialSearch.push(component.primary_material.id)
+    materialSearch.push(component.primaryMaterial.id)
     for (const material of component.materials.getItems()) {
       materialSearch.push(material.id)
     }
@@ -78,7 +78,7 @@ export class StreamService {
     score.score = validScores > 0 ? totalScore / validScores : undefined
     score.rating =
       validScores > 0 ? StreamScoreRating.GOOD : StreamScoreRating.UNKNOWN
-    score.rating_f = this.i18n.t(`stream.score_rating.${score.rating}`)
+    score.ratingF = this.i18n.t(`stream.scoreRating.${score.rating}`)
     return score
   }
 
@@ -90,7 +90,7 @@ export class StreamService {
     } else {
       score.rating = StreamScoreRating.UNKNOWN
     }
-    score.rating_f = this.i18n.t(`stream.score_rating.${score.rating}`)
+    score.ratingF = this.i18n.t(`stream.scoreRating.${score.rating}`)
     return score
   }
 }

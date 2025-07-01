@@ -19,19 +19,19 @@ type CategoriesPage {
 type Category implements Named {
   ancestors(after: String, before: String, first: Int, last: Int): CategoriesPage!
   children(after: String, before: String, first: Int, last: Int): CategoriesPage!
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
-  desc_short: String
-  desc_short_tr: [TranslatedOutput!]
-  desc_tr: [TranslatedOutput!]
+  descShort: String
+  descShortTr: [TranslatedOutput!]
+  descTr: [TranslatedOutput!]
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
   id: ID!
-  image_url: String
+  imageURL: String
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String!
-  name_tr: [TranslatedOutput!]
+  nameTr: [TranslatedOutput!]
   parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type CategoryEdge {
@@ -40,14 +40,14 @@ type CategoryEdge {
 }
 
 type Change {
-  created_at: DateTime!
+  createdAt: DateTime!
   description: String
   edits(after: String, before: String, first: Int, id: ID, last: Int, type: EditModelType): ChangeEditsPage!
   id: ID!
   sources(after: String, before: String, first: Int, last: Int): SourcesPage!
   status: ChangeStatus!
   title: String
-  updated_at: DateTime!
+  updatedAt: DateTime!
   user: User!
 }
 
@@ -80,21 +80,21 @@ type ChangesPage {
 }
 
 type Component implements Named {
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
   history: [ComponentHistory!]!
 
   """The ID of the model"""
   id: ID!
-  image_url: String
+  imageURL: String
   materials: [ComponentMaterial!]!
   name: String
-  primary_material: Material!
-  recycle(region_id: ID): [ComponentRecycle!]
-  recycle_score(region_id: ID): StreamScore
+  primaryMaterial: Material!
+  recycle(regionID: ID): [ComponentRecycle!]
+  recycleScore(regionID: ID): StreamScore
   region: Region
   tags: [Tag!]!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type ComponentEdge {
@@ -104,19 +104,19 @@ type ComponentEdge {
 
 type ComponentHistory {
   changes: String
-  component_id: String!
+  componentID: String!
   datetime: DateTime!
   original: String
 }
 
 type ComponentMaterial {
   material: Material!
-  material_fraction: Float
+  materialFraction: Float
 }
 
 input ComponentMaterialInput {
   id: ID!
-  material_fraction: Float
+  materialFraction: Float
 }
 
 type ComponentRecycle {
@@ -144,7 +144,7 @@ type Container {
   access: String
   color: String
   image: String
-  image_entry_point: ContainerImageEntryPoint
+  imageEntryPoint: ContainerImageEntryPoint
   shape: ContainerShape
   type: String!
 }
@@ -162,19 +162,19 @@ type ContainerShape {
 }
 
 input CreateCategoryInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_short: String
-  desc_short_tr: [TranslatedInput!]
-  desc_tr: [TranslatedInput!]
-  image_url: String
+  descShort: String
+  descShortTr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
+  imageURL: String
   lang: String
   name: String
-  name_tr: [TranslatedInput!]
-  remove_sources: [ID!]
+  nameTr: [TranslatedInput!]
+  removeSources: [ID!]
 }
 
 type CreateCategoryOutput {
@@ -194,21 +194,23 @@ type CreateChangeOutput {
 }
 
 input CreateComponentInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_tr: [TranslatedInput!]
-  image_url: String
+  descTr: [TranslatedInput!]
+  imageURL: String
   lang: String
   materials: [ComponentMaterialInput!]
   name: String
-  name_tr: [TranslatedInput!]
-  primary_material: ComponentMaterialInput
+  nameTr: [TranslatedInput!]
+  physical: JSONObject
+  primaryMaterial: ComponentMaterialInput
   region: ComponentRegionInput
-  remove_sources: [ID!]
+  removeSources: [ID!]
   tags: [ComponentTagsInput!]
+  visual: JSONObject
 }
 
 type CreateComponentOutput {
@@ -217,18 +219,18 @@ type CreateComponentOutput {
 }
 
 input CreateItemInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   categories: [ItemCategoriesInput!]
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_tr: [TranslatedInput!]
-  image_url: String
+  descTr: [TranslatedInput!]
+  imageURL: String
   lang: String
   name: String
-  name_tr: [TranslatedInput!]
-  remove_sources: [ID!]
+  nameTr: [TranslatedInput!]
+  removeSources: [ID!]
   tags: [ItemTagsInput!]
 }
 
@@ -238,17 +240,17 @@ type CreateItemOutput {
 }
 
 input CreateOrgInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
-  avatar_url: String
+  avatarURL: String
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
   lang: String
   name: String!
-  remove_sources: [ID!]
+  removeSources: [ID!]
   slug: String!
-  website_url: String
+  websiteURL: String
 }
 
 type CreateOrgOutput {
@@ -257,23 +259,23 @@ type CreateOrgOutput {
 }
 
 input CreateProcessInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_tr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
   efficiency: JSONObject
   instructions: JSONObject
   intent: String!
   lang: String
   material: ProcessMaterialInput
   name: String
-  name_tr: [TranslatedInput!]
+  nameTr: [TranslatedInput!]
   org: ProcessOrgInput
   place: ProcessPlaceInput
   region: ProcessRegionInput
-  remove_sources: [ID!]
+  removeSources: [ID!]
   rules: JSONObject
   variant: ProcessVariantInput
 }
@@ -285,7 +287,7 @@ type CreateProcessOutput {
 
 input CreateSourceInput {
   content: JSONObject
-  content_url: String
+  contentURL: String
   location: String
   metadata: JSONObject
   type: SourceType!
@@ -296,10 +298,10 @@ type CreateSourceOutput {
 }
 
 input CreateTagDefinitionInput {
-  bg_color: String
+  bgColor: String
   desc: String
   image: String
-  meta_template: JSONObject
+  metaTemplate: JSONObject
   name: String!
   type: TagType!
 }
@@ -309,23 +311,23 @@ type CreateTagDefinitionOutput {
 }
 
 input CreateVariantInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   code: String
   components: [VariantComponentsInput!]
   desc: String
-  desc_tr: [TranslatedInput!]
-  image_url: String
+  descTr: [TranslatedInput!]
+  imageURL: String
   items: [VariantItemsInput!]
   lang: String
   name: String
-  name_tr: [TranslatedInput!]
+  nameTr: [TranslatedInput!]
   orgs: [VariantOrgsInput!]
   region: VariantRegionsInput
   regions: [VariantRegionsInput!]
-  remove_sources: [ID!]
+  removeSources: [ID!]
   tags: [VariantTagsInput!]
 }
 
@@ -344,12 +346,12 @@ type DeleteChangeOutput {
 }
 
 input DeleteInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   id: ID!
-  remove_sources: [ID!]
+  removeSources: [ID!]
 }
 
 type DeleteOutput {
@@ -362,10 +364,10 @@ type DeleteSourceOutput {
 }
 
 type DirectEdit {
-  entity_name: String!
+  createModel: JSONObject
+  entityName: String!
   id: ID
-  model_create: JSONObject
-  model_update: JSONObject
+  updateModel: JSONObject
 }
 
 type DiscardEditOutput {
@@ -375,11 +377,11 @@ type DiscardEditOutput {
 
 type Edit {
   changes: EditModel
-  changes_create: JSONObject
-  changes_update: JSONObject
-  entity_name: String!
+  createChanges: JSONObject
+  entityName: String!
   id: ID
   original: EditModel
+  updateChanges: JSONObject
 }
 
 type EditEdge {
@@ -403,15 +405,15 @@ enum EditModelType {
 
 type Item implements Named {
   categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
 
   """The ID of the model"""
   id: ID!
-  image_url: String
+  imageURL: String
   name: String
   tags(after: String, before: String, first: Int, last: Int): TagPage!
-  updated_at: DateTime!
+  updatedAt: DateTime!
   variants(after: String, before: String, first: Int, last: Int): VariantsPage!
 }
 
@@ -449,17 +451,17 @@ type Material implements Named {
   ancestors(after: String, before: String, first: Int, last: Int): MaterialsPage!
   children(after: String, before: String, first: Int, last: Int): MaterialsPage!
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
   descendants(after: String, before: String, first: Int, last: Int): MaterialsPage!
   id: ID!
   name: String
   parents(after: String, before: String, first: Int, last: Int): MaterialsPage!
-  primary_components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  primaryComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
   processes(after: String, before: String, first: Int, last: Int): ProcessPage!
   shape: String
   technical: Boolean!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type MaterialEdge {
@@ -506,7 +508,7 @@ type Mutation {
   deleteProcess(input: DeleteInput!): DeleteOutput
   deleteSource(id: ID!): DeleteSourceOutput
   deleteVariant(input: DeleteInput!): DeleteOutput
-  discardEdit(change_id: ID!, edit_id: ID!): DiscardEditOutput
+  discardEdit(changeID: ID!, editID: ID!): DiscardEditOutput
   markSourceProcessed(id: ID!): MarkSourceProcessedOutput
   mergeChange(id: ID!): MergeChangeOutput
   updateCategory(input: UpdateCategoryInput!): UpdateCategoryOutput
@@ -532,17 +534,17 @@ interface Named {
 }
 
 type Org implements Named {
-  avatar_url: String
-  created_at: DateTime!
+  avatarURL: String
+  createdAt: DateTime!
   desc: String
 
   """The ID of the model"""
   id: ID!
   name: String!
   slug: String!
-  updated_at: DateTime!
+  updatedAt: DateTime!
   users(after: String, before: String, first: Int, last: Int): UserPage!
-  website_url: String
+  websiteURL: String
 }
 
 type OrgEdge {
@@ -559,21 +561,21 @@ type PageInfo {
 
 type Place implements Named {
   address: PlaceAddress
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
   id: ID!
   location: PlaceLocation
   name: String
   org: Org
   tags: TagPage!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type PlaceAddress {
   city: String
   country: String
   housenumber: String
-  postal_code: String
+  postalCode: String
   region: String
   street: String
 }
@@ -596,7 +598,7 @@ type PlacesPage {
 }
 
 type Process implements Named {
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
   efficiency: ProcessEfficiency
   history: [ProcessHistory!]!
@@ -609,7 +611,7 @@ type Process implements Named {
   org: Org
   place: Place
   region: Region
-  updated_at: DateTime!
+  updatedAt: DateTime!
   variant: Variant
 }
 
@@ -621,7 +623,7 @@ type ProcessEdge {
 type ProcessEfficiency {
   efficiency: Float
   equivalency: Float
-  value_ratio: Float
+  valueRatio: Float
 }
 
 type ProcessHistory {
@@ -665,11 +667,11 @@ type Query {
   categoryRoot: Category!
   categorySchema: ModelEditSchema
   change(id: ID!): Change
-  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, user_id: ID): ChangesPage!
-  component(id: ID!, with_change: ID): Component
+  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesPage!
+  component(id: ID!, withChange: ID): Component
   componentSchema: ModelEditSchema
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
-  directEdit(entity_name: String, id: ID): DirectEdit
+  directEdit(entityName: String, id: ID): DirectEdit
   item(id: ID!): Item
   itemSchema: ModelEditSchema
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -684,8 +686,8 @@ type Query {
   processes(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
   region(id: ID!): Region
   regions(after: String, before: String, first: Int, last: Int): RegionsPage!
-  search(lat_long: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
-  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, lat_long: [Float!]!): RegionsPage!
+  search(latlong: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
+  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latlong: [Float!]!): RegionsPage!
   source(id: ID!): Source
   sources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
   tag(id: ID!): Tag
@@ -706,12 +708,12 @@ type RecyclingStream {
 
 type Region {
   bbox: [Float!]
-  created_at: DateTime!
+  createdAt: DateTime!
   id: ID!
-  min_zoom: Float
+  minZoom: Float
   name: String
   placetype: String!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type RegionEdge {
@@ -755,14 +757,14 @@ enum SearchType {
 type Source {
   changes: ChangesPage!
   content: JSONObject
-  content_url: String
-  created_at: DateTime!
+  contentURL: String
+  createdAt: DateTime!
   id: ID!
   location: String
   metadata: JSONObject
-  processed_at: DateTime
+  processedAt: DateTime
   type: SourceType!
-  updated_at: DateTime!
+  updatedAt: DateTime!
   user: User!
 }
 
@@ -804,13 +806,13 @@ type StreamContext {
 }
 
 type StreamScore {
-  data_quality: StreamScoreRating
-  data_quality_f: String
-  max_score: Float
-  min_score: Float
+  dataQuality: StreamScoreRating
+  dataQualityF: String
+  maxScore: Float
+  minScore: Float
   name: String
   rating: StreamScoreRating
-  rating_f: String
+  ratingF: String
   score: Float
 }
 
@@ -825,32 +827,32 @@ enum StreamScoreRating {
 }
 
 type Tag implements Named {
-  bg_color: String
-  created_at: DateTime!
+  bgColor: String
+  createdAt: DateTime!
   desc: String
 
   """The ID of the model"""
   id: ID!
   image: String
   meta: JSONObject
-  meta_template: JSONObject
+  metaTemplate: JSONObject
   name: String!
   type: TagType!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type TagDefinition implements Named {
-  bg_color: String
-  created_at: DateTime!
+  bgColor: String
+  createdAt: DateTime!
   desc: String
 
   """The ID of the model"""
   id: ID!
   image: String
-  meta_template: JSONObject
+  metaTemplate: JSONObject
   name: String!
   type: TagType!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type TagDefinitionEdge {
@@ -893,20 +895,20 @@ type TranslatedOutput {
 }
 
 input UpdateCategoryInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_short: String
-  desc_short_tr: [TranslatedInput!]
-  desc_tr: [TranslatedInput!]
+  descShort: String
+  descShortTr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
   id: ID!
-  image_url: String
+  imageURL: String
   lang: String
   name: String
-  name_tr: [TranslatedInput!]
-  remove_sources: [ID!]
+  nameTr: [TranslatedInput!]
+  removeSources: [ID!]
 }
 
 type UpdateCategoryOutput {
@@ -927,24 +929,26 @@ type UpdateChangeOutput {
 }
 
 input UpdateComponentInput {
-  add_sources: [SourceInput!]
-  add_tags: [ComponentTagsInput!]
+  addSources: [SourceInput!]
+  addTags: [ComponentTagsInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_tr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
   id: ID!
-  image_url: String
+  imageURL: String
   lang: String
   materials: [ComponentMaterialInput!]
   name: String
-  name_tr: [TranslatedInput!]
-  primary_material: ComponentMaterialInput
+  nameTr: [TranslatedInput!]
+  physical: JSONObject
+  primaryMaterial: ComponentMaterialInput
   region: ComponentRegionInput
-  remove_sources: [ID!]
-  remove_tags: [ID!]
+  removeSources: [ID!]
+  removeTags: [ID!]
   tags: [ComponentTagsInput!]
+  visual: JSONObject
 }
 
 type UpdateComponentOutput {
@@ -953,23 +957,23 @@ type UpdateComponentOutput {
 }
 
 input UpdateItemInput {
-  add_categories: [ItemCategoriesInput!]
-  add_sources: [SourceInput!]
-  add_tags: [ItemTagsInput!]
+  addCategories: [ItemCategoriesInput!]
+  addSources: [SourceInput!]
+  addTags: [ItemTagsInput!]
   apply: Boolean
   categories: [ItemCategoriesInput!]
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_tr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
   id: ID!
-  image_url: String
+  imageURL: String
   lang: String
   name: String
-  name_tr: [TranslatedInput!]
-  remove_categories: [ID!]
-  remove_sources: [ID!]
-  remove_tags: [ID!]
+  nameTr: [TranslatedInput!]
+  removeCategories: [ID!]
+  removeSources: [ID!]
+  removeTags: [ID!]
   tags: [ItemTagsInput!]
 }
 
@@ -979,18 +983,18 @@ type UpdateItemOutput {
 }
 
 input UpdateOrgInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
-  avatar_url: String
+  avatarURL: String
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
   id: String!
   lang: String
   name: String
-  remove_sources: [ID!]
+  removeSources: [ID!]
   slug: String
-  website_url: String
+  websiteURL: String
 }
 
 type UpdateOrgOutput {
@@ -999,12 +1003,12 @@ type UpdateOrgOutput {
 }
 
 input UpdateProcessInput {
-  add_sources: [SourceInput!]
+  addSources: [SourceInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   desc: String
-  desc_tr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
   efficiency: JSONObject
   id: ID!
   instructions: JSONObject
@@ -1012,11 +1016,11 @@ input UpdateProcessInput {
   lang: String
   material: ProcessMaterialInput
   name: String
-  name_tr: [TranslatedInput!]
+  nameTr: [TranslatedInput!]
   org: ProcessOrgInput
   place: ProcessPlaceInput
   region: ProcessRegionInput
-  remove_sources: [ID!]
+  removeSources: [ID!]
   rules: JSONObject
   variant: ProcessVariantInput
 }
@@ -1028,7 +1032,7 @@ type UpdateProcessOutput {
 
 input UpdateSourceInput {
   content: JSONObject
-  content_url: String
+  contentURL: String
   id: ID!
   location: String
   metadata: JSONObject
@@ -1040,11 +1044,11 @@ type UpdateSourceOutput {
 }
 
 input UpdateTagDefinitionInput {
-  bg_color: String
+  bgColor: String
   desc: String
   id: String!
   image: String
-  meta_template: JSONObject
+  metaTemplate: JSONObject
   name: String
   type: TagType
 }
@@ -1054,32 +1058,33 @@ type UpdateTagDefinitionOutput {
 }
 
 input UpdateVariantInput {
-  add_components: [VariantComponentsInput!]
-  add_items: [VariantItemsInput!]
-  add_orgs: [VariantOrgsInput!]
-  add_regions: [VariantRegionsInput!]
-  add_sources: [SourceInput!]
-  add_tags: [VariantTagsInput!]
+  addComponents: [VariantComponentsInput!]
+  addItems: [VariantItemsInput!]
+  addOrgs: [VariantOrgsInput!]
+  addRegions: [VariantRegionsInput!]
+  addSources: [SourceInput!]
+  addTags: [VariantTagsInput!]
   apply: Boolean
   change: CreateChangeInput
-  change_id: ID
+  changeID: ID
   code: String
   components: [VariantComponentsInput!]
   desc: String
-  desc_tr: [TranslatedInput!]
+  descTr: [TranslatedInput!]
   id: ID!
-  image_url: String
+  imageURL: String
+  items: [VariantItemsInput!]
   lang: String
   name: String
-  name_tr: [TranslatedInput!]
+  nameTr: [TranslatedInput!]
   orgs: [VariantOrgsInput!]
   region: VariantRegionsInput
-  remove_components: [ID!]
-  remove_items: [ID!]
-  remove_orgs: [ID!]
-  remove_regions: [ID!]
-  remove_sources: [ID!]
-  remove_tags: [ID!]
+  removeComponents: [ID!]
+  removeItems: [ID!]
+  removeOrgs: [ID!]
+  removeRegions: [ID!]
+  removeSources: [ID!]
+  removeTags: [ID!]
   tags: [VariantTagsInput!]
 }
 
@@ -1089,16 +1094,16 @@ type UpdateVariantOutput {
 }
 
 type User {
-  avatar_url: String
-  created_at: DateTime!
+  avatarURL: String
+  createdAt: DateTime!
   email: String!
-  email_verified: Boolean!
+  emailVerified: Boolean!
   id: ID!
   lang: String
   name: String
   orgs(after: String, before: String, first: Int, last: Int): UserOrgsPage!
   profile: UserProfile
-  updated_at: DateTime!
+  updatedAt: DateTime!
   username: String!
 }
 
@@ -1137,18 +1142,18 @@ type UserProfile {
 
 type Variant implements Named {
   components(after: String, before: String, first: Int, last: Int): VariantComponentsPage!
-  created_at: DateTime!
+  createdAt: DateTime!
   desc: String
 
   """The ID of the model"""
   id: ID!
-  image_url: String
+  imageURL: String
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String
   orgs(after: String, before: String, first: Int, last: Int): VariantOrgsPage!
-  recycle_score(region_id: ID): StreamScore
+  recycleScore(regionID: ID): StreamScore
   tags(after: String, before: String, first: Int, last: Int): TagPage!
-  updated_at: DateTime!
+  updatedAt: DateTime!
 }
 
 type VariantComponent {

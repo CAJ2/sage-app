@@ -29,7 +29,7 @@ export class ProcessEfficiency {
   equivalency?: number
 
   @Field(() => Number, { nullable: true })
-  value_ratio?: number
+  valueRatio?: number
 }
 
 @ObjectType({
@@ -140,13 +140,13 @@ export class CreateProcessInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => JSONObjectResolver, { nullable: true })
   instructions?: Record<string, any>
@@ -187,13 +187,13 @@ export class UpdateProcessInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => JSONObjectResolver, { nullable: true })
   instructions?: Record<string, any>

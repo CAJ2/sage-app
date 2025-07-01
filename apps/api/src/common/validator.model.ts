@@ -1,8 +1,10 @@
-import { ValidatorConstraint } from 'class-validator'
+import { registerDecorator, ValidatorConstraint } from 'class-validator'
 import _ from 'lodash'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import type {
   ValidationArguments,
+  ValidationOptions,
   ValidatorConstraintInterface,
 } from 'class-validator'
 
@@ -37,5 +39,27 @@ export class IsDateTime implements ValidatorConstraintInterface {
 
   defaultMessage(args: ValidationArguments) {
     return 'Invalid datetime'
+  }
+}
+
+export function ZodValid(
+  schema: z.ZodType,
+  validationOptions?: ValidationOptions,
+) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'ZodValid',
+      target: object.constructor,
+      propertyName,
+      constraints: [schema],
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          const [zodSchema] = args.constraints
+          const result = zodSchema.safeParse(value)
+          return result.success
+        },
+      },
+    })
   }
 }

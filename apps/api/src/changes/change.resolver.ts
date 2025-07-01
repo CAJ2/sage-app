@@ -67,7 +67,7 @@ export class ChangeResolver {
   async directEdit(@Args() args: DirectEditArgs) {
     const directEdit = await this.changeService.directEdit(
       args.id,
-      args.entity_name,
+      args.entityName,
     )
     if (!directEdit) {
       throw NotFoundErr('Direct edit not found')
@@ -129,8 +129,8 @@ export class ChangeResolver {
   @Mutation(() => DiscardEditOutput, { nullable: true })
   @UseGuards(AuthGuard)
   async discardEdit(
-    @Args('change_id', { type: () => ID }) changeID: string,
-    @Args('edit_id', { type: () => ID }) editID: string,
+    @Args('changeID', { type: () => ID }) changeID: string,
+    @Args('editID', { type: () => ID }) editID: string,
   ): Promise<DiscardEditOutput> {
     const result = await this.changeService.discardEdit(changeID, editID)
     if (!result) {

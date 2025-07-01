@@ -56,8 +56,8 @@ export class TagService {
       throw new Error(`Tag with ID "${input.id}" not found`)
     }
     if (input.meta) {
-      if (tag.meta_template && tag.meta_template.schema) {
-        const validator = ajv.compile(tag.meta_template.schema)
+      if (tag.metaTemplate && tag.metaTemplate.schema) {
+        const validator = ajv.compile(tag.metaTemplate.schema)
         const valid = validator(input.meta)
         if (!valid) {
           throw new Error(

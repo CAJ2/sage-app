@@ -32,16 +32,16 @@ export class Org extends IDCreatedUpdated implements Searchable {
   desc: TranslatedField = defaultTranslatedField()
 
   @Property()
-  avatar_url?: string
+  avatarURL?: string
 
   @Property()
-  website_url?: string
+  websiteURL?: string
 
   @Property()
   metadata?: string
 
-  @Property({ type: 'json' })
-  name_translations: TranslatedField = defaultTranslatedField()
+  @Property({ fieldName: 'name_translations', type: 'json' })
+  nameTr: TranslatedField = defaultTranslatedField()
 
   @ManyToMany(() => User, (user) => user.orgs)
   users = new Collection<User>(this)
@@ -67,8 +67,8 @@ export class Org extends IDCreatedUpdated implements Searchable {
       id: this.id,
       name: this.name,
       slug: this.slug,
-      updated_at: this.updated_at,
-      avatar_url: this.avatar_url,
+      updatedAt: this.updatedAt,
+      avatarURL: this.avatarURL,
       ...flattenTr('desc', this.desc),
     }
   }
@@ -114,5 +114,5 @@ export class Invitation extends IDCreatedUpdated {
   status!: string
 
   @Property()
-  expires_at!: Date
+  expiresAt!: Date
 }

@@ -28,7 +28,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
   type!: SourceType
 
   @Field(() => LuxonDateTimeResolver, { nullable: true })
-  processed_at?: DateTime
+  processedAt?: DateTime
 
   @Field(() => String, { nullable: true })
   location?: string
@@ -37,7 +37,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
   content?: Record<string, any>
 
   @Field(() => String, { nullable: true })
-  content_url?: string
+  contentURL?: string
 
   @Field(() => User)
   user!: User & {}
@@ -77,7 +77,7 @@ export class CreateSourceInput {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsUrl({ protocols: ['https'] })
-  content_url?: string
+  contentURL?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
   metadata?: Record<string, any>
@@ -106,7 +106,7 @@ export class UpdateSourceInput {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsUrl({ protocols: ['https'] })
-  content_url?: string
+  contentURL?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()

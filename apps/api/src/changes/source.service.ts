@@ -49,7 +49,7 @@ export class SourceService {
 
   async markProcessed(id: string) {
     const source = await this.findOneByID(id)
-    source.processed_at = new Date()
+    source.processedAt = new Date()
     await this.em.persistAndFlush(source)
     return source
   }
@@ -69,8 +69,8 @@ export class SourceService {
     if (input.content) {
       source.content = input.content
     }
-    if (input.content_url) {
-      source.content_url = input.content_url
+    if (input.contentURL) {
+      source.contentURL = input.contentURL
     }
     if (input.metadata) {
       source.metadata = input.metadata

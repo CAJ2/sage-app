@@ -38,10 +38,10 @@ export class TagDefinition
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  meta_template?: Record<string, any>
+  metaTemplate?: Record<string, any>
 
   @Field(() => String, { nullable: true })
-  bg_color?: string
+  bgColor?: string
 
   @Field(() => String, { nullable: true })
   image?: string
@@ -84,10 +84,10 @@ export class CreateTagDefinitionInput {
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  meta_template?: Record<string, any>
+  metaTemplate?: Record<string, any>
 
   @Field(() => String, { nullable: true })
-  bg_color?: string
+  bgColor?: string
 
   @Field(() => String, { nullable: true })
   image?: string
@@ -108,10 +108,10 @@ export class UpdateTagDefinitionInput {
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  meta_template?: Record<string, any>
+  metaTemplate?: Record<string, any>
 
   @Field(() => String, { nullable: true })
-  bg_color?: string
+  bgColor?: string
 
   @Field(() => String, { nullable: true })
   image?: string

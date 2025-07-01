@@ -54,7 +54,7 @@ const processEditQuery = graphql(`
       status
       edits(id: $id) {
         nodes {
-          changes_update
+          updateChanges
         }
       }
     }
@@ -87,7 +87,7 @@ if (processID !== 'new') {
   ) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.change.edits.nodes[0].changes_update,
+      data.value.change.edits.nodes[0].updateChanges,
     ) as UpdateProcessInput
   }
   if (data?.value?.change?.status) {
@@ -116,7 +116,7 @@ const processCreateMutation = graphql(`
 const processCreate = useMutation(processCreateMutation, {
   variables: {
     input: {
-      change_id: changeID,
+      changeID: changeID,
     } as CreateProcessInput,
   },
 })
@@ -132,7 +132,7 @@ const processUpdateMutation = graphql(`
 const processUpdate = useMutation(processUpdateMutation, {
   variables: {
     input: {
-      change_id: changeID,
+      changeID: changeID,
       id: processID,
       ...updateData.value,
     },
@@ -156,7 +156,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       await processCreate
         .mutate({
           input: {
-            change_id: changeID,
+            changeID: changeID,
             ...createData.value,
           } as CreateProcessInput,
         })
@@ -181,7 +181,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       await processUpdate
         .mutate({
           input: {
-            change_id: changeID,
+            changeID: changeID,
             id: processID,
             ...updateData.value,
           },

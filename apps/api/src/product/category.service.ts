@@ -130,7 +130,7 @@ export class CategoryService {
   async create(input: CreateCategoryInput, userID: string) {
     const category = new Category()
     const change = await this.editService.findOneOrCreate(
-      input.change_id,
+      input.changeID,
       input.change,
       userID,
     )
@@ -152,7 +152,7 @@ export class CategoryService {
     if (!category) {
       throw new Error(`Category with ID "${input.id}" not found`)
     }
-    if (!input.useChange()) {
+    if (!change) {
       await this.setFields(category, input)
       await this.em.persistAndFlush(category)
       return {
@@ -187,31 +187,31 @@ export class CategoryService {
     if (input.name) {
       category.name = addTrReq(category.name, input.lang, input.name)
     }
-    if (input.name_tr) {
-      category.name = addTrReq(category.name, input.lang, input.name_tr)
+    if (input.nameTr) {
+      category.name = addTrReq(category.name, input.lang, input.nameTr)
     }
-    if (input.desc_short) {
-      category.desc_short = addTr(
-        category.desc_short,
+    if (input.descShort) {
+      category.descShort = addTr(
+        category.descShort,
         input.lang,
-        input.desc_short,
+        input.descShort,
       )
     }
-    if (input.desc_short_tr) {
-      category.desc_short = addTr(
-        category.desc_short,
+    if (input.descShortTr) {
+      category.descShort = addTr(
+        category.descShort,
         input.lang,
-        input.desc_short_tr,
+        input.descShortTr,
       )
     }
     if (input.desc) {
       category.desc = addTr(category.desc, input.lang, input.desc)
     }
-    if (input.desc_tr) {
-      category.desc = addTr(category.desc, input.lang, input.desc_tr)
+    if (input.descTr) {
+      category.desc = addTr(category.desc, input.lang, input.descTr)
     }
-    if (input.image_url) {
-      category.image_url = input.image_url
+    if (input.imageURL) {
+      category.imageURL = input.imageURL
     }
   }
 }

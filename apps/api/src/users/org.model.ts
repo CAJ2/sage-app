@@ -26,10 +26,10 @@ export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
   desc?: string
 
   @Field(() => String, { nullable: true })
-  avatar_url?: string
+  avatarURL?: string
 
   @Field(() => String, { nullable: true })
-  website_url?: string
+  websiteURL?: string
 
   @Field(() => UserPage)
   users!: UserPage & {}
@@ -72,10 +72,10 @@ export class CreateOrgInput extends ChangeInputWithLang() {
   desc?: string
 
   @Field(() => String, { nullable: true })
-  avatar_url?: string
+  avatarURL?: string
 
   @Field(() => String, { nullable: true })
-  website_url?: string
+  websiteURL?: string
 }
 
 @InputType()
@@ -94,10 +94,10 @@ export class UpdateOrgInput extends ChangeInputWithLang() {
   desc?: string
 
   @Field(() => String, { nullable: true })
-  avatar_url?: string
+  avatarURL?: string
 
   @Field(() => String, { nullable: true })
-  website_url?: string
+  websiteURL?: string
 }
 
 @ObjectType()

@@ -15,7 +15,7 @@
           >
             <div class="flex flex-col gap-1">
               <span class="text-xs opacity-70">{{
-                new Date(change.updated_at).toLocaleDateString() +
+                new Date(change.updatedAt).toLocaleDateString() +
                 ' - ' +
                 (change.edits ? change.edits.totalCount + ' edits' : 'No edits')
               }}</span>
@@ -58,7 +58,7 @@ const { data } = defineProps<{
     nodes?:
       | (Pick<
           Change,
-          'id' | 'status' | 'title' | 'description' | 'updated_at'
+          'id' | 'status' | 'title' | 'description' | 'updatedAt'
         > & {
           edits?: {
             totalCount: number

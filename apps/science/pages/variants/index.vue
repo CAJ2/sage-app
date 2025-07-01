@@ -91,14 +91,14 @@ const variantsQuery = graphql(`
 
 const variantsChangesQuery = graphql(`
   query VariantsChangesQuery(
-    $change_id: ID!
+    $changeID: ID!
     $type: EditModelType
     $first: Int
     $last: Int
     $before: String
     $after: String
   ) {
-    change(id: $change_id) {
+    change(id: $changeID) {
       edits(
         type: $type
         first: $first

@@ -6,22 +6,22 @@ import { Path } from "nestjs-i18n";
 /* prettier-ignore */
 export type I18nTranslations = {
     "schemas": {
-        "translated_input": {
-            "lang_title": string;
-            "text_title": string;
-            "auto_title": string;
+        "translatedInput": {
+            "langTitle": string;
+            "textTitle": string;
+            "autoTitle": string;
         };
         "components": {
-            "name_tr": {
+            "nameTr": {
                 "title": string;
             };
-            "desc_tr": {
+            "descTr": {
                 "title": string;
             };
-            "image_url": {
+            "imageURL": {
                 "title": string;
             };
-            "primary_material": {
+            "primaryMaterial": {
                 "title": string;
             };
             "materials": {
@@ -31,7 +31,7 @@ export type I18nTranslations = {
         };
     };
     "stream": {
-        "score_rating": {
+        "scoreRating": {
             "POOR": string;
             "FAIR": string;
             "GOOD": string;

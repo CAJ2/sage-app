@@ -28,19 +28,19 @@ export class IDCreatedUpdated<T> extends BaseModel<T> {
   id!: string
 
   @Field(() => LuxonDateTimeResolver)
-  created_at!: DateTime
+  createdAt!: DateTime
 
   @Field(() => LuxonDateTimeResolver)
-  updated_at!: DateTime
+  updatedAt!: DateTime
 }
 
 @ObjectType()
 export class CreatedUpdated<T> extends BaseModel<T> {
   @Field(() => LuxonDateTimeResolver)
-  created_at!: DateTime
+  createdAt!: DateTime
 
   @Field(() => LuxonDateTimeResolver)
-  updated_at!: DateTime
+  updatedAt!: DateTime
 }
 
 @ObjectType()

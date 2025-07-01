@@ -80,7 +80,7 @@ const regionQuery = graphql(`
       name
       placetype
       bbox
-      min_zoom
+      minZoom
     }
   }
 `)
@@ -98,7 +98,7 @@ maplibregl.addProtocol('pmtiles', protocol.tile)
 
 const placeSearch = graphql(`
   query PlaceSearch($search: String!, $latLong: [Float!]) {
-    search(query: $search, types: [PLACE], lat_long: $latLong, limit: 100) {
+    search(query: $search, types: [PLACE], latlong: $latLong, limit: 100) {
       nodes {
         ... on Place {
           id
@@ -211,7 +211,7 @@ onMounted(() => {
     container: mapContainer.value,
     style: 'map-style-light.json',
     center,
-    zoom: regionData.value?.region?.min_zoom || 10,
+    zoom: regionData.value?.region?.minZoom || 10,
     attributionControl: false,
   })
   map.value.addControl(new NavigationControl(), 'top-right')

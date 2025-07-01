@@ -50,7 +50,7 @@ export class ProcessService {
           'material',
           'variant',
           'org',
-          'process_sources',
+          'processSources',
           'region',
           'place',
         ],
@@ -69,7 +69,7 @@ export class ProcessService {
       }
     }
     const change = await this.editService.findOneOrCreate(
-      input.change_id,
+      input.changeID,
       input.change,
       userID,
     )
@@ -91,7 +91,7 @@ export class ProcessService {
     if (!process) {
       throw new Error(`Process with ID "${input.id}" not found`)
     }
-    if (!input.useChange()) {
+    if (!change) {
       await this.setFields(process, input)
       await this.em.persistAndFlush(process)
       return {
@@ -129,14 +129,14 @@ export class ProcessService {
     if (input.name) {
       process.name = addTrReq(process.name, input.lang, input.name)
     }
-    if (input.name_tr) {
-      process.name = addTrReq(process.name, input.lang, input.name_tr)
+    if (input.nameTr) {
+      process.name = addTrReq(process.name, input.lang, input.nameTr)
     }
     if (input.desc) {
       process.desc = addTr(process.desc, input.lang, input.desc)
     }
-    if (input.desc_tr) {
-      process.desc = addTr(process.desc, input.lang, input.desc_tr)
+    if (input.descTr) {
+      process.desc = addTr(process.desc, input.lang, input.descTr)
     }
     if (input.instructions) {
       process.instructions = input.instructions

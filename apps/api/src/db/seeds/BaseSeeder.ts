@@ -1,6 +1,7 @@
 import { Seeder } from '@mikro-orm/seeder'
 import { Material, MATERIAL_ROOT } from '@src/process/material.entity'
 import { Category, CATEGORY_ROOT } from '@src/product/category.entity'
+import { Org } from '@src/users/org.entity'
 import type { EntityManager } from '@mikro-orm/core'
 
 export class BaseSeeder extends Seeder {
@@ -15,8 +16,8 @@ export class BaseSeeder extends Seeder {
         name: {
           xx: CATEGORY_ROOT,
         },
-        created_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
     }
 
@@ -32,8 +33,24 @@ export class BaseSeeder extends Seeder {
         },
         source: {},
         technical: false,
-        created_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+    }
+
+    const org = await em.findOne(Org, {
+      slug: 'sage',
+    })
+    if (!org) {
+      em.create(Org, {
+        name: 'Sage',
+        slug: 'sage',
+        desc: {
+          en: 'Sage is a circular economy database',
+        },
+        metadata: '{}',
+        updatedAt: new Date(),
+        createdAt: new Date(),
       })
     }
   }

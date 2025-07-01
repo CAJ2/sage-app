@@ -64,12 +64,12 @@ export class VariantSchemaService {
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema,
+      nameTr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema,
-      image_url: ImageOrIconSchema,
+      descTr: TrArraySchema,
+      imageURL: ImageOrIconSchema,
       items: z.array(VariantItemsInputSchema).optional(),
-      region_id: RegionIDSchema.optional(),
+      regionID: RegionIDSchema.optional(),
       regions: z.array(VariantRegionsInputSchema).optional(),
       code: z.string().max(1024).optional(),
       orgs: z.array(VariantOrgsInputSchema).optional(),
@@ -84,17 +84,17 @@ export class VariantSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
@@ -103,7 +103,7 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/region_id',
+          scope: '#/properties/regionID',
         },
         {
           type: 'Control',
@@ -131,27 +131,27 @@ export class VariantSchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: VariantIDSchema,
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema,
+      nameTr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema,
-      image_url: ImageOrIconSchema,
+      descTr: TrArraySchema,
+      imageURL: ImageOrIconSchema,
       items: z.array(VariantItemsInputSchema).optional(),
-      add_items: z.array(VariantItemsInputSchema).optional(),
-      remove_items: z.array(ItemIDSchema).optional(),
-      region_id: RegionIDSchema.optional(),
+      addItems: z.array(VariantItemsInputSchema).optional(),
+      removeItems: z.array(ItemIDSchema).optional(),
+      regionID: RegionIDSchema.optional(),
       regions: z.array(VariantRegionsInputSchema).optional(),
-      add_regions: z.array(VariantRegionsInputSchema).optional(),
-      remove_regions: z.array(RegionIDSchema).optional(),
+      addRegions: z.array(VariantRegionsInputSchema).optional(),
+      removeRegions: z.array(RegionIDSchema).optional(),
       code: z.string().max(1024).optional(),
       orgs: z.array(VariantOrgsInputSchema).optional(),
-      add_orgs: z.array(VariantOrgsInputSchema).optional(),
-      remove_orgs: z.array(OrgIDSchema).optional(),
+      addOrgs: z.array(VariantOrgsInputSchema).optional(),
+      removeOrgs: z.array(OrgIDSchema).optional(),
       tags: z.array(VariantTagsInputSchema).optional(),
-      add_tags: z.array(VariantTagsInputSchema).optional(),
-      remove_tags: z.array(TagDefinitionIDSchema).optional(),
+      addTags: z.array(VariantTagsInputSchema).optional(),
+      removeTags: z.array(TagDefinitionIDSchema).optional(),
       components: z.array(VariantComponentsInputSchema).optional(),
-      add_components: z.array(VariantComponentsInputSchema).optional(),
-      remove_components: z.array(ComponentIDSchema).optional(),
+      addComponents: z.array(VariantComponentsInputSchema).optional(),
+      removeComponents: z.array(ComponentIDSchema).optional(),
     })
 
     this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
@@ -161,17 +161,17 @@ export class VariantSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
@@ -180,7 +180,7 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/region_id',
+          scope: '#/properties/regionID',
         },
         {
           type: 'Control',
@@ -218,7 +218,7 @@ export class VariantSchemaService {
     const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
     if (data) {
       data.items = this.baseSchema.collectionToInput(
-        data.add_items || [],
+        data.addItems || [],
         'variant',
         'item',
       )

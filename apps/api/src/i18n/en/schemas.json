@@ -1,20 +1,20 @@
 {
-  "translated_input": {
-    "lang_title": "Language",
-    "text_title": "Translated Text",
-    "auto_title": "Is Auto-Translated?"
+  "translatedInput": {
+    "langTitle": "Language",
+    "textTitle": "Translated Text",
+    "autoTitle": "Is Auto-Translated?"
   },
   "components": {
-    "name_tr": {
+    "nameTr": {
       "title": "Name"
     },
-    "desc_tr": {
+    "descTr": {
       "title": "Description"
     },
-    "image_url": {
+    "imageURL": {
       "title": "Image Source"
     },
-    "primary_material": {
+    "primaryMaterial": {
       "title": "Primary Material"
     },
     "materials": {

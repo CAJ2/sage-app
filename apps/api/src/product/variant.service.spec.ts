@@ -1,8 +1,17 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
+import { MikroORM } from '@mikro-orm/postgresql'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
 import { EditsModule } from '@src/changes/edits.module'
+import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import {
+  COMPONENT_IDS,
+  ITEM_IDS,
+  TestVariantSeeder,
+  VARIANT_IDS,
+} from '@src/db/seeds/TestVariantSeeder'
+import { clearDatabase } from '@src/db/test.utils'
 import { ProcessModule } from '@src/process/process.module'
 import { ClsModule } from 'nestjs-cls'
 import {
@@ -18,7 +27,7 @@ describe('VariantService', () => {
   let module: TestingModule
   let service: VariantService
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
         MikroOrmModule.forRoot(),
@@ -26,7 +35,6 @@ describe('VariantService', () => {
           fallbackLanguage: 'en',
           loaderOptions: {
             path: path.join(__dirname, '../i18n/'),
-            watch: true,
           },
           resolvers: [
             new QueryResolver(['lang', 'locale']),
@@ -48,11 +56,59 @@ describe('VariantService', () => {
     service = module.get<VariantService>(VariantService)
   })
 
-  afterEach(async () => {
+  afterAll(async () => {
+    const orm = module.get<MikroORM>(MikroORM)
+    await clearDatabase(orm, 'public')
     await module.close()
   })
 
   it('should be defined', () => {
     expect(service).toBeDefined()
+  })
+
+  describe('Query', () => {
+    beforeAll(async () => {
+      const orm = module.get<MikroORM>(MikroORM)
+      await orm.getSeeder().seed(TestMaterialSeeder, TestVariantSeeder)
+    })
+
+    it('should find one variant by ID', async () => {
+      const result = await service.findOneByID(VARIANT_IDS[0])
+      expect(result).toBeDefined()
+      expect(result?.id).toBe(VARIANT_IDS[0])
+    })
+
+    it('should find variants with options', async () => {
+      const result = await service.find({
+        where: { id: VARIANT_IDS[1] },
+        options: {},
+      })
+      expect(result.items).toHaveLength(1)
+      expect(result.items[0].id).toBe(VARIANT_IDS[1])
+    })
+
+    it('should retrieve items for a variant', async () => {
+      const result = await service.items(VARIANT_IDS[2], {
+        where: {},
+        options: {
+          orderBy: { id: 'DESC' },
+        },
+      })
+      expect(result.items).toHaveLength(2)
+      expect(result.items[0].id).toBe(ITEM_IDS[0])
+      expect(result.items[1].id).toBe(ITEM_IDS[1])
+    })
+
+    it('should retrieve components for a variant', async () => {
+      const result = await service.components(VARIANT_IDS[0], {
+        where: {},
+        options: {
+          orderBy: { component: 'ASC' },
+        },
+      })
+      expect(result.items).toHaveLength(2)
+      expect(result.items[0].component.id).toBe(COMPONENT_IDS[0])
+      expect(result.items[1].component.id).toBe(COMPONENT_IDS[1])
+    })
   })
 })

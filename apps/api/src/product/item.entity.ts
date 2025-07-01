@@ -56,7 +56,7 @@ export class Item extends IDCreatedUpdated implements Searchable {
     mappedBy: (it) => it.item,
     orphanRemoval: true,
   })
-  item_categories = new Collection<ItemsCategories>(this)
+  itemCategories = new Collection<ItemsCategories>(this)
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => ItemsTags })
   tags = new Collection<Tag>(this)
@@ -66,7 +66,7 @@ export class Item extends IDCreatedUpdated implements Searchable {
     mappedBy: (it) => it.item,
     orphanRemoval: true,
   })
-  item_tags = new Collection<ItemsTags>(this)
+  itemTags = new Collection<ItemsTags>(this)
 
   @ManyToMany(() => Variant, (iv) => iv.items)
   variants = new Collection<Variant>(this)
@@ -79,12 +79,12 @@ export class Item extends IDCreatedUpdated implements Searchable {
   }
 
   async toSearchDoc() {
-    await this.item_tags.load()
+    await this.itemTags.load()
     return {
       id: this.id,
       ...flattenTr('name', this.name),
       ...flattenTr('desc', this.desc || {}),
-      tags: this.item_tags
+      tags: this.itemTags
         .getItems()
         .map((it) => ({ name: it.tag.name, meta: it.meta })),
     }

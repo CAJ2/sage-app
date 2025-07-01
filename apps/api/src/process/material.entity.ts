@@ -74,8 +74,8 @@ export class Material extends IDCreatedUpdated {
   @OneToMany(() => MaterialEdge, (edge) => edge.child)
   children = new Collection<MaterialEdge>(this)
 
-  @OneToMany({ mappedBy: 'primary_material' })
-  primary_components = new Collection<Component>(this)
+  @OneToMany({ mappedBy: 'primaryMaterial' })
+  primaryComponents = new Collection<Component>(this)
 
   @ManyToMany({ entity: () => Component, mappedBy: (c) => c.materials })
   components = new Collection<Component>(this)

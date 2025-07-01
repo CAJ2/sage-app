@@ -17,7 +17,12 @@ import { TagService } from '@src/process/tag.service'
 import { Org } from '@src/users/org.entity'
 import { I18nService } from 'nestjs-i18n'
 import { Item } from './item.entity'
-import { Variant, VariantsOrgs, VariantsTags } from './variant.entity'
+import {
+  Variant,
+  VariantsComponents,
+  VariantsOrgs,
+  VariantsTags,
+} from './variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 @Injectable()
@@ -36,10 +41,10 @@ export class VariantService {
       { id },
       {
         populate: [
-          'variant_sources',
-          'variant_items',
-          'variant_tags',
-          'variant_components',
+          'variantSources',
+          'variantItems',
+          'variantTags',
+          'variantComponents',
           'orgs',
         ],
       },
@@ -65,10 +70,13 @@ export class VariantService {
     }
   }
 
-  async orgs(variantID: string, opts: CursorOptions<Org>) {
-    opts.where.variants = this.em.getReference(Variant, variantID)
-    const orgs = await this.em.find(Org, opts.where, opts.options)
-    const count = await this.em.count(Org, { variants: opts.where.variants })
+  async orgs(variantID: string, opts: CursorOptions<VariantsOrgs>) {
+    opts.where.variant = this.em.getReference(Variant, variantID)
+    opts.options.populate = ['org']
+    const orgs = await this.em.find(VariantsOrgs, opts.where, opts.options)
+    const count = await this.em.count(VariantsOrgs, {
+      variant: opts.where.variant,
+    })
     return {
       items: orgs,
       count,
@@ -103,11 +111,16 @@ export class VariantService {
     }
   }
 
-  async components(variantID: string, opts: CursorOptions<Component>) {
-    opts.where.variants = this.em.getReference(Variant, variantID)
-    const components = await this.em.find(Component, opts.where, opts.options)
-    const count = await this.em.count(Component, {
-      variants: opts.where.variants,
+  async components(variantID: string, opts: CursorOptions<VariantsComponents>) {
+    opts.where.variant = this.em.getReference(Variant, variantID)
+    opts.options.populate = ['component']
+    const components = await this.em.find(
+      VariantsComponents,
+      opts.where,
+      opts.options,
+    )
+    const count = await this.em.count(VariantsComponents, {
+      variant: opts.where.variant,
     })
     return {
       items: components,
@@ -115,7 +128,7 @@ export class VariantService {
     }
   }
 
-  async recycle_score(variantID: string, regionID?: string) {
+  async recycleScore(variantID: string, regionID?: string) {
     const variant = await this.em.findOne(
       Variant,
       { id: variantID },
@@ -146,8 +159,8 @@ export class VariantService {
       totalScore / variant.components.getItems().length,
     )
     variantScore.rating = StreamScoreRating.VERY_GOOD
-    variantScore.rating_f = this.i18n.t(
-      `stream.score_rating.${variantScore.rating}`,
+    variantScore.ratingF = this.i18n.t(
+      `stream.scoreRating.${variantScore.rating}`,
     )
     return variantScore
   }
@@ -160,7 +173,7 @@ export class VariantService {
       return { variant }
     }
     const change = await this.editService.findOneOrCreate(
-      input.change_id,
+      input.changeID,
       input.change,
       userID,
     )
@@ -179,7 +192,7 @@ export class VariantService {
     if (!variant) {
       throw new Error('Variant not found')
     }
-    if (!input.useChange()) {
+    if (!change) {
       await this.setFields(variant, input)
       await this.em.persistAndFlush(variant)
       return { variant }
@@ -208,20 +221,20 @@ export class VariantService {
     if (input.name) {
       variant.name = addTrReq(variant.name, input.lang, input.name)
     }
-    if (input.name_tr) {
-      variant.name = addTrReq(variant.name, input.lang, input.name_tr)
+    if (input.nameTr) {
+      variant.name = addTrReq(variant.name, input.lang, input.nameTr)
     }
     if (input.desc) {
       variant.desc = addTr(variant.desc, input.lang, input.desc)
     }
-    if (input.desc_tr) {
-      variant.desc = addTr(variant.desc, input.lang, input.desc_tr)
+    if (input.descTr) {
+      variant.desc = addTr(variant.desc, input.lang, input.descTr)
     }
     if (input.code) {
       variant.code = input.code
     }
-    if (!change && input.add_sources) {
-      for (const source of input.add_sources) {
+    if (!change && input.addSources) {
+      for (const source of input.addSources) {
         const sourceEntity = await this.em.findOneOrFail(Source, {
           id: source.id,
         })
@@ -231,8 +244,8 @@ export class VariantService {
         variant.sources.add(ref(sourceEntity))
       }
     }
-    if (!change && input.remove_sources) {
-      for (const source of input.remove_sources) {
+    if (!change && input.removeSources) {
+      for (const source of input.removeSources) {
         const sourceEntity = await this.em.findOneOrFail(Source, {
           id: source,
         })
@@ -241,8 +254,8 @@ export class VariantService {
         }
       }
     }
-    if (input.items || input.add_items) {
-      for (const item of input.items || input.add_items || []) {
+    if (input.items || input.addItems) {
+      for (const item of input.items || input.addItems || []) {
         if (!change) {
           const itemEntity = await this.em.findOneOrFail(Item, { id: item.id })
           if (variant.items.contains(ref(itemEntity))) {
@@ -262,8 +275,8 @@ export class VariantService {
         }
       }
     }
-    if (input.remove_items) {
-      for (const item of input.remove_items) {
+    if (input.removeItems) {
+      for (const item of input.removeItems) {
         if (!change) {
           const itemEntity = await this.em.findOneOrFail(Item, { id: item })
           if (variant.items.contains(ref(itemEntity))) {
@@ -296,8 +309,8 @@ export class VariantService {
         variant.region = region
       }
     }
-    if (input.regions || input.add_regions) {
-      for (const region of input.regions || input.add_regions || []) {
+    if (input.regions || input.addRegions) {
+      for (const region of input.regions || input.addRegions || []) {
         const regionEntity = await this.em.findOneOrFail(Region, {
           id: region.id,
         })
@@ -310,8 +323,8 @@ export class VariantService {
         variant.regions.push(regionEntity.id)
       }
     }
-    if (input.remove_regions) {
-      for (const region of input.remove_regions) {
+    if (input.removeRegions) {
+      for (const region of input.removeRegions) {
         const regionEntity = await this.em.findOneOrFail(Region, {
           id: region,
         })
@@ -320,7 +333,7 @@ export class VariantService {
         }
       }
     }
-    if (input.orgs || input.add_orgs) {
+    if (input.orgs || input.addOrgs) {
       variant.orgs = await this.editService.setOrAddPivot(
         variant.id,
         change?.id,
@@ -328,23 +341,23 @@ export class VariantService {
         Org,
         VariantsOrgs,
         input.orgs,
-        input.add_orgs,
+        input.addOrgs,
       )
     }
-    if (input.remove_orgs) {
+    if (input.removeOrgs) {
       variant.orgs = await this.editService.removeFromPivot(
         change?.id,
         variant.orgs,
         Org,
         VariantsOrgs,
-        input.remove_orgs,
+        input.removeOrgs,
       )
     }
-    if (input.tags || input.add_tags) {
-      for (const tag of input.tags || input.add_tags || []) {
+    if (input.tags || input.addTags) {
+      for (const tag of input.tags || input.addTags || []) {
         const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
         const tagDef = await this.tagService.validateTagInput(tag)
-        const tagEx = variant.variant_tags.find((t) => t.tag.id === tag.id)
+        const tagEx = variant.variantTags.find((t) => t.tag.id === tag.id)
         if (tagEx) {
           tagEx.meta = tagDef.meta
           this.em.persist(tagEx)
@@ -357,14 +370,14 @@ export class VariantService {
         this.em.persist(tagInst)
       }
     }
-    if (input.remove_tags) {
-      for (const tag of input.remove_tags) {
+    if (input.removeTags) {
+      for (const tag of input.removeTags) {
         const tagEntity = await this.em.findOneOrFail(Tag, { id: tag })
         variant.tags.remove(ref(tagEntity))
       }
     }
-    if (input.components || input.add_components) {
-      for (const component of input.components || input.add_components || []) {
+    if (input.components || input.addComponents) {
+      for (const component of input.components || input.addComponents || []) {
         if (!change) {
           const comp = await this.em.findOneOrFail(Component, {
             id: component.id,
@@ -383,8 +396,8 @@ export class VariantService {
         }
       }
     }
-    if (input.remove_components) {
-      for (const component of input.remove_components) {
+    if (input.removeComponents) {
+      for (const component of input.removeComponents) {
         if (!change) {
           const comp = await this.em.findOneOrFail(Component, {
             id: component,

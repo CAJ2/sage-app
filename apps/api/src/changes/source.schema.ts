@@ -10,7 +10,7 @@ export const CreateSourceInputSchema = z.strictObject({
   type: z.enum(SourceType),
   location: z.string().max(2048).optional(),
   content: z.record(z.string(), z.json()).optional(),
-  content_url: z.url().optional(),
+  contentURL: z.url().optional(),
   metadata: z.record(z.string(), z.json()).optional(),
 })
 export const CreateSourceInputJSONSchema = z.toJSONSchema(
@@ -22,7 +22,7 @@ export const UpdateSourceInputSchema = z.strictObject({
   type: z.enum(SourceType).optional(),
   location: z.string().max(2048).optional(),
   content: z.record(z.string(), z.json()).optional(),
-  content_url: z.url().optional(),
+  contentURL: z.url().optional(),
   metadata: z.record(z.string(), z.json()).optional(),
 })
 export const UpdateSourceInputJSONSchema = z.toJSONSchema(

@@ -24,13 +24,13 @@ export class Category extends IDCreatedUpdated {
   name!: TranslatedField
 
   @Property({ type: 'json' })
-  desc_short?: TranslatedField
+  descShort?: TranslatedField
 
   @Property({ type: 'json' })
   desc?: TranslatedField
 
   @Property({ nullable: true })
-  image_url?: string
+  imageURL?: string
 
   @OneToMany(() => CategoryTree, (tree) => tree.ancestor)
   ancestors = new Collection<CategoryTree>(this)

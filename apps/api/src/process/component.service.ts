@@ -43,19 +43,19 @@ export class ComponentService {
       {
         populate: [
           'region',
-          'primary_material',
+          'primaryMaterial',
           'materials',
-          'component_sources',
-          'component_tags',
-          'component_materials',
+          'componentSources',
+          'componentTags',
+          'componentMaterials',
         ],
       },
     )
   }
 
-  async primary_material(id: string, component?: Component) {
+  async primaryMaterial(id: string, component?: Component) {
     if (component) {
-      return component.primary_material.load()
+      return component.primaryMaterial.load()
     }
     return null
   }
@@ -76,12 +76,12 @@ export class ComponentService {
     const component = await this.em.findOne(
       Component,
       { id: componentId },
-      { populate: ['component_tags', 'component_tags.tag'] },
+      { populate: ['componentTags', 'componentTags.tag'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
-    return component.component_tags.getItems().map((tag) => {
+    return component.componentTags.getItems().map((tag) => {
       return {
         ...tag.tag,
         meta: tag.meta,
@@ -116,7 +116,7 @@ export class ComponentService {
       }
     }
     const change = await this.editService.findOneOrCreate(
-      input.change_id,
+      input.changeID,
       input.change,
       userID,
     )
@@ -138,7 +138,7 @@ export class ComponentService {
     if (!component) {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
-    if (!input.useChange()) {
+    if (!change) {
       await this.setFields(component, input)
       await this.em.persistAndFlush(component)
       return {
@@ -173,60 +173,66 @@ export class ComponentService {
     if (input.name) {
       component.name = addTrReq(component.name, input.lang, input.name)
     }
-    if (input.name_tr) {
-      component.name = addTrReq(component.name, input.lang, input.name_tr)
+    if (input.nameTr) {
+      component.name = addTrReq(component.name, input.lang, input.nameTr)
     }
     if (input.desc) {
       component.desc = addTr(component.desc, input.lang, input.desc)
     }
-    if (input.desc_tr) {
-      component.desc = addTr(component.desc, input.lang, input.desc_tr)
+    if (input.descTr) {
+      component.desc = addTr(component.desc, input.lang, input.descTr)
     }
-    if (input.image_url) {
-      component.visual = { image: input.image_url }
+    if (input.visual) {
+      component.visual = { ...component.visual, ...input.visual }
     }
-    if (input.primary_material) {
+    if (input.physical) {
+      component.physical = { ...component.physical, ...input.physical }
+    }
+    if (input.imageURL) {
+      component.visual = { image: input.imageURL }
+    }
+    if (input.primaryMaterial) {
       const material = await this.em.findOne(Material, {
-        id: input.primary_material.id,
+        id: input.primaryMaterial.id,
       })
       if (!material) {
         throw new Error(
-          `Material with ID "${input.primary_material.id}" not found`,
+          `Material with ID "${input.primaryMaterial.id}" not found`,
         )
       }
-      component.primary_material = ref(Material, material.id)
+      component.primaryMaterial = ref(Material, material.id)
     }
     if (input.materials) {
-      component.component_materials = await this.editService.setOrAddPivot(
+      component.componentMaterials = await this.editService.setOrAddPivot(
         component.id,
         change?.id,
-        component.component_materials,
+        component.componentMaterials,
         Component,
         ComponentsMaterials,
         input.materials,
       )
     }
-    if (input.tags || input.add_tags) {
-      for (const tag of input.tags || input.add_tags || []) {
+    if (input.tags || input.addTags) {
+      for (const tag of input.tags || input.addTags || []) {
         await this.tagService.validateTagInput(tag)
       }
-      component.component_tags = await this.editService.setOrAddPivot(
+      component.componentTags = await this.editService.setOrAddPivot(
         component.id,
         change?.id,
-        component.component_tags,
+        component.componentTags,
         Component,
         ComponentsTags,
         input.tags,
-        input.add_tags,
+        input.addTags,
       )
     }
-    if (input.remove_tags) {
-      component.component_tags = await this.editService.removeFromPivot(
+    if (input.removeTags) {
+      component.componentTags = await this.editService.removeFromPivot(
         change?.id,
-        component.component_tags,
+        component.componentTags,
         Component,
         ComponentsTags,
-        input.remove_tags,
+        input.removeTags,
       )
     }
     if (input.region) {

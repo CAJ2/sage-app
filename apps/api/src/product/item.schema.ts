@@ -51,10 +51,10 @@ export class ItemSchemaService {
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().min(1).max(100).optional(),
-      name_tr: TrArraySchema,
+      nameTr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema,
-      image_url: ImageOrIconSchema,
+      descTr: TrArraySchema,
+      imageURL: ImageOrIconSchema,
       categories: z.array(this.ItemCategoriesInputSchema).optional(),
       tags: z.array(this.ItemTagsInputSchema).optional(),
     })
@@ -65,19 +65,19 @@ export class ItemSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           label: 'Name Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           label: 'Description Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           label: 'Image',
         },
         {
@@ -95,9 +95,9 @@ export class ItemSchemaService {
 
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: ItemIDSchema,
-      name_tr: TrArraySchema.optional(),
-      desc_tr: TrArraySchema.optional(),
-      image_url: ImageOrIconSchema,
+      nameTr: TrArraySchema.optional(),
+      descTr: TrArraySchema.optional(),
+      imageURL: ImageOrIconSchema,
       categories: z.array(this.ItemCategoriesInputSchema).optional(),
       tags: z.array(this.ItemTagsInputSchema).optional(),
     })
@@ -107,19 +107,19 @@ export class ItemSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           label: 'Name Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           label: 'Description Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           label: 'Image',
         },
         {

@@ -48,7 +48,7 @@ export class OrgService {
       return { org }
     }
     const change = await this.editService.findOneOrCreate(
-      input.change_id,
+      input.changeID,
       input.change,
       userID,
     )
@@ -67,7 +67,7 @@ export class OrgService {
     if (!org) {
       throw NotFoundErr('ORG_NOT_FOUND', `Org with id ${input.id} not found`)
     }
-    if (!input.useChange()) {
+    if (!change) {
       await this.setFields(org, input)
       await this.em.persistAndFlush(org)
       await this.searchService.addDocs(org)
@@ -95,11 +95,11 @@ export class OrgService {
     if (input.desc) {
       org.desc = addTrReq(org.desc, input.lang, input.desc)
     }
-    if (input.avatar_url) {
-      org.avatar_url = input.avatar_url
+    if (input.avatarURL) {
+      org.avatarURL = input.avatarURL
     }
-    if (input.website_url) {
-      org.website_url = input.website_url
+    if (input.websiteURL) {
+      org.websiteURL = input.websiteURL
     }
   }
 }

@@ -47,13 +47,13 @@ export class Variant extends IDCreatedUpdated {
   sources = new Collection<Source>(this)
 
   @OneToMany(() => VariantsSources, (vs) => vs.variant)
-  variant_sources = new Collection<VariantsSources>(this)
+  variantSources = new Collection<VariantsSources>(this)
 
   @ManyToMany({ entity: () => Item, pivotEntity: () => VariantsItems })
   items = new Collection<Item>(this)
 
   @OneToMany(() => VariantsItems, (vi) => vi.variant)
-  variant_items = new Collection<VariantsItems>(this)
+  variantItems = new Collection<VariantsItems>(this)
 
   @ManyToOne()
   region?: Ref<Region>
@@ -68,7 +68,7 @@ export class Variant extends IDCreatedUpdated {
   orgs = new Collection<Org>(this)
 
   @OneToMany(() => VariantsOrgs, (vo) => vo.variant)
-  variant_orgs = new Collection<VariantsOrgs>(this)
+  variantOrgs = new Collection<VariantsOrgs>(this)
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => VariantsTags })
   tags = new Collection<Tag>(this)
@@ -78,7 +78,7 @@ export class Variant extends IDCreatedUpdated {
     mappedBy: (vt) => vt.variant,
     orphanRemoval: true,
   })
-  variant_tags = new Collection<VariantsTags>(this)
+  variantTags = new Collection<VariantsTags>(this)
 
   @ManyToMany({
     entity: () => Component,
@@ -87,7 +87,7 @@ export class Variant extends IDCreatedUpdated {
   components = new Collection<Component>(this)
 
   @OneToMany(() => VariantsComponents, (vc) => vc.variant)
-  variant_components = new Collection<VariantsComponents>(this)
+  variantComponents = new Collection<VariantsComponents>(this)
 
   @OneToMany(() => VariantHistory, (history) => history.variant)
   history = new Collection<VariantHistory>(this)

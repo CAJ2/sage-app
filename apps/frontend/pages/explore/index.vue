@@ -26,14 +26,14 @@
                       <div class="flex flex-col items-start gap-2">
                         <UiImage
                           class="size-10 rounded-xl"
-                          :src="category.image_url"
+                          :src="category.imageURL"
                         ></UiImage>
                         <CardTitle>{{ category.name }}</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent class="flex flex-col justify-center px-4 pb-3">
                       <span class="text-xs line-clamp-2">{{
-                        category.desc_short
+                        category.descShort
                       }}</span>
                     </CardContent>
                   </Card>
@@ -57,9 +57,9 @@ const categoriesQuery = graphql(`
         nodes {
           id
           name
-          desc_short
+          descShort
           desc
-          image_url
+          imageURL
         }
       }
     }

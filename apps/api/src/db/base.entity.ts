@@ -10,30 +10,38 @@ export abstract class IDCreatedUpdated extends BaseEntity {
   constructor() {
     super()
     this.id = nanoid()
-    this.created_at = new Date()
-    this.updated_at = new Date()
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
   }
 
   @PrimaryKey()
   id: string
 
-  @Property({ defaultRaw: 'current_timestamp()' })
-  created_at: Date
+  @Property({ fieldName: 'created_at', defaultRaw: 'current_timestamp()' })
+  createdAt: Date
 
-  @Property({ defaultRaw: 'current_timestamp()', onUpdate: () => new Date() })
-  updated_at: Date
+  @Property({
+    fieldName: 'updated_at',
+    defaultRaw: 'current_timestamp()',
+    onUpdate: () => new Date(),
+  })
+  updatedAt: Date
 }
 
 export abstract class CreatedUpdated extends BaseEntity {
   constructor() {
     super()
-    this.created_at = new Date()
-    this.updated_at = new Date()
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
   }
 
-  @Property({ defaultRaw: 'current_timestamp()' })
-  created_at: Date
+  @Property({ fieldName: 'created_at', defaultRaw: 'current_timestamp()' })
+  createdAt: Date
 
-  @Property({ defaultRaw: 'current_timestamp()', onUpdate: () => new Date() })
-  updated_at: Date
+  @Property({
+    fieldName: 'updated_at',
+    defaultRaw: 'current_timestamp()',
+    onUpdate: () => new Date(),
+  })
+  updatedAt: Date
 }

@@ -103,7 +103,7 @@ export class MaterialService {
     }
   }
 
-  async primary_components(materialID: string, opts: CursorOptions<Component>) {
+  async primaryComponents(materialID: string, opts: CursorOptions<Component>) {
     opts.where.materials = materialID
     const components = await this.em.find(Component, opts.where, opts.options)
     const count = await this.em.count(Component, {

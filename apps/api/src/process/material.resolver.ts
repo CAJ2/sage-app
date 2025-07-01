@@ -116,12 +116,12 @@ export class MaterialResolver {
   }
 
   @ResolveField()
-  async primary_components(
+  async primaryComponents(
     @Parent() material: Material,
     @Args() args: PrimaryComponentsArgs,
   ) {
     const filter = this.transform.paginationArgs(args)
-    const cursor = await this.materialService.primary_components(
+    const cursor = await this.materialService.primaryComponents(
       material.id,
       filter,
     )

@@ -22,7 +22,7 @@ export enum ChangeStatus {
 
 export interface Edit {
   // The name of the created/updated/deleted entity
-  entity_name: string
+  entityName: string
   // If the entity currently exists, this is the ID
   id?: string
   // The current state of the entity

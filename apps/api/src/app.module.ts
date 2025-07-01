@@ -3,6 +3,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import config from '@src/config/config'
+import dotenv from 'dotenv-flow'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
 import { ClsModule, ClsService } from 'nestjs-cls'
@@ -25,12 +26,17 @@ import { ProductModule } from './product/product.module'
 import { SearchModule } from './search/search.module'
 import { UsersModule } from './users/users.module'
 
+if (dotenv) {
+  dotenv.config()
+}
+
 @Module({
   controllers: [AppController],
   exports: [],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      ignoreEnvFile: true,
       load: [config],
     }),
     ClsModule.forRoot({

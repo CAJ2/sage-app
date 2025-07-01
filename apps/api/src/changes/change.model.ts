@@ -14,39 +14,39 @@ import { EditModel, EditModelType } from './change.enum'
 @ObjectType()
 export class Edit {
   @Field(() => String)
-  entity_name!: string
+  entityName!: string
 
   @Field(() => ID, { nullable: true })
   id?: string
 
   @Field(() => EditModel, { nullable: true })
-  @Transform(transformUnion('entity_name'))
+  @Transform(transformUnion('entityName'))
   original?: typeof EditModel
 
   @Field(() => EditModel, { nullable: true })
-  @Transform(transformUnion('entity_name'))
+  @Transform(transformUnion('entityName'))
   changes?: typeof EditModel
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  changes_create?: Record<string, any>
+  createChanges?: Record<string, any>
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  changes_update?: Record<string, any>
+  updateChanges?: Record<string, any>
 }
 
 @ObjectType()
 export class DirectEdit {
   @Field(() => String)
-  entity_name!: string
+  entityName!: string
 
   @Field(() => ID, { nullable: true })
   id?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  model_create?: Record<string, any>
+  createModel?: Record<string, any>
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  model_update?: Record<string, any>
+  updateModel?: Record<string, any>
 
   // Not exposed in GraphQL
   original?: typeof EditModel
@@ -89,7 +89,7 @@ export class ChangesArgs extends PaginationBasicArgs {
 
   @Field(() => ID, { nullable: true })
   @IsOptional()
-  user_id?: string
+  userID?: string
 }
 
 @ArgsType()
@@ -110,7 +110,7 @@ export class DirectEditArgs {
   id?: string
 
   @Field(() => String, { nullable: true })
-  entity_name?: string
+  entityName?: string
 }
 
 @InputType()
@@ -200,10 +200,10 @@ export interface ISourceInput {
 }
 
 export interface IChangeInputWithLang {
-  change_id?: string
+  changeID?: string
   change?: CreateChangeInput & {}
-  add_sources?: ISourceInput[]
-  remove_sources?: string[]
+  addSources?: ISourceInput[]
+  removeSources?: string[]
   apply?: boolean
   useChange(): boolean
 }
@@ -225,22 +225,22 @@ export function ChangeInputWithLang() {
     @Field(() => ID, { nullable: true })
     @IsOptional()
     @Validate(IsNanoID)
-    change_id?: string
+    changeID?: string
 
     @Field(() => CreateChangeInput, { nullable: true })
     change?: CreateChangeInput & {}
 
     @Field(() => [SourceInput], { nullable: true })
-    add_sources?: SourceInput[]
+    addSources?: SourceInput[]
 
     @Field(() => [ID], { nullable: true })
-    remove_sources?: string[]
+    removeSources?: string[]
 
     @Field(() => Boolean, { nullable: true })
     apply?: boolean
 
     useChange(): boolean {
-      return !!this.change_id || !!this.change
+      return !!this.changeID || !!this.change
     }
   }
   return ChangeInputWithLangCls
@@ -254,22 +254,22 @@ export class DeleteInput {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @Validate(IsNanoID)
-  change_id?: string
+  changeID?: string
 
   @Field(() => CreateChangeInput, { nullable: true })
   change?: CreateChangeInput & {}
 
   @Field(() => [SourceInput], { nullable: true })
-  add_sources?: SourceInput[]
+  addSources?: SourceInput[]
 
   @Field(() => [ID], { nullable: true })
-  remove_sources?: string[]
+  removeSources?: string[]
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
   apply?: boolean
 
   useChange(): boolean {
-    return !!this.change_id || !!this.change
+    return !!this.changeID || !!this.change
   }
 }

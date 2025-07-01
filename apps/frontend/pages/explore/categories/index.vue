@@ -18,9 +18,9 @@ const categoriesQuery = graphql(`
         nodes {
           id
           name
-          desc_short
+          descShort
           desc
-          image_url
+          imageURL
         }
       }
     }

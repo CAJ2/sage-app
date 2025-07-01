@@ -15,8 +15,8 @@ export class OrgSeeder extends Seeder {
           en: 'Sage is a circular economy database',
         },
         metadata: '{}',
-        updated_at: new Date(),
-        created_at: new Date(),
+        updatedAt: new Date(),
+        createdAt: new Date(),
       })
     }
   }

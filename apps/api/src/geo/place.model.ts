@@ -53,7 +53,7 @@ export class PlaceAddress {
   region?: string
 
   @Field(() => String, { nullable: true })
-  postal_code?: string
+  postalCode?: string
 
   @Field(() => String, { nullable: true })
   country?: string
@@ -98,7 +98,7 @@ export class PlaceHistory {
   datetime!: DateTime
 
   @Field(() => String)
-  user_id!: string
+  userID!: string
 
   @Field(() => String, { nullable: true })
   original?: string
@@ -153,7 +153,7 @@ export class CreatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -162,7 +162,7 @@ export class CreatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -171,7 +171,7 @@ export class CreatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  address_tr?: TranslatedInput[]
+  addressTr?: TranslatedInput[]
 
   @Field(() => PlaceLocationInput, { nullable: true })
   @IsOptional()
@@ -199,7 +199,7 @@ export class UpdatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -208,7 +208,7 @@ export class UpdatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -217,7 +217,7 @@ export class UpdatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  address_tr?: TranslatedInput[]
+  addressTr?: TranslatedInput[]
 
   @Field(() => PlaceLocationInput, { nullable: true })
   @IsOptional()
@@ -233,11 +233,11 @@ export class UpdatePlaceInput extends ChangeInputWithLang() {
 
   @Field(() => [PlaceTagsInput], { nullable: true })
   @IsOptional()
-  add_tags?: PlaceTagsInput[]
+  addTags?: PlaceTagsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_tags?: string[]
+  removeTags?: string[]
 }
 
 @ObjectType()

@@ -25,7 +25,7 @@ export enum TagType {
 
 export interface TagMetaTemplate {
   schema?: JSONSchemaType<any>
-  ui_schema?: Record<string, any>
+  uischema?: Record<string, any>
 }
 
 @Entity({ tableName: 'tags', schema: 'public' })
@@ -41,10 +41,10 @@ export class Tag extends IDCreatedUpdated {
   desc?: TranslatedField
 
   @Property({ type: 'json' })
-  meta_template?: TagMetaTemplate
+  metaTemplate?: TagMetaTemplate
 
   @Property()
-  bg_color?: string
+  bgColor?: string
 
   @Property()
   image?: string

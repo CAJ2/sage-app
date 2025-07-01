@@ -1,7 +1,7 @@
 <template>
   <li class="list-row">
     <div>
-      <UiImage class="size-10" :src="org.avatar_url"></UiImage>
+      <UiImage class="size-10" :src="org.avatarURL"></UiImage>
     </div>
     <div>
       <div class="text-bold">{{ org.name_req }}</div>
@@ -26,7 +26,7 @@ const ListOrgFragment = graphql(`
     id
     name_req: name
     desc
-    avatar_url
+    avatarURL
   }
 `)
 

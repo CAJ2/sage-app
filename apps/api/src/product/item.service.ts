@@ -28,12 +28,12 @@ export class ItemService {
     return await this.em.findOne(
       Item,
       { id },
-      { populate: ['categories', 'item_tags'] },
+      { populate: ['categories', 'itemTags'] },
     )
   }
 
   async find(opts: CursorOptions<Item>) {
-    opts.options.populate = ['categories', 'item_tags']
+    opts.options.populate = ['categories', 'itemTags']
     const items = await this.em.find(Item, opts.where, opts.options)
     const count = await this.em.count(Item, opts.where)
     return {
@@ -117,7 +117,7 @@ export class ItemService {
       return { item }
     }
     const change = await this.editService.findOneOrCreate(
-      input.change_id,
+      input.changeID,
       input.change,
       userID,
     )
@@ -136,7 +136,7 @@ export class ItemService {
     if (!item) {
       throw new Error('Item not found')
     }
-    if (!input.useChange()) {
+    if (!change) {
       await this.setFields(item, input)
       await this.em.persistAndFlush(item)
       await this.searchService.addDocs(item)
@@ -166,41 +166,41 @@ export class ItemService {
     if (input.name) {
       item.name = addTrReq(item.name, input.lang, input.name)
     }
-    if (input.name_tr) {
-      item.name = addTrReq(item.name, input.lang, input.name_tr)
+    if (input.nameTr) {
+      item.name = addTrReq(item.name, input.lang, input.nameTr)
     }
     if (input.desc) {
       item.desc = addTr(item.desc, input.lang, input.desc)
     }
-    if (input.desc_tr) {
-      item.desc = addTr(item.desc, input.lang, input.desc_tr)
+    if (input.descTr) {
+      item.desc = addTr(item.desc, input.lang, input.descTr)
     }
-    if (input.image_url) {
+    if (input.imageURL) {
       if (!item.files) {
         item.files = {}
       }
-      item.files.thumbnail = input.image_url
+      item.files.thumbnail = input.imageURL
     }
     if (!item.source) {
       item.source = {}
     }
-    if (input.categories || input.add_categories) {
+    if (input.categories || input.addCategories) {
       item.categories = await this.editService.setOrAddCollection(
         item.categories,
         Category,
         input.categories,
-        input.add_categories,
+        input.addCategories,
       )
     }
-    if (input.remove_categories) {
+    if (input.removeCategories) {
       item.categories = await this.editService.removeFromCollection(
         item.categories,
         Category,
-        input.remove_categories,
+        input.removeCategories,
       )
     }
-    if (input.tags || input.add_tags) {
-      for (const tag of input.tags || input.add_tags || []) {
+    if (input.tags || input.addTags) {
+      for (const tag of input.tags || input.addTags || []) {
         const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
         const tagDef = await this.tagService.validateTagInput(tag)
         const tagInst = new ItemsTags()
@@ -208,19 +208,19 @@ export class ItemService {
         tagInst.item = item
         tagInst.meta = tagDef.meta
         if (input.tags) {
-          item.item_tags.set([])
+          item.itemTags.set([])
         }
-        if (item.item_tags.contains(tagInst)) {
-          item.item_tags.remove(tagInst)
+        if (item.itemTags.contains(tagInst)) {
+          item.itemTags.remove(tagInst)
         }
-        item.item_tags.add(tagInst)
+        item.itemTags.add(tagInst)
       }
     }
-    if (input.remove_tags) {
+    if (input.removeTags) {
       item.tags = await this.editService.removeFromCollection(
         item.tags,
         Tag,
-        input.remove_tags,
+        input.removeTags,
       )
     }
   }

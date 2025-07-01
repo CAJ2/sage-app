@@ -30,16 +30,16 @@ const categoriesQuery = gql`
     category(id: $id) {
       id
       name
-      desc_short
+      descShort
       desc
-      image_url
+      imageURL
       children {
         nodes {
           id
           name
-          desc_short
+          descShort
           desc
-          image_url
+          imageURL
         }
       }
     }
@@ -53,16 +53,16 @@ type CategoryResult = {
   category: {
     id: string
     name: string
-    desc_short: string
+    descShort: string
     desc: string
-    image_url: string
+    imageURL: string
     children: {
       nodes: {
         id: string
         name: string
-        desc_short: string
+        descShort: string
         desc: string
-        image_url: string
+        imageURL: string
       }[]
     }
   }

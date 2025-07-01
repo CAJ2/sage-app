@@ -1,7 +1,7 @@
 <template>
   <li class="list-row">
     <div>
-      <UiImage class="size-10" :src="component.image_url"></UiImage>
+      <UiImage class="size-10" :src="component.imageURL"></UiImage>
     </div>
     <div>
       <div class="text-bold">{{ component.name }}</div>
@@ -26,7 +26,7 @@ const ListComponentFragment = graphql(`
     id
     name
     desc
-    image_url
+    imageURL
   }
 `)
 

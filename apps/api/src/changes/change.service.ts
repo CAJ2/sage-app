@@ -63,9 +63,7 @@ export class ChangeService {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
     if (editType) {
-      change.edits = change.edits.filter(
-        (edit) => edit.entity_name === editType,
-      )
+      change.edits = change.edits.filter((edit) => edit.entityName === editType)
     }
     if (editID) {
       let edit = change.edits.find((e) => e.id === editID)
@@ -77,23 +75,23 @@ export class ChangeService {
         edit = {
           _type: EditModel,
           id: directEdit.id,
-          entity_name: directEdit.entity_name,
+          entityName: directEdit.entityName,
         }
         const editModel = await this.transform.objectToModel(edit, EditModel)
         editModel.original = directEdit.original
         editModel.changes = directEdit.changes
-        editModel.changes_create = directEdit.model_create
-        editModel.changes_update = directEdit.model_update
+        editModel.createChanges = directEdit.createModel
+        editModel.updateChanges = directEdit.updateModel
         return [editModel]
       }
       edit._type = EditModel
       const editModel = await this.transform.objectToModel(edit, EditModel)
-      editModel.changes_create = await this.changeMapService.createEdit(
-        edit.entity_name,
+      editModel.createChanges = await this.changeMapService.createEdit(
+        edit.entityName,
         editModel,
       )
-      editModel.changes_update = await this.changeMapService.updateEdit(
-        edit.entity_name,
+      editModel.updateChanges = await this.changeMapService.updateEdit(
+        edit.entityName,
         editModel,
       )
       return [editModel]
@@ -102,12 +100,12 @@ export class ChangeService {
       change.edits.map(async (edit) => {
         edit._type = EditModel
         const editModel = await this.transform.objectToModel(edit, EditModel)
-        editModel.changes_create = await this.changeMapService.createEdit(
-          edit.entity_name,
+        editModel.createChanges = await this.changeMapService.createEdit(
+          edit.entityName,
           editModel,
         )
-        editModel.changes_update = await this.changeMapService.updateEdit(
-          edit.entity_name,
+        editModel.updateChanges = await this.changeMapService.updateEdit(
+          edit.entityName,
           editModel,
         )
         return editModel
@@ -138,10 +136,10 @@ export class ChangeService {
             )
           }
           directEdit.id = (entity as any).id
-          directEdit.entity_name = svc.name
+          directEdit.entityName = svc.name
           directEdit.original = editModel as typeof EditEnum
           directEdit.changes = editModel as typeof EditEnum
-          directEdit.model_update = await this.changeMapService.updateEdit(
+          directEdit.updateModel = await this.changeMapService.updateEdit(
             svc.name,
             directEdit,
           )
@@ -150,8 +148,8 @@ export class ChangeService {
       }
     } else if (entityName) {
       const editModel = new DirectEdit()
-      editModel.entity_name = entityName
-      editModel.model_create = await this.changeMapService.createEdit(
+      editModel.entityName = entityName
+      editModel.createModel = await this.changeMapService.createEdit(
         entityName,
         editModel,
       )

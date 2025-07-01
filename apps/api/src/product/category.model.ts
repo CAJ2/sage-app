@@ -30,27 +30,27 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   name!: string
 
   @Field(() => [TranslatedOutput], { nullable: true })
-  name_tr?: TranslatedOutput[]
+  nameTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
-  desc_short?: string
+  descShort?: string
 
   @Field(() => [TranslatedOutput], { nullable: true })
-  desc_short_tr?: TranslatedOutput[]
+  descShortTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
   desc?: string
 
   @Field(() => [TranslatedOutput], { nullable: true })
-  desc_tr?: TranslatedOutput[]
+  descTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 
   @Field(() => CategoriesPage)
   parents!: CategoriesPage & {}
@@ -104,26 +104,26 @@ export class CreateCategoryInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1024)
-  desc_short?: string
+  descShort?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_short_tr?: TranslatedInput[]
+  descShortTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 }
 
 @InputType()
@@ -137,26 +137,26 @@ export class UpdateCategoryInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1024)
-  desc_short?: string
+  descShort?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_short_tr?: TranslatedInput[]
+  descShortTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 }
 
 @ObjectType()

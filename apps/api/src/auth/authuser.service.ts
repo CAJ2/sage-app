@@ -22,6 +22,14 @@ export class AuthUserService {
     return session.user.id === userID || session.user.role === 'admin'
   }
 
+  admin(): boolean {
+    const session = this.getSession()
+    if (!session) {
+      return false
+    }
+    return session.user.role === 'admin'
+  }
+
   private getSession(): {
     session: Session
     user: User & { role: string | null }

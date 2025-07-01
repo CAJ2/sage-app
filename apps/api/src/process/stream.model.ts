@@ -26,22 +26,22 @@ export class StreamScore {
   score?: number
 
   @Field(() => Number, { nullable: true })
-  min_score?: number
+  minScore?: number
 
   @Field(() => Number, { nullable: true })
-  max_score?: number
+  maxScore?: number
 
   @Field(() => StreamScoreRating, { nullable: true })
   rating?: StreamScoreRating
 
   @Field(() => String, { nullable: true })
-  rating_f?: string
+  ratingF?: string
 
   @Field(() => StreamScoreRating, { nullable: true })
-  data_quality?: StreamScoreRating
+  dataQuality?: StreamScoreRating
 
   @Field(() => String, { nullable: true })
-  data_quality_f?: string
+  dataQualityF?: string
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
@@ -90,7 +90,7 @@ export class Container {
   shape?: ContainerShape
 
   @Field(() => ContainerImageEntryPoint, { nullable: true })
-  image_entry_point?: ContainerImageEntryPoint
+  imageEntryPoint?: ContainerImageEntryPoint
 }
 
 @ObjectType()

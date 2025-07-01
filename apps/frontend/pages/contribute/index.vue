@@ -90,8 +90,8 @@ const changeListQuery = graphql(`
         status
         title
         description
-        created_at
-        updated_at
+        createdAt
+        updatedAt
       }
     }
   }

@@ -13,9 +13,7 @@ import { Change, DeleteInput } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
-import { Component, ComponentsPage } from '@src/process/component.model'
 import { Tag, TagPage } from '@src/process/tag.model'
-import { Org, OrgsPage } from '@src/users/org.model'
 import { Item, ItemsPage } from './item.model'
 import {
   CreateVariantInput,
@@ -23,9 +21,13 @@ import {
   UpdateVariantInput,
   UpdateVariantOutput,
   Variant,
+  VariantComponent,
   VariantComponentsArgs,
+  VariantComponentsPage,
   VariantItemsArgs,
+  VariantOrg,
   VariantOrgsArgs,
+  VariantOrgsPage,
   VariantRecycleArgs,
   VariantsArgs,
   VariantsPage,
@@ -84,7 +86,12 @@ export class VariantResolver {
   async orgs(@Parent() variant: Variant, @Args() args: VariantOrgsArgs) {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.variantService.orgs(variant.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Org, OrgsPage)
+    return this.transform.entityToPaginated(
+      cursor,
+      args,
+      VariantOrg,
+      VariantOrgsPage,
+    )
   }
 
   @ResolveField()
@@ -104,19 +111,19 @@ export class VariantResolver {
     return this.transform.entityToPaginated(
       cursor,
       args,
-      Component,
-      ComponentsPage,
+      VariantComponent,
+      VariantComponentsPage,
     )
   }
 
   @ResolveField()
-  async recycle_score(
+  async recycleScore(
     @Parent() variant: Variant,
     @Args() args: VariantRecycleArgs,
   ) {
-    const score = await this.variantService.recycle_score(
+    const score = await this.variantService.recycleScore(
       variant.id,
-      args.region_id,
+      args.regionID,
     )
     if (!score) {
       return null

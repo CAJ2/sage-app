@@ -21,7 +21,10 @@ import type {
   ObjectQuery,
   QueryOrderMap,
 } from '@mikro-orm/core'
-import type { TransformFnParams } from 'class-transformer'
+import type {
+  ClassTransformOptions,
+  TransformFnParams,
+} from 'class-transformer'
 
 export type EntityDTOCtx<T> = EntityDTO<T> & {
   _lang?: string[]
@@ -48,17 +51,11 @@ export class TransformService {
     model: new () => S,
   ): Promise<S> {
     const entityObj: EntityDTOCtx<T> = entity.toObject()
-    entityObj._lang = this.cls.get('lang')
-    const inst = plainToInstance(model, entityObj)
-    // Transform special cases like translation objects
-    _.each(entityObj, (value, key) => {
-      if (key.endsWith('_tr')) {
-        ;(inst as any)[key] = value
-      }
-    })
-    if ((inst as any).transform) {
-      ;(inst as any).transform(entityObj)
-    }
+    ;(entityObj as any)._lang = this.cls.get('lang')
+    const inst = plainToInstance(model, entityObj, {
+      lang: this.cls.get('lang'),
+    } as ClassTransformOptions)
+    specialCases(inst, entityObj)
     await validateOrReject(inst).catch((errors) => {
       throw new GraphQLError(errors.toString())
     })
@@ -71,17 +68,11 @@ export class TransformService {
     model: new () => S,
   ): Promise<S> {
     const obj = object as EntityDTOCtx<T>
-    obj._lang = this.cls.get('lang')
-    const inst = plainToInstance(model, obj)
-    // Transform special cases like translation objects
-    _.each(obj, (value, key) => {
-      if (key.endsWith('_tr')) {
-        ;(inst as any)[key] = value
-      }
-    })
-    if ((inst as any).transform) {
-      ;(inst as any).transform(obj)
-    }
+    ;(obj as any)._lang = this.cls.get('lang')
+    const inst = plainToInstance(model, obj, {
+      lang: this.cls.get('lang'),
+    } as ClassTransformOptions)
+    specialCases(inst, obj)
     await validateOrReject(inst).catch((errors) => {
       throw new GraphQLError(errors.toString())
     })
@@ -173,8 +164,9 @@ export class TransformService {
     for (const item of cursor.items) {
       const cls = await this.entityToModel(item, model)
       nodes.push(cls)
+      const itemOrderField = (item as any)[options.orderBy()[0] || 'id']
       const cid = Buffer.from(
-        (item as any)[options.orderBy()[0] || 'id'],
+        _.isString(itemOrderField) ? itemOrderField : itemOrderField.id,
       ).toString('base64')
       edges.push({ cursor: cid, node: cls })
     }
@@ -266,16 +258,10 @@ export class TransformService {
           continue
         }
         ;(obj as any)._lang = this.cls.get('lang')
-        const inst: object = plainToInstance((obj as any)._type, obj)
-        // Transform special cases like translation objects
-        _.each(obj, (value, key) => {
-          if (key.endsWith('_tr')) {
-            ;(inst as any)[key] = value
-          }
-        })
-        if ((inst as any).transform) {
-          ;(inst as any).transform(obj)
-        }
+        const inst: object = plainToInstance((obj as any)._type, obj, {
+          lang: this.cls.get('lang'),
+        } as ClassTransformOptions)
+        specialCases(inst, obj)
         await validateOrReject(inst).catch((errors) => {
           throw new GraphQLError(errors.toString())
         })
@@ -310,16 +296,10 @@ export function transformUnion(
       throw new Error(`Model ${obj[field]} not found in registry`)
     }
     params.value._lang = params.obj._lang || []
-    const instance = plainToInstance(constr, params.value)
-    // Transform special cases like translation objects
-    _.each(params.value, (value, key) => {
-      if (key.endsWith('_tr')) {
-        ;(instance as any)[key] = value
-      }
-    })
-    if ((instance as any).transform) {
-      ;(instance as any).transform(obj)
-    }
+    const instance = plainToInstance(constr, params.value, {
+      lang: params.obj._lang,
+    } as ClassTransformOptions)
+    specialCases(instance, params.value)
     return instance
   }
 }
@@ -337,15 +317,57 @@ export function entityToModelRegistry(
     throw new Error(`Model ${entity} not found in registry`)
   }
   ;(obj as any)._lang = lang
-  const instance = plainToInstance(constr, obj)
+  const instance = plainToInstance(constr, obj, {
+    lang,
+  } as ClassTransformOptions)
+  specialCases(instance, obj)
+  return instance
+}
+
+function specialCases(instance: any, obj: any) {
   // Transform special cases like translation objects
   _.each(obj, (value, key) => {
-    if (key.endsWith('_tr')) {
+    if (_.has(instance, key) && instance[key] instanceof BaseModel) {
+      _.each(value, (v, k) => {
+        if (k.endsWith('Tr')) {
+          ;(instance[key] as any)[k] = v
+        }
+      })
+    }
+    if (key.endsWith('Tr')) {
       ;(instance as any)[key] = value
     }
   })
   if ((instance as any).transform) {
     ;(instance as any).transform(obj)
   }
-  return instance
+  callTransform(instance, obj)
+}
+
+function callTransform(obj: any, src: any, depth = 0, maxDepth = 5) {
+  if (!obj || depth > maxDepth) return
+
+  // If the object itself has a transform method, call it
+  if (typeof obj.transform === 'function') {
+    obj.transform(src)
+  }
+
+  // Iterate over all properties
+  for (const key of Object.keys(obj)) {
+    const value = obj[key]
+    const srcValue = src ? src[key] : undefined
+
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        callTransform(
+          value[i],
+          srcValue ? srcValue[i] : undefined,
+          depth + 1,
+          maxDepth,
+        )
+      }
+    } else if (value && typeof value === 'object') {
+      callTransform(value, srcValue, depth + 1, maxDepth)
+    }
+  }
 }

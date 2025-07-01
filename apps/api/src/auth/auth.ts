@@ -37,7 +37,7 @@ export const configureAuth = (orm: MikroORM) => {
           organization: {
             modelName: 'Org',
             fields: {
-              logo: 'avatar_url',
+              logo: 'avatarURL',
               createdAt: 'created_at',
             },
           },
@@ -66,7 +66,7 @@ export const configureAuth = (orm: MikroORM) => {
       modelName: 'User',
       fields: {
         emailVerified: 'email_verified',
-        image: 'avatar_url',
+        image: 'avatarURL',
         displayUsername: 'display_username',
         createdAt: 'created_at',
         updatedAt: 'updated_at',
@@ -140,8 +140,18 @@ export const configureAuth = (orm: MikroORM) => {
     },
     trustedOrigins:
       process.env.NODE_ENV === 'production'
-        ? ['https://sageleaf.app', 'https://dev.sageleaf.app']
-        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+        ? [
+            'https://sageleaf.app',
+            'https://dev.sageleaf.app',
+            'https://science.sageleaf.app',
+            'https://science.dev.sageleaf.app',
+          ]
+        : [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+            'http://localhost:3001',
+            'http://127.0.0.1:3001',
+          ],
     advanced: {
       cookiePrefix: 'sage',
       crossSubDomainCookies: {

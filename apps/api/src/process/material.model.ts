@@ -55,7 +55,7 @@ export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   descendants!: MaterialsPage & {}
 
   @Field(() => ComponentsPage)
-  primary_components!: ComponentsPage & {}
+  primaryComponents!: ComponentsPage & {}
 
   @Field(() => ComponentsPage)
   components!: ComponentsPage & {}
@@ -107,13 +107,13 @@ export class CreateMaterialInput extends ChangeInputWithLang() {
   name!: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => Boolean)
   technical: boolean = false
@@ -135,13 +135,13 @@ export class UpdateMaterialInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => Boolean, { nullable: true })
   technical?: boolean

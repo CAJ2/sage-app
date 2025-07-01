@@ -18,7 +18,9 @@ async function bootstrap() {
         origin: [
           'https://sageleaf.app',
           'https://dev.sageleaf.app',
+          'https://science.dev.sageleaf.app',
           'http://localhost:3000',
+          'http://localhost:3001',
         ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,

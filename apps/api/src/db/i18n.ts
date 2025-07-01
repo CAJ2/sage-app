@@ -58,14 +58,16 @@ export function isTranslatedField(
 export function translate(params: TransformFnParams): string | undefined {
   const value = params.value as TranslatedField | undefined
   const obj = params.obj as Record<string, any>
+  const opts = params.options || {}
+  const lang: string[] | undefined = obj._lang || (opts as any).lang
   if (!value) {
     return value
   }
   if (!isTranslatedField(value)) {
     console.error('Invalid translated field', value)
   }
-  // Set _tr property to full translation object
-  obj[params.key + '_tr'] = _.map(value, (text, lang) => {
+  // Set Tr property to full translation object
+  obj[params.key + 'Tr'] = _.map(value, (text, lang) => {
     return {
       lang,
       text,
@@ -73,8 +75,7 @@ export function translate(params: TransformFnParams): string | undefined {
     }
   })
   const field: TranslatedField = value
-  if (_.isArray(obj._lang)) {
-    const lang: string[] = obj._lang
+  if (_.isArray(lang)) {
     for (const l of lang) {
       const iso3 = map2to3[l]
       if (iso3) {
@@ -97,7 +98,7 @@ export function translate(params: TransformFnParams): string | undefined {
       }
     }
   }
-  return field.xx
+  return field.en || field.xx
 }
 
 // Non class-transformer version of the translate function.

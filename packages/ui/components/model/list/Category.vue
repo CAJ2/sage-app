@@ -1,12 +1,12 @@
 <template>
   <li class="list-row">
     <div>
-      <UiImage class="size-10" :src="category.image_url"></UiImage>
+      <UiImage class="size-10" :src="category.imageURL"></UiImage>
     </div>
     <div>
       <div class="text-bold">{{ category.name_req }}</div>
       <div class="text-xs opacity-70">
-        {{ category.desc_short }}
+        {{ category.descShort }}
       </div>
     </div>
     <ModelListActionButtons
@@ -25,8 +25,8 @@ const ListCategoryFragment = graphql(`
   fragment ListCategoryFragment on Category {
     id
     name_req: name
-    desc_short
-    image_url
+    descShort
+    imageURL
   }
 `)
 

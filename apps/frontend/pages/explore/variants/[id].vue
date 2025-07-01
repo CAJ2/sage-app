@@ -4,13 +4,13 @@
       :title="data?.variant?.name || 'Product'"
       :subtitle="data?.variant?.orgs.nodes?.map((o) => o.org.name).join(', ')"
       :use-image="true"
-      :image="data?.variant?.image_url || undefined"
+      :image="data?.variant?.imageURL || undefined"
       back="true"
     ></NavTopbar>
     <div class="flex flex-col p-4">
       <UiImage
-        v-if="data?.variant?.image_url"
-        :src="data?.variant?.image_url"
+        v-if="data?.variant?.imageURL"
+        :src="data?.variant?.imageURL"
         class="rounded-box shadow-md w-32 h-32 object-cover mb-4"
       />
       <h2 class="text-lg font-semibold mb-2">{{ data?.variant?.name }}</h2>
@@ -64,13 +64,13 @@
         <div v-if="recyclingResult" class="px-3 pb-4">
           <ScoreBar
             size="medium"
-            :score="recyclingResult.variant?.recycle_score?.score"
+            :score="recyclingResult.variant?.recycleScore?.score"
           ></ScoreBar>
         </div>
         <ul class="list bg-base-100 rounded-box shadow-md">
           <li class="px-4 pb-2 text-sm opacity-80 tracking-wide">Components</li>
           <div class="divider my-0"></div>
-          <li v-if="status === 'pending'" class="list-row">
+          <li v-if="loadingRecycling" class="list-row">
             <div class="skeleton h-4 w-28"></div>
             <div class="skeleton h-4 w-full"></div>
             <div class="skeleton h-4 w-full"></div>
@@ -90,7 +90,7 @@
                 <div>
                   <UiImage
                     class="size-10 rounded-box"
-                    :src="component.component.image_url || undefined"
+                    :src="component.component.imageURL || undefined"
                   />
                 </div>
                 <div>
@@ -100,24 +100,23 @@
                   </div>
                 </div>
               </li>
-              <div class="px-3">
-                <ScoreBar
-                  size="small"
-                  :score="component.component.recycle_score?.score"
-                  :rating="component.component.recycle_score?.rating"
-                  :rating-fmt="component.component.recycle_score?.rating_f"
-                ></ScoreBar>
-              </div>
               <RecycleContainer
                 v-for="recycle in component.component.recycle"
                 :key="recycle.stream?.name || undefined"
-                :image="component.component.image_url"
+                :image="component.component.imageURL"
                 :recycle="recycle"
               ></RecycleContainer>
             </div>
           </div>
 
-          <li v-else class="list-row">
+          <li
+            v-if="
+              !loadingRecycling &&
+              (!recyclingResult?.variant?.components.nodes ||
+                recyclingResult.variant.components.nodes.length <= 0)
+            "
+            class="list-row"
+          >
             Recycling instructions are currently not available
           </li>
         </ul>
@@ -140,14 +139,14 @@ const variantQuery = graphql(`
       id
       name
       desc
-      image_url
+      imageURL
       orgs {
         nodes {
           org {
             id
             name
             desc
-            avatar_url
+            avatarURL
           }
         }
       }
@@ -157,7 +156,7 @@ const variantQuery = graphql(`
             id
             name
             desc
-            image_url
+            imageURL
           }
         }
       }
@@ -169,10 +168,10 @@ const variantRecycling = graphql(`
     variant(id: $id) {
       id
       name
-      recycle_score(region_id: $region) {
+      recycleScore(regionID: $region) {
         score
         rating
-        rating_f
+        ratingF
       }
       components {
         nodes {
@@ -180,13 +179,13 @@ const variantRecycling = graphql(`
             id
             name
             desc
-            image_url
-            recycle_score(region_id: $region) {
+            imageURL
+            recycleScore(regionID: $region) {
               score
               rating
-              rating_f
+              ratingF
             }
-            recycle(region_id: $region) {
+            recycle(regionID: $region) {
               context {
                 key
                 desc
@@ -194,6 +193,11 @@ const variantRecycling = graphql(`
               stream {
                 name
                 desc
+                score {
+                  score
+                  rating
+                  ratingF
+                }
                 container {
                   type
                   access
@@ -204,7 +208,7 @@ const variantRecycling = graphql(`
                   }
                   color
                   image
-                  image_entry_point {
+                  imageEntryPoint {
                     x
                     y
                     side
@@ -222,18 +226,17 @@ const vars = {
   id: route.params.id,
 }
 
-const { status, data } = await useLazyAsyncQuery(variantQuery, vars)
+const { data } = await useLazyAsyncQuery(variantQuery, vars)
 
-const { result: recyclingResult, load: loadRecycling } = useLazyQuery(
-  variantRecycling,
-  {
-    id:
-      typeof route.params.id === 'string'
-        ? route.params.id
-        : route.params.id[0],
-    region: useRegionStore().selectedRegion,
-  },
-)
+const {
+  result: recyclingResult,
+  load: loadRecycling,
+  loading: loadingRecycling,
+} = useLazyQuery(variantRecycling, {
+  id:
+    typeof route.params.id === 'string' ? route.params.id : route.params.id[0],
+  region: useRegionStore().selectedRegion,
+})
 watch(
   recyclingOpen,
   async (open) => {

@@ -45,11 +45,11 @@ export class PlaceSchemaService {
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema,
+      nameTr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema,
+      descTr: TrArraySchema,
       address: z.string().max(2048).optional(),
-      address_tr: TrArraySchema,
+      addressTr: TrArraySchema,
       location: z
         .object({
           latitude: z.number(),
@@ -65,17 +65,17 @@ export class PlaceSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/address_tr',
+          scope: '#/properties/addressTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
@@ -96,11 +96,11 @@ export class PlaceSchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: PlaceIDSchema,
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema,
+      nameTr: TrArraySchema,
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema,
+      descTr: TrArraySchema,
       address: z.string().max(2048).optional(),
-      address_tr: TrArraySchema,
+      addressTr: TrArraySchema,
       location: z
         .object({
           latitude: z.number(),
@@ -109,8 +109,8 @@ export class PlaceSchemaService {
         .optional(),
       org: PlaceOrgInputSchema.optional(),
       tags: z.array(PlaceTagsInputSchema).optional(),
-      add_tags: z.array(PlaceTagsInputSchema).optional(),
-      remove_tags: TagDefinitionIDSchema.array().optional(),
+      addTags: z.array(PlaceTagsInputSchema).optional(),
+      removeTags: TagDefinitionIDSchema.array().optional(),
     })
     this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
     this.UpdateUISchema = {
@@ -118,17 +118,17 @@ export class PlaceSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/address_tr',
+          scope: '#/properties/addressTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {

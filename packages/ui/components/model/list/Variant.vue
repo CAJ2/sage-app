@@ -1,7 +1,7 @@
 <template>
   <li class="list-row">
     <div>
-      <UiImage class="size-10" :src="variant.image_url"></UiImage>
+      <UiImage class="size-10" :src="variant.imageURL"></UiImage>
     </div>
     <div>
       <div class="text-bold">{{ variant.name }}</div>
@@ -26,7 +26,7 @@ const ListVariantFragment = graphql(`
     id
     name
     desc
-    image_url
+    imageURL
   }
 `)
 

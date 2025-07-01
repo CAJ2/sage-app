@@ -71,7 +71,7 @@ export class Component extends IDCreatedUpdated {
   sources = new Collection<Source>(this)
 
   @OneToMany(() => ComponentsSources, (cs) => cs.component)
-  component_sources = new Collection<ComponentsSources>(this)
+  componentSources = new Collection<ComponentsSources>(this)
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => ComponentsTags })
   tags = new Collection<Tag>(this)
@@ -81,13 +81,13 @@ export class Component extends IDCreatedUpdated {
     mappedBy: (ct) => ct.component,
     orphanRemoval: true,
   })
-  component_tags = new Collection<ComponentsTags>(this)
+  componentTags = new Collection<ComponentsTags>(this)
 
   @ManyToOne()
   region?: Ref<Region>
 
   @ManyToOne()
-  primary_material!: Ref<Material>
+  primaryMaterial!: Ref<Material>
 
   @Property({ type: 'json' })
   visual?: ComponentVisual
@@ -102,7 +102,7 @@ export class Component extends IDCreatedUpdated {
   materials = new Collection<Material>(this)
 
   @OneToMany(() => ComponentsMaterials, (cm) => cm.component)
-  component_materials = new Collection<ComponentsMaterials>(this)
+  componentMaterials = new Collection<ComponentsMaterials>(this)
 
   @ManyToMany(() => Variant, (variant) => variant.components)
   variants = new Collection<Variant>(this)
@@ -149,7 +149,7 @@ export class ComponentsMaterials extends BaseEntity {
   material!: Material
 
   @Property({ type: 'numeric', precision: 16, scale: 6, default: 0 })
-  material_fraction!: number
+  materialFraction!: number
 }
 
 @Entity({ tableName: 'component_history', schema: 'public' })

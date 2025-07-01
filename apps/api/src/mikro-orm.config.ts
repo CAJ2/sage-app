@@ -78,4 +78,5 @@ export default defineConfig({
   highlighter: process.env.NODE_ENV !== 'production' ? highlighter : undefined,
   extensions: [Migrator, SeedManager],
   dataloader: DataloaderType.ALL,
+  allowGlobalContext: process.env.NODE_ENV === 'test',
 })

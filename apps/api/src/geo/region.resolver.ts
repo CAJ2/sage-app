@@ -39,8 +39,8 @@ export class RegionResolver {
     const filter = this.transform.paginationArgs(args)
     const cursor = await this.regionService.searchByPoint(
       {
-        latitude: args.lat_long[0],
-        longitude: args.lat_long[1],
+        latitude: args.latlong[0],
+        longitude: args.latlong[1],
       },
       filter,
     )

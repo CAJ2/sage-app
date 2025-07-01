@@ -57,7 +57,7 @@ const categoryEditQuery = graphql(`
       status
       edits(id: $id) {
         nodes {
-          changes_update
+          updateChanges
         }
       }
     }
@@ -90,7 +90,7 @@ if (categoryID !== 'new') {
   ) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.change.edits.nodes[0].changes_update,
+      data.value.change.edits.nodes[0].updateChanges,
     ) as UpdateCategoryInput
   }
   if (data?.value?.change?.status) {
@@ -119,7 +119,7 @@ const categoryCreateMutation = graphql(`
 const categoryCreate = useMutation(categoryCreateMutation, {
   variables: {
     input: {
-      change_id: changeID,
+      changeID: changeID,
     } as CreateCategoryInput,
   },
 })
@@ -135,7 +135,7 @@ const categoryUpdateMutation = graphql(`
 const categoryUpdate = useMutation(categoryUpdateMutation, {
   variables: {
     input: {
-      change_id: changeID,
+      changeID: changeID,
       id: categoryID,
       ...updateData.value,
     },
@@ -159,7 +159,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       await categoryCreate
         .mutate({
           input: {
-            change_id: changeID,
+            changeID: changeID,
             ...createData.value,
           } as CreateCategoryInput,
         })
@@ -184,7 +184,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       await categoryUpdate
         .mutate({
           input: {
-            change_id: changeID,
+            changeID: changeID,
             id: categoryID,
             ...updateData.value,
           },

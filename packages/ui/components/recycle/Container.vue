@@ -5,29 +5,38 @@
         <CardTitle class="text-md text-center mb-3">{{
           recycle.stream.name
         }}</CardTitle>
+        <div class="px-3 pb-2 w-full">
+          <ScoreBar
+            size="small"
+            :score="recycle.stream?.score?.score"
+            :rating="recycle.stream?.score?.rating"
+            :rating-fmt="recycle.stream?.score?.ratingF"
+          ></ScoreBar>
+        </div>
       </CardHeader>
-      <CardContent class="flex flex-col justify-center px-4 pb-3">
-        <div class="relative">
-          <img
+      <CardContent class="flex flex-col justify-center items-center px-4 pb-3">
+        <div
+          class="relative max-w-[256px]"
+          :style="{
+            'margin-top': containerTopMargin,
+          }"
+        >
+          <UiImage
             v-if="recycle.stream.container.image"
             ref="containerImage"
             :src="recycle.stream.container.image"
           />
           <div
             v-if="recycle.stream.container.image"
-            class="absolute border-2 rounded-xl bg-base-100"
+            ref="compImage"
+            class="absolute border-2 rounded-xl bg-base-100 shadow-base-content shadow-md"
             :style="{
               top: `${compPercs.y}%`,
               left: `${compPercs.x}%`,
               'border-color': recycle.stream.container.color || '#000',
             }"
           >
-            <UiImage
-              ref="compImage"
-              :src="image || ''"
-              :width="14"
-              :height="14"
-            />
+            <UiImage :src="image || ''" :width="12" :height="12" />
           </div>
         </div>
         <span class="text-xs line-clamp-3">{{ recycle.stream.desc }}</span>
@@ -51,15 +60,23 @@ const containerDims = useElementSize(containerImage)
 const compDims = useElementSize(compImage)
 
 const compPercs = computed(() => {
-  if (!containerDims.width || !containerDims.height) return { x: 0, y: 0 }
-  if (!recycle?.stream?.container?.image_entry_point) return { x: 0, y: 0 }
+  if (!compDims.width.value || !compDims.height.value) return { x: 0, y: 0 }
+  if (!containerDims.width.value || !containerDims.height.value)
+    return { x: 0, y: 0 }
+  if (!recycle?.stream?.container?.imageEntryPoint) return { x: 0, y: 0 }
   return {
     x:
-      recycle.stream.container.image_entry_point.x -
+      recycle.stream.container.imageEntryPoint.x -
       (compDims.width.value / containerDims.width.value) * 50,
     y:
-      recycle.stream.container.image_entry_point.y -
+      recycle.stream.container.imageEntryPoint.y -
       (compDims.height.value / containerDims.height.value) * 50,
   }
+})
+const containerTopMargin = computed(() => {
+  if (compPercs.value.y < 0) {
+    return (-compPercs.value.y / 100) * containerDims.height.value + 'px'
+  }
+  return '0px'
 })
 </script>

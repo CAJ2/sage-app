@@ -104,7 +104,7 @@ const editQuery = graphql(`
       status
       edits(id: $id) {
         nodes {
-          changes_update
+          updateChanges
         }
       }
     }
@@ -113,9 +113,9 @@ const editQuery = graphql(`
 const directEditQuery = graphql(`
   query DirectGetEdit($id: ID!) {
     directEdit(id: $id) {
-      entity_name
+      entityName
       id
-      model_update
+      updateModel
     }
   }
 `)
@@ -130,7 +130,7 @@ if (modelId !== 'new' && changeId) {
       if (result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.change.edits.nodes[0].changes_update,
+          result.change.edits.nodes[0].updateChanges,
         )
       }
       if (result?.change?.status) {
@@ -151,7 +151,7 @@ if (modelId !== 'new' && changeId) {
       if (result?.directEdit?.id) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.directEdit.model_update,
+          result.directEdit.updateModel,
         )
       }
     },
@@ -170,14 +170,14 @@ const readOnly = computed<boolean | undefined>(() => {
 const create = useMutation(createMutation, {
   variables: {
     input: {
-      change_id: changeId,
+      changeID: changeId,
     },
   },
 })
 const update = useMutation(updateMutation, {
   variables: {
     input: {
-      change_id: changeId,
+      changeID: changeId,
       id: modelId,
       ...updateData.value,
     },
@@ -217,7 +217,7 @@ if (changeId && autoSave && modelId === 'new') {
     await create
       .mutate({
         input: {
-          change_id: changeId,
+          changeID: changeId,
           ...createData.value,
         },
       })
@@ -251,7 +251,7 @@ if (changeId && autoSave && modelId === 'new') {
     await update
       .mutate({
         input: {
-          change_id: changeId,
+          changeID: changeId,
           id: modelId,
           ...updateData.value,
         },
@@ -274,7 +274,7 @@ const saveForm = async () => {
     await create
       .mutate({
         input: {
-          change_id: changeId || undefined,
+          changeID: changeId || undefined,
           ...createData.value,
         },
       })
@@ -305,7 +305,7 @@ const saveForm = async () => {
     await update
       .mutate({
         input: {
-          change_id: changeId || undefined,
+          changeID: changeId || undefined,
           id: modelId,
           ...updateData.value,
         },

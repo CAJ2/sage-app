@@ -66,9 +66,9 @@
                       </p>
                       <div class="flex items-center gap-2">
                         <img
-                          v-if="res.image_url"
+                          v-if="res.imageURL"
                           class="size-12 rounded-box"
-                          :src="res.image_url"
+                          :src="res.imageURL"
                         />
                         <span
                           v-else
@@ -84,7 +84,7 @@
                             {{ res.name || res.name_null }}
                           </div>
                           <div class="text-xs opacity-70">
-                            {{ res.desc_short }}
+                            {{ res.descShort }}
                           </div>
                         </div>
                         <button class="btn btn-square btn-ghost">
@@ -137,15 +137,15 @@ const searchQuery = gql`
         ... on Category {
           id
           name
-          desc_short
+          descShort
           desc
-          image_url
+          imageURL
         }
         ... on Item {
           id
           name_null: name
           desc
-          image_url
+          imageURL
         }
         ... on Variant {
           id
@@ -183,9 +183,9 @@ type SearchResult = {
       id: string
       name: string
       name_null: string
-      desc_short: string
+      descShort: string
       desc: string
-      image_url: string
+      imageURL: string
       __typename: string
     }[]
     totalCount: number

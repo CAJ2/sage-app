@@ -50,7 +50,7 @@ export class ComponentResolver {
   @Query(() => Component, { name: 'component', nullable: true })
   async component(
     @Args('id', { type: () => ID }) id: string,
-    @Args('with_change', { type: () => ID, nullable: true })
+    @Args('withChange', { type: () => ID, nullable: true })
     withChange?: string,
   ): Promise<Component> {
     const component = await this.componentService.findOneByID(id)
@@ -75,8 +75,8 @@ export class ComponentResolver {
   }
 
   @ResolveField()
-  async primary_material(@Parent() component: Component) {
-    const material = await this.componentService.primary_material(
+  async primaryMaterial(@Parent() component: Component) {
+    const material = await this.componentService.primaryMaterial(
       component.id,
       component.entity,
     )
@@ -105,7 +105,7 @@ export class ComponentResolver {
   ) {
     const recycle = await this.componentService.recycle(
       component.id,
-      args.region_id,
+      args.regionID,
     )
     if (!recycle) {
       return null
@@ -114,13 +114,13 @@ export class ComponentResolver {
   }
 
   @ResolveField()
-  async recycle_score(
+  async recycleScore(
     @Parent() component: Component,
     @Args() args: ComponentRecycleArgs,
   ) {
     const score = await this.componentService.recycleScore(
       component.id,
-      args.region_id,
+      args.regionID,
     )
     if (!score) {
       return null

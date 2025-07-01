@@ -22,7 +22,7 @@ export class User extends IDCreatedUpdated<UserEntity> {
   email!: string
 
   @Field()
-  email_verified!: boolean
+  emailVerified!: boolean
 
   @Field()
   @MaxLength(64)
@@ -31,7 +31,7 @@ export class User extends IDCreatedUpdated<UserEntity> {
   @Field({ nullable: true })
   @IsOptional()
   @IsUrl()
-  avatar_url?: string
+  avatarURL?: string
 
   @Field({ nullable: true })
   lang?: string

@@ -2,7 +2,7 @@
   <div>
     <NavTopbar
       :title="
-        route.params.component_id === 'new'
+        route.params.componentID === 'new'
           ? 'Create Component'
           : 'Edit Component'
       "
@@ -31,7 +31,7 @@ import { ChangeStatus } from '~/gql/graphql'
 const route = useRoute()
 const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
-const componentID = route.params.component_id as string
+const componentID = route.params.componentID as string
 
 const formQuery = graphql(`
   query ChangesComponentSchema {
@@ -54,20 +54,20 @@ const componentEditQuery = graphql(`
       status
       edits(id: $id) {
         nodes {
-          changes_update
+          updateChanges
         }
       }
     }
   }
 `)
 const jsonSchema = computed(() => {
-  if (route.params.component_id === 'new') {
+  if (route.params.componentID === 'new') {
     return formData.value?.componentSchema?.create?.schema
   }
   return formData.value?.componentSchema?.update?.schema
 })
 const uiSchema = computed(() => {
-  if (route.params.component_id === 'new') {
+  if (route.params.componentID === 'new') {
     return formData.value?.componentSchema?.create?.uischema
   }
   return formData.value?.componentSchema?.update?.uischema
@@ -87,7 +87,7 @@ if (componentID !== 'new') {
   ) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.change.edits.nodes[0].changes_update,
+      data.value.change.edits.nodes[0].updateChanges,
     ) as UpdateComponentInput
   }
   if (data?.value?.change?.status) {
@@ -116,7 +116,7 @@ const componentCreateMutation = graphql(`
 const componentCreate = useMutation(componentCreateMutation, {
   variables: {
     input: {
-      change_id: changeID,
+      changeID: changeID,
     } as CreateComponentInput,
   },
 })
@@ -132,7 +132,7 @@ const componentUpdateMutation = graphql(`
 const componentUpdate = useMutation(componentUpdateMutation, {
   variables: {
     input: {
-      change_id: changeID,
+      changeID: changeID,
       id: componentID,
       ...updateData.value,
     },
@@ -156,7 +156,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       await componentCreate
         .mutate({
           input: {
-            change_id: changeID,
+            changeID: changeID,
             ...createData.value,
           } as CreateComponentInput,
         })
@@ -181,7 +181,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       await componentUpdate
         .mutate({
           input: {
-            change_id: changeID,
+            changeID: changeID,
             id: componentID,
             ...updateData.value,
           },

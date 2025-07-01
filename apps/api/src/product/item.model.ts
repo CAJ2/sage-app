@@ -35,7 +35,7 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 
   @Field(() => CategoriesPage)
   categories!: CategoriesPage
@@ -47,7 +47,7 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   variants!: VariantsPage & {}
 
   transform(entity: ItemEntity) {
-    this.image_url = entity.files?.thumbnail
+    this.imageURL = entity.files?.thumbnail
   }
 }
 registerModel('Item', Item)
@@ -108,7 +108,7 @@ export class CreateItemInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -116,11 +116,11 @@ export class CreateItemInput extends ChangeInputWithLang() {
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 
   @Field(() => [ItemCategoriesInput], { nullable: true })
   categories?: ItemCategoriesInput[]
@@ -141,7 +141,7 @@ export class UpdateItemInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -149,29 +149,29 @@ export class UpdateItemInput extends ChangeInputWithLang() {
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 
   @Field(() => [ItemCategoriesInput], { nullable: true })
   categories?: ItemCategoriesInput[]
 
   @Field(() => [ItemCategoriesInput], { nullable: true })
-  add_categories?: ItemCategoriesInput[]
+  addCategories?: ItemCategoriesInput[]
 
   @Field(() => [ID], { nullable: true })
-  remove_categories?: string[]
+  removeCategories?: string[]
 
   @Field(() => [ItemTagsInput], { nullable: true })
   tags?: ItemTagsInput[]
 
   @Field(() => [ItemTagsInput], { nullable: true })
-  add_tags?: ItemTagsInput[]
+  addTags?: ItemTagsInput[]
 
   @Field(() => [ID], { nullable: true })
-  remove_tags?: string[]
+  removeTags?: string[]
 }
 
 @ObjectType()

@@ -32,7 +32,7 @@
                 <span class="opacity-70"
                   >created on
                   {{
-                    new Date(changeData.change?.created_at).toLocaleDateString()
+                    new Date(changeData.change?.createdAt).toLocaleDateString()
                   }}
                 </span>
               </div>
@@ -124,14 +124,14 @@
           <ul v-if="changeData?.change?.edits" class="divide-y-1">
             <li
               v-for="edit in changeData.change.edits.nodes"
-              :key="edit.id || edit.entity_name"
+              :key="edit.id || edit.entityName"
               class="border-neutral-300"
             >
               <NuxtLinkLocale :to="getEditSubLink(edit as Edit)">
                 <div v-if="edit.changes" class="my-4 mx-3">
                   <div class="flex items-center">
                     <div class="badge badge-sm badge-secondary">
-                      {{ edit.entity_name }}
+                      {{ edit.entityName }}
                     </div>
                     <div class="flex-1 px-2">
                       <span
@@ -207,8 +207,8 @@ const changeQuery = graphql(`
       status
       title
       description
-      created_at
-      updated_at
+      createdAt
+      updatedAt
       user {
         id
         username
@@ -216,7 +216,7 @@ const changeQuery = graphql(`
       edits {
         nodes {
           id
-          entity_name
+          entityName
           original {
             ... on Variant {
               name
@@ -280,7 +280,7 @@ const entityToPage: Record<string, string> = {
 }
 
 const getEditSubLink = (edit: Edit) => {
-  return `/contribute/changes/${changeData.value?.change?.id}/${entityToPage[edit.entity_name]}/${edit.id}`
+  return `/contribute/changes/${changeData.value?.change?.id}/${entityToPage[edit.entityName]}/${edit.id}`
 }
 
 const changeEditMutation = graphql(`

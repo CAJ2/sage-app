@@ -8,7 +8,7 @@ import {
 } from '@nestjs/graphql'
 import { Change, ChangeInputWithLang } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { IsNanoID } from '@src/common/validator.model'
+import { IsNanoID, ZodValid } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import { Region } from '@src/geo/region.model'
 import {
@@ -22,7 +22,11 @@ import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
-import { Component as ComponentEntity } from './component.entity'
+import {
+  Component as ComponentEntity,
+  ComponentPhysicalSchema,
+  ComponentVisualSchema,
+} from './component.entity'
 import { Material } from './material.model'
 import { RecyclingStream, StreamContext, StreamScore } from './stream.model'
 import { Tag } from './tag.model'
@@ -33,7 +37,7 @@ export class ComponentMaterial {
   material!: Material & {}
 
   @Field(() => Float, { nullable: true })
-  material_fraction?: number
+  materialFraction?: number
 }
 
 @ObjectType()
@@ -63,10 +67,10 @@ export class Component
 
   @Field(() => String, { nullable: true })
   @Transform(({ value }) => value.image)
-  image_url?: string
+  imageURL?: string
 
   @Field(() => Material)
-  primary_material!: Material & {}
+  primaryMaterial!: Material & {}
 
   @Field(() => [ComponentMaterial])
   materials: ComponentMaterial[] = []
@@ -81,13 +85,13 @@ export class Component
   recycle?: ComponentRecycle[]
 
   @Field(() => StreamScore, { nullable: true })
-  recycle_score?: StreamScore
+  recycleScore?: StreamScore
 
   @Field(() => [ComponentHistory])
   history: ComponentHistory[] = []
 
   transform(entity: ComponentEntity) {
-    this.image_url = entity.visual?.image
+    this.imageURL = entity.visual?.image
   }
 }
 registerModel('Component', Component)
@@ -95,7 +99,7 @@ registerModel('Component', Component)
 @ObjectType()
 export class ComponentHistory {
   @Field(() => String)
-  component_id!: string
+  componentID!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
@@ -113,18 +117,18 @@ export class ComponentsPage extends Paginated(Component) {}
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {
   @Field(() => ID, { nullable: true })
-  with_change?: string
+  withChange?: string
 
   @Field(() => ID, { nullable: true })
   @IsOptional()
-  region_id?: string
+  regionID?: string
 }
 
 @ArgsType()
 export class ComponentRecycleArgs {
   @Field(() => ID, { nullable: true })
   @IsOptional()
-  region_id?: string
+  regionID?: string
 }
 
 @InputType()
@@ -134,7 +138,7 @@ export class ComponentMaterialInput {
   id!: string
 
   @Field(() => Float, { nullable: true })
-  material_fraction?: number
+  materialFraction?: number
 }
 
 @InputType()
@@ -160,19 +164,25 @@ export class CreateComponentInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
-  image_url?: string
+  imageURL?: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  visual?: Record<string, any>
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  physical?: Record<string, any>
 
   @Field(() => ComponentMaterialInput, { nullable: true })
-  primary_material?: ComponentMaterialInput
+  primaryMaterial?: ComponentMaterialInput
 
   @Field(() => [ComponentMaterialInput], { nullable: true })
   materials?: ComponentMaterialInput[]
@@ -194,19 +204,27 @@ export class UpdateComponentInput extends ChangeInputWithLang() {
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
-  image_url?: string
+  imageURL?: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  @ZodValid(ComponentVisualSchema.optional())
+  visual?: Record<string, any>
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  @ZodValid(ComponentPhysicalSchema.optional())
+  physical?: Record<string, any>
 
   @Field(() => ComponentMaterialInput, { nullable: true })
-  primary_material?: ComponentMaterialInput
+  primaryMaterial?: ComponentMaterialInput
 
   @Field(() => [ComponentMaterialInput], { nullable: true })
   materials?: ComponentMaterialInput[]
@@ -215,10 +233,10 @@ export class UpdateComponentInput extends ChangeInputWithLang() {
   tags?: ComponentTagsInput[]
 
   @Field(() => [ComponentTagsInput], { nullable: true })
-  add_tags?: ComponentTagsInput[]
+  addTags?: ComponentTagsInput[]
 
   @Field(() => [ID], { nullable: true })
-  remove_tags?: string[]
+  removeTags?: string[]
 
   @Field(() => ComponentRegionInput, { nullable: true })
   region?: ComponentRegionInput

@@ -56,7 +56,7 @@ import { graphql } from '~/gql'
 import type { EditModelType } from '~/gql/graphql'
 
 type CursorVars = {
-  change_id: string
+  changeID: string
   type?: EditModelType
   first?: number
   last?: number
@@ -76,7 +76,7 @@ const { selectedChange } = storeToRefs(changeStore)
 
 const fetchCount = pageSize || 5
 const { result, refetch } = useQuery(query, {
-  change_id: selectedChange.value,
+  changeID: selectedChange.value,
   type,
   first: fetchCount,
   last: undefined,
@@ -93,7 +93,7 @@ const hasNextPage = computed(() => {
 
 const prevPage = async () => {
   await refetch({
-    change_id: selectedChange.value,
+    changeID: selectedChange.value,
     first: undefined,
     last: fetchCount,
     after: null,
@@ -102,7 +102,7 @@ const prevPage = async () => {
 }
 const nextPage = async () => {
   await refetch({
-    change_id: selectedChange.value,
+    changeID: selectedChange.value,
     first: fetchCount,
     last: undefined,
     before: null,
@@ -111,8 +111,8 @@ const nextPage = async () => {
 }
 
 const discardEditMutation = graphql(`
-  mutation DiscardEditMutation($change_id: ID!, $edit_id: ID!) {
-    discardEdit(change_id: $change_id, edit_id: $edit_id) {
+  mutation DiscardEditMutation($changeID: ID!, $editID: ID!) {
+    discardEdit(changeID: $changeID, editID: $editID) {
       id
     }
   }
@@ -121,8 +121,8 @@ const discardEditMutation = graphql(`
 const discardEdit = async (editId: string) => {
   const { mutate } = useMutation(discardEditMutation, {
     variables: {
-      change_id: selectedChange.value,
-      edit_id: editId,
+      changeID: selectedChange.value,
+      editID: editId,
     },
   })
   await mutate()

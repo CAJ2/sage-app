@@ -32,7 +32,7 @@ export class Source extends IDCreatedUpdated {
   type!: SourceType
 
   @Property()
-  processed_at?: Date
+  processedAt?: Date
 
   @Property()
   location?: string
@@ -41,7 +41,7 @@ export class Source extends IDCreatedUpdated {
   content?: any
 
   @Property()
-  content_url?: string
+  contentURL?: string
 
   @ManyToOne(() => User)
   user!: Ref<User>

@@ -88,7 +88,7 @@ export const ProcessInstructionsSchema = z.object({
     .object({
       type: ProcessInstructionsContainerTypeSchema,
       access: ProcessInstructionsAccessSchema.optional(),
-      image: z.string().optional(),
+      image: z.url().optional(),
       color: z.string().optional(),
       shape: z
         .object({
@@ -97,7 +97,7 @@ export const ProcessInstructionsSchema = z.object({
           depth: z.number().optional(),
         })
         .optional(),
-      image_entry_point: z
+      imageEntryPoint: z
         .object({
           x: z.int().min(-100).max(200),
           y: z.int().min(-100).max(200),
@@ -126,7 +126,7 @@ export interface ProcessInstructions {
       width?: number
       depth?: number
     }
-    image_entry_point?: {
+    imageEntryPoint?: {
       // The entry point is the relative position where items are placed in the container.
       // x and y are percentages (0-100) relative to the top left corner of the image.
       // The percentages can be less than 0 or greater than 100, if the image should be
@@ -149,9 +149,9 @@ export const MatchRuleSchema = z.object({
   // One component, zero or more component tags, and one or more materials.
   // These rules are used to match properties of any of these inputs.
   // Check if this component tag is present.
-  component_tag: z.string().optional(),
+  componentTag: z.string().optional(),
   // Run a JSON schema against the meta object.
-  component_tag_meta: z.string().optional(),
+  componentTagMeta: z.string().optional(),
   // Check if this material is present.
   material: z.string().optional(),
 })
@@ -189,13 +189,13 @@ export interface ProcessEfficiency {
   // The value cannot be less than 0, but possibly
   // greater than 1, meaning the output is more valuable
   // than the input.
-  value_ratio?: number
+  valueRatio?: number
 }
 
 export const ProcessEfficiencySchema = z.object({
   efficiency: z.number().min(0).max(1).optional(),
   equivalency: z.number().min(0).max(1).optional(),
-  value_ratio: z.number().min(0).optional(),
+  valueRatio: z.number().min(0).optional(),
 })
 
 @Entity({ tableName: 'processes', schema: 'public' })
@@ -238,7 +238,7 @@ export class Process extends IDCreatedUpdated {
   sources = new Collection<Source>(this)
 
   @OneToMany(() => ProcessSources, (pr) => pr.process)
-  process_sources = new Collection<ProcessSources>(this)
+  processSources = new Collection<ProcessSources>(this)
 
   @ManyToOne()
   org?: Ref<Org>

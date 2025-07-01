@@ -104,12 +104,12 @@ export class BaseSchemaService {
           {
             type: 'Control',
             scope: '#/properties/lang',
-            label: this.i18n.t('schemas.translated_input.lang_title'),
+            label: this.i18n.t('schemas.translatedInput.langTitle'),
           },
           {
             type: 'Control',
             scope: '#/properties/text',
-            label: this.i18n.t('schemas.translated_input.text_title'),
+            label: this.i18n.t('schemas.translatedInput.textTitle'),
           },
         ],
       },

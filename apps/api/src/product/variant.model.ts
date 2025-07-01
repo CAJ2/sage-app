@@ -4,6 +4,7 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
 import {
+  BaseModel,
   IDCreatedUpdated,
   registerModel,
   TranslatedInput,
@@ -14,7 +15,7 @@ import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
-import { Transform } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
   IsOptional,
   IsPositive,
@@ -25,7 +26,11 @@ import {
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { ItemsPage } from './item.model'
-import { Variant as VariantEntity } from './variant.entity'
+import {
+  Variant as VariantEntity,
+  VariantsComponents,
+  VariantsOrgs,
+} from './variant.entity'
 
 @ObjectType({
   implements: () => [Named],
@@ -45,7 +50,7 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsUrl({ protocols: ['https'] })
-  image_url?: string
+  imageURL?: string
 
   @Field(() => ItemsPage)
   items!: ItemsPage
@@ -57,7 +62,7 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   tags!: TagPage
 
   @Field(() => StreamScore, { nullable: true })
-  recycle_score?: StreamScore
+  recycleScore?: StreamScore
 
   @Field(() => VariantComponentsPage)
   components!: VariantComponentsPage & {}
@@ -80,8 +85,9 @@ export class VariantHistory {
 }
 
 @ObjectType()
-export class VariantOrg {
+export class VariantOrg extends BaseModel<VariantsOrgs> {
   @Field(() => Org)
+  @Type(() => Org)
   org!: Org & {}
 
   @Field(() => String, { nullable: true })
@@ -89,8 +95,9 @@ export class VariantOrg {
 }
 
 @ObjectType()
-export class VariantComponent {
+export class VariantComponent extends BaseModel<VariantsComponents> {
   @Field(() => Component)
+  @Type(() => Component)
   component!: Component & {}
 
   @Field(() => Number, { nullable: true })
@@ -113,10 +120,18 @@ export class VariantComponentsPage extends Paginated(VariantComponent) {}
 export class VariantsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
-export class VariantComponentsArgs extends PaginationBasicArgs {}
+export class VariantComponentsArgs extends PaginationBasicArgs {
+  orderBy(): string[] {
+    return ['component']
+  }
+}
 
 @ArgsType()
-export class VariantOrgsArgs extends PaginationBasicArgs {}
+export class VariantOrgsArgs extends PaginationBasicArgs {
+  orderBy(): string[] {
+    return ['org']
+  }
+}
 
 @ArgsType()
 export class VariantTagsArgs extends PaginationBasicArgs {}
@@ -127,7 +142,7 @@ export class VariantItemsArgs extends PaginationBasicArgs {}
 @ArgsType()
 export class VariantRecycleArgs {
   @Field(() => ID, { nullable: true })
-  region_id?: string
+  regionID?: string
 }
 
 @InputType()
@@ -188,7 +203,7 @@ export class CreateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -197,11 +212,11 @@ export class CreateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 
   @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
@@ -246,7 +261,7 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  name_tr?: TranslatedInput[]
+  nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -255,19 +270,23 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [TranslatedInput], { nullable: true })
   @IsOptional()
-  desc_tr?: TranslatedInput[]
+  descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  image_url?: string
+  imageURL?: string
 
   @Field(() => [VariantItemsInput], { nullable: true })
   @IsOptional()
-  add_items?: VariantItemsInput[]
+  items?: VariantItemsInput[]
+
+  @Field(() => [VariantItemsInput], { nullable: true })
+  @IsOptional()
+  addItems?: VariantItemsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_items?: string[]
+  removeItems?: string[]
 
   @Field(() => VariantRegionsInput, { nullable: true })
   @IsOptional()
@@ -275,11 +294,11 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [VariantRegionsInput], { nullable: true })
   @IsOptional()
-  add_regions?: VariantRegionsInput[]
+  addRegions?: VariantRegionsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_regions?: string[]
+  removeRegions?: string[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
@@ -292,11 +311,11 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [VariantOrgsInput], { nullable: true })
   @IsOptional()
-  add_orgs?: VariantOrgsInput[]
+  addOrgs?: VariantOrgsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_orgs?: string[]
+  removeOrgs?: string[]
 
   @Field(() => [VariantTagsInput], { nullable: true })
   @IsOptional()
@@ -304,11 +323,11 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [VariantTagsInput], { nullable: true })
   @IsOptional()
-  add_tags?: VariantTagsInput[]
+  addTags?: VariantTagsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_tags?: string[]
+  removeTags?: string[]
 
   @Field(() => [VariantComponentsInput], { nullable: true })
   @IsOptional()
@@ -316,11 +335,11 @@ export class UpdateVariantInput extends ChangeInputWithLang() {
 
   @Field(() => [VariantComponentsInput], { nullable: true })
   @IsOptional()
-  add_components?: VariantComponentsInput[]
+  addComponents?: VariantComponentsInput[]
 
   @Field(() => [ID], { nullable: true })
   @IsOptional()
-  remove_components?: string[]
+  removeComponents?: string[]
 }
 
 @ObjectType()

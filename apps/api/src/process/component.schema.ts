@@ -48,12 +48,7 @@ export class ComponentSchemaService {
     this.ComponentMaterialInputSchema = z
       .strictObject({
         id: MaterialIDSchema,
-        material_fraction: z
-          .number()
-          .min(0.000001)
-          .max(1)
-          .optional()
-          .default(1),
+        materialFraction: z.number().min(0.000001).max(1).optional().default(1),
       })
       .meta({
         title: this.i18n.t('schemas.components.materials.item_title'),
@@ -70,19 +65,19 @@ export class ComponentSchemaService {
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema.meta({
-        title: this.i18n.t('schemas.components.name_tr.title'),
+      nameTr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.nameTr.title'),
       }),
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema.meta({
-        title: this.i18n.t('schemas.components.desc_tr.title'),
+      descTr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.descTr.title'),
       }),
-      image_url: ImageOrIconSchema.meta({
-        title: this.i18n.t('schemas.components.image_url.title'),
+      imageURL: ImageOrIconSchema.meta({
+        title: this.i18n.t('schemas.components.imageURL.title'),
       }),
       visual: ComponentVisualSchema.optional(),
       physical: ComponentPhysicalSchema.optional(),
-      primary_material: this.ComponentMaterialInputSchema.optional(),
+      primaryMaterial: this.ComponentMaterialInputSchema.optional(),
       materials: this.ComponentMaterialInputSchema.array()
         .optional()
         .meta({
@@ -99,17 +94,17 @@ export class ComponentSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
@@ -122,8 +117,8 @@ export class ComponentSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/primary_material',
-          label: this.i18n.t('schemas.components.primary_material.title'),
+          scope: '#/properties/primaryMaterial',
+          label: this.i18n.t('schemas.components.primaryMaterial.title'),
         },
         {
           type: 'Control',
@@ -143,23 +138,23 @@ export class ComponentSchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: z.string(),
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema.meta({
-        title: this.i18n.t('schemas.components.name_tr.title'),
+      nameTr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.nameTr.title'),
       }),
       desc: z.string().max(100_000).optional(),
-      desc_tr: TrArraySchema.meta({
-        title: this.i18n.t('schemas.components.desc_tr.title'),
+      descTr: TrArraySchema.meta({
+        title: this.i18n.t('schemas.components.descTr.title'),
       }),
-      image_url: ImageOrIconSchema.meta({
-        title: this.i18n.t('schemas.components.image_url.title'),
+      imageURL: ImageOrIconSchema.meta({
+        title: this.i18n.t('schemas.components.imageURL.title'),
       }),
       visual: ComponentVisualSchema.optional(),
       physical: ComponentPhysicalSchema.optional(),
-      primary_material: this.ComponentMaterialInputSchema.optional(),
+      primaryMaterial: this.ComponentMaterialInputSchema.optional(),
       materials: this.ComponentMaterialInputSchema.array().optional(),
       tags: this.ComponentTagsInputSchema.array().optional(),
-      add_tags: this.ComponentTagsInputSchema.array().optional(),
-      remove_tags: TagDefinitionIDSchema.array().optional(),
+      addTags: this.ComponentTagsInputSchema.array().optional(),
+      removeTags: TagDefinitionIDSchema.array().optional(),
       region: this.ComponentRegionInputSchema.optional(),
     })
 
@@ -170,17 +165,17 @@ export class ComponentSchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
         {
@@ -193,7 +188,7 @@ export class ComponentSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/primary_material',
+          scope: '#/properties/primaryMaterial',
         },
         {
           type: 'Control',
@@ -228,7 +223,7 @@ export class ComponentSchemaService {
         'material',
       )
       data.tags = this.baseSchema.collectionToInput(
-        data.component_tags || [],
+        data.componentTags || [],
         'component',
         'tag',
       )

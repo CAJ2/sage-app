@@ -66,8 +66,8 @@ export class ProcessSchemaService {
     })
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       intent: z.enum(ProcessIntent),
-      name_tr: TrArraySchema.optional(),
-      desc_tr: TrArraySchema.optional(),
+      nameTr: TrArraySchema.optional(),
+      descTr: TrArraySchema.optional(),
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
       rules: ProcessRulesSchema.optional(),
@@ -87,12 +87,12 @@ export class ProcessSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
@@ -133,8 +133,8 @@ export class ProcessSchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: ProcessIDSchema,
       intent: z.enum(ProcessIntent).optional(),
-      name_tr: TrArraySchema.optional(),
-      desc_tr: TrArraySchema.optional(),
+      nameTr: TrArraySchema.optional(),
+      descTr: TrArraySchema.optional(),
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
       rules: ProcessRulesSchema.optional(),
@@ -154,12 +154,12 @@ export class ProcessSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {

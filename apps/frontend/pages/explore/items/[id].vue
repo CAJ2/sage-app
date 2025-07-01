@@ -26,7 +26,7 @@ const itemQuery = graphql(`
       id
       name
       desc
-      image_url
+      imageURL
     }
   }
 `)

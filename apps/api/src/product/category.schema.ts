@@ -35,10 +35,10 @@ export class CategorySchemaService {
     private readonly baseSchema: BaseSchemaService,
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
-      name_tr: TrArraySchema,
-      desc_short_tr: TrArraySchema,
-      desc_tr: TrArraySchema,
-      image_url: ImageOrIconSchema,
+      nameTr: TrArraySchema,
+      descShortTr: TrArraySchema,
+      descTr: TrArraySchema,
+      imageURL: ImageOrIconSchema,
     })
 
     this.CreateJSONSchema = zToSchema(this.CreateSchema)
@@ -48,24 +48,24 @@ export class CategorySchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           label: 'Name Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_short_tr',
+          scope: '#/properties/descShortTr',
           label: 'Short Description Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
       ],
@@ -74,10 +74,10 @@ export class CategorySchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: z.string(),
       name: z.string().max(1024).optional(),
-      name_tr: TrArraySchema,
-      desc_short_tr: TrArraySchema,
-      desc_tr: TrArraySchema,
-      image_url: ImageOrIconSchema,
+      nameTr: TrArraySchema,
+      descShortTr: TrArraySchema,
+      descTr: TrArraySchema,
+      imageURL: ImageOrIconSchema,
     })
 
     this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
@@ -87,23 +87,23 @@ export class CategorySchemaService {
       elements: [
         {
           type: 'Control',
-          scope: '#/properties/name_tr',
+          scope: '#/properties/nameTr',
           label: 'Name Translations',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_short_tr',
+          scope: '#/properties/descShortTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/desc_tr',
+          scope: '#/properties/descTr',
           options: this.baseSchema.trOptionsUISchema(),
         },
         {
           type: 'Control',
-          scope: '#/properties/image_url',
+          scope: '#/properties/imageURL',
           options: this.baseSchema.imageOrIconOptionsUISchema(),
         },
       ],

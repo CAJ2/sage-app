@@ -30,12 +30,12 @@ export class Region extends CreatedUpdated<RegionEntity> {
   bbox?: number[]
 
   @Field(() => Number, { nullable: true })
-  min_zoom?: number
+  minZoom?: number
 
   transform(entity: RegionEntity) {
     this.bbox = extractBbox(entity)
-    if (entity.properties && entity.properties['lbl:min_zoom']) {
-      this.min_zoom = Number(entity.properties['lbl:min_zoom'])
+    if (entity.properties && entity.properties['lbl:minZoom']) {
+      this.minZoom = Number(entity.properties['lbl:minZoom'])
     }
   }
 }
@@ -44,13 +44,13 @@ registerModel('Region', Region)
 @ObjectType()
 export class RegionHistory {
   @Field(() => ID)
-  region_id!: string
+  regionID!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
 
   @Field(() => String)
-  user_id!: string
+  userID!: string
 
   @Field(() => String, { nullable: true })
   original?: string
@@ -68,7 +68,7 @@ export class RegionsArgs extends PaginationBasicArgs {}
 @ArgsType()
 export class RegionsSearchByPointArgs extends PaginationBasicArgs {
   @Field(() => [Number])
-  lat_long!: number[]
+  latlong!: number[]
 }
 
 export const RegionIDSchema = z.string().meta({

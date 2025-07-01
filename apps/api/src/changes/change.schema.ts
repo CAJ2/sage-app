@@ -31,9 +31,9 @@ export const UpdateChangeInputJSONSchema = z.toJSONSchema(
 )
 
 export const ChangeInputWithLangSchema = z.strictObject({
-  change_id: ChangeIDSchema.optional(),
+  changeID: ChangeIDSchema.optional(),
   change: CreateChangeInputSchema.optional(),
-  add_sources: z.array(SourceIDSchema).optional(),
-  remove_sources: z.array(SourceIDSchema).optional(),
+  addSources: z.array(SourceIDSchema).optional(),
+  removeSources: z.array(SourceIDSchema).optional(),
   apply: z.boolean().optional(),
 })
