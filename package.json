@@ -1,7 +1,7 @@
 {
   "name": "@sageleaf/app",
   "version": "0.0.0",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0",
   "scripts": {
     "prepare": "husky"
   },
