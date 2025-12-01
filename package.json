@@ -34,11 +34,12 @@
       "@apollo/protobufjs",
       "@nestjs/core",
       "@parcel/watcher",
+      "@sageleaf/ui",
       "@swc/core",
       "core-js",
+      "cypress",
       "esbuild",
       "nx",
-      "@sageleaf/ui",
       "sharp",
       "vue-demi"
     ]
