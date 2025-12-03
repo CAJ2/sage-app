@@ -3,6 +3,10 @@ packages:
   - apps/api
   - apps/frontend
   - apps/science
+
+injectWorkspacePackages: true
+
+sideEffectsCache: false
+
 syncInjectedDepsAfterScripts:
   - build
-injectWorkspacePackages: true
