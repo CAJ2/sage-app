@@ -50,6 +50,9 @@
       "inputs": [
         "default",
         "^production"
+      ],
+      "dependsOn": [
+        "^build"
       ]
     },
     "test": {
