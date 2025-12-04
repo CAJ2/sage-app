@@ -1,9 +1,7 @@
-name: CI
+name: Pull Request CI
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
 
 permissions:
   actions: read
@@ -61,41 +59,3 @@ jobs:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test
           TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
-
-  build-image-api:
-    name: "Build API images"
-    uses: ./.github/workflows/oci-build-image.yml
-    if: github.event_name != 'pull_request'
-    needs: test
-    permissions:
-      contents: read
-      packages: write
-      security-events: write
-      id-token: write
-    with:
-      registry: ghcr.io/caj2
-      image_name: sageleaf-api
-      target: api
-
-  build-image-frontend:
-    name: "Build frontend images"
-    uses: ./.github/workflows/oci-build-image.yml
-    if: github.event_name != 'pull_request'
-    needs: build-image-api
-    permissions:
-      contents: read
-      packages: write
-      security-events: write
-      id-token: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - image_name: sageleaf-frontend
-            target: frontend
-          - image_name: sageleaf-science
-            target: science
-    with:
-      registry: ghcr.io/caj2
-      image_name: ${{ matrix.image_name }}
-      target: ${{ matrix.target }}
