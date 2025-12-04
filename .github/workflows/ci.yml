@@ -18,7 +18,7 @@ jobs:
       crdb:
         image: cockroachdb/cockroach
         env:
-          COCKROACH_ARGS: 'start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost --log="{file-defaults: {dir: /cockroach}, sinks: {stderr: {filter: NONE}}}"'
+          COCKROACH_ARGS: "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost --log-dir=/cockroach"
         ports:
           - 26257:26257
         options: >-

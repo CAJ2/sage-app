@@ -8,19 +8,10 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: "Build & Test"
+  build:
+    name: "Build & Lint"
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    services:
-      crdb:
-        image: cockroachdb/cockroach
-        env:
-          COCKROACH_ARGS: 'start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost --log="{file-defaults: {dir: /cockroach}, sinks: {stderr: {filter: NONE}}}"'
-        ports:
-          - 26257:26257
-        options: >-
-          --health-cmd "curl -f http://localhost:8080/health?ready=1"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,6 +38,35 @@ jobs:
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+
+  test:
+    name: "Test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      crdb:
+        image: cockroachdb/cockroach
+        env:
+          COCKROACH_ARGS: "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost --log-dir=/cockroach"
+        ports:
+          - 26257:26257
+        options: >-
+          --health-cmd "curl -f http://localhost:8080/health?ready=1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      # Cache node_modules
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
 
       # Run migrations
       - run: pnpm --filter api exec mikro-orm migration:up
