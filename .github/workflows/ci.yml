@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
 
 permissions:
   actions: read
@@ -12,14 +11,14 @@ permissions:
 
 jobs:
   test:
-    name: 'Build & Test'
+    name: "Build & Test"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
       crdb:
         image: cockroachdb/cockroach
         env:
-          COCKROACH_ARGS: "start-single-node --insecure"
+          COCKROACH_ARGS: "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost"
         ports:
           - 26257:26257
         options: >-
@@ -35,15 +34,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      # Run migrations
-      - run: pnpm --filter api exec mikro-orm migration:up
+      # Check linting
+      - run: pnpm exec nx affected -t lint:ci
         env:
-          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
 
       # Build
       - run: pnpm exec nx affected -t build
@@ -51,10 +50,10 @@ jobs:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
-      # Check linting
-      - run: pnpm exec nx affected -t lint:ci
+      # Run migrations
+      - run: pnpm --filter api exec mikro-orm migration:up
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
       # Run tests
       - run: pnpm exec nx affected -t test
@@ -64,7 +63,7 @@ jobs:
           TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
   build-image-api:
-    name: 'Build API images'
+    name: "Build API images"
     uses: ./.github/workflows/oci-build-image.yml
     if: github.event_name != 'pull_request'
     needs: test
@@ -79,7 +78,7 @@ jobs:
       target: api
 
   build-image-frontend:
-    name: 'Build frontend images'
+    name: "Build frontend images"
     uses: ./.github/workflows/oci-build-image.yml
     if: github.event_name != 'pull_request'
     needs: build-image-api

@@ -46,7 +46,7 @@
       ]
     },
     "lint:ci": {
-      "cache": true,
+      "cache": false,
       "inputs": [
         "default",
         "^production"
