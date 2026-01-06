@@ -59,11 +59,14 @@ export class GraphQLModule {
           playground: false,
           plugins: [
             ApolloServerPluginLandingPageLocalDefault({
-              embed: true,
+              embed: {
+                endpointIsEditable: false,
+              },
+              includeCookies: true,
             }),
           ],
-          hideSchemaDetailsFromClientErrors:
-            process.env.NODE_ENV === 'production',
+          introspection: true,
+          hideSchemaDetailsFromClientErrors: false,
           resolvers: {
             DateTime: LuxonDateTimeResolver,
             JSONObject: JSONObjectResolver,
