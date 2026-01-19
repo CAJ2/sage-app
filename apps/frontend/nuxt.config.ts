@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     ['reka-ui/nuxt', { prefix: 'reka' }],
+    '@posthog/nuxt',
   ],
 
   app: {
@@ -98,6 +99,35 @@ export default defineNuxtConfig({
 
   colorMode: {
     classSuffix: '',
+  },
+
+  sourcemap: {
+    client: 'hidden',
+  },
+
+  nitro: {
+    rollupConfig: {
+      output: {
+        sourcemapExcludeSources: false,
+      }
+    },
+  },
+
+  posthogConfig: {
+    publicKey: 'phc_zJRW2N7cF9qAxfBaCCfXOpz42qQKr2WGOImojvinsUa',
+    host: 'https://eu.i.posthog.com',
+    clientConfig: {
+      capture_exceptions: true, // Enables automatic exception capture on the client side (Vue)
+    },
+    serverConfig: {
+      enableExceptionAutocapture: true, // Enables automatic exception capture on the server side (Nitro)
+    },
+    sourcemaps: {
+      enabled: true,
+      envId: '117506',
+      personalApiKey: process.env.POSTHOG_PERSONAL_API_KEY || '',
+      project: 'sage-frontend',
+    },
   },
 
   compatibilityDate: '2025-02-12',
