@@ -2,16 +2,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-postman-configmap
+  name: '{{ .Release.Name }}-postman-configmap'
   annotations:
     "helm.sh/hook": test-success
-data:
-{{ (.Files.Glob "postman/*").AsConfig | indent 2 }}
+data: '{{ (.Files.Glob "postman/*").AsConfig | indent 2 }}'
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "sageleaf-api.fullname" . }}-postman-test"
+  name: '{{ include "sageleaf-api.fullname" . }}-postman-test'
   annotations:
     "helm.sh/hook": test-success
 spec:
@@ -30,4 +29,4 @@ spec:
   volumes:
     - name: collection-volume
       configMap:
-        name: {{ .Release.Name }}-postman-configmap
+        name: '{{ .Release.Name }}-postman-configmap'
