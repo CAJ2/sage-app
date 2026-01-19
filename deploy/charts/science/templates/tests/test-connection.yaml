@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "sageleaf-science.fullname" . }}-test-connection"
-  labels:
-    {{- include "sageleaf-science.labels" . | nindent 4 }}
+  name: '{{ include "sageleaf-science.fullname" . }}-test-connection'
+  labels: '{{- include "sageleaf-science.labels" . | nindent 4 }}'
   annotations:
     "helm.sh/hook": test
 spec:

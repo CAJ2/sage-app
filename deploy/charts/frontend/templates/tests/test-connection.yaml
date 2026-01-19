@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "sageleaf-frontend.fullname" . }}-test-connection"
-  labels:
-    {{- include "sageleaf-frontend.labels" . | nindent 4 }}
+  name: '{{ include "sageleaf-frontend.fullname" . }}-test-connection'
+  labels: '{{- include "sageleaf-frontend.labels" . | nindent 4 }}'
   annotations:
     "helm.sh/hook": test
 spec:
