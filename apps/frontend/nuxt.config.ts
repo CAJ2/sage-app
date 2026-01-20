@@ -123,7 +123,7 @@ export default defineNuxtConfig({
       enableExceptionAutocapture: true, // Enables automatic exception capture on the server side (Nitro)
     },
     sourcemaps: {
-      enabled: true,
+      enabled: !!process.env.POSTHOG_PERSONAL_API_KEY,
       envId: '117506',
       personalApiKey: process.env.POSTHOG_PERSONAL_API_KEY || '',
       project: 'sage-frontend',

@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: 'Build & Test'
+    name: "Build & Test"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
@@ -49,6 +49,7 @@ jobs:
       - run: pnpm exec nx affected -t build
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
       # Check linting
@@ -64,7 +65,7 @@ jobs:
           TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
   build-image-api:
-    name: 'Build API images'
+    name: "Build API images"
     uses: ./.github/workflows/oci-build-image.yml
     if: github.event_name != 'pull_request'
     needs: test
@@ -79,7 +80,7 @@ jobs:
       target: api
 
   build-image-frontend:
-    name: 'Build frontend images'
+    name: "Build frontend images"
     uses: ./.github/workflows/oci-build-image.yml
     if: github.event_name != 'pull_request'
     needs: build-image-api
