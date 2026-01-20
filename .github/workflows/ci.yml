@@ -10,9 +10,36 @@ permissions:
   contents: read
 
 jobs:
+  nx-affected:
+    name: "Calculate affected projects"
+    runs-on: ubuntu-latest
+    outputs:
+      affected: ${{ steps.affected.outputs.affected }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
+
+      - name: "Calculate affected projects"
+        id: affected
+        run: |
+          echo "affected=$(nx show projects --affected --with-target build)" >> $GITHUB_OUTPUT
+
   test:
     name: "Build & Test"
     runs-on: ubuntu-latest
+    if: ${{ contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
+    needs: nx-affected
     timeout-minutes: 20
     services:
       crdb:
@@ -63,11 +90,50 @@ jobs:
           NODE_ENV: test
           TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
+  test-frontend:
+    name: "Build & Test"
+    runs-on: ubuntu-latest
+    if: ${{ !contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
+    needs: nx-affected
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      # Cache node_modules
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
+
+      # Check linting
+      - run: pnpm exec nx affected -t lint:ci
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+
+      # Build
+      - run: pnpm exec nx affected -t build
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+
+      # Run tests
+      - run: pnpm exec nx affected -t test
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NODE_ENV: test
+
   build-image-api:
     name: "Build API images"
     uses: ./.github/workflows/oci-build-image.yml
-    if: github.event_name != 'pull_request'
-    needs: test
+    if: ${{ contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
+    needs: [nx-affected, test]
     permissions:
       contents: read
       packages: write
@@ -81,22 +147,29 @@ jobs:
   build-image-frontend:
     name: "Build frontend images"
     uses: ./.github/workflows/oci-build-image.yml
-    if: github.event_name != 'pull_request'
-    needs: build-image-api
+    if: ${{ !failure() && !cancelled() && contains(needs.nx-affected.outputs.affected, '@sageleaf/frontend') }}
+    needs: [nx-affected, test, test-frontend]
     permissions:
       contents: read
       packages: write
       security-events: write
       id-token: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - image_name: sageleaf-frontend
-            target: frontend
-          - image_name: sageleaf-science
-            target: science
     with:
       registry: ghcr.io/caj2
-      image_name: ${{ matrix.image_name }}
-      target: ${{ matrix.target }}
+      image_name: sageleaf-frontend
+      target: frontend
+
+  build-image-science:
+    name: "Build science images"
+    uses: ./.github/workflows/oci-build-image.yml
+    if: ${{ !failure() && !cancelled() && contains(needs.nx-affected.outputs.affected, '@sageleaf/science') }}
+    needs: [nx-affected, test, test-frontend]
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+      id-token: write
+    with:
+      registry: ghcr.io/caj2
+      image_name: sageleaf-science
+      target: science
