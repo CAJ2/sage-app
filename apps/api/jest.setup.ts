@@ -9,7 +9,12 @@ import { CustomMigrationGenerator } from '@src/db/migration.gen'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import dotenv from 'dotenv-flow'
 import { JestConfigWithTsJest } from 'ts-jest'
+
+if (dotenv) {
+  dotenv.config()
+}
 
 export default async (_: any, jestConfig: JestConfigWithTsJest) => {
   const url =
