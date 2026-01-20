@@ -65,6 +65,7 @@
     "@jsonforms/vue": "^3.5.1",
     "@nuxt/kit": "^3.17.5",
     "@pinia/nuxt": "^0.10.1",
+    "@posthog/nuxt": "^1.5.1",
     "@sageleaf/ui": "workspace:^0.1.0",
     "@tailwindcss/vite": "~4.0.17",
     "@tanstack/vue-form": "^1.11.2",
