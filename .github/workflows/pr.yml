@@ -31,7 +31,7 @@ jobs:
       - name: "Calculate affected projects"
         id: affected
         run: |
-          echo "affected=$(nx show projects --affected --with-target build)" >> $GITHUB_OUTPUT
+          echo "affected=$(pnpm exec nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
 
   build:
     name: "Build & Lint"
@@ -65,7 +65,7 @@ jobs:
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
   test:
-    name: "Test"
+    name: "Test API + Frontend"
     runs-on: ubuntu-latest
     if: ${{ contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: nx-affected
@@ -108,7 +108,7 @@ jobs:
           TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
   test-frontend:
-    name: "Test"
+    name: "Test Frontend"
     runs-on: ubuntu-latest
     if: ${{ !contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: nx-affected
