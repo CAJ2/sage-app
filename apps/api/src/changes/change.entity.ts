@@ -5,11 +5,13 @@ import {
   Enum,
   ManyToMany,
   ManyToOne,
+  OneToMany,
+  PrimaryKey,
   Property,
   Ref,
 } from '@mikro-orm/core'
 import { Source } from '@src/changes/source.entity'
-import { IDCreatedUpdated } from '@src/db/base.entity'
+import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
 
 export enum ChangeStatus {
@@ -27,26 +29,6 @@ export interface Suggestion {
   userID: string
   // Description of the suggestion
   description?: string
-}
-
-export interface Edit {
-  // The name of the created/updated/deleted entity
-  entityName: string
-  // If the entity currently exists, this is the ID
-  id?: string
-  // The current state of the entity
-  original?: Record<string, any>
-  // The new state of the entity
-  changes?: Record<string, any>
-  // The user making the change
-  userID: string
-  // Description of the change
-  description?: string
-  // Suggested changes for the edit
-  suggestions?: Suggestion[]
-
-  // For GraphQL conversion
-  _type?: new () => any
 }
 
 export interface ChangeMetadata {
@@ -68,8 +50,8 @@ export class Change extends IDCreatedUpdated {
   @ManyToOne(() => User)
   user!: Ref<User>
 
-  @Property({ type: 'json' })
-  edits: Edit[] = []
+  @OneToMany(() => ChangeEdits, (edit) => edit.change)
+  edits = new Collection<ChangeEdits>(this)
 
   @ManyToMany({
     entity: () => Source,
@@ -79,6 +61,43 @@ export class Change extends IDCreatedUpdated {
 
   @Property({ type: 'json' })
   metadata?: ChangeMetadata
+}
+
+@Entity({ tableName: 'change_edits', schema: 'public' })
+export class ChangeEdits extends CreatedUpdated {
+  @ManyToOne({ primary: true })
+  change!: Change
+
+  @PrimaryKey()
+  edit_id!: string
+
+  // The name of the created/updated/deleted entity
+  @Property()
+  entityName!: string
+
+  // The ID of the created/updated/deleted entity
+  @Property()
+  entityID?: string
+
+  // The current state of the entity
+  @Property({ type: 'json' })
+  original?: Record<string, any>
+
+  // The new state of the entity
+  @Property({ type: 'json' })
+  changes?: Record<string, any>
+
+  // The user making the change
+  @Property()
+  userID!: string
+
+  // Description of the change
+  @Property()
+  description?: string
+
+  // Suggested changes for the edit
+  @Property({ type: 'json' })
+  suggestions?: Suggestion[]
 }
 
 @Entity({ tableName: 'changes_sources', schema: 'public' })
