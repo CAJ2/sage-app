@@ -20,6 +20,15 @@ export enum ChangeStatus {
   MERGED = 'MERGED',
 }
 
+export interface Suggestion {
+  // Suggested changes for the entity
+  changes?: Record<string, any>
+  // The user making the suggestion
+  userID: string
+  // Description of the suggestion
+  description?: string
+}
+
 export interface Edit {
   // The name of the created/updated/deleted entity
   entityName: string
@@ -29,9 +38,20 @@ export interface Edit {
   original?: Record<string, any>
   // The new state of the entity
   changes?: Record<string, any>
+  // The user making the change
+  userID: string
+  // Description of the change
+  description?: string
+  // Suggested changes for the edit
+  suggestions?: Suggestion[]
 
   // For GraphQL conversion
   _type?: new () => any
+}
+
+export interface ChangeMetadata {
+  // The last time the change was checked
+  checkedAt?: string
 }
 
 @Entity({ tableName: 'changes', schema: 'public' })
@@ -58,7 +78,7 @@ export class Change extends IDCreatedUpdated {
   sources = new Collection<Source>(this)
 
   @Property({ type: 'json' })
-  metadata?: Record<string, any>
+  metadata?: ChangeMetadata
 }
 
 @Entity({ tableName: 'changes_sources', schema: 'public' })
