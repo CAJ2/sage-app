@@ -4,7 +4,7 @@ import { AuthUserService } from '@src/auth/authuser.service'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { User } from '@src/users/users.entity'
 import _ from 'lodash'
-import { Change, ChangeStatus, Edit } from './change.entity'
+import { Change, ChangeEdits, ChangeStatus } from './change.entity'
 import {
   CreateChangeInput,
   DeleteInput,
@@ -69,7 +69,11 @@ export class EditService {
     }
 
     if (id) {
-      const change = await this.em.findOne(Change, { id, user: userID })
+      const change = await this.em.findOne(
+        Change,
+        { id, user: userID },
+        { populate: ['edits', 'user', 'sources'] },
+      )
       if (!change) {
         throw NotFoundErr(`Change with ID "${id}" not found`)
       }
@@ -83,7 +87,7 @@ export class EditService {
   async findEntityEdits<T extends BaseEntity>(
     changeID: string,
     entity: EntityName<T>,
-  ): Promise<Edit[]> {
+  ): Promise<ChangeEdits[]> {
     const change = await this.em.findOne(
       Change,
       { id: changeID },
@@ -492,13 +496,13 @@ export class EditService {
   ): Promise<{ id: string } & Reference<Loaded<T>>> {
     // First check if it exists in the change
     const edit = change.edits.find((e) => {
-      if (e.entityName === model && e.id === where.id) {
+      if (e.entityName === model && e.entityID === where.id) {
         return true
       }
       return false
     })
     if (edit) {
-      return this.em.getReference(model, edit.id as any) as any
+      return this.em.getReference(model, edit.entityID as any) as any
     }
     // If not, check if it exists in the database
     const entity = await this.em.findOne<T>(
@@ -542,7 +546,7 @@ export class EditService {
     const meta = this.em.getMetadata().get(model)
     // First check if it exists in the change
     const edit = change.edits.find((e) => {
-      if (e.entityName === meta.name && e.id === where.id) {
+      if (e.entityName === meta.name && e.entityID === where.id) {
         return true
       }
       return false
@@ -601,7 +605,7 @@ export class EditService {
     }
     // First check if it exists in the change
     const edit = change.edits.find((e) => {
-      if (e.entityName === meta.name && e.id === input.id) {
+      if (e.entityName === meta.name && e.entityID === input.id) {
         return true
       }
       return false
@@ -609,7 +613,7 @@ export class EditService {
     if (edit) {
       if (!edit.original) {
         // The edit is currently a create, so discard the edit entirely
-        change.edits = change.edits.filter((e) => e.id !== edit.id)
+        change.edits.remove(edit)
       } else if (edit.changes) {
         edit.changes = undefined // Turn the edit into a delete
       }
@@ -626,15 +630,14 @@ export class EditService {
     if (!entity) {
       throw NotFoundErr(`${meta.name} with ID "${input.id}" not found`)
     }
-    change.edits.push({
-      entityName: meta.name,
-      id: input.id,
-      original: this.entityToChangePOJO(
-        meta.name,
-        entity as BaseEntity & { id: string },
-      ),
-      changes: undefined,
-    })
+    const newEdit = new ChangeEdits()
+    newEdit.entityName = meta.name
+    newEdit.entityID = input.id
+    newEdit.original = this.entityToChangePOJO(
+      meta.name,
+      entity as BaseEntity & { id: string },
+    )
+    change.edits.add(newEdit)
     await this.em.persistAndFlush(change)
     return { id: input.id }
   }
@@ -647,21 +650,22 @@ export class EditService {
       throw BadRequestErr('You can only update edits for your own changes')
     }
     let edit = change.edits.find(
-      (e) => e.entityName === entity.constructor.name && e.id === entity.id,
+      (e) =>
+        e.entityName === entity.constructor.name && e.entityID === entity.id,
     )
     if (!edit) {
-      edit = {
-        entityName: entity.constructor.name,
-        id: entity.id,
-        original: this.entityToChangePOJO(entity.constructor.name, entity),
-      }
-      change.edits.push(edit)
+      edit = new ChangeEdits()
+      edit.entityName = entity.constructor.name
+      edit.entityID = entity.id
+      edit.original = this.entityToChangePOJO(entity.constructor.name, entity)
+      change.edits.add(edit)
     }
   }
 
   async updateEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
     const edit = change.edits.find(
-      (e) => e.entityName === entity.constructor.name && e.id === entity.id,
+      (e) =>
+        e.entityName === entity.constructor.name && e.entityID === entity.id,
     )
     if (!edit) {
       throw NotFoundErr(
@@ -679,12 +683,11 @@ export class EditService {
     if (!entityName) {
       throw BadRequestErr('Entity name is required for edit creation')
     }
-    const edit: Edit = {
-      entityName,
-      id: entity.id,
-      changes: _.omit(entity.toPOJO(), ['history']),
-    }
-    change.edits.push(edit)
+    const edit = new ChangeEdits()
+    edit.entityName = entityName
+    edit.entityID = entity.id
+    edit.changes = _.omit(entity.toPOJO(), ['history'])
+    change.edits.add(edit)
   }
 
   async checkMerge(change: Change, mergeInput: MergeInput) {
@@ -710,14 +713,14 @@ export class EditService {
     await this.em.begin()
     try {
       for (const edit of change.edits) {
-        if (edit.id) {
+        if (edit.entityID) {
           const entity = await this.em.findOne(edit.entityName, {
-            id: edit.id,
+            id: edit.entityID,
           })
           if (!entity && edit.original) {
             // TODO: Entity could have been deleted, handle stale edits
             throw NotFoundErr(
-              `Entity with ID "${edit.id}" not found in "${edit.entityName}"`,
+              `Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`,
             )
           }
           if (!entity && !edit.original && edit.changes) {

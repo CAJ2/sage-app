@@ -98,6 +98,8 @@ export class ChangeEdits extends CreatedUpdated {
   // Suggested changes for the edit
   @Property({ type: 'json' })
   suggestions?: Suggestion[]
+
+  _type: any
 }
 
 @Entity({ tableName: 'changes_sources', schema: 'public' })
