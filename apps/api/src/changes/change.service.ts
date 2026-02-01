@@ -9,7 +9,7 @@ import {
 } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
 import { ClsService } from 'nestjs-cls'
-import { Change, ChangeStatus } from './change.entity'
+import { Change, ChangeEdits, ChangeStatus } from './change.entity'
 import { EditModel as EditEnum, EditModelType } from './change.enum'
 import {
   CreateChangeInput,
@@ -62,21 +62,21 @@ export class ChangeService {
     if (!change) {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
-    if (editType) {
-      change.edits = change.edits.filter((edit) => edit.entityName === editType)
-    }
     if (editID) {
-      let edit = change.edits.find((e) => e.id === editID)
+      let edit = change.edits.find(
+        (e) =>
+          e.entityID === editID &&
+          (editType ? e.entityName === editType : true),
+      )
       if (!edit) {
         const directEdit = await this.directEdit(editID, editType)
         if (!directEdit) {
           throw NotFoundErr(`Edit or model with ID "${editID}" not found`)
         }
-        edit = {
-          _type: EditModel,
-          id: directEdit.id,
-          entityName: directEdit.entityName,
-        }
+        edit = new ChangeEdits()
+        edit._type = EditModel
+        edit.entityID = directEdit.id
+        edit.entityName = directEdit.entityName
         const editModel = await this.transform.objectToModel(edit, EditModel)
         editModel.original = directEdit.original
         editModel.changes = directEdit.changes
@@ -235,11 +235,11 @@ export class ChangeService {
     if (!change) {
       throw NotFoundErr('Change not found')
     }
-    const edit = change.edits.find((e) => e.id === editID)
+    const edit = change.edits.find((e) => e.entityID === editID)
     if (!edit) {
       throw NotFoundErr('Edit not found')
     }
-    change.edits = change.edits.filter((e) => e.id !== editID)
+    change.edits.remove(edit)
     await this.em.persistAndFlush(change)
     return editID
   }
