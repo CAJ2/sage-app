@@ -45,6 +45,6 @@ export async function clearDatabase(
         'write',
       )
       .withSchema(schema)
-      .truncate()
+      .delete({})
   }
 }
