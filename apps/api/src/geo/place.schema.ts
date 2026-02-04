@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -14,6 +13,7 @@ import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
+import type { Edit } from '@src/changes/change.model'
 
 export const PlaceIDSchema = z.string().meta({
   id: 'Place',

@@ -11,7 +11,7 @@ import { ItemService } from '@src/product/item.service'
 import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
 import _ from 'lodash'
-import { Edit as EditModel } from './change.model'
+import type { Edit as EditModel } from './change.model'
 import type { Loaded } from '@mikro-orm/postgresql'
 
 export interface IEntityService {

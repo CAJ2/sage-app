@@ -1,7 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
-import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'

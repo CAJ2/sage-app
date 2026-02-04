@@ -1,5 +1,6 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Change, ChangeInputWithLang } from '@src/changes/change.model'
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import {
@@ -101,7 +102,7 @@ export const MaterialIDSchema = z.string().meta({
 })
 
 @InputType()
-export class CreateMaterialInput extends ChangeInputWithLang() {
+export class CreateMaterialInput extends ChangeInputWithLang {
   @Field(() => String)
   @MaxLength(1024)
   name!: string
@@ -126,7 +127,7 @@ export class CreateMaterialInput extends ChangeInputWithLang() {
 }
 
 @InputType()
-export class UpdateMaterialInput extends ChangeInputWithLang() {
+export class UpdateMaterialInput extends ChangeInputWithLang {
   @Field(() => ID)
   id!: string
 

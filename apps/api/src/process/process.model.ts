@@ -1,5 +1,6 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Change, ChangeInputWithLang } from '@src/changes/change.model'
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import { Place } from '@src/geo/place.model'
@@ -131,7 +132,7 @@ export class ProcessPlaceInput {
 }
 
 @InputType()
-export class CreateProcessInput extends ChangeInputWithLang() {
+export class CreateProcessInput extends ChangeInputWithLang {
   @Field(() => String)
   @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
   intent!: ProcessIntent
@@ -174,7 +175,7 @@ export class CreateProcessInput extends ChangeInputWithLang() {
 }
 
 @InputType()
-export class UpdateProcessInput extends ChangeInputWithLang() {
+export class UpdateProcessInput extends ChangeInputWithLang {
   @Field(() => ID)
   id!: string
 

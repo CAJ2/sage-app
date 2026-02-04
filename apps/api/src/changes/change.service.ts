@@ -9,10 +9,10 @@ import {
 } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
 import { ClsService } from 'nestjs-cls'
+import { CreateChangeInput } from './change-ext.model'
 import { Change, ChangeEdits, ChangeStatus } from './change.entity'
 import { EditModel as EditEnum, EditModelType } from './change.enum'
 import {
-  CreateChangeInput,
   DirectEdit,
   Edit as EditModel,
   UpdateChangeInput,
@@ -179,15 +179,17 @@ export class ChangeService {
     change.user = ref(User, userID)
     change.status = input.status || ChangeStatus.DRAFT
 
-    const sources = await this.em.find(
-      Source,
-      {
-        id: { $in: input.sources },
-      },
-      { fields: ['id'] },
-    )
-    for (const source of sources) {
-      change.sources.add(ref(source.id))
+    if (input.sources && input.sources.length > 0) {
+      const sources = await this.em.find(
+        Source,
+        {
+          id: { $in: input.sources },
+        },
+        { fields: ['id'] },
+      )
+      for (const source of sources) {
+        change.sources.add(ref(source.id))
+      }
     }
 
     await this.em.persistAndFlush(change)

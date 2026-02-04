@@ -31,6 +31,6 @@ import { EditsModule } from './edits.module'
     SourceService,
     ChangeMapService,
   ],
-  exports: [ChangeService, SourceService],
+  exports: [ChangeService, SourceService, ChangeMapService],
 })
 export class ChangesModule {}

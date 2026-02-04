@@ -13,6 +13,7 @@ import { Optional } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.model'
+import { CreateChangeInput } from './change-ext.model'
 import {
   Change,
   ChangeEditsArgs,
@@ -20,7 +21,6 @@ import {
   ChangesArgs,
   ChangeSourcesArgs,
   ChangesPage,
-  CreateChangeInput,
   CreateChangeOutput,
   DeleteChangeOutput,
   DirectEdit,

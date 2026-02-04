@@ -6,7 +6,8 @@ import {
   InputType,
   ObjectType,
 } from '@nestjs/graphql'
-import { Change, ChangeInputWithLang } from '@src/changes/change.model'
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID, ZodValid } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
@@ -159,7 +160,7 @@ export class ComponentRegionInput {
 }
 
 @InputType()
-export class CreateComponentInput extends ChangeInputWithLang() {
+export class CreateComponentInput extends ChangeInputWithLang {
   @Field(() => String, { nullable: true })
   name?: string
 
@@ -195,7 +196,7 @@ export class CreateComponentInput extends ChangeInputWithLang() {
 }
 
 @InputType()
-export class UpdateComponentInput extends ChangeInputWithLang() {
+export class UpdateComponentInput extends ChangeInputWithLang {
   @Field(() => ID)
   @Validate(IsNanoID)
   id!: string

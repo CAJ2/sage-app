@@ -2,7 +2,7 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
 import { IsNanoID } from '@src/common/validator.model'
-import { IDCreatedUpdated, InputWithLang } from '@src/graphql/base.model'
+import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
@@ -114,25 +114,6 @@ export class DirectEditArgs {
 }
 
 @InputType()
-export class CreateChangeInput {
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(1000)
-  title?: string
-
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(100000)
-  description?: string
-
-  @Field(() => ChangeStatus, { nullable: true })
-  status?: ChangeStatus & {}
-
-  @Field(() => [ID], { nullable: true })
-  sources?: string[]
-}
-
-@InputType()
 export class UpdateChangeInput {
   @Field(() => ID)
   @Validate(IsNanoID)
@@ -192,84 +173,4 @@ export class DiscardEditOutput {
 
 export interface MergeInput {
   apply?: boolean
-}
-
-export interface ISourceInput {
-  id: string
-  meta?: Record<string, any>
-}
-
-export interface IChangeInputWithLang {
-  changeID?: string
-  change?: CreateChangeInput & {}
-  addSources?: ISourceInput[]
-  removeSources?: string[]
-  apply?: boolean
-  useChange(): boolean
-}
-
-@InputType()
-class SourceInput {
-  @Field(() => ID)
-  @Validate(IsNanoID)
-  id!: string
-
-  @Field(() => JSONObjectResolver, { nullable: true })
-  @IsOptional()
-  meta?: Record<string, any>
-}
-
-export function ChangeInputWithLang() {
-  @InputType()
-  class ChangeInputWithLangCls extends InputWithLang {
-    @Field(() => ID, { nullable: true })
-    @IsOptional()
-    @Validate(IsNanoID)
-    changeID?: string
-
-    @Field(() => CreateChangeInput, { nullable: true })
-    change?: CreateChangeInput & {}
-
-    @Field(() => [SourceInput], { nullable: true })
-    addSources?: SourceInput[]
-
-    @Field(() => [ID], { nullable: true })
-    removeSources?: string[]
-
-    @Field(() => Boolean, { nullable: true })
-    apply?: boolean
-
-    useChange(): boolean {
-      return !!this.changeID || !!this.change
-    }
-  }
-  return ChangeInputWithLangCls
-}
-
-@InputType()
-export class DeleteInput {
-  @Field(() => ID)
-  id!: string
-
-  @Field(() => ID, { nullable: true })
-  @IsOptional()
-  @Validate(IsNanoID)
-  changeID?: string
-
-  @Field(() => CreateChangeInput, { nullable: true })
-  change?: CreateChangeInput & {}
-
-  @Field(() => [SourceInput], { nullable: true })
-  addSources?: SourceInput[]
-
-  @Field(() => [ID], { nullable: true })
-  removeSources?: string[]
-
-  @Field(() => Boolean, { nullable: true })
-  @IsOptional()
-  apply?: boolean
-
-  useChange(): boolean {
-    return !!this.changeID || !!this.change
-  }
 }

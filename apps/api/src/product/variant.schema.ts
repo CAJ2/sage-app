@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -19,6 +18,7 @@ import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 import { ItemIDSchema } from './item.schema'
 import { VariantComponentUnitSchema } from './variant.entity'
+import type { Edit } from '@src/changes/change.model'
 
 export const VariantIDSchema = z.string().meta({
   id: 'Variant',

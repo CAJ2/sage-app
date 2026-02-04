@@ -1,5 +1,6 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Change, ChangeInputWithLang } from '@src/changes/change.model'
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/db/i18n'
 import {
@@ -97,7 +98,7 @@ export class CategoriesArgs extends PaginationBasicArgs {}
 export class CategoryItemsArgs extends PaginationBasicArgs {}
 
 @InputType()
-export class CreateCategoryInput extends ChangeInputWithLang() {
+export class CreateCategoryInput extends ChangeInputWithLang {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1024)
@@ -127,7 +128,7 @@ export class CreateCategoryInput extends ChangeInputWithLang() {
 }
 
 @InputType()
-export class UpdateCategoryInput extends ChangeInputWithLang() {
+export class UpdateCategoryInput extends ChangeInputWithLang {
   @Field(() => ID)
   id!: string
 
