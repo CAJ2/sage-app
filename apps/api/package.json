@@ -11,9 +11,9 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage",
+    "test": "./db-defs.sh && vitest run",
+    "test:watch": "./db-defs.sh && vitest",
+    "test:cov": "./db-defs.sh && vitest run --coverage",
     "lint": "pnpm exec eslint --fix",
     "lint:ci": "pnpm exec eslint . --max-warnings 0",
     "check:migrations": "pnpm exec mikro-orm migration:check"
