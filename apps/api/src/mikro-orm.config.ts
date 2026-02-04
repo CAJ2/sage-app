@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
-export default defineConfig({
+export const MIKRO_CONFIG = defineConfig({
   entities: [join(process.cwd(), 'dist/**/*.entity.js')],
   entitiesTs: [join(process.cwd(), 'src/**/*.entity.ts')],
   strict: true,
@@ -80,3 +80,4 @@ export default defineConfig({
   dataloader: DataloaderType.ALL,
   allowGlobalContext: process.env.NODE_ENV === 'test',
 })
+export default MIKRO_CONFIG
