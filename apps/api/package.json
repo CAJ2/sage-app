@@ -11,11 +11,9 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
     "lint": "pnpm exec eslint --fix",
     "lint:ci": "pnpm exec eslint . --max-warnings 0",
     "check:migrations": "pnpm exec mikro-orm migration:check"
@@ -77,6 +75,7 @@
     "@types/luxon": "^3.4.2",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "^4.0.18",
     "graphql-tag": "^2.12.6",
     "jest": "^29.7.0",
     "source-map-support": "^0.5.21",
@@ -85,7 +84,9 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "unplugin-swc": "^1.5.9",
+    "vitest": "^4.0.18"
   },
   "files": [
     "dist",
