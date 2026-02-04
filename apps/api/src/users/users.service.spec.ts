@@ -1,5 +1,6 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
+import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { UsersService } from './users.service'
 
 describe('UsersService', () => {
@@ -8,7 +9,7 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      imports: [MikroOrmModule.forRoot()],
+      imports: [MikroOrmModule.forRoot(MIKRO_TEST_CONFIG)],
       providers: [UsersService],
     }).compile()
 
@@ -16,10 +17,12 @@ describe('UsersService', () => {
   })
 
   afterEach(async () => {
-    await module.close()
+    if (module) {
+      await module.close()
+    }
   })
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(service).toBeDefined()
   })
 })
