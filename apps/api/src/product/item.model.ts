@@ -1,5 +1,6 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Change, ChangeInputWithLang } from '@src/changes/change.model'
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
@@ -101,7 +102,7 @@ export class ItemTagsInput {
 }
 
 @InputType()
-export class CreateItemInput extends ChangeInputWithLang() {
+export class CreateItemInput extends ChangeInputWithLang {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1000)
@@ -130,7 +131,7 @@ export class CreateItemInput extends ChangeInputWithLang() {
 }
 
 @InputType()
-export class UpdateItemInput extends ChangeInputWithLang() {
+export class UpdateItemInput extends ChangeInputWithLang {
   @Field(() => ID)
   @Validate(IsNanoID)
   id!: string

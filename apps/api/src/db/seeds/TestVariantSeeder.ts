@@ -1,4 +1,4 @@
-import { type EntityManager, ref, rel } from '@mikro-orm/core'
+import { type EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 import { Source, SourceType } from '@src/changes/source.entity'
 import { Component } from '@src/process/component.entity'
@@ -68,7 +68,7 @@ export class TestVariantSeeder extends Seeder {
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      source: rel(Source, SOURCE_IDS[0]),
+      source: [{ id: SOURCE_IDS[0] }],
     })
     try {
       await em.persistAndFlush(item1)
@@ -87,7 +87,7 @@ export class TestVariantSeeder extends Seeder {
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      source: rel(Source, SOURCE_IDS[1]),
+      source: [{ id: SOURCE_IDS[1] }],
     })
     em.create(Component, {
       id: COMPONENT_IDS[0],
@@ -101,7 +101,7 @@ export class TestVariantSeeder extends Seeder {
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      primaryMaterial: ref(Material, MATERIAL_IDS[0]),
+      primaryMaterial: em.getReference(Material, MATERIAL_IDS[0]),
     })
     em.create(Component, {
       id: COMPONENT_IDS[1],
@@ -115,37 +115,38 @@ export class TestVariantSeeder extends Seeder {
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      primaryMaterial: ref(Material, MATERIAL_IDS[1]),
+      primaryMaterial: em.getReference(Material, MATERIAL_IDS[1]),
     })
     for (const id of VARIANT_IDS) {
-      em.create(Variant, {
-        id,
-        name: {
-          en: `Variant ${id}`,
-          sv: `Svensk Variant ${id}`,
-        },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        desc: {
-          en: `Description for Variant ${id}`,
-          sv: `Beskrivning för Svensk Variant ${id}`,
-        },
-        variantSources: SOURCE_IDS.map((sourceId) => {
-          const source = new VariantsSources()
-          source.source = rel(Source, sourceId)
-          source.variant = rel(Variant, id)
-          source.meta = { test: 'meta' }
-          return source
-        }),
-        items: [item1, item2],
-        variantComponents: COMPONENT_IDS.map((componentId) => {
-          const component = new VariantsComponents()
-          component.component = rel(Component, componentId)
-          component.variant = rel(Variant, id)
-          component.quantity = 1
-          return component
-        }),
-      })
+      const variant = new Variant()
+      variant.id = id
+      variant.name = {
+        en: `Variant ${id}`,
+        sv: `Beskrivning för Svensk Variant ${id}`,
+      }
+      variant.desc = {
+        en: `Description for Variant ${id}`,
+        sv: `Beskrivning för Svensk Variant ${id}`,
+      }
+      variant.items.add(item1, item2)
+      em.persist(variant)
+      for (const sourceId of SOURCE_IDS) {
+        const source = new VariantsSources()
+        source.source = em.getReference(Source, sourceId)
+        source.variant = em.getReference(Variant, id)
+        source.meta = { test: 'meta' }
+        em.persist(source)
+        variant.variantSources.add(source)
+      }
+      for (const componentId of COMPONENT_IDS) {
+        const component = new VariantsComponents()
+        component.component = em.getReference(Component, componentId)
+        component.variant = em.getReference(Variant, id)
+        component.quantity = 1
+        em.persist(component)
+        variant.variantComponents.add(component)
+      }
+      await em.persistAndFlush(variant)
     }
   }
 }

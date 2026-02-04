@@ -9,9 +9,8 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/vitest.config.[jt]s",
+      "!{projectRoot}/test/test-setup.[jt]s",
       "!{projectRoot}/eslint.config.js"
     ],
     "sharedGlobals": [
@@ -60,13 +59,13 @@
       "inputs": [
         "default",
         "^default",
-        "{workspaceRoot}/jest.preset.js"
+        "{workspaceRoot}/vitest.config.ts"
       ],
       "outputs": [
         "{workspaceRoot}/coverage/{projectRoot}",
         "{projectRoot}/coverage"
       ],
-      "executor": "@nx/jest:jest"
+      "executor": "@nx/vitest:vitest"
     }
   },
   "nxCloudId": "67acadc6cdcfda5eba4a88e1",
@@ -81,9 +80,10 @@
       }
     },
     {
-      "plugin": "@nx/jest/plugin",
+      "plugin": "@nx/vitest",
       "options": {
-        "targetName": "test"
+        "testTargetName": "test",
+        "testMode": "watch"
       }
     }
   ]

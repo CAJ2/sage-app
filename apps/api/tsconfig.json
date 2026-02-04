@@ -15,6 +15,9 @@
       "@src/*": [
         "src/*"
       ],
+      "@test/*": [
+        "test/*"
+      ],
     },
     "strict": true,
     "incremental": true,
@@ -23,6 +26,9 @@
     "noImplicitAny": true,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "types": [
+      "vitest/globals"
+    ]
   }
 }

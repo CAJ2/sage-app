@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -23,6 +22,7 @@ import {
   ProcessIntent,
   ProcessRulesSchema,
 } from './process.entity'
+import type { Edit } from '@src/changes/change.model'
 
 export const ProcessIDSchema = z.string().meta({
   id: 'Process',

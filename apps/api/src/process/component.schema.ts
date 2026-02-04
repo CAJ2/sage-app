@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -21,6 +20,7 @@ import {
 } from './component.entity'
 import { MaterialIDSchema } from './material.model'
 import { TagDefinitionIDSchema } from './tag.model'
+import type { Edit } from '@src/changes/change.model'
 
 export const ComponentIDSchema = z.string().meta({
   id: 'Component',

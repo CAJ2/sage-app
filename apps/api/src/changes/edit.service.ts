@@ -4,14 +4,13 @@ import { AuthUserService } from '@src/auth/authuser.service'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { User } from '@src/users/users.entity'
 import _ from 'lodash'
-import { Change, ChangeEdits, ChangeStatus } from './change.entity'
 import {
   CreateChangeInput,
   DeleteInput,
   IChangeInputWithLang,
-  MergeInput,
-  UpdateChangeInput,
-} from './change.model'
+} from './change-ext.model'
+import { Change, ChangeEdits, ChangeStatus } from './change.entity'
+import { MergeInput, UpdateChangeInput } from './change.model'
 import { Source } from './source.entity'
 import type {
   Collection,
@@ -106,15 +105,17 @@ export class EditService {
     change.user = ref(User, userID)
     change.status = input.status || ChangeStatus.DRAFT
 
-    const sources = await this.em.find(
-      Source,
-      {
-        id: { $in: input.sources },
-      },
-      { fields: ['id'] },
-    )
-    for (const source of sources) {
-      change.sources.add(ref(source.id))
+    if (input.sources && input.sources.length > 0) {
+      const sources = await this.em.find(
+        Source,
+        {
+          id: { $in: input.sources },
+        },
+        { fields: ['id'] },
+      )
+      for (const source of sources) {
+        change.sources.add(ref(source.id))
+      }
     }
 
     await this.em.persistAndFlush(change)

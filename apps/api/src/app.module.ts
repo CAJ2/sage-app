@@ -2,7 +2,19 @@ import path from 'path'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { AppController } from '@src/app.controller'
+import { AppService } from '@src/app.service'
+import { AuthModule } from '@src/auth/auth.module'
+import { ChangesModule } from '@src/changes/changes.module'
 import config from '@src/config/config'
+import { parseLanguageHeader } from '@src/db/i18n'
+import { GeoModule } from '@src/geo/geo.module'
+import { GraphQLModule } from '@src/graphql/graphql.module'
+import { HealthModule } from '@src/health/health.module'
+import { ProcessModule } from '@src/process/process.module'
+import { ProductModule } from '@src/product/product.module'
+import { SearchModule } from '@src/search/search.module'
+import { UsersModule } from '@src/users/users.module'
 import dotenv from 'dotenv-flow'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
@@ -13,18 +25,7 @@ import {
   I18nModule,
   QueryResolver,
 } from 'nestjs-i18n'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { AuthModule } from './auth/auth.module'
-import { ChangesModule } from './changes/changes.module'
-import { parseLanguageHeader } from './db/i18n'
-import { GeoModule } from './geo/geo.module'
-import { GraphQLModule } from './graphql/graphql.module'
-import { HealthModule } from './health/health.module'
-import { ProcessModule } from './process/process.module'
-import { ProductModule } from './product/product.module'
-import { SearchModule } from './search/search.module'
-import { UsersModule } from './users/users.module'
+import { MIKRO_CONFIG } from './mikro-orm.config'
 
 if (dotenv) {
   dotenv.config()
@@ -71,7 +72,7 @@ if (dotenv) {
         AcceptLanguageResolver,
       ],
     }),
-    MikroOrmModule.forRoot(),
+    MikroOrmModule.forRoot(MIKRO_CONFIG),
     GraphQLModule.register(),
     HealthModule,
     AuthModule.registerAsync(),

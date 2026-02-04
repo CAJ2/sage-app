@@ -1,5 +1,6 @@
 import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
-import { Change, ChangeInputWithLang } from '@src/changes/change.model'
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { translate } from '@src/db/i18n'
@@ -61,7 +62,7 @@ export class OrgsPage extends Paginated(Org) {}
 export class OrgUsersArgs extends PaginationBasicArgs {}
 
 @InputType()
-export class CreateOrgInput extends ChangeInputWithLang() {
+export class CreateOrgInput extends ChangeInputWithLang {
   @Field(() => String)
   name!: string
 
@@ -79,7 +80,7 @@ export class CreateOrgInput extends ChangeInputWithLang() {
 }
 
 @InputType()
-export class UpdateOrgInput extends ChangeInputWithLang() {
+export class UpdateOrgInput extends ChangeInputWithLang {
   @Field(() => String)
   @Validate(IsNanoID)
   id!: string

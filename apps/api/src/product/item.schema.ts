@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { EditService } from '@src/changes/edit.service'
 import {
@@ -17,6 +16,7 @@ import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 import { CategoryIDSchema } from './category.schema'
+import type { Edit } from '@src/changes/change.model'
 
 export const ItemIDSchema = z.string().meta({
   id: 'Item',

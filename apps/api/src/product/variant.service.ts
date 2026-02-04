@@ -1,7 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
-import { DeleteInput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
 import { mapOrderBy } from '@src/common/db.utils'
@@ -9,6 +9,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
+import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { Component } from '@src/process/component.entity'
 import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
@@ -32,7 +33,7 @@ export class VariantService {
     private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly streamService: StreamService,
-    private readonly i18n: I18nService,
+    private readonly i18n: I18nService<I18nTranslations>,
   ) {}
 
   async findOneByID(id: string) {

@@ -2,6 +2,7 @@ import { Seeder } from '@mikro-orm/seeder'
 import { Material, MATERIAL_ROOT } from '@src/process/material.entity'
 import { Category, CATEGORY_ROOT } from '@src/product/category.entity'
 import { Org } from '@src/users/org.entity'
+import { User } from '@src/users/users.entity'
 import type { EntityManager } from '@mikro-orm/core'
 
 export class BaseSeeder extends Seeder {
@@ -51,6 +52,20 @@ export class BaseSeeder extends Seeder {
         metadata: '{}',
         updatedAt: new Date(),
         createdAt: new Date(),
+      })
+    }
+
+    const admin = await em.findOne(User, {
+      username: 'admin',
+    })
+    if (!admin) {
+      em.create(User, {
+        username: 'admin',
+        email: 'admin@example.com',
+        name: 'Admin',
+        displayUsername: 'Admin',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
     }
   }
