@@ -7,7 +7,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2022",
+    "target": "ES2024",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -27,8 +27,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
-    "types": [
-      "vitest/globals"
-    ]
+    "isolatedModules": true
   }
 }

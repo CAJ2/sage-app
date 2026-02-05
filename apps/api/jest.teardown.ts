@@ -1,4 +1,3 @@
-export default async (_: any, jestConfig: any) => {
-  // @ts-expect-error legacy noImplicitAny
-  await global.orm.close()
-}
+import { JestConfigWithTsJest } from 'ts-jest'
+
+export default async (_: any, jestConfig: JestConfigWithTsJest) => {}
