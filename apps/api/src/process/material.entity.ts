@@ -9,15 +9,15 @@ import {
   PrimaryKey,
   PrimaryKeyProp,
   Property,
-  Ref,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { TranslatedField } from '@src/db/i18n'
 import { User } from '@src/users/users.entity'
-import { JsonLdDocument } from 'jsonld'
 import { z } from 'zod/v4'
 import { Component } from './component.entity'
 import { Process } from './process.entity'
+import type { Ref } from '@mikro-orm/core'
+import type { TranslatedField } from '@src/db/i18n'
+import type { JsonLdDocument } from 'jsonld'
 
 export const MATERIAL_ROOT = 'MATERIAL_ROOT'
 

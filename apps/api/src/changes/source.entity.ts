@@ -5,7 +5,6 @@ import {
   ManyToMany,
   ManyToOne,
   Property,
-  Ref,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Component } from '@src/process/component.entity'
@@ -14,6 +13,7 @@ import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { Change } from './change.entity'
+import type { Ref } from '@mikro-orm/core'
 
 export enum SourceType {
   API = 'API',

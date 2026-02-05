@@ -8,11 +8,11 @@ import {
   OneToMany,
   PrimaryKey,
   Property,
-  Ref,
 } from '@mikro-orm/core'
 import { Source } from '@src/changes/source.entity'
 import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
+import type { Ref } from '@mikro-orm/core'
 
 export enum ChangeStatus {
   DRAFT = 'DRAFT',
