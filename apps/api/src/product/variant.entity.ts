@@ -5,14 +5,15 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  type Opt,
   PrimaryKey,
   PrimaryKeyProp,
   Property,
-  Ref,
+  type Ref,
 } from '@mikro-orm/core'
 import { Source } from '@src/changes/source.entity'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { TranslatedField } from '@src/db/i18n'
+import { type TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
@@ -20,7 +21,6 @@ import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { z } from 'zod/v4'
 import { Item } from './item.entity'
-import type { Opt } from '@mikro-orm/core'
 
 export const VariantComponentUnitSchema = z.enum(['g', 'ml']).optional()
 

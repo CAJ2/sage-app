@@ -9,15 +9,15 @@ import {
   PrimaryKey,
   PrimaryKeyProp,
   Property,
-  Ref,
 } from '@mikro-orm/core'
 import { CreatedUpdated } from '@src/db/base.entity'
 import { Point, PointType } from '@src/db/custom.types'
-import { TranslatedField } from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
+import type { Ref } from '@mikro-orm/core'
+import type { TranslatedField } from '@src/db/i18n'
 
 @Entity({ tableName: 'places', schema: 'public' })
 @Index({ properties: ['location'], type: 'gist' })

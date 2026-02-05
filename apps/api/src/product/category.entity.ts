@@ -9,12 +9,12 @@ import {
   PrimaryKey,
   PrimaryKeyProp,
   Property,
-  Ref,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { TranslatedField } from '@src/db/i18n'
 import { User } from '@src/users/users.entity'
 import { Item } from './item.entity'
+import type { Ref } from '@mikro-orm/core'
+import type { TranslatedField } from '@src/db/i18n'
 
 export const CATEGORY_ROOT = 'CATEGORY_ROOT'
 
