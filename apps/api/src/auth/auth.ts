@@ -60,7 +60,6 @@ export const configureAuth = (orm: MikroORM) => {
     user: {
       modelName: 'User',
       fields: {
-        emailVerified: 'email_verified',
         image: 'avatarURL',
         organizations: 'orgs',
       },
