@@ -19,6 +19,8 @@ async function bootstrap() {
           'https://sageleaf.app',
           'https://dev.sageleaf.app',
           'https://science.dev.sageleaf.app',
+          'https://tauri.localhost',
+          'http://tauri.localhost',
           'http://localhost:3000',
           'http://localhost:3001',
         ],
