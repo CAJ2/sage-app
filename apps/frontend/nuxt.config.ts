@@ -37,6 +37,15 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    clearScreen: false,
+    envPrefix: ['VITE_', 'TAURI_'],
+    server: {
+      strictPort: true,
+    },
+  },
+
+  devServer: {
+    host: '0',
   },
 
   vue: {
@@ -129,6 +138,8 @@ export default defineNuxtConfig({
       project: 'sage-frontend',
     },
   },
+
+  ignore: ['**/src-tauri/**'],
 
   compatibilityDate: '2025-02-12',
 })
