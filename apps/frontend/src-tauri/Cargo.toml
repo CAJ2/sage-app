@@ -19,7 +19,7 @@ tauri-build = { version = "2.5.4", features = ["isolation"] }
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 log.workspace = true
-tauri = { workspace = true, features = ["isolation"] }
+tauri = { version = "2.10.0", features = ["isolation"] }
 tauri-plugin-log.workspace = true
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
