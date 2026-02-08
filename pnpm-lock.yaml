@@ -267,7 +267,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.13.8
-        version: 3.13.8(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
+        version: 3.13.8(graphql-ws@5.16.2(graphql@16.11.0))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
       '@capacitor/android':
         specifier: ^7.0.0
         version: 7.0.1(@capacitor/core@7.0.1)
@@ -339,7 +339,7 @@ importers:
         version: 1.5.1(magicast@0.3.5)
       '@sageleaf/ui':
         specifier: workspace:^0.1.0
-        version: file:packages/ui(@parcel/watcher@2.5.1)(@types/node@22.15.24)(db0@0.3.2)(encoding@0.1.13)(eslint@9.27.0(jiti@2.4.2))(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))(xml2js@0.6.2)(yaml@2.8.0)
+        version: file:packages/ui(@parcel/watcher@2.5.1)(@types/node@22.15.24)(db0@0.3.2)(encoding@0.1.13)(eslint@9.27.0(jiti@2.4.2))(graphql-ws@5.16.2(graphql@16.11.0))(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))(xml2js@0.6.2)(yaml@2.8.0)
       '@tailwindcss/vite':
         specifier: ~4.0.17
         version: 4.0.17(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))
@@ -348,7 +348,7 @@ importers:
         version: 1.11.2(vue@3.5.16(typescript@5.8.3))
       '@vue/apollo-composable':
         specifier: ^4.2.2
-        version: 4.2.2(@apollo/client@3.13.8(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0)))(graphql@16.11.0)(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
+        version: 4.2.2(@apollo/client@3.13.8(graphql-ws@5.16.2(graphql@16.11.0))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0)))(graphql@16.11.0)(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
       '@vueuse/core':
         specifier: ^13.3.0
         version: 13.3.0(vue@3.5.16(typescript@5.8.3))
@@ -532,7 +532,7 @@ importers:
         version: 0.10.1(magicast@0.3.5)(pinia@3.0.2(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3)))
       '@sageleaf/ui':
         specifier: workspace:^0.1.0
-        version: file:packages/ui(@parcel/watcher@2.5.1)(@types/node@22.15.24)(db0@0.3.2)(encoding@0.1.13)(eslint@9.27.0(jiti@2.4.2))(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))(xml2js@0.6.2)(yaml@2.8.0)
+        version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: ~4.0.17
         version: 4.0.17(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))
@@ -686,7 +686,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.13.8
-        version: 3.13.8(graphql-ws@5.16.2(graphql@16.11.0))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
+        version: 3.13.8(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
       '@capacitor/android':
         specifier: ^7.0.0
         version: 7.0.1(@capacitor/core@7.0.1)
@@ -889,6 +889,18 @@ importers:
       vue-tsc:
         specifier: ^2.2.10
         version: 2.2.10(typescript@5.8.3)
+
+  test/frontend:
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.58.2
+        version: 1.58.2
+      '@types/node':
+        specifier: ^22.15.24
+        version: 22.15.24
+      dotenv-flow:
+        specifier: ^4.1.0
+        version: 4.1.0
 
 packages:
 
@@ -3852,6 +3864,11 @@ packages:
   '@pkgr/core@0.2.1':
     resolution: {integrity: sha512-VzgHzGblFmUeBmmrk55zPyrQIArQN4vujc9shWytaPdB3P7qhi0cpaiKIr7tlCmFv2lYUwnLospIqjL9ZSAhhg==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
+
+  '@playwright/test@1.58.2':
+    resolution: {integrity: sha512-akea+6bHYBBfA9uQqSYmlJXn61cTa+jbO87xVLCWbTqbWadRVmhxlXATaOjOgcBaWU4ePo0wB41KMFv3o35IXA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@polka/url@1.0.0-next.28':
     resolution: {integrity: sha512-8LduaNlMZGwdZ6qWrKlfa+2M4gahzFkprZiAt2TF8uS0qQgBizKXpXURqvTJ4WtmupWxaLqjRb2UCTe72mu+Aw==}
@@ -7497,6 +7514,11 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -9704,6 +9726,16 @@ packages:
 
   pkg-types@2.1.0:
     resolution: {integrity: sha512-wmJwA+8ihJixSoHKxZJRBQG1oY8Yr9pGLzRmSsNms0iNWyHHAlZCa7mmKiFR10YPZuz/2k169JiS/inOjBCZ2A==}
+
+  playwright-core@1.58.2:
+    resolution: {integrity: sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.58.2:
+    resolution: {integrity: sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   plist@3.1.0:
     resolution: {integrity: sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==}
@@ -15802,6 +15834,10 @@ snapshots:
 
   '@pkgr/core@0.2.1': {}
 
+  '@playwright/test@1.58.2':
+    dependencies:
+      playwright: 1.58.2
+
   '@polka/url@1.0.0-next.28': {}
 
   '@poppinss/colors@4.1.4':
@@ -16040,9 +16076,9 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@sageleaf/ui@file:packages/ui(@parcel/watcher@2.5.1)(@types/node@22.15.24)(db0@0.3.2)(encoding@0.1.13)(eslint@9.27.0(jiti@2.4.2))(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))(xml2js@0.6.2)(yaml@2.8.0)':
+  '@sageleaf/ui@file:packages/ui(@parcel/watcher@2.5.1)(@types/node@22.15.24)(db0@0.3.2)(encoding@0.1.13)(eslint@9.27.0(jiti@2.4.2))(graphql-ws@5.16.2(graphql@16.11.0))(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))(xml2js@0.6.2)(yaml@2.8.0)':
     dependencies:
-      '@apollo/client': 3.13.8(graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
+      '@apollo/client': 3.13.8(graphql-ws@5.16.2(graphql@16.11.0))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
       '@capacitor/android': 7.0.1(@capacitor/core@7.0.1)
       '@capacitor/app': 7.0.1(@capacitor/core@7.0.1)
       '@capacitor/barcode-scanner': 2.0.3(@capacitor/core@7.0.1)
@@ -17084,6 +17120,14 @@ snapshots:
       '@vitest/utils': 4.0.18
       chai: 6.2.2
       tinyrainbow: 3.0.3
+
+  '@vitest/mocker@4.0.18(vite@6.3.5(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))':
+    dependencies:
+      '@vitest/spy': 4.0.18
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+    optionalDependencies:
+      vite: 6.3.5(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0)
 
   '@vitest/mocker@4.0.18(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))':
     dependencies:
@@ -20257,6 +20301,9 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -22739,6 +22786,14 @@ snapshots:
       exsolve: 1.0.5
       pathe: 2.0.3
 
+  playwright-core@1.58.2: {}
+
+  playwright@1.58.2:
+    dependencies:
+      playwright-core: 1.58.2
+    optionalDependencies:
+      fsevents: 2.3.2
+
   plist@3.1.0:
     dependencies:
       '@xmldom/xmldom': 0.8.10
@@ -24871,7 +24926,7 @@ snapshots:
   vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(vite@6.3.5(@types/node@22.15.24)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))
+      '@vitest/mocker': 4.0.18(vite@6.3.5(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.40.0)(yaml@2.8.0))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
