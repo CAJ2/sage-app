@@ -2,7 +2,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: !process.env.TAURI_DEV_HOST },
 
   extends: ['../../packages/ui'],
 
