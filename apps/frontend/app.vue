@@ -7,17 +7,6 @@
 </template>
 <script setup lang="ts">
 import { useDark } from '@vueuse/core'
-import { StatusBar, Style } from '@capacitor/status-bar'
-import { Capacitor } from '@capacitor/core'
-
-if (Capacitor.isNativePlatform()) {
-  StatusBar.setStyle({
-    style: Style.Dark,
-  })
-  StatusBar.setOverlaysWebView({
-    overlay: false,
-  })
-}
 
 useHead({
   title: 'Sage',

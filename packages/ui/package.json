@@ -10,7 +10,6 @@
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.0.0",
     "@graphql-codegen/cli": "5.0.7",
     "@graphql-codegen/client-preset": "4.8.2",
     "@graphql-typed-document-node/core": "^3.2.0",
@@ -31,15 +30,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
-    "@capacitor/android": "^7.0.0",
-    "@capacitor/app": "^7.0.1",
-    "@capacitor/barcode-scanner": "^2.0.3",
-    "@capacitor/camera": "^7.0.1",
-    "@capacitor/core": "^7.0.0",
-    "@capacitor/haptics": "^7.0.1",
-    "@capacitor/ios": "^7.0.0",
-    "@capacitor/keyboard": "^7.0.1",
-    "@capacitor/status-bar": "^7.0.1",
     "@ericblade/quagga2": "^1.8.4",
     "@formkit/auto-animate": "^0.8.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

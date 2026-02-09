@@ -2,7 +2,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: !process.env.TAURI_DEV_HOST },
 
   extends: ['../../packages/ui'],
 
@@ -37,6 +37,15 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    clearScreen: false,
+    envPrefix: ['VITE_', 'TAURI_'],
+    server: {
+      strictPort: true,
+    },
+  },
+
+  devServer: {
+    host: '0',
   },
 
   vue: {
@@ -129,6 +138,8 @@ export default defineNuxtConfig({
       project: 'sage-frontend',
     },
   },
+
+  ignore: ['**/src-tauri/**'],
 
   compatibilityDate: '2025-02-12',
 })
