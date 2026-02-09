@@ -11,8 +11,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { Capacitor } from '@capacitor/core'
-
-const isAndroid = Capacitor.getPlatform() === 'android'
-</script>
+<script setup lang="ts"></script>
