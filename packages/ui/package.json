@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
+    "@ericblade/quagga2": "^1.8.4",
     "@formkit/auto-animate": "^0.8.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
