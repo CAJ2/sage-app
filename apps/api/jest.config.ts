@@ -5,7 +5,9 @@ const jestConfig: JestConfigWithTsJest = {
   testEnvironment: 'node',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': ['ts-jest', {
+      tsconfig: 'tsconfig.json',
+    }],
   },
   moduleNameMapper: {
     '@src/(.*)$': '<rootDir>/src/$1',
@@ -16,6 +18,11 @@ const jestConfig: JestConfigWithTsJest = {
   coverageDirectory: '../coverage',
   globalSetup: '<rootDir>/jest.setup.ts',
   globalTeardown: '<rootDir>/jest.teardown.ts',
+  maxWorkers: 1,
+  extensionsToTreatAsEsm: ['.mts'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!.*(better-auth|@noble)/)'
+  ],
 };
 
 export default jestConfig;

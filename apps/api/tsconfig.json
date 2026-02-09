@@ -7,6 +7,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "target": "ES2024",
     "sourceMap": true,
     "outDir": "./dist",
@@ -27,6 +28,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
-    "isolatedModules": true
+    "isolatedModules": true,
   }
 }

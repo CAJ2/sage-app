@@ -15,7 +15,7 @@ describe('AuthService', () => {
       imports: [
         CommonModule,
         MikroOrmModule.forRoot(MIKRO_TEST_CONFIG),
-        AuthModule.registerAsync(),
+        AuthModule,
       ],
       providers: [AuthService, UsersService],
     }).compile()

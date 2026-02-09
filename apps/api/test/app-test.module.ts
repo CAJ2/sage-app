@@ -75,7 +75,7 @@ if (dotenv) {
     MikroOrmModule.forRoot(MIKRO_TEST_CONFIG),
     GraphQLModule.register(),
     HealthModule,
-    AuthModule.registerAsync(),
+    AuthModule,
     UsersModule,
     GeoModule,
     ProductModule,

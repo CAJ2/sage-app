@@ -3,7 +3,11 @@ import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
 import { IsNanoID } from '@src/common/validator.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
-import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import {
+  OrderDirection,
+  Paginated,
+  PaginationBasicArgs,
+} from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
 import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
@@ -90,6 +94,18 @@ export class ChangesArgs extends PaginationBasicArgs {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   userID?: string
+
+  validate(): void {
+    super.validate()
+  }
+
+  orderBy(): string[] {
+    return ['id']
+  }
+
+  orderDir(): OrderDirection[] {
+    return [OrderDirection.ASC]
+  }
 }
 
 @ArgsType()

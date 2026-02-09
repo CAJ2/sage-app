@@ -107,7 +107,7 @@ describe('ChangeResolver (integration)', () => {
     expect(res.data?.change?.id).toBe(changeID)
   })
 
-  test('should query directEdit', async () => {
+  test('should query directEdit (Item)', async () => {
     const res = await gql.send(
       graphql(`
         query GetDirectEdit($id: ID!, $entityName: String!) {
@@ -117,10 +117,10 @@ describe('ChangeResolver (integration)', () => {
           }
         }
       `),
-      { id: changeID, entityName: 'TestEntity' },
+      { id: changeID, entityName: 'Item' },
     )
     expect(res.data?.directEdit).toBeTruthy()
-    expect(res.data?.directEdit?.entityName).toBe('TestEntity')
+    expect(res.data?.directEdit?.entityName).toBe('Item')
   })
 
   test('should create a change', async () => {

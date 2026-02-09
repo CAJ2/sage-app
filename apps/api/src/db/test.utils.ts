@@ -46,5 +46,6 @@ export async function clearDatabase(
       )
       .withSchema(schema)
       .delete({})
+      .execute()
   }
 }

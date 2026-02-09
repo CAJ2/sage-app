@@ -5,11 +5,7 @@ import { CommonModule } from '@src/common/common.module'
 import { EditService } from './edit.service'
 
 @Module({
-  imports: [
-    MikroOrmModule.forFeature([]),
-    CommonModule,
-    AuthModule.registerAsync(),
-  ],
+  imports: [MikroOrmModule.forFeature([]), CommonModule, AuthModule],
   providers: [EditService],
   exports: [EditService],
 })

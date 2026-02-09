@@ -104,6 +104,7 @@ export class TransformService {
   }
 
   paginationArgs(args: PaginationArgsType) {
+    console.log(args)
     args.validate()
     const where: ObjectQuery<any> = {}
     const orderByField = args.orderBy()[0] || 'id'

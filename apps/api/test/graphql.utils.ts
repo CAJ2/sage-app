@@ -27,6 +27,7 @@ export class GraphQLTestClient {
   async signIn(username: string, password: string): Promise<void> {
     const res = await this.agent
       .post('/auth/sign-in/username')
+      .set('Content-Type', 'application/json')
       .send({ username, password })
 
     if (res.status !== 200) {
@@ -38,7 +39,6 @@ export class GraphQLTestClient {
     // Extract and store cookies from the response
     const setCookieHeaders = res.headers['set-cookie']
     if (setCookieHeaders) {
-      console.warn(setCookieHeaders)
       this.cookies = Array.isArray(setCookieHeaders)
         ? setCookieHeaders
         : [setCookieHeaders]

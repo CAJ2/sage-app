@@ -18,7 +18,7 @@ import { VariantService } from './variant.service'
   imports: [
     CommonModule,
     MikroOrmModule.forFeature([]),
-    AuthModule.registerAsync(),
+    AuthModule,
     EditsModule,
     ProcessModule,
   ],
