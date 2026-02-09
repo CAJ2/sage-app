@@ -29,5 +29,8 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "isolatedModules": true,
+    "types": [
+      "vitest/globals"
+    ],
   }
 }
