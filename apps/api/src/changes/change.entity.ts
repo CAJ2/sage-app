@@ -12,6 +12,7 @@ import {
 import { Source } from '@src/changes/source.entity'
 import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
+import { nanoid } from 'nanoid'
 import type { Ref } from '@mikro-orm/core'
 
 export enum ChangeStatus {
@@ -50,7 +51,11 @@ export class Change extends IDCreatedUpdated {
   @ManyToOne(() => User)
   user!: Ref<User>
 
-  @OneToMany(() => ChangeEdits, (edit) => edit.change)
+  @OneToMany({
+    entity: () => ChangeEdits,
+    mappedBy: (edit) => edit.change,
+    orphanRemoval: true,
+  })
   edits = new Collection<ChangeEdits>(this)
 
   @ManyToMany({
@@ -65,6 +70,12 @@ export class Change extends IDCreatedUpdated {
 
 @Entity({ tableName: 'change_edits', schema: 'public' })
 export class ChangeEdits extends CreatedUpdated {
+  constructor(init?: Partial<ChangeEdits>) {
+    super()
+    this.edit_id = nanoid()
+    Object.assign(this, init)
+  }
+
   @ManyToOne({ primary: true })
   change!: Change
 
