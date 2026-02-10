@@ -10,9 +10,10 @@ import { ClsService } from 'nestjs-cls'
 import {
   DEFAULT_PAGE_SIZE,
   EdgeType,
+  IPaginationArgs,
   OrderDirection,
   PaginatedType,
-  PaginationArgsType,
+  PaginationArgsSchema,
 } from '../graphql/paginated'
 import type {
   EntityDTO,
@@ -22,6 +23,7 @@ import type {
   QueryOrderMap,
 } from '@mikro-orm/core'
 import type {
+  ClassConstructor,
   ClassTransformOptions,
   TransformFnParams,
 } from 'class-transformer'
@@ -47,8 +49,8 @@ export class TransformService {
   constructor(private readonly cls: ClsService) {}
 
   async entityToModel<T extends BaseEntity, S extends BaseModel<T>>(
-    entity: Loaded<T, never>,
     model: new () => S,
+    entity: Loaded<T, never>,
   ): Promise<S> {
     const entityObj: EntityDTOCtx<T> = entity.toObject()
     ;(entityObj as any)._lang = this.cls.get('lang')
@@ -64,8 +66,8 @@ export class TransformService {
   }
 
   async objectToModel<T, S extends object>(
-    object: T,
     model: new () => S,
+    object: T,
   ): Promise<S> {
     const obj = object as EntityDTOCtx<T>
     ;(obj as any)._lang = this.cls.get('lang')
@@ -80,32 +82,38 @@ export class TransformService {
   }
 
   async entitiesToModels<T extends BaseEntity, S extends BaseModel<T>>(
-    entities: Loaded<T, never>[],
     model: new () => S,
+    entities: Loaded<T, never>[],
   ): Promise<S[]> {
     const models: S[] = []
     for (const entity of entities) {
-      const inst = await this.entityToModel(entity, model)
+      const inst = await this.entityToModel(model, entity)
       models.push(inst)
     }
     return models
   }
 
   async objectsToModels<T, S extends object>(
-    objects: T[],
     model: new () => S,
+    objects: T[],
   ): Promise<S[]> {
     const models: S[] = []
     for (const obj of objects) {
-      const inst = await this.objectToModel(obj, model)
+      const inst = await this.objectToModel(model, obj)
       models.push(inst)
     }
     return models
   }
 
-  paginationArgs(args: PaginationArgsType) {
-    console.log(args)
-    args.validate()
+  async paginationArgs<T extends IPaginationArgs>(
+    cls: ClassConstructor<T> & { schema: PaginationArgsSchema },
+    argsObj: T,
+  ): Promise<[T, CursorOptions<any>]> {
+    const result = await cls.schema.safeParseAsync(argsObj)
+    if (!result.success) {
+      throw new GraphQLError(result.error.toString())
+    }
+    const args = plainToInstance(cls, result.data)
     const where: ObjectQuery<any> = {}
     const orderByField = args.orderBy()[0] || 'id'
     let decoded = ''
@@ -144,7 +152,7 @@ export class TransformService {
         limit: (args.first || args.last || DEFAULT_PAGE_SIZE) + 2,
       },
     }
-    return options
+    return [args, options]
   }
 
   async entityToPaginated<
@@ -152,10 +160,10 @@ export class TransformService {
     U extends BaseModel<T>,
     S extends PaginatedType<U, T>,
   >(
-    cursor: Cursor<T, '*'>,
-    options: PaginationArgsType,
     model: new () => U,
     PageModel: new () => S,
+    cursor: Cursor<T, '*'>,
+    options: IPaginationArgs,
   ): Promise<PaginatedType<U, T>> {
     const page: S = new PageModel()
     const nodes: U[] = []
@@ -163,7 +171,7 @@ export class TransformService {
     const flip = options.before || options.last
     cursor.items = flip ? cursor.items.reverse() : cursor.items
     for (const item of cursor.items) {
-      const cls = await this.entityToModel(item, model)
+      const cls = await this.entityToModel(model, item)
       nodes.push(cls)
       const itemOrderField = (item as any)[options.orderBy()[0] || 'id']
       const cid = Buffer.from(
@@ -246,8 +254,8 @@ export class TransformService {
   }
 
   async objectsToPaginated<T, S extends PaginatedType<any, any>>(
-    cursor: { items: EntityDTO<T>[]; count: number },
     PageModel: new () => S,
+    cursor: { items: EntityDTO<T>[]; count: number },
     skipTransform?: boolean,
   ): Promise<PaginatedType<any, any>> {
     const entities: any[] = []

@@ -10,8 +10,9 @@ import {
 } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
-import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
+import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
+import { z } from 'zod/v4'
 import { Change as ChangeEntity, ChangeStatus } from './change.entity'
 import { EditModel, EditModelType } from './change.enum'
 
@@ -86,18 +87,16 @@ export class ChangesPage extends Paginated(Change) {}
 
 @ArgsType()
 export class ChangesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    status: z.enum(ChangeStatus).optional(),
+    userID: z.string().optional(),
+  })
+
   @Field(() => ChangeStatus, { nullable: true })
-  @IsOptional()
-  @IsEnum(ChangeStatus)
   status?: ChangeStatus
 
   @Field(() => ID, { nullable: true })
-  @IsOptional()
   userID?: string
-
-  validate(): void {
-    super.validate()
-  }
 
   orderBy(): string[] {
     return ['id']

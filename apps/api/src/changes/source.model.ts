@@ -14,6 +14,7 @@ import { User } from '@src/users/users.model'
 import { IsEnum, IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import { ChangesPage } from './change.model'
 import { Source as SourceEntity, SourceType } from './source.entity'
 
@@ -54,9 +55,11 @@ export class SourcesPage extends Paginated(Source) {}
 
 @ArgsType()
 export class SourcesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    type: z.enum(SourceType).optional(),
+  })
+
   @Field(() => SourceType, { nullable: true })
-  @IsOptional()
-  @IsEnum(SourceType)
   type?: SourceType
 }
 

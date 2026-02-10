@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { DeleteInput } from '@src/changes/change-ext.model'
+import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { mapOrderBy } from '@src/common/db.utils'
@@ -110,7 +110,7 @@ export class ItemService {
 
   async create(input: CreateItemInput, userID: string) {
     const item = new Item()
-    if (!input.useChange()) {
+    if (!isUsingChange(input)) {
       await this.setFields(item, input)
       await this.em.persistAndFlush(item)
       await this.searchService.addDocs(item)

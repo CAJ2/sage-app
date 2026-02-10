@@ -8,6 +8,7 @@ import {
   CreateChangeInput,
   DeleteInput,
   IChangeInputWithLang,
+  isUsingChange,
 } from './change-ext.model'
 import { Change, ChangeEdits, ChangeStatus } from './change.entity'
 import { MergeInput, UpdateChangeInput } from './change.model'
@@ -571,7 +572,7 @@ export class EditService {
     }
     // If not, check if it exists in the database
     if (!options) {
-      options = { disableIdentityMap: input.useChange() }
+      options = { disableIdentityMap: isUsingChange(input) }
     }
     const entity = await this.em.findOne<T>(
       model,
@@ -622,7 +623,7 @@ export class EditService {
       return
     }
     // If not, check if it exists in the database
-    const options = { disableIdentityMap: input.useChange() }
+    const options = { disableIdentityMap: isUsingChange(input) }
     const entity = await this.em.findOne<T>(
       model,
       { id: input.id } as FilterQuery<T>,
@@ -634,6 +635,7 @@ export class EditService {
     const newEdit = new ChangeEdits()
     newEdit.entityName = meta.name
     newEdit.entityID = input.id
+    newEdit.userID = userID
     newEdit.original = this.entityToChangePOJO(
       meta.name,
       entity as BaseEntity & { id: string },
@@ -658,6 +660,7 @@ export class EditService {
       edit = new ChangeEdits()
       edit.entityName = entity.constructor.name
       edit.entityID = entity.id
+      edit.userID = this.authUser.userID()!
       edit.original = this.entityToChangePOJO(entity.constructor.name, entity)
       change.edits.add(edit)
     }
@@ -687,6 +690,7 @@ export class EditService {
     const edit = new ChangeEdits()
     edit.entityName = entityName
     edit.entityID = entity.id
+    edit.userID = this.authUser.userID()!
     edit.changes = _.omit(entity.toPOJO(), ['history'])
     change.edits.add(edit)
   }

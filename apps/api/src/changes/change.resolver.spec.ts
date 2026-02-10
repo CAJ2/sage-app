@@ -2,6 +2,8 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
+import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TestVariantSeeder, VARIANT_IDS } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { User } from '@src/users/users.entity'
@@ -9,15 +11,12 @@ import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
 import { ChangeService } from './change.service'
-import { EditService } from './edit.service'
 
 describe('ChangeResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
   let changeService: ChangeService
-  let editService: EditService
   let changeID: string
-  let editID: string
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,12 +29,16 @@ describe('ChangeResolver (integration)', () => {
     gql = new GraphQLTestClient(app)
 
     changeService = module.get(ChangeService)
-    editService = module.get(EditService)
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'auth')
     await clearDatabase(orm, 'public')
-    await orm.getSeeder().seed(BaseSeeder, UserSeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      TestVariantSeeder,
+    )
 
     const user = await orm.em.findOne(User, {
       username: 'admin',
@@ -55,15 +58,6 @@ describe('ChangeResolver (integration)', () => {
       user.id,
     )
     changeID = change.id
-    // Insert an edit for the change
-    const edit = await editService.create(
-      {
-        title: 'Test Edit',
-        description: 'Integration test edit',
-      },
-      user.id,
-    )
-    editID = edit.id
   })
 
   afterAll(async () => {
@@ -73,7 +67,7 @@ describe('ChangeResolver (integration)', () => {
   test('should query changes', async () => {
     const res = await gql.send(
       graphql(`
-        query ListChanges($after: String, $first: Int) {
+        query ChangeResolverListChanges($after: String, $first: Int) {
           changes(after: $after, first: $first) {
             nodes {
               id
@@ -93,7 +87,7 @@ describe('ChangeResolver (integration)', () => {
   test('should query a single change', async () => {
     const res = await gql.send(
       graphql(`
-        query GetChange($id: ID!) {
+        query ChangeResolverGetChange($id: ID!) {
           change(id: $id) {
             id
             title
@@ -107,26 +101,10 @@ describe('ChangeResolver (integration)', () => {
     expect(res.data?.change?.id).toBe(changeID)
   })
 
-  test('should query directEdit (Item)', async () => {
-    const res = await gql.send(
-      graphql(`
-        query GetDirectEdit($id: ID!, $entityName: String!) {
-          directEdit(id: $id, entityName: $entityName) {
-            id
-            entityName
-          }
-        }
-      `),
-      { id: changeID, entityName: 'Item' },
-    )
-    expect(res.data?.directEdit).toBeTruthy()
-    expect(res.data?.directEdit?.entityName).toBe('Item')
-  })
-
   test('should create a change', async () => {
     const res = await gql.send(
       graphql(`
-        mutation CreateChange($input: CreateChangeInput!) {
+        mutation ChangeResolverCreateChange($input: CreateChangeInput!) {
           createChange(input: $input) {
             change {
               id
@@ -149,7 +127,7 @@ describe('ChangeResolver (integration)', () => {
   test('should update a change', async () => {
     const res = await gql.send(
       graphql(`
-        mutation UpdateChange($input: UpdateChangeInput!) {
+        mutation ChangeResolverUpdateChange($input: UpdateChangeInput!) {
           updateChange(input: $input) {
             change {
               id
@@ -169,10 +147,47 @@ describe('ChangeResolver (integration)', () => {
     expect(res.data?.updateChange?.change?.title).toBe('Updated Title')
   })
 
+  test('should make an edit to a Variant', async () => {
+    const res = await gql.send(
+      graphql(`
+        mutation ChangeResolverEditVariant($input: UpdateVariantInput!) {
+          updateVariant(input: $input) {
+            change {
+              id
+              edits(first: 10) {
+                nodes {
+                  id
+                  entityName
+                }
+              }
+            }
+            variant {
+              name
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: VARIANT_IDS[0],
+          changeID,
+          name: 'Updated Name',
+        },
+      },
+    )
+    expect(res.data?.updateVariant).toBeTruthy()
+    const body = res.data?.updateVariant
+    expect(body?.change?.id).toBe(changeID)
+    expect(body?.variant?.name).toBe(`Variant ${VARIANT_IDS[0]}`)
+    expect(body?.change?.edits?.nodes?.length).toEqual(1)
+    expect(body?.change?.edits?.nodes?.[0]?.id).toBe(VARIANT_IDS[0])
+    expect(body?.change?.edits?.nodes?.[0]?.entityName).toBe('Variant')
+  })
+
   test('should discard an edit', async () => {
     const res = await gql.send(
       graphql(`
-        mutation DiscardEdit($changeID: ID!, $editID: ID!) {
+        mutation ChangeResolverDiscardEdit($changeID: ID!, $editID: ID!) {
           discardEdit(changeID: $changeID, editID: $editID) {
             success
             id
@@ -181,17 +196,17 @@ describe('ChangeResolver (integration)', () => {
       `),
       {
         changeID,
-        editID,
+        editID: VARIANT_IDS[0],
       },
     )
     expect(res.data?.discardEdit?.success).toBe(true)
-    expect(res.data?.discardEdit?.id).toBe(editID)
+    expect(res.data?.discardEdit?.id).toBe(VARIANT_IDS[0])
   })
 
   test('should delete a change', async () => {
     const res = await gql.send(
       graphql(`
-        mutation DeleteChange($id: ID!) {
+        mutation ChangeResolverDeleteChange($id: ID!) {
           deleteChange(id: $id) {
             success
           }

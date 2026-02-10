@@ -22,9 +22,17 @@ export class PlaceResolver {
 
   @Query(() => PlacesPage, { name: 'places' })
   async places(@Args() args: PlacesArgs): Promise<PlacesPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      PlacesArgs,
+      args,
+    )
     const cursor = await this.placeService.find(filter)
-    return this.transform.entityToPaginated(cursor, args, Place, PlacesPage)
+    return this.transform.entityToPaginated(
+      Place,
+      PlacesPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @Query(() => Place, { name: 'place', nullable: true })
@@ -33,13 +41,13 @@ export class PlaceResolver {
     if (!place) {
       throw NotFoundErr('Place not found')
     }
-    return this.transform.entityToModel(place, Place)
+    return this.transform.entityToModel(Place, place)
   }
 
   @ResolveField()
   async tags(@Parent() place: Place) {
     const tags = await this.placeService.tags(place.id)
-    return this.transform.entitiesToModels(tags, Tag)
+    return this.transform.entitiesToModels(Tag, tags)
   }
 
   @ResolveField()
@@ -48,6 +56,6 @@ export class PlaceResolver {
     if (!org) {
       return null
     }
-    return this.transform.entityToModel(org, Org)
+    return this.transform.entityToModel(Org, org)
   }
 }

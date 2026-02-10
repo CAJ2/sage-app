@@ -38,13 +38,16 @@ export class CategoryResolver {
 
   @Query(() => CategoriesPage, { name: 'categories' })
   async categories(@Args() args: CategoriesArgs): Promise<CategoriesPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      CategoriesArgs,
+      args,
+    )
     const cursor = await this.categoryService.find(filter)
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       Category,
       CategoriesPage,
+      cursor,
+      parsedArgs,
     )
   }
 
@@ -56,7 +59,7 @@ export class CategoryResolver {
     if (!category) {
       throw NotFoundErr('Category not found')
     }
-    const model = await this.transform.entityToModel(category, Category)
+    const model = await this.transform.entityToModel(Category, category)
     return model
   }
 
@@ -66,7 +69,7 @@ export class CategoryResolver {
     if (!category) {
       throw NotFoundErr('Root category not found')
     }
-    const model = await this.transform.entityToModel(category, Category)
+    const model = await this.transform.entityToModel(Category, category)
     return model
   }
 
@@ -86,40 +89,49 @@ export class CategoryResolver {
 
   @ResolveField()
   async parents(@Parent() category: Category, @Args() args: CategoriesArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      CategoriesArgs,
+      args,
+    )
     const cursor = await this.categoryService.findParents(category.id, filter)
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       Category,
       CategoriesPage,
+      cursor,
+      parsedArgs,
     )
   }
 
   @ResolveField()
   async children(@Parent() category: Category, @Args() args: CategoriesArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      CategoriesArgs,
+      args,
+    )
     const cursor = await this.categoryService.findChildren(category.id, filter)
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       Category,
       CategoriesPage,
+      cursor,
+      parsedArgs,
     )
   }
 
   @ResolveField()
   async ancestors(@Parent() category: Category, @Args() args: CategoriesArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      CategoriesArgs,
+      args,
+    )
     const cursor = await this.categoryService.findDirectAncestors(
       category.id,
       filter,
     )
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       Category,
       CategoriesPage,
+      cursor,
+      parsedArgs,
     )
   }
 
@@ -128,24 +140,30 @@ export class CategoryResolver {
     @Parent() category: Category,
     @Args() args: CategoriesArgs,
   ) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      CategoriesArgs,
+      args,
+    )
     const cursor = await this.categoryService.findDirectDescendants(
       category.id,
       filter,
     )
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       Category,
       CategoriesPage,
+      cursor,
+      parsedArgs,
     )
   }
 
   @ResolveField()
   async items(@Parent() category: Category, @Args() args: CategoryItemsArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      CategoryItemsArgs,
+      args,
+    )
     const cursor = await this.categoryService.items(category.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Item, ItemsPage)
+    return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateCategoryOutput, {
@@ -158,8 +176,8 @@ export class CategoryResolver {
     @AuthUser() user: ReqUser,
   ): Promise<CreateCategoryOutput> {
     const created = await this.categoryService.create(input, user.id)
-    const model = await this.transform.entityToModel(created.category, Category)
-    const change = await this.transform.entityToModel(created.change, Change)
+    const model = await this.transform.entityToModel(Category, created.category)
+    const change = await this.transform.entityToModel(Change, created.change)
     return { category: model, change }
   }
 
@@ -173,11 +191,11 @@ export class CategoryResolver {
     @AuthUser() user: ReqUser,
   ): Promise<UpdateCategoryOutput> {
     const updated = await this.categoryService.update(input, user.id)
-    const model = await this.transform.entityToModel(updated.category, Category)
+    const model = await this.transform.entityToModel(Category, updated.category)
     if (!updated.change) {
       return { category: model }
     }
-    const change = await this.transform.entityToModel(updated.change, Change)
+    const change = await this.transform.entityToModel(Change, updated.change)
     return { category: model, change }
   }
 

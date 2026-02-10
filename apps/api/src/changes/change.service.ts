@@ -77,7 +77,7 @@ export class ChangeService {
         edit._type = EditModel
         edit.entityID = directEdit.id
         edit.entityName = directEdit.entityName
-        const editModel = await this.transform.objectToModel(edit, EditModel)
+        const editModel = await this.transform.objectToModel(EditModel, edit)
         editModel.original = directEdit.original
         editModel.changes = directEdit.changes
         editModel.createChanges = directEdit.createModel
@@ -85,7 +85,7 @@ export class ChangeService {
         return [editModel]
       }
       edit._type = EditModel
-      const editModel = await this.transform.objectToModel(edit, EditModel)
+      const editModel = await this.transform.objectToModel(EditModel, edit)
       editModel.createChanges = await this.changeMapService.createEdit(
         edit.entityName,
         editModel,
@@ -99,7 +99,7 @@ export class ChangeService {
     return Promise.all(
       change.edits.map(async (edit) => {
         edit._type = EditModel
-        const editModel = await this.transform.objectToModel(edit, EditModel)
+        const editModel = await this.transform.objectToModel(EditModel, edit)
         editModel.createChanges = await this.changeMapService.createEdit(
           edit.entityName,
           editModel,
@@ -242,7 +242,7 @@ export class ChangeService {
       throw NotFoundErr('Edit not found')
     }
     change.edits.remove(edit)
-    await this.em.persistAndFlush(change)
+    await this.em.flush()
     return editID
   }
 }

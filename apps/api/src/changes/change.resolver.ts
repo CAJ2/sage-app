@@ -9,7 +9,7 @@ import {
   Resolver,
 } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
-import { Optional } from '@src/auth/decorators'
+import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.model'
@@ -44,22 +44,30 @@ export class ChangeResolver {
 
   @Query(() => ChangesPage)
   @UseGuards(AuthGuard)
-  @Optional()
+  @OptionalAuth()
   async changes(@Args() args: ChangesArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      ChangesArgs,
+      args,
+    )
     const cursor = await this.changeService.find(filter)
-    return this.transform.entityToPaginated(cursor, args, Change, ChangesPage)
+    return this.transform.entityToPaginated(
+      Change,
+      ChangesPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @Query(() => Change, { name: 'change', nullable: true })
   @UseGuards(AuthGuard)
-  @Optional()
+  @OptionalAuth()
   async change(@Args('id', { type: () => ID }) id: string) {
     const change = await this.changeService.findOne(id)
     if (!change) {
       throw NotFoundErr('Change not found')
     }
-    return this.transform.entityToModel(change, Change)
+    return this.transform.entityToModel(Change, change)
   }
 
   @Query(() => DirectEdit, { nullable: true })
@@ -82,7 +90,7 @@ export class ChangeResolver {
     @AuthUser() user: ReqUser,
   ): Promise<CreateChangeOutput> {
     const change = await this.changeService.create(input, user.id)
-    const model = await this.transform.entityToModel(change, Change)
+    const model = await this.transform.entityToModel(Change, change)
     return {
       change: model,
     }
@@ -94,7 +102,7 @@ export class ChangeResolver {
     @Args('input') input: UpdateChangeInput,
   ): Promise<UpdateChangeOutput> {
     const change = await this.changeService.update(input)
-    const model = await this.transform.entityToModel(change, Change)
+    const model = await this.transform.entityToModel(Change, change)
     return {
       change: model,
     }
@@ -120,7 +128,7 @@ export class ChangeResolver {
     if (!result) {
       throw NotFoundErr('Change not found or already merged')
     }
-    const model = await this.transform.entityToModel(result.change, Change)
+    const model = await this.transform.entityToModel(Change, result.change)
     return {
       change: model,
     }
@@ -146,17 +154,25 @@ export class ChangeResolver {
   ): Promise<ChangeEditsPage> {
     const edits = await this.changeService.edits(change.id, args.id, args.type)
     return this.transform.objectsToPaginated(
-      { items: edits, count: edits.length },
       ChangeEditsPage,
+      { items: edits, count: edits.length },
       true,
     )
   }
 
   @ResolveField(() => SourcesPage, { nullable: true })
   async sources(@Parent() change: Change, @Args() args: ChangeSourcesArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      ChangeSourcesArgs,
+      args,
+    )
     const cursor = await this.changeService.sources(change.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Source, SourcesPage)
+    return this.transform.entityToPaginated(
+      Source,
+      SourcesPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @ResolveField(() => User, { nullable: true })
@@ -165,6 +181,6 @@ export class ChangeResolver {
     if (!user) {
       return null
     }
-    return this.transform.entityToModel(user, User)
+    return this.transform.entityToModel(User, user)
   }
 }

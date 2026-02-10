@@ -1,6 +1,6 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { DeleteInput } from '@src/changes/change-ext.model'
+import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
@@ -168,7 +168,7 @@ export class VariantService {
 
   async create(input: CreateVariantInput, userID: string) {
     const variant = new Variant()
-    if (!input.useChange()) {
+    if (!isUsingChange(input)) {
       await this.setFields(variant, input)
       await this.em.persistAndFlush(variant)
       return { variant }

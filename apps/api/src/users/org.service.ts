@@ -1,5 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
@@ -41,7 +42,7 @@ export class OrgService {
       )
     }
     const org = new Org()
-    if (!input.useChange()) {
+    if (!isUsingChange(input)) {
       await this.setFields(org, input)
       await this.em.persistAndFlush(org)
       await this.searchService.addDocs(org)

@@ -15,6 +15,7 @@ import { Category } from '@src/product/category.model'
 import { Item } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
+import { z } from 'zod/v4'
 
 export enum SearchType {
   CATEGORY = 'category',
@@ -69,6 +70,14 @@ registerEnumType(SearchType, {
 
 @ArgsType()
 export class SearchArgs {
+  static schema = z.object({
+    query: z.string(),
+    types: z.array(z.enum(SearchType)).optional(),
+    latlong: z.array(z.number()).length(2).optional(),
+    limit: z.number().int().positive().optional(),
+    offset: z.number().int().min(0).optional(),
+  })
+
   @Field(() => String)
   query!: string
 

@@ -16,6 +16,9 @@ export class GraphQLTestClient {
   constructor(app: INestApplication) {
     this.app = app
     this.agent = request(app.getHttpServer())
+    this.headers = {
+      'Accept-Language': 'en',
+    }
   }
 
   /**
@@ -50,6 +53,15 @@ export class GraphQLTestClient {
    */
   clearAuth(): void {
     this.cookies = []
+  }
+
+  /**
+   * Set the language(s) for the request using the Accept-Language header.
+   */
+  setLanguage(lang: string | string[]): void {
+    this.headers!['Accept-Language'] = Array.isArray(lang)
+      ? lang.join(',')
+      : lang
   }
 
   /**

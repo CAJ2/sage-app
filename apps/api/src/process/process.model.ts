@@ -18,6 +18,7 @@ import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
 import { IsEnum, IsOptional } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
+import { z } from 'zod/v4'
 import { Material } from './material.model'
 import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
@@ -94,6 +95,11 @@ export class ProcessPage extends Paginated(Process) {}
 
 @ArgsType()
 export class ProcessArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    region: z.string().optional(),
+    material: z.nanoid().optional(),
+  })
+
   @Field(() => String, { nullable: true })
   region?: string
 

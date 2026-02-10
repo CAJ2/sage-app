@@ -38,13 +38,16 @@ export class ComponentResolver {
 
   @Query(() => ComponentsPage, { name: 'components' })
   async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      ComponentsArgs,
+      args,
+    )
     const cursor = await this.componentService.find(filter)
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       Component,
       ComponentsPage,
+      cursor,
+      parsedArgs,
     )
   }
 
@@ -58,7 +61,7 @@ export class ComponentResolver {
     if (!component) {
       throw NotFoundErr('Component not found')
     }
-    return this.transform.entityToModel(component, Component)
+    return this.transform.entityToModel(Component, component)
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
@@ -84,19 +87,19 @@ export class ComponentResolver {
     if (!material) {
       return null
     }
-    return this.transform.entityToModel(material, Material)
+    return this.transform.entityToModel(Material, material)
   }
 
   @ResolveField()
   async materials(@Parent() component: Component) {
     const materials = await this.componentService.materials(component.id)
-    return this.transform.entitiesToModels(materials, Material)
+    return this.transform.entitiesToModels(Material, materials)
   }
 
   @ResolveField()
   async tags(@Parent() component: Component) {
     const tags = await this.componentService.tags(component.id)
-    return this.transform.objectsToModels(tags, Tag)
+    return this.transform.objectsToModels(Tag, tags)
   }
 
   @ResolveField()
@@ -140,11 +143,11 @@ export class ComponentResolver {
   ): Promise<CreateComponentOutput> {
     const created = await this.componentService.create(input, user.id)
     const model = await this.transform.entityToModel(
-      created.component,
       Component,
+      created.component,
     )
     if (created.change) {
-      const change = await this.transform.entityToModel(created.change, Change)
+      const change = await this.transform.entityToModel(Change, created.change)
       return { component: model, change }
     }
     return { component: model }
@@ -161,11 +164,11 @@ export class ComponentResolver {
   ): Promise<UpdateComponentOutput> {
     const updated = await this.componentService.update(input, user.id)
     const model = await this.transform.entityToModel(
-      updated.component,
       Component,
+      updated.component,
     )
     if (updated.change) {
-      const change = await this.transform.entityToModel(updated.change, Change)
+      const change = await this.transform.entityToModel(Change, updated.change)
       return { component: model, change }
     }
     return { component: model }

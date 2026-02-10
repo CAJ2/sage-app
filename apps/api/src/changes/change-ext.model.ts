@@ -15,7 +15,10 @@ export interface IChangeInputWithLang {
   addSources?: ISourceInput[]
   removeSources?: string[]
   apply?: boolean
-  useChange(): boolean
+}
+
+export const isUsingChange = (input: IChangeInputWithLang): boolean => {
+  return !!input.changeID || !!input.change
 }
 
 @InputType()
@@ -69,10 +72,6 @@ export class ChangeInputWithLang {
 
   @Field(() => String, { nullable: true })
   lang?: string
-
-  useChange(): boolean {
-    return !!this.changeID || !!this.change
-  }
 }
 
 @InputType()
@@ -97,8 +96,4 @@ export class DeleteInput {
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
   apply?: boolean
-
-  useChange(): boolean {
-    return !!this.changeID || !!this.change
-  }
 }
