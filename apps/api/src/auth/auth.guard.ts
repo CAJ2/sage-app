@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { fromNodeHeaders } from 'better-auth/node'
+import { ClsService } from 'nestjs-cls'
 import {
   type AuthModuleOptions,
   MODULE_OPTIONS_TOKEN,
@@ -154,6 +155,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     @Inject(MODULE_OPTIONS_TOKEN)
     private readonly options: AuthModuleOptions,
+    private readonly cls: ClsService,
   ) {}
 
   /**
@@ -171,6 +173,8 @@ export class AuthGuard implements CanActivate {
       ),
     })
 
+    // Store session in CLS for access in AuthUserService
+    this.cls.set('session', session)
     request.session = session
     request.user = session?.user ?? null // useful for observability tools like Sentry
 
