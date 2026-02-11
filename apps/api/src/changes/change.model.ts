@@ -2,7 +2,7 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
 import { IsNanoID } from '@src/common/validator.model'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
+import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
 import {
   OrderDirection,
   Paginated,
@@ -13,11 +13,15 @@ import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
-import { Change as ChangeEntity, ChangeStatus } from './change.entity'
+import {
+  ChangeEdits,
+  Change as ChangeEntity,
+  ChangeStatus,
+} from './change.entity'
 import { EditModel, EditModelType } from './change.enum'
 
 @ObjectType()
-export class Edit {
+export class Edit extends BaseModel<ChangeEdits> {
   @Field(() => String)
   entityName!: string
 
@@ -37,6 +41,10 @@ export class Edit {
 
   @Field(() => JSONObjectResolver, { nullable: true })
   updateChanges?: Record<string, any>
+
+  transform(entity: ChangeEdits) {
+    this.id = entity.entityID
+  }
 }
 
 @ObjectType()
@@ -56,6 +64,10 @@ export class DirectEdit {
   // Not exposed in GraphQL
   original?: typeof EditModel
   changes?: typeof EditModel
+
+  transform(entity: any) {
+    this.id = entity.id
+  }
 }
 
 @ObjectType()

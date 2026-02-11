@@ -18,9 +18,17 @@ export class RegionResolver {
 
   @Query(() => RegionsPage, { name: 'regions' })
   async regions(@Args() args: RegionsArgs): Promise<RegionsPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      RegionsArgs,
+      args,
+    )
     const cursor = await this.regionService.find(filter)
-    return this.transform.entityToPaginated(cursor, args, Region, RegionsPage)
+    return this.transform.entityToPaginated(
+      Region,
+      RegionsPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @Query(() => Region, { name: 'region', nullable: true })
@@ -29,14 +37,17 @@ export class RegionResolver {
     if (!region) {
       throw NotFoundErr('Region not found')
     }
-    return this.transform.entityToModel(region, Region)
+    return this.transform.entityToModel(Region, region)
   }
 
   @Query(() => RegionsPage, { name: 'searchRegionsByPoint' })
   async searchRegionsByPoint(
     @Args() args: RegionsSearchByPointArgs,
   ): Promise<RegionsPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      RegionsSearchByPointArgs,
+      args,
+    )
     const cursor = await this.regionService.searchByPoint(
       {
         latitude: args.latlong[0],
@@ -44,6 +55,11 @@ export class RegionResolver {
       },
       filter,
     )
-    return this.transform.entityToPaginated(cursor, args, Region, RegionsPage)
+    return this.transform.entityToPaginated(
+      Region,
+      RegionsPage,
+      cursor,
+      parsedArgs,
+    )
   }
 }

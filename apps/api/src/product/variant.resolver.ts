@@ -180,9 +180,7 @@ export class VariantResolver {
     @AuthUser() user: ReqUser,
   ): Promise<UpdateVariantOutput> {
     const updated = await this.variantService.update(input, user.id)
-    console.log('Updated variant and change:', updated)
     const result = await this.transform.entityToModel(Variant, updated.variant)
-    console.log('entityToModel:', result)
     if (!updated.change) {
       return { variant: result }
     }

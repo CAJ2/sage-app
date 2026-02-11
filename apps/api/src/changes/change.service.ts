@@ -99,7 +99,7 @@ export class ChangeService {
     return Promise.all(
       change.edits.map(async (edit) => {
         edit._type = EditModel
-        const editModel = await this.transform.objectToModel(EditModel, edit)
+        const editModel = await this.transform.entityToModel(EditModel, edit)
         editModel.createChanges = await this.changeMapService.createEdit(
           edit.entityName,
           editModel,

@@ -91,7 +91,7 @@ export class GraphQLModule {
     ctx: Context,
   ): GraphQLFormattedError {
     const msg = ctx.req as IncomingMessageWithAuthCode
-    console.log('GraphQL Error:', error.extensions)
+    console.error('GraphQL Error:', error)
     if (msg.authCode) {
       if (msg.authCode === 401) {
         return {
