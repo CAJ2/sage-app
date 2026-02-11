@@ -8,7 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
@@ -47,9 +47,17 @@ export class VariantResolver {
 
   @Query(() => VariantsPage, { name: 'variants' })
   async variants(@Args() args: VariantsArgs): Promise<VariantsPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      VariantsArgs,
+      args,
+    )
     const cursor = await this.variantService.find(filter)
-    return this.transform.entityToPaginated(cursor, args, Variant, VariantsPage)
+    return this.transform.entityToPaginated(
+      Variant,
+      VariantsPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @Query(() => Variant, { name: 'variant', nullable: true })
@@ -58,7 +66,7 @@ export class VariantResolver {
     if (!variant) {
       throw NotFoundErr('Variant not found')
     }
-    const result = this.transform.entityToModel(variant, Variant)
+    const result = await this.transform.entityToModel(Variant, variant)
     return result
   }
 
@@ -78,28 +86,37 @@ export class VariantResolver {
 
   @ResolveField()
   async items(@Parent() variant: Variant, @Args() args: VariantItemsArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      VariantItemsArgs,
+      args,
+    )
     const cursor = await this.variantService.items(variant.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Item, ItemsPage)
+    return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
   }
 
   @ResolveField()
   async orgs(@Parent() variant: Variant, @Args() args: VariantOrgsArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      VariantOrgsArgs,
+      args,
+    )
     const cursor = await this.variantService.orgs(variant.id, filter)
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       VariantOrg,
       VariantOrgsPage,
+      cursor,
+      parsedArgs,
     )
   }
 
   @ResolveField()
   async tags(@Parent() variant: Variant, @Args() args: VariantTagsArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      VariantTagsArgs,
+      args,
+    )
     const cursor = await this.variantService.tags(variant.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Tag, TagPage)
+    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }
 
   @ResolveField()
@@ -107,13 +124,16 @@ export class VariantResolver {
     @Parent() variant: Variant,
     @Args() args: VariantComponentsArgs,
   ) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      VariantComponentsArgs,
+      args,
+    )
     const cursor = await this.variantService.components(variant.id, filter)
     return this.transform.entityToPaginated(
-      cursor,
-      args,
       VariantComponent,
       VariantComponentsPage,
+      cursor,
+      parsedArgs,
     )
   }
 
@@ -142,11 +162,11 @@ export class VariantResolver {
     @AuthUser() user: ReqUser,
   ): Promise<CreateVariantOutput> {
     const created = await this.variantService.create(input, user.id)
-    const result = await this.transform.entityToModel(created.variant, Variant)
+    const result = await this.transform.entityToModel(Variant, created.variant)
     if (!created.change) {
       return { variant: result }
     }
-    const change = await this.transform.entityToModel(created.change, Change)
+    const change = await this.transform.entityToModel(Change, created.change)
     return { change, variant: result }
   }
 
@@ -160,11 +180,11 @@ export class VariantResolver {
     @AuthUser() user: ReqUser,
   ): Promise<UpdateVariantOutput> {
     const updated = await this.variantService.update(input, user.id)
-    const result = await this.transform.entityToModel(updated.variant, Variant)
+    const result = await this.transform.entityToModel(Variant, updated.variant)
     if (!updated.change) {
       return { variant: result }
     }
-    const change = await this.transform.entityToModel(updated.change, Change)
+    const change = await this.transform.entityToModel(Change, updated.change)
     return { change, variant: result }
   }
 

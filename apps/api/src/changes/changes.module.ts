@@ -17,7 +17,7 @@ import { EditsModule } from './edits.module'
   imports: [
     MikroOrmModule.forFeature([]),
     CommonModule,
-    AuthModule.registerAsync(),
+    AuthModule,
     ProductModule,
     ProcessModule,
     UsersModule,

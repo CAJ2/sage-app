@@ -8,15 +8,15 @@ import {
   PrimaryKey,
   PrimaryKeyProp,
   Property,
-  Ref,
 } from '@mikro-orm/core'
 import { MultiPolygon, MultiPolygonType } from '@src/db/custom.types'
-import { TranslatedField } from '@src/db/i18n'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
 import _ from 'lodash'
+import type { Ref } from '@mikro-orm/core'
+import type { TranslatedField } from '@src/db/i18n'
 
 @Entity({ tableName: 'regions', schema: 'public' })
 @Index({ properties: ['geo'], type: 'gist' })

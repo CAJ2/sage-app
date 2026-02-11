@@ -12,7 +12,7 @@ import { UsersService } from './users.service'
   imports: [
     MikroOrmModule.forFeature([]),
     CommonModule,
-    AuthModule.registerAsync(),
+    AuthModule,
     EditsModule,
   ],
   providers: [UsersService, UsersResolver, OrgService, OrgResolver],

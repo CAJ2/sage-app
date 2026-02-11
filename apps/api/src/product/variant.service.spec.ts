@@ -27,7 +27,7 @@ describe('VariantService', () => {
       imports: [
         CommonModule,
         MikroOrmModule.forRoot(MIKRO_TEST_CONFIG),
-        AuthModule.registerAsync(),
+        AuthModule,
         EditsModule,
         ProcessModule,
       ],
@@ -37,6 +37,7 @@ describe('VariantService', () => {
     service = module.get<VariantService>(VariantService)
     orm = module.get<MikroORM>(MikroORM)
 
+    await clearDatabase(orm, 'auth')
     await clearDatabase(orm, 'public')
     await orm
       .getSeeder()

@@ -7,7 +7,7 @@ import {
   Unique,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { TranslatedField } from '@src/db/i18n'
+import { type TranslatedField } from '@src/db/i18n'
 import { Place } from '@src/geo/place.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'

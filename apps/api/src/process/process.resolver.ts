@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
@@ -28,9 +28,17 @@ export class ProcessResolver {
 
   @Query(() => ProcessPage, { name: 'processes' })
   async processes(@Args() args: ProcessArgs): Promise<ProcessPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      ProcessArgs,
+      args,
+    )
     const cursor = await this.processService.find(filter)
-    return this.transform.entityToPaginated(cursor, args, Process, ProcessPage)
+    return this.transform.entityToPaginated(
+      Process,
+      ProcessPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @Query(() => Process, { name: 'process', nullable: true })
@@ -39,7 +47,7 @@ export class ProcessResolver {
     if (!process) {
       throw NotFoundErr('Process not found')
     }
-    return this.transform.entityToModel(process, Process)
+    return this.transform.entityToModel(Process, process)
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
@@ -66,9 +74,9 @@ export class ProcessResolver {
     @AuthUser() user: ReqUser,
   ): Promise<CreateProcessOutput> {
     const created = await this.processService.create(input, user.id)
-    const model = await this.transform.entityToModel(created.process, Process)
+    const model = await this.transform.entityToModel(Process, created.process)
     if (created.change) {
-      const change = await this.transform.entityToModel(created.change, Change)
+      const change = await this.transform.entityToModel(Change, created.change)
       return { process: model, change }
     }
     return { process: model }
@@ -84,9 +92,9 @@ export class ProcessResolver {
     @AuthUser() user: ReqUser,
   ): Promise<UpdateProcessOutput> {
     const updated = await this.processService.update(input, user.id)
-    const model = await this.transform.entityToModel(updated.process, Process)
+    const model = await this.transform.entityToModel(Process, updated.process)
     if (updated.change) {
-      const change = await this.transform.entityToModel(updated.change, Change)
+      const change = await this.transform.entityToModel(Change, updated.change)
       return { process: model, change }
     }
     return { process: model }

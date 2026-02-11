@@ -2,17 +2,26 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
 import { IsNanoID } from '@src/common/validator.model'
-import { IDCreatedUpdated } from '@src/graphql/base.model'
-import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
+import {
+  OrderDirection,
+  Paginated,
+  PaginationBasicArgs,
+} from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
-import { IsEnum, IsOptional, MaxLength, Validate } from 'class-validator'
+import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
-import { Change as ChangeEntity, ChangeStatus } from './change.entity'
+import { z } from 'zod/v4'
+import {
+  ChangeEdits,
+  Change as ChangeEntity,
+  ChangeStatus,
+} from './change.entity'
 import { EditModel, EditModelType } from './change.enum'
 
 @ObjectType()
-export class Edit {
+export class Edit extends BaseModel<ChangeEdits> {
   @Field(() => String)
   entityName!: string
 
@@ -32,6 +41,10 @@ export class Edit {
 
   @Field(() => JSONObjectResolver, { nullable: true })
   updateChanges?: Record<string, any>
+
+  transform(entity: ChangeEdits) {
+    this.id = entity.entityID
+  }
 }
 
 @ObjectType()
@@ -51,6 +64,10 @@ export class DirectEdit {
   // Not exposed in GraphQL
   original?: typeof EditModel
   changes?: typeof EditModel
+
+  transform(entity: any) {
+    this.id = entity.id
+  }
 }
 
 @ObjectType()
@@ -82,14 +99,24 @@ export class ChangesPage extends Paginated(Change) {}
 
 @ArgsType()
 export class ChangesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    status: z.enum(ChangeStatus).optional(),
+    userID: z.string().optional(),
+  })
+
   @Field(() => ChangeStatus, { nullable: true })
-  @IsOptional()
-  @IsEnum(ChangeStatus)
   status?: ChangeStatus
 
   @Field(() => ID, { nullable: true })
-  @IsOptional()
   userID?: string
+
+  orderBy(): string[] {
+    return ['id']
+  }
+
+  orderDir(): OrderDirection[] {
+    return [OrderDirection.ASC]
+  }
 }
 
 @ArgsType()

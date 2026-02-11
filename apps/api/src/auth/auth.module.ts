@@ -1,84 +1,108 @@
-import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { MikroORM } from '@mikro-orm/postgresql'
+import { Inject, Logger, Module } from '@nestjs/common'
+import { normalizePath } from '@nestjs/common/utils/shared.utils.js'
 import {
-  Inject,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  OnModuleInit,
-  Provider,
-  RequestMethod,
-} from '@nestjs/common'
-import {
-  APP_FILTER,
+  APP_GUARD,
+  ApplicationConfig,
   DiscoveryModule,
   DiscoveryService,
   HttpAdapterHost,
   MetadataScanner,
 } from '@nestjs/core'
-import { createAuthMiddleware } from 'better-auth/api'
+import { mapToExcludeRoute } from '@nestjs/core/middleware/utils.js'
 import { toNodeHandler } from 'better-auth/node'
-import { APIErrorExceptionFilter } from './api-error-exception-filter'
+import { createAuthMiddleware } from 'better-auth/plugins'
 import { configureAuth } from './auth'
+import {
+  type ASYNC_OPTIONS_TYPE,
+  type AuthModuleOptions,
+  ConfigurableModuleClass,
+  MODULE_OPTIONS_TOKEN,
+  type OPTIONS_TYPE,
+} from './auth-module-definition'
 import { AuthGuard } from './auth.guard'
-import { AuthResolver } from './auth.resolver'
 import { AuthService } from './auth.service'
 import { AuthUserService } from './authuser.service'
 import { SkipBodyParsingMiddleware } from './middlewares'
-import {
-  AFTER_HOOK_KEY,
-  AUTH_INSTANCE_KEY,
-  AUTH_MODULE_OPTIONS_KEY,
-  BEFORE_HOOK_KEY,
-  HOOK_KEY,
-} from './symbols'
-import type { Auth } from 'better-auth'
-
-/**
- * Configuration options for the AuthModule
- */
-interface AuthModuleOptions {
-  disableExceptionFilter?: boolean
-  disableTrustedOriginsCors?: boolean
-  disableBodyParser?: boolean
-}
+import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './symbols'
+import type {
+  DynamicModule,
+  MiddlewareConsumer,
+  NestModule,
+  OnModuleInit,
+} from '@nestjs/common'
+import type { Request, Response } from 'express'
 
 const HOOKS = [
   { metadataKey: BEFORE_HOOK_KEY, hookType: 'before' as const },
   { metadataKey: AFTER_HOOK_KEY, hookType: 'after' as const },
 ]
 
+// biome-ignore lint/suspicious/noExplicitAny: i don't want to cause issues/breaking changes between different ways of setting up better-auth and even versions
+export type Auth = any
+
 /**
  * NestJS module that integrates the Auth library with NestJS applications.
  * Provides authentication middleware, hooks, and exception handling.
  */
 @Module({
-  imports: [MikroOrmModule, DiscoveryModule],
-  providers: [AuthService, AuthResolver, AuthGuard],
+  imports: [DiscoveryModule],
+  providers: [AuthService],
+  exports: [AuthService],
 })
-export class AuthModule implements NestModule, OnModuleInit {
+export class BetterAuthModule
+  extends ConfigurableModuleClass
+  implements NestModule, OnModuleInit
+{
+  private readonly logger = new Logger(BetterAuthModule.name)
+  private readonly basePath: string
+
   constructor(
-    private readonly orm: MikroORM,
-    @Inject(AUTH_INSTANCE_KEY) private readonly auth: Auth,
+    @Inject(ApplicationConfig)
+    private readonly applicationConfig: ApplicationConfig,
     @Inject(DiscoveryService)
-    private discoveryService: DiscoveryService,
+    private readonly discoveryService: DiscoveryService,
     @Inject(MetadataScanner)
-    private metadataScanner: MetadataScanner,
+    private readonly metadataScanner: MetadataScanner,
     @Inject(HttpAdapterHost)
     private readonly adapter: HttpAdapterHost,
-    @Inject(AUTH_MODULE_OPTIONS_KEY)
+    @Inject(MODULE_OPTIONS_TOKEN)
     private readonly options: AuthModuleOptions,
-  ) {}
+  ) {
+    super()
 
-  onModuleInit() {
-    // Setup hooks
-    if (!this.auth.options.hooks) return
+    // Get basePath from options or use default
+    // - Ensure basePath starts with /
+    // - Ensure basePath doesn't end with /
+    this.basePath = normalizePath(this.options.auth.options.basePath ?? '/auth')
 
+    // Add exclusion to global prefix for Better Auth routes
+    const globalPrefixOptions = this.applicationConfig.getGlobalPrefixOptions()
+    this.applicationConfig.setGlobalPrefixOptions({
+      exclude: [
+        ...(globalPrefixOptions.exclude ?? []),
+        ...mapToExcludeRoute([this.basePath]),
+      ],
+    })
+  }
+
+  onModuleInit(): void {
     const providers = this.discoveryService
       .getProviders()
       .filter(
         ({ metatype }) => metatype && Reflect.getMetadata(HOOK_KEY, metatype),
       )
+
+    const hasHookProviders = providers.length > 0
+    const hooksConfigured =
+      typeof this.options.auth?.options?.hooks === 'object'
+
+    if (hasHookProviders && !hooksConfigured)
+      throw new Error(
+        "Detected @Hook providers but Better Auth 'hooks' are not configured. Add 'hooks: {}' to your betterAuth(...) options.",
+      )
+
+    if (!hooksConfigured) return
 
     for (const provider of providers) {
       const providerPrototype = Object.getPrototypeOf(provider.instance)
@@ -86,21 +110,13 @@ export class AuthModule implements NestModule, OnModuleInit {
 
       for (const method of methods) {
         const providerMethod = providerPrototype[method]
-        this.setupHooks(providerMethod)
+        this.setupHooks(providerMethod, provider.instance)
       }
     }
   }
 
-  configure(consumer: MiddlewareConsumer) {
-    const conf = configureAuth(this.orm)
-    this.auth.handler = conf.handler
-    this.auth.api = conf.api as any
-    this.auth.options = {
-      ...conf.options,
-    }
-    this.auth.$context = conf.$context
-    this.auth.$ERROR_CODES = conf.$ERROR_CODES
-    const trustedOrigins = this.auth.options.trustedOrigins
+  configure(consumer: MiddlewareConsumer): void {
+    const trustedOrigins = this.options.auth.options.trustedOrigins
     // function-based trustedOrigins requires a Request (from web-apis) object to evaluate, which is not available in NestJS (we only have a express Request object)
     // if we ever need this, take a look at better-call which show an implementation for this
     const isNotFunctionBased = trustedOrigins && Array.isArray(trustedOrigins)
@@ -111,91 +127,132 @@ export class AuthModule implements NestModule, OnModuleInit {
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
       })
-    } else
+    } else if (
+      trustedOrigins &&
+      !this.options.disableTrustedOriginsCors &&
+      !isNotFunctionBased
+    )
       throw new Error(
         'Function-based trustedOrigins not supported in NestJS. Use string array or disable CORS with disableTrustedOriginsCors: true.',
       )
 
-    if (!this.options.disableBodyParser)
-      consumer.apply(SkipBodyParsingMiddleware).forRoutes('*')
+    if (!this.options.disableBodyParser) {
+      consumer
+        .apply(
+          SkipBodyParsingMiddleware({
+            basePath: this.basePath,
+            enableRawBodyParser: this.options.enableRawBodyParser,
+          }),
+        )
+        .forRoutes('*path')
+    }
 
-    const handler = toNodeHandler(this.auth)
-    consumer.apply(handler).forRoutes({
-      path: '/auth/*path',
-      method: RequestMethod.ALL,
-    })
+    const handler = toNodeHandler(this.options.auth)
+    consumer
+      .apply((req: Request, res: Response) => {
+        if (this.options.middleware) {
+          return this.options.middleware(req, res, () => handler(req, res))
+        }
+        return handler(req, res)
+      })
+      .forRoutes(this.basePath)
+    this.logger.log(`AuthModule initialized BetterAuth on '${this.basePath}'`)
   }
 
-  private setupHooks(providerMethod: Function) {
-    if (!this.auth.options.hooks) return
+  private setupHooks(
+    providerMethod: (...args: unknown[]) => unknown,
+    providerClass: { new (...args: unknown[]): unknown },
+  ) {
+    if (!this.options.auth.options.hooks) return
 
     for (const { metadataKey, hookType } of HOOKS) {
+      const hasHook = Reflect.hasMetadata(metadataKey, providerMethod)
+      if (!hasHook) continue
+
       const hookPath = Reflect.getMetadata(metadataKey, providerMethod)
-      if (!hookPath) continue
 
-      const originalHook = this.auth.options.hooks[hookType]
-      this.auth.options.hooks[hookType] = createAuthMiddleware(async (ctx) => {
-        if (originalHook) {
-          await originalHook(ctx)
-        }
+      const originalHook = this.options.auth.options.hooks[hookType]
+      this.options.auth.options.hooks[hookType] = createAuthMiddleware(
+        async (ctx) => {
+          if (originalHook) {
+            await originalHook(ctx)
+          }
 
-        if (hookPath === ctx.path) {
-          await providerMethod(ctx)
-        }
-      })
+          if (hookPath && hookPath !== ctx.path) return
+
+          await providerMethod.apply(providerClass, [ctx])
+        },
+      )
     }
   }
 
-  /**
-   * Static factory method to create and configure the AuthModule.
-   * @param auth - The Auth instance to use
-   * @param options - Configuration options for the module
-   */
-  static async registerAsync(options: AuthModuleOptions = {}) {
-    const auth = { options: { hooks: {} } }
-
-    // Initialize hooks with an empty object if undefined
-    // Without this initialization, the setupHook method won't be able to properly override hooks
-    // It won't throw an error, but any hook functions we try to add won't be called
-    auth.options.hooks = {
-      ...auth.options.hooks,
-    }
-
-    const providers: Provider[] = [
-      {
-        provide: AUTH_INSTANCE_KEY,
-        useValue: auth,
-      },
-      {
-        provide: AUTH_MODULE_OPTIONS_KEY,
-        useValue: options,
-      },
-      AuthService,
-      AuthUserService,
-    ]
-
-    if (!options.disableExceptionFilter) {
-      providers.push({
-        provide: APP_FILTER,
-        useClass: APIErrorExceptionFilter,
-      })
-    }
+  static forRootAsync(options: typeof ASYNC_OPTIONS_TYPE): DynamicModule {
+    const forRootAsyncResult = super.forRootAsync(options)
+    const { module } = forRootAsyncResult
 
     return {
-      module: AuthModule,
-      providers,
-      exports: [
-        {
-          provide: AUTH_INSTANCE_KEY,
-          useValue: auth,
-        },
-        {
-          provide: AUTH_MODULE_OPTIONS_KEY,
-          useValue: options,
-        },
-        AuthService,
-        AuthUserService,
+      ...forRootAsyncResult,
+      module: options.disableControllers
+        ? AuthModuleWithoutControllers
+        : module,
+      controllers: options.disableControllers
+        ? []
+        : forRootAsyncResult.controllers,
+      providers: [
+        ...(forRootAsyncResult.providers ?? []),
+        ...(!options.disableGlobalAuthGuard
+          ? [
+              {
+                provide: APP_GUARD,
+                useClass: AuthGuard,
+              },
+            ]
+          : []),
+      ],
+    }
+  }
+
+  static forRoot(options: typeof OPTIONS_TYPE): DynamicModule {
+    const forRootResult = super.forRoot(options)
+    const { module } = forRootResult
+
+    return {
+      ...forRootResult,
+      module: options.disableControllers
+        ? AuthModuleWithoutControllers
+        : module,
+      controllers: options.disableControllers ? [] : forRootResult.controllers,
+      providers: [
+        ...(forRootResult.providers ?? []),
+        ...(!options.disableGlobalAuthGuard
+          ? [
+              {
+                provide: APP_GUARD,
+                useClass: AuthGuard,
+              },
+            ]
+          : []),
       ],
     }
   }
 }
+
+class AuthModuleWithoutControllers extends BetterAuthModule {
+  configure(): void {}
+}
+
+@Module({
+  imports: [
+    BetterAuthModule.forRootAsync({
+      useFactory: (orm: MikroORM) => {
+        return {
+          auth: configureAuth(orm),
+        }
+      },
+      inject: [MikroORM],
+    }),
+  ],
+  providers: [AuthUserService],
+  exports: [AuthUserService],
+})
+export class AuthModule {}

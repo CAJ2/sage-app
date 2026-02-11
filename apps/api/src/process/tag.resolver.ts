@@ -23,9 +23,12 @@ export class TagResolver {
 
   @Query(() => TagPage, { name: 'tags' })
   async tags(@Args() args: TagArgs): Promise<TagPage> {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      TagArgs,
+      args,
+    )
     const cursor = await this.tagService.find(filter)
-    return this.transform.entityToPaginated(cursor, args, Tag, TagPage)
+    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }
 
   @Query(() => Tag, { name: 'tag', nullable: true })
@@ -34,7 +37,7 @@ export class TagResolver {
     if (!tag) {
       throw NotFoundErr('Tag not found')
     }
-    return this.transform.entityToModel(tag, Tag)
+    return this.transform.entityToModel(Tag, tag)
   }
 
   @Mutation(() => CreateTagDefinitionOutput, {
@@ -46,7 +49,7 @@ export class TagResolver {
     @Args('input') input: CreateTagDefinitionInput,
   ): Promise<CreateTagDefinitionOutput> {
     const created = await this.tagService.create(input)
-    const model = await this.transform.entityToModel(created, Tag)
+    const model = await this.transform.entityToModel(Tag, created)
     return {
       tag: model,
     }
@@ -61,7 +64,7 @@ export class TagResolver {
     @Args('input') input: UpdateTagDefinitionInput,
   ): Promise<UpdateTagDefinitionOutput> {
     const updated = await this.tagService.update(input)
-    const model = await this.transform.entityToModel(updated, Tag)
+    const model = await this.transform.entityToModel(Tag, updated)
     return {
       tag: model,
     }

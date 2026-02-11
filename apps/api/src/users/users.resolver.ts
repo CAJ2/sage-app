@@ -25,14 +25,17 @@ export class UsersResolver {
     if (!user) {
       throw NotFoundErr('User not found')
     }
-    const result = await this.transform.entityToModel(user, User)
+    const result = await this.transform.entityToModel(User, user)
     return result
   }
 
   @ResolveField()
   async orgs(@Parent() user: User, @Args() args: UsersOrgsArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      UsersOrgsArgs,
+      args,
+    )
     const cursor = await this.usersService.orgs(user.id, filter)
-    return this.transform.entityToPaginated(cursor, args, Org, OrgsPage)
+    return this.transform.entityToPaginated(Org, OrgsPage, cursor, parsedArgs)
   }
 }

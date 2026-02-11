@@ -8,13 +8,13 @@ import {
   PrimaryKey,
   PrimaryKeyProp,
   Property,
-  Ref,
+  type Ref,
 } from '@mikro-orm/core'
 import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import {
   defaultTranslatedField,
   flattenTr,
-  TranslatedField,
+  type TranslatedField,
 } from '@src/db/i18n'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'

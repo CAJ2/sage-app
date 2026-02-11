@@ -20,7 +20,7 @@ import { TagService } from './tag.service'
   imports: [
     CommonModule,
     MikroOrmModule.forFeature([]),
-    AuthModule.registerAsync(),
+    AuthModule,
     ClsModule.forFeature(),
     EditsModule,
   ],

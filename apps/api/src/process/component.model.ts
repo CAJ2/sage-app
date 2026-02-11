@@ -23,6 +23,7 @@ import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import {
   Component as ComponentEntity,
   ComponentPhysicalSchema,
@@ -117,11 +118,15 @@ export class ComponentsPage extends Paginated(Component) {}
 
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    withChange: z.nanoid().optional(),
+    regionID: z.string().optional(),
+  })
+
   @Field(() => ID, { nullable: true })
   withChange?: string
 
   @Field(() => ID, { nullable: true })
-  @IsOptional()
   regionID?: string
 }
 

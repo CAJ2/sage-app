@@ -8,7 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql'
-import { AuthGuard, AuthUser, ReqUser } from '@src/auth/auth.guard'
+import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -36,15 +36,18 @@ export class OrgResolver {
     if (!org) {
       throw NotFoundErr('Org not found')
     }
-    const result = await this.transform.entityToModel(org, Org)
+    const result = await this.transform.entityToModel(Org, org)
     return result
   }
 
   @ResolveField()
   async users(@Parent() org: Org, @Args() args: OrgUsersArgs) {
-    const filter = this.transform.paginationArgs(args)
+    const [parsedArgs, filter] = await this.transform.paginationArgs(
+      OrgUsersArgs,
+      args,
+    )
     const cursor = await this.orgService.users(org.id, filter)
-    return this.transform.entityToPaginated(cursor, args, User, UserPage)
+    return this.transform.entityToPaginated(User, UserPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateOrgOutput, { nullable: true })
@@ -54,11 +57,11 @@ export class OrgResolver {
     @AuthUser() user: ReqUser,
   ): Promise<CreateOrgOutput> {
     const created = await this.orgService.create(input, user.id)
-    const result = await this.transform.entityToModel(created.org, Org)
+    const result = await this.transform.entityToModel(Org, created.org)
     if (!created.change) {
       return { org: result }
     }
-    const change = await this.transform.entityToModel(created.change, Change)
+    const change = await this.transform.entityToModel(Change, created.change)
     return { org: result, change }
   }
 
@@ -69,11 +72,11 @@ export class OrgResolver {
     @AuthUser() user: ReqUser,
   ): Promise<UpdateOrgOutput> {
     const updated = await this.orgService.update(input, user.id)
-    const result = await this.transform.entityToModel(updated.org, Org)
+    const result = await this.transform.entityToModel(Org, updated.org)
     if (!updated.change) {
       return { org: result }
     }
-    const change = await this.transform.entityToModel(updated.change, Change)
+    const change = await this.transform.entityToModel(Change, updated.change)
     return { org: result, change }
   }
 }

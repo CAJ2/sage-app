@@ -14,7 +14,7 @@
       "!{projectRoot}/eslint.config.js"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml"
+      "{workspaceRoot}/.github/workflows/*.yml"
     ]
   },
   "targetDefaults": {
@@ -66,6 +66,17 @@
         "{projectRoot}/coverage"
       ],
       "executor": "@nx/vitest:vitest"
+    },
+    "generate": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "outputs": [
+        "{projectRoot}/temp",
+        "{projectRoot}/test/gql"
+      ]
     }
   },
   "nxCloudId": "67acadc6cdcfda5eba4a88e1",

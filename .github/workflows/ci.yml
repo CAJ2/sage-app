@@ -84,7 +84,7 @@ jobs:
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
       # Run tests
-      - run: pnpm exec nx affected -t test
+      - run: pnpm exec nx affected -t gen test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test
@@ -124,7 +124,7 @@ jobs:
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
 
       # Run tests
-      - run: pnpm exec nx affected -t test
+      - run: pnpm exec nx affected -t gen test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test

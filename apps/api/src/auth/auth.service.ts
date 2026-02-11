@@ -1,21 +1,25 @@
-import { EntityManager } from '@mikro-orm/postgresql'
-import { Inject, Injectable } from '@nestjs/common'
-import { AUTH_INSTANCE_KEY } from './symbols'
+import { Inject } from '@nestjs/common'
+import {
+  type AuthModuleOptions,
+  MODULE_OPTIONS_TOKEN,
+} from './auth-module-definition'
 import type { Auth } from 'better-auth'
 
-@Injectable()
+/**
+ * NestJS service that provides access to the Better Auth instance
+ * Use generics to support auth instances extended by plugins
+ */
 export class AuthService<T extends { api: T['api'] } = Auth> {
   constructor(
-    @Inject(AUTH_INSTANCE_KEY)
-    private readonly auth: T,
-    private readonly em: EntityManager,
+    @Inject(MODULE_OPTIONS_TOKEN)
+    private readonly options: AuthModuleOptions<T>,
   ) {}
 
   /**
    * Returns the API endpoints provided by the auth instance
    */
-  get api() {
-    return this.auth.api
+  get api(): T['api'] {
+    return this.options.auth.api
   }
 
   /**
@@ -23,6 +27,6 @@ export class AuthService<T extends { api: T['api'] } = Auth> {
    * Access this for plugin-specific functionality
    */
   get instance(): T {
-    return this.auth
+    return this.options.auth
   }
 }

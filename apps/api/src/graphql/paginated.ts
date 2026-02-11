@@ -9,15 +9,8 @@ import {
   PickType,
   registerEnumType,
 } from '@nestjs/graphql'
-import {
-  IsBase64,
-  IsOptional,
-  IsPositive,
-  IsString,
-  Validate,
-  validateSync,
-} from 'class-validator'
-import { GraphQLError } from 'graphql'
+import { IsOptional } from 'class-validator'
+import { z } from 'zod/v4'
 import { BaseModel } from './base.model'
 
 export const DEFAULT_PAGE_SIZE = 20
@@ -111,53 +104,46 @@ export class OrderFieldType {
   id!: OrderDirection
 }
 
-export interface PaginationArgsType {
+export interface IPaginationArgs {
   first?: number
   after?: string
   last?: number
   before?: string
   order?: Record<string, OrderDirection>[] | Record<string, OrderDirection>
 
-  validate(): void
   orderBy(): string[]
   orderDir(): OrderDirection[]
 }
 
+export type PaginationArgsSchema = z.ZodObject
+
 @ArgsType()
-export class PaginationBasicArgs implements PaginationArgsType {
+export class PaginationBasicArgs implements IPaginationArgs {
+  static schema = z
+    .object({
+      first: z.number().positive().optional(),
+      after: z.base64().nullish(),
+      last: z.number().positive().optional(),
+      before: z.base64().nullish(),
+    })
+    .refine((data) => !(data.first && data.last), {
+      message: 'Cannot use both `first` and `last`',
+    })
+    .refine((data) => !(data.after && data.before), {
+      message: 'Cannot use both `after` and `before`',
+    })
+
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsPositive()
   first?: number
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @IsString()
-  @Validate(IsBase64)
   after?: string
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsPositive()
   last?: number
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @IsString()
-  @Validate(IsBase64)
   before?: string
-
-  validate() {
-    if (this.first && this.last) {
-      throw new GraphQLError('Cannot use both `first` and `last`')
-    } else if (this.after && this.before) {
-      throw new GraphQLError('Cannot use both `after` and `before`')
-    }
-    const errs = validateSync(this, { skipMissingProperties: true })
-    if (errs.length > 0) {
-      throw new GraphQLError(errs.toString())
-    }
-  }
 
   orderBy(): string[] {
     return ['id']
@@ -171,7 +157,7 @@ export class PaginationBasicArgs implements PaginationArgsType {
 export function PaginationOrderArgs(
   name: string,
   fields: readonly string[],
-): Type<PaginationArgsType> {
+): Type<IPaginationArgs> {
   @InputType(`${name}Order`)
   class OrderType extends PickType(OrderFieldType, fields as any) {}
 
@@ -181,7 +167,7 @@ export function PaginationOrderArgs(
     @IsOptional()
     order?: Record<string, OrderDirection>[] | Record<string, OrderDirection>
   }
-  return PaginationOrderArgs as Type<PaginationArgsType>
+  return PaginationOrderArgs as Type<IPaginationArgs>
 }
 
 export function emptyPage(): IPaginatedType<any> {

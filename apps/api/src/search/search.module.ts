@@ -10,7 +10,7 @@ import { SearchService } from './search.service'
   imports: [
     CommonModule,
     MikroOrmModule.forFeature([]),
-    AuthModule.registerAsync(),
+    AuthModule,
     ChangesModule,
   ],
   providers: [SearchResolver, SearchService],

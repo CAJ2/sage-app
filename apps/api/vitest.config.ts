@@ -4,34 +4,12 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [
-    swc.vite({
-      module: {
-        type: "es6",
-        strict: true,
-        importInterop: "node",
-        preserveImportMeta: true,
-      },
-      sourceMaps: true,
-      jsc: {
-        baseUrl: path.resolve(__dirname),
-        paths: {
-          "@src/*": ["./src/*"]
-        },
-        parser: {
-          syntax: "typescript",
-          decorators: true,
-          dynamicImport: true
-        },
-        transform: {
-          useDefineForClassFields: false,
-        },
-      },
-      minify: false,
-    }),
+    swc.vite(),
   ],
   resolve: {
     alias: {
       "@src": path.resolve(__dirname, "./src"),
+      "@test": path.resolve(__dirname, "./test"),
     }
   },
   test: {

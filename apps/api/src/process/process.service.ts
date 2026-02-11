@@ -1,6 +1,6 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { DeleteInput } from '@src/changes/change-ext.model'
+import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
@@ -60,7 +60,7 @@ export class ProcessService {
 
   async create(input: CreateProcessInput, userID: string) {
     const process = new Process()
-    if (!input.useChange()) {
+    if (!isUsingChange(input)) {
       await this.setFields(process, input)
       await this.em.persistAndFlush(process)
       return {
