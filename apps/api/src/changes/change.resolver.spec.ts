@@ -31,8 +31,7 @@ describe('ChangeResolver (integration)', () => {
     changeService = module.get(ChangeService)
     const orm = module.get<MikroORM>(MikroORM)
 
-    await clearDatabase(orm, 'auth')
-    await clearDatabase(orm, 'public')
+    await clearDatabase(orm, 'public', ['users'])
     await orm.seeder.seed(
       BaseSeeder,
       UserSeeder,
