@@ -69,12 +69,12 @@ jobs:
       # Check linting
       - run: pnpm exec nx affected -t lint:ci
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
 
       # Build
       - run: pnpm exec nx affected -t build
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
           DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
@@ -86,7 +86,7 @@ jobs:
       # Run tests
       - run: pnpm exec nx affected -t gen test
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           NODE_ENV: test
           TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
 
@@ -115,18 +115,18 @@ jobs:
       # Check linting
       - run: pnpm exec nx affected -t lint:ci
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
 
       # Build
       - run: pnpm exec nx affected -t build
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
 
       # Run tests
       - run: pnpm exec nx affected -t gen test
         env:
-          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           NODE_ENV: test
 
   build-image-api:
