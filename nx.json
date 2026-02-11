@@ -54,6 +54,17 @@
         "^build"
       ]
     },
+    "gen": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "outputs": [
+        "{projectRoot}/temp",
+        "{projectRoot}/test/gql"
+      ]
+    },
     "test": {
       "cache": true,
       "inputs": [
@@ -64,6 +75,9 @@
       "outputs": [
         "{workspaceRoot}/coverage/{projectRoot}",
         "{projectRoot}/coverage"
+      ],
+      "dependsOn": [
+        "^gen"
       ],
       "executor": "@nx/vitest:vitest"
     }
