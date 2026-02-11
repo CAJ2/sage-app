@@ -7,6 +7,7 @@ RUN corepack enable && corepack install --global pnpm@10.12.1
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN pnpm add -g nx@latest
 COPY package.json pnpm-*.yaml nx.json /usr/src/app/
+COPY patches /usr/src/app/patches/
 COPY apps/api/package.json /usr/src/app/apps/api/
 COPY apps/frontend/package.json /usr/src/app/apps/frontend/
 COPY apps/science/package.json /usr/src/app/apps/science/
@@ -17,7 +18,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 FROM build AS api-build
 COPY apps/api /usr/src/app/apps/api
 RUN nx run-many -p api -t build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --filter=...api --prod /prod/api
+# NOTE(CAJ2): We use --legacy here because pnpm patches don't work with a frozen lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...api --prod /prod/api
 
 FROM base AS api
 COPY --from=api-build /prod/api /prod/api
@@ -31,7 +33,7 @@ COPY apps/frontend /usr/src/app/apps/frontend
 COPY packages/ui /usr/src/app/packages/ui/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
 RUN nx run-many -p frontend -t build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --filter=...frontend --prod /prod/frontend
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...frontend --prod /prod/frontend
 
 FROM base AS frontend
 COPY --from=frontend-build /prod/frontend /prod/frontend
@@ -45,7 +47,7 @@ COPY apps/science /usr/src/app/apps/science
 COPY packages/ui /usr/src/app/packages/ui/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
 RUN nx run-many -p science -t build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --filter=...science --prod /prod/science
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...science --prod /prod/science
 
 FROM base AS science
 COPY --from=science-build /prod/science /prod/science
