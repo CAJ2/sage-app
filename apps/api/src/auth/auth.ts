@@ -143,10 +143,12 @@ export const configureAuth = (orm: MikroORM) => {
       autoSignInAfterVerification: true,
     },
     socialProviders: {
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      },
+      google: process.env.GOOGLE_CLIENT_ID
+        ? {
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+          }
+        : undefined,
     },
     trustedOrigins: isProd()
       ? [
