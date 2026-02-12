@@ -4,8 +4,8 @@ import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
+import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { addTr, addTrReq } from '@src/db/i18n'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
@@ -24,6 +24,7 @@ export class ProcessService {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
+    private readonly i18n: I18nService,
   ) {}
 
   async find(opts: CursorOptions<Process>, filter?: FindProcessFilter) {
@@ -127,16 +128,16 @@ export class ProcessService {
       process.intent = input.intent
     }
     if (input.name) {
-      process.name = addTrReq(process.name, input.lang, input.name)
+      process.name = this.i18n.addTrReq(process.name, input.name, input.lang)
     }
     if (input.nameTr) {
-      process.name = addTrReq(process.name, input.lang, input.nameTr)
+      process.name = this.i18n.addTrReq(process.name, input.nameTr, input.lang)
     }
     if (input.desc) {
-      process.desc = addTr(process.desc, input.lang, input.desc)
+      process.desc = this.i18n.addTr(process.desc, input.desc, input.lang)
     }
     if (input.descTr) {
-      process.desc = addTr(process.desc, input.lang, input.descTr)
+      process.desc = this.i18n.addTr(process.desc, input.descTr, input.lang)
     }
     if (input.instructions) {
       process.instructions = input.instructions

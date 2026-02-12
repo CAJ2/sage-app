@@ -2,8 +2,9 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
-import { translate } from '@src/db/i18n'
+import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
 import {
   IDCreatedUpdated,
   registerModel,
@@ -16,6 +17,7 @@ import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 import { CategoriesPage } from './category.model'
 import { Item as ItemEntity } from './item.entity'
 import { VariantsPage } from './variant.model'
@@ -85,42 +87,60 @@ export class ItemVariantsArgs extends PaginationBasicArgs {}
 
 @InputType()
 export class ItemCategoriesInput {
+  static schema = z.object({
+    id: z.nanoid(),
+  })
+
   @Field(() => ID)
-  @Validate(IsNanoID)
   id!: string
 }
 
 @InputType()
 export class ItemTagsInput {
+  static schema = z.object({
+    id: z.nanoid(),
+    meta: ZJSONObject.optional(),
+  })
+
   @Field(() => ID)
-  @Validate(IsNanoID)
   id!: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  @IsOptional()
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 
 @InputType()
 export class CreateItemInput extends ChangeInputWithLang {
+  static schema = ChangeInputWithLang.schema
+    .extend({
+      name: z.string().max(100).optional(),
+      nameTr: TranslatedInput.schema.array().optional(),
+      desc: z.string().max(100_000).optional(),
+      descTr: TranslatedInput.schema.array().optional(),
+      imageURL: z.string().max(1000).optional(),
+      categories: ItemCategoriesInput.schema.array().optional(),
+      tags: ItemTagsInput.schema.array().optional(),
+    })
+    .refine((data) => !data.name === !data.nameTr, {
+      message: 'Either name or nameTr must be provided, but not both.',
+    })
+    .refine((data) => !data.desc === !data.descTr, {
+      message: 'Either desc or descTr must be provided, but not both.',
+    })
+
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(1000)
   name?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
   nameTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(100_000)
   desc?: string
 
   @Field(() => [TranslatedInput], { nullable: true })
   descTr?: TranslatedInput[]
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
   imageURL?: string
 
   @Field(() => [ItemCategoriesInput], { nullable: true })

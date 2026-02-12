@@ -17,7 +17,7 @@ import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/db/i18n'
+import type { TranslatedField } from '@src/common/i18n'
 
 @Entity({ tableName: 'places', schema: 'public' })
 @Index({ properties: ['location'], type: 'gist' })

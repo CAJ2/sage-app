@@ -6,13 +6,15 @@ import {
   Property,
   Unique,
 } from '@mikro-orm/core'
+import { type TranslatedField } from '@src/common/i18n'
+import { AjvTemplateSchema, JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { type TranslatedField } from '@src/db/i18n'
 import { Place } from '@src/geo/place.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
+import { JSONSchemaType } from 'ajv/dist/2020'
+import { z } from 'zod/v4'
 import { Component } from './component.entity'
-import type { JSONSchemaType } from 'ajv'
 
 export enum TagType {
   PLACE = 'PLACE',
@@ -24,9 +26,25 @@ export enum TagType {
 }
 
 export interface TagMetaTemplate {
-  schema?: JSONSchemaType<any>
-  uischema?: Record<string, any>
+  schema?: JSONType
+  uischema?: JSONType
 }
+export const TagMetaTemplateSchema = z
+  .object({
+    schema: z.json().optional(),
+    uischema: z.json().optional(),
+  })
+  .refine(
+    (data) => {
+      try {
+        AjvTemplateSchema.compile(data.schema as JSONSchemaType<any>)
+      } catch (e) {
+        return false
+      }
+      return true
+    },
+    { error: 'Invalid JSON Schema in meta template' },
+  )
 
 @Entity({ tableName: 'tags', schema: 'public' })
 @Unique({ properties: ['type', 'tag_id'] })

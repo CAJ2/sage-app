@@ -120,6 +120,7 @@ export class ItemResolver {
     @Args('input') input: CreateItemInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateItemOutput> {
+    input = CreateItemInput.schema.parse(input)
     const created = await this.itemService.create(input, user.id)
     const result = await this.transform.entityToModel(Item, created.item)
     if (!created.change) {

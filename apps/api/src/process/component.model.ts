@@ -9,8 +9,8 @@ import {
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/common/i18n'
 import { IsNanoID, ZodValid } from '@src/common/validator.model'
-import { translate } from '@src/db/i18n'
 import { Region } from '@src/geo/region.model'
 import {
   IDCreatedUpdated,

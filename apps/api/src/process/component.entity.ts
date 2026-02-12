@@ -18,7 +18,7 @@ import { z } from 'zod/v4'
 import { Material } from './material.entity'
 import { Tag } from './tag.entity'
 import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/db/i18n'
+import type { TranslatedField } from '@src/common/i18n'
 
 export const ComponentVisualSchema = z.object({
   // The visual representation of the component.

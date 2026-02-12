@@ -2,8 +2,8 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
-import { translate } from '@src/db/i18n'
 import {
   CreatedUpdated,
   registerModel,

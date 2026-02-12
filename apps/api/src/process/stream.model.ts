@@ -1,5 +1,5 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { translate } from '@src/db/i18n'
+import { translate } from '@src/common/i18n'
 import { Transform } from 'class-transformer'
 import {
   ProcessInstructionsAccess,

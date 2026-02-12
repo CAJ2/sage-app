@@ -96,7 +96,7 @@ describe('ProcessResolver (integration)', () => {
       {
         input: {
           name: 'Test Process',
-          intent: 'recycle',
+          intent: 'RECYCLE',
         },
       },
     )

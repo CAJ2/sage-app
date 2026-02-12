@@ -26,27 +26,6 @@ export const zToSchema = (
   })
 }
 
-export const TranslatedInputSchema = z.object({
-  lang: z
-    .string()
-    .regex(/^[a-z]{2,3}(-[A-Z]{2,8}(-[^-]{2,8})?)?$/)
-    .meta({
-      id: 'lang',
-      title: 'Language Code',
-    }),
-  text: z.string().optional(),
-  auto: z.boolean().default(false),
-})
-export const TrArraySchema = z
-  .array(TranslatedInputSchema)
-  .optional()
-  .default([
-    {
-      lang: 'en',
-      text: '',
-      auto: false,
-    },
-  ])
 export const ImageOrIconSchema = z
   .url({ protocol: /^(https|icon):\/\// })
   .optional()

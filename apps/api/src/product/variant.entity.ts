@@ -12,8 +12,8 @@ import {
   type Ref,
 } from '@mikro-orm/core'
 import { Source } from '@src/changes/source.entity'
+import { type TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-import { type TranslatedField } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'

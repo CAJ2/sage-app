@@ -6,17 +6,15 @@ import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
 import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
+import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { Component } from '@src/process/component.entity'
 import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Org } from '@src/users/org.entity'
-import { I18nService } from 'nestjs-i18n'
 import { Item } from './item.entity'
 import {
   Variant,
@@ -33,7 +31,7 @@ export class VariantService {
     private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly streamService: StreamService,
-    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly i18n: I18nService,
   ) {}
 
   async findOneByID(id: string) {
@@ -220,16 +218,16 @@ export class VariantService {
     change?: Change,
   ) {
     if (input.name) {
-      variant.name = addTrReq(variant.name, input.lang, input.name)
+      variant.name = this.i18n.addTrReq(variant.name, input.name, input.lang)
     }
     if (input.nameTr) {
-      variant.name = addTrReq(variant.name, input.lang, input.nameTr)
+      variant.name = this.i18n.addTrReq(variant.name, input.nameTr, input.lang)
     }
     if (input.desc) {
-      variant.desc = addTr(variant.desc, input.lang, input.desc)
+      variant.desc = this.i18n.addTr(variant.desc, input.desc, input.lang)
     }
     if (input.descTr) {
-      variant.desc = addTr(variant.desc, input.lang, input.descTr)
+      variant.desc = this.i18n.addTr(variant.desc, input.descTr, input.lang)
     }
     if (input.code) {
       variant.code = input.code

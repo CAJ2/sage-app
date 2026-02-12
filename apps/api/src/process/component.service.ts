@@ -3,10 +3,9 @@ import { Injectable } from '@nestjs/common'
 import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
+import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { addTr, addTrReq } from '@src/db/i18n'
 import { Region } from '@src/geo/region.entity'
-import { I18nService } from 'nestjs-i18n'
 import {
   Component,
   ComponentsMaterials,
@@ -171,16 +170,24 @@ export class ComponentService {
     change?: Change,
   ) {
     if (input.name) {
-      component.name = addTrReq(component.name, input.lang, input.name)
+      component.name = this.i18n.addTrReq(
+        component.name,
+        input.name,
+        input.lang,
+      )
     }
     if (input.nameTr) {
-      component.name = addTrReq(component.name, input.lang, input.nameTr)
+      component.name = this.i18n.addTrReq(
+        component.name,
+        input.nameTr,
+        input.lang,
+      )
     }
     if (input.desc) {
-      component.desc = addTr(component.desc, input.lang, input.desc)
+      component.desc = this.i18n.addTr(component.desc, input.desc, input.lang)
     }
     if (input.descTr) {
-      component.desc = addTr(component.desc, input.lang, input.descTr)
+      component.desc = this.i18n.addTr(component.desc, input.descTr, input.lang)
     }
     if (input.visual) {
       component.visual = { ...component.visual, ...input.visual }

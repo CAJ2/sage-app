@@ -4,9 +4,9 @@ import { isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
+import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
-import { addTrReq } from '@src/db/i18n'
 import { Org } from './org.entity'
 import { CreateOrgInput, UpdateOrgInput } from './org.model'
 import { User } from './users.entity'
@@ -17,6 +17,7 @@ export class OrgService {
     private readonly em: EntityManager,
     private readonly editService: EditService,
     private readonly searchService: MeiliService,
+    private readonly i18n: I18nService,
   ) {}
 
   async findOneByID(id: string) {
@@ -94,7 +95,7 @@ export class OrgService {
       org.slug = input.slug
     }
     if (input.desc) {
-      org.desc = addTrReq(org.desc, input.lang, input.desc)
+      org.desc = this.i18n.addTrReq(org.desc, input.desc, input.lang)
     }
     if (input.avatarURL) {
       org.avatarURL = input.avatarURL
