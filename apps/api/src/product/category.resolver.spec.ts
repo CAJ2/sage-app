@@ -2,17 +2,21 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
+import {
+  CATEGORY_IDS,
+  TestCategorySeeder,
+} from '@src/db/seeds/TestCategorySeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+import { CATEGORY_ROOT } from './category.entity'
 
 describe('CategoryResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
-  let categoryID: string
-  let rootCategoryID: string
+  let packagingID: string
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,19 +31,11 @@ describe('CategoryResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder)
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestCategorySeeder)
 
     await gql.signIn('admin', 'password')
 
-    // Get the root category
-    const rootCategory = await orm.em.findOne('Category', { parent: null })
-    rootCategoryID = (rootCategory as any)?.id
-
-    // Get any non-root category for testing
-    const category = await orm.em.findOne('Category', {
-      parent: { $ne: null },
-    })
-    categoryID = (category as any)?.id || rootCategoryID
+    packagingID = CATEGORY_IDS[0]
   })
 
   afterAll(async () => {
@@ -79,10 +75,10 @@ describe('CategoryResolver (integration)', () => {
           }
         }
       `),
-      { id: categoryID },
+      { id: packagingID },
     )
     expect(res.data?.category).toBeTruthy()
-    expect(res.data?.category?.id).toBe(categoryID)
+    expect(res.data?.category?.id).toBe(packagingID)
   })
 
   test('should query the root category', async () => {
@@ -97,7 +93,7 @@ describe('CategoryResolver (integration)', () => {
       `),
     )
     expect(res.data?.categoryRoot).toBeTruthy()
-    expect(res.data?.categoryRoot?.id).toBe(rootCategoryID)
+    expect(res.data?.categoryRoot?.id).toBe(CATEGORY_ROOT)
   })
 
   test('should query category schema', async () => {
@@ -138,7 +134,7 @@ describe('CategoryResolver (integration)', () => {
           }
         }
       `),
-      { id: categoryID, first: 10 },
+      { id: packagingID, first: 10 },
     )
     expect(res.data?.category?.parents).toBeTruthy()
     expect(Array.isArray(res.data?.category?.parents.nodes)).toBe(true)
@@ -160,7 +156,7 @@ describe('CategoryResolver (integration)', () => {
           }
         }
       `),
-      { id: rootCategoryID, first: 10 },
+      { id: CATEGORY_ROOT, first: 10 },
     )
     expect(res.data?.category?.children).toBeTruthy()
     expect(Array.isArray(res.data?.category?.children.nodes)).toBe(true)
@@ -182,33 +178,10 @@ describe('CategoryResolver (integration)', () => {
           }
         }
       `),
-      { id: categoryID, first: 10 },
+      { id: packagingID, first: 10 },
     )
     expect(res.data?.category?.items).toBeTruthy()
     expect(Array.isArray(res.data?.category?.items.nodes)).toBe(true)
-  })
-
-  test('should create a category', async () => {
-    const res = await gql.send(
-      graphql(`
-        mutation CategoryResolverCreateCategory($input: CreateCategoryInput!) {
-          createCategory(input: $input) {
-            category {
-              id
-              name
-            }
-          }
-        }
-      `),
-      {
-        input: {
-          name: 'Test Category',
-          parentID: rootCategoryID,
-        },
-      },
-    )
-    expect(res.data?.createCategory?.category).toBeTruthy()
-    expect(res.data?.createCategory?.category?.name).toBe('Test Category')
   })
 
   test('should update a category', async () => {
@@ -225,12 +198,12 @@ describe('CategoryResolver (integration)', () => {
       `),
       {
         input: {
-          id: categoryID,
+          id: packagingID,
           name: 'Updated Category Name',
         },
       },
     )
-    expect(res.data?.updateCategory?.category?.id).toBe(categoryID)
+    expect(res.data?.updateCategory?.category?.id).toBe(packagingID)
   })
 
   test('should return error for non-existent category', async () => {

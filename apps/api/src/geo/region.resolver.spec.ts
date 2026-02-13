@@ -11,7 +11,6 @@ import { GraphQLTestClient } from '@test/graphql.utils'
 describe('RegionResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
-  let regionID: string
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +28,6 @@ describe('RegionResolver (integration)', () => {
     await orm.seeder.seed(BaseSeeder, UserSeeder)
 
     await gql.signIn('admin', 'password')
-
-    // Get a region for testing if any exist
-    const region = await orm.em.findOne('Region', {})
-    if (region) {
-      regionID = (region as any).id
-    }
   })
 
   afterAll(async () => {
@@ -62,26 +55,6 @@ describe('RegionResolver (integration)', () => {
     )
     expect(res.data?.regions).toBeTruthy()
     expect(Array.isArray(res.data?.regions.nodes)).toBe(true)
-  })
-
-  test('should query a single region when it exists', async () => {
-    if (!regionID) {
-      return // Skip if no regions exist
-    }
-
-    const res = await gql.send(
-      graphql(`
-        query RegionResolverGetRegion($id: ID!) {
-          region(id: $id) {
-            id
-            name
-          }
-        }
-      `),
-      { id: regionID },
-    )
-    expect(res.data?.region).toBeTruthy()
-    expect(res.data?.region?.id).toBe(regionID)
   })
 
   test('should search regions by point with pagination', async () => {

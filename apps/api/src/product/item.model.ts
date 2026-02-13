@@ -121,12 +121,25 @@ export class CreateItemInput extends ChangeInputWithLang {
       categories: ItemCategoriesInput.schema.array().optional(),
       tags: ItemTagsInput.schema.array().optional(),
     })
-    .refine((data) => !data.name === !data.nameTr, {
-      message: 'Either name or nameTr must be provided, but not both.',
-    })
-    .refine((data) => !data.desc === !data.descTr, {
-      message: 'Either desc or descTr must be provided, but not both.',
-    })
+    .refine(
+      (data) => {
+        if (data.name && data.nameTr) return false
+        if (!data.name && !data.nameTr) return false
+        return true
+      },
+      {
+        error: 'Either name or nameTr must be provided, but not both.',
+      },
+    )
+    .refine(
+      (data) => {
+        if (data.desc && data.descTr) return false
+        return true
+      },
+      {
+        error: 'Either desc or descTr may be provided, but not both.',
+      },
+    )
 
   @Field(() => String, { nullable: true })
   name?: string

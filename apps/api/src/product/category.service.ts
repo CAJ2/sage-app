@@ -75,15 +75,15 @@ export class CategoryService {
     }
   }
 
-  async findDirectAncestors(childID: string, opts: CursorOptions<Category>) {
+  async findDirectAncestors(categoryID: string, opts: CursorOptions<Category>) {
     const ancestors = await this.em
-      .createQueryBuilder(CategoryTree)
+      .createQueryBuilder(CategoryTree, 't')
       .joinAndSelect('ancestor', 'ancestor')
       .where({
-        descendant: childID,
-        ancestor: { $ne: childID },
+        descendant: categoryID,
+        ancestor: { $ne: categoryID },
+        't.depth': '1',
       })
-      .andWhere({ depth: 1, ancestor: opts.where.id })
       .limit(opts.options.limit)
       .getResult()
     return {
@@ -92,15 +92,18 @@ export class CategoryService {
     }
   }
 
-  async findDirectDescendants(parentID: string, opts: CursorOptions<Category>) {
+  async findDirectDescendants(
+    categoryID: string,
+    opts: CursorOptions<Category>,
+  ) {
     const descendants = await this.em
-      .createQueryBuilder(CategoryTree)
+      .createQueryBuilder(CategoryTree, 't')
       .joinAndSelect('descendant', 'descendant')
       .where({
-        ancestor: parentID,
-        descendant: { $ne: parentID },
+        ancestor: categoryID,
+        descendant: { $ne: categoryID },
+        't.depth': '1',
       })
-      .andWhere({ depth: 1, descendant: opts.where.id })
       .limit(opts.options.limit)
       .getResult()
     return {

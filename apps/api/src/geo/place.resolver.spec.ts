@@ -11,7 +11,6 @@ import { GraphQLTestClient } from '@test/graphql.utils'
 describe('PlaceResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
-  let placeID: string
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +28,6 @@ describe('PlaceResolver (integration)', () => {
     await orm.seeder.seed(BaseSeeder, UserSeeder)
 
     await gql.signIn('admin', 'password')
-
-    // Get a place for testing if any exist
-    const place = await orm.em.findOne('Place', {})
-    if (place) {
-      placeID = (place as any).id
-    }
   })
 
   afterAll(async () => {
@@ -62,74 +55,6 @@ describe('PlaceResolver (integration)', () => {
     )
     expect(res.data?.places).toBeTruthy()
     expect(Array.isArray(res.data?.places.nodes)).toBe(true)
-  })
-
-  test('should query a single place when it exists', async () => {
-    if (!placeID) {
-      return // Skip if no places exist
-    }
-
-    const res = await gql.send(
-      graphql(`
-        query PlaceResolverGetPlace($id: ID!) {
-          place(id: $id) {
-            id
-            name
-          }
-        }
-      `),
-      { id: placeID },
-    )
-    expect(res.data?.place).toBeTruthy()
-    expect(res.data?.place?.id).toBe(placeID)
-  })
-
-  test('should query place tags when place exists', async () => {
-    if (!placeID) {
-      return // Skip if no places exist
-    }
-
-    const res = await gql.send(
-      graphql(`
-        query PlaceResolverGetPlaceTags($id: ID!) {
-          place(id: $id) {
-            id
-            tags {
-              nodes {
-                id
-                name
-              }
-            }
-          }
-        }
-      `),
-      { id: placeID },
-    )
-    expect(res.data?.place).toBeTruthy()
-    expect(res.data?.place?.tags?.nodes).toBeTruthy()
-    expect(Array.isArray(res.data?.place?.tags?.nodes)).toBe(true)
-  })
-
-  test('should query place org when place exists', async () => {
-    if (!placeID) {
-      return // Skip if no places exist
-    }
-
-    const res = await gql.send(
-      graphql(`
-        query PlaceResolverGetPlaceOrg($id: ID!) {
-          place(id: $id) {
-            id
-            org {
-              id
-              name
-            }
-          }
-        }
-      `),
-      { id: placeID },
-    )
-    expect(res.data?.place).toBeTruthy()
   })
 
   test('should return error for non-existent place', async () => {

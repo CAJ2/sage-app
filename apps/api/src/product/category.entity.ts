@@ -67,8 +67,8 @@ export class CategoryTree extends BaseEntity {
   @ManyToOne({ primary: true })
   descendant!: Category
 
-  @Property({ default: 0 })
-  depth!: number
+  @Property({ type: 'number', default: 0 })
+  depth!: string
 }
 
 @Entity({ tableName: 'category_edges', schema: 'public' })

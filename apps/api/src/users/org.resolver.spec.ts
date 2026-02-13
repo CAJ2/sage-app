@@ -8,6 +8,7 @@ import { clearDatabase } from '@src/db/test.utils'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+import { Org } from './org.entity'
 
 describe('OrgResolver (integration)', () => {
   let app: INestApplication
@@ -31,9 +32,11 @@ describe('OrgResolver (integration)', () => {
 
     await gql.signIn('admin', 'password')
 
-    // Get the first org for testing
-    const org = await orm.em.findOne('Org', {})
-    orgID = (org as any)?.id
+    const org = await orm.em.findOne(Org, { slug: 'sage' })
+    if (!org) {
+      throw new Error('Seeded org not found')
+    }
+    orgID = org.id
   })
 
   afterAll(async () => {

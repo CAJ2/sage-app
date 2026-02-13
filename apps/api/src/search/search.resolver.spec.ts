@@ -6,19 +6,37 @@ import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { Variant } from '@src/product/variant.model'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { SearchType } from '@test/gql/graphql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+import { nanoid } from 'nanoid'
+import { type Mock } from 'vitest'
+import { SearchService } from './search.service'
 
 describe('SearchResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let searchAllMock: Mock<any>
 
   beforeAll(async () => {
+    // Mock the search service
+    searchAllMock = vi.fn(() => {
+      return {
+        items: [],
+        count: 0,
+      }
+    })
+    const searchService = {
+      searchAll: searchAllMock,
+    }
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
-    }).compile()
+    })
+      .overrideProvider(SearchService)
+      .useValue(searchService)
+      .compile()
 
     app = module.createNestApplication()
     await app.init()
@@ -43,6 +61,18 @@ describe('SearchResolver (integration)', () => {
   })
 
   test('should search across all types', async () => {
+    searchAllMock.mockResolvedValueOnce({
+      items: [
+        {
+          id: nanoid(),
+          name: {
+            en: 'Test Variant',
+          },
+          _type: Variant,
+        },
+      ],
+      count: 1,
+    })
     const res = await gql.send(
       graphql(`
         query SearchResolverSearchAll($query: String!, $limit: Int) {
@@ -68,7 +98,9 @@ describe('SearchResolver (integration)', () => {
       },
     )
     expect(res.data?.search).toBeTruthy()
-    expect(Array.isArray(res.data?.search.nodes)).toBe(true)
+    expect(res.data?.search.totalCount).toBe(1)
+    expect(res.data?.search.nodes?.[0]?.__typename).toBe('Variant')
+    expect((res.data?.search.nodes?.[0] as any).name).toBe('Test Variant')
   })
 
   test('should search with specific types', async () => {

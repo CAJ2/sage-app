@@ -2,6 +2,7 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
+import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { SOURCE_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
@@ -28,7 +29,12 @@ describe('SourceResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestVariantSeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      TestVariantSeeder,
+    )
 
     await gql.signIn('admin', 'password')
 
