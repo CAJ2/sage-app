@@ -114,7 +114,6 @@ export class ItemService {
     if (!isUsingChange(input)) {
       await this.setFields(item, input)
       await this.em.persistAndFlush(item)
-      await this.searchService.addDocs(item)
       return { item }
     }
     const change = await this.editService.findOneOrCreate(
@@ -140,7 +139,6 @@ export class ItemService {
     if (!change) {
       await this.setFields(item, input)
       await this.em.persistAndFlush(item)
-      await this.searchService.addDocs(item)
       return { item }
     }
     await this.editService.beginUpdateEntityEdit(change, item)

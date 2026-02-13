@@ -46,7 +46,6 @@ export class OrgService {
     if (!isUsingChange(input)) {
       await this.setFields(org, input)
       await this.em.persistAndFlush(org)
-      await this.searchService.addDocs(org)
       return { org }
     }
     const change = await this.editService.findOneOrCreate(
@@ -72,7 +71,6 @@ export class OrgService {
     if (!change) {
       await this.setFields(org, input)
       await this.em.persistAndFlush(org)
-      await this.searchService.addDocs(org)
       return { org }
     }
     await this.editService.beginUpdateEntityEdit(change, org)
