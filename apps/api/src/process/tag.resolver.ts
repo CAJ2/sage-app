@@ -3,6 +3,7 @@ import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { AuthGuard } from '@src/auth/auth.guard'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ZService } from '@src/common/z.service'
 import {
   CreateTagDefinitionInput,
   CreateTagDefinitionOutput,
@@ -19,6 +20,7 @@ export class TagResolver {
   constructor(
     private readonly tagService: TagService,
     private readonly transform: TransformService,
+    private readonly z: ZService,
   ) {}
 
   @Query(() => TagPage, { name: 'tags' })
@@ -48,6 +50,7 @@ export class TagResolver {
   async createTagDefinition(
     @Args('input') input: CreateTagDefinitionInput,
   ): Promise<CreateTagDefinitionOutput> {
+    input = await this.z.parse(CreateTagDefinitionInput.schema, input)
     const created = await this.tagService.create(input)
     const model = await this.transform.entityToModel(Tag, created)
     return {

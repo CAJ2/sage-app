@@ -20,7 +20,7 @@ import { User } from '@src/users/users.entity'
 import { z } from 'zod/v4'
 import { Material } from './material.entity'
 import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/db/i18n'
+import type { TranslatedField } from '@src/common/i18n'
 
 export enum ProcessIntent {
   // Reuse a functional product.
@@ -83,35 +83,37 @@ export enum ProcessInstructionsAccess {
   RESTRICTED = 'RESTRICTED',
 }
 
-export const ProcessInstructionsSchema = z.object({
-  container: z
-    .object({
-      type: ProcessInstructionsContainerTypeSchema,
-      access: ProcessInstructionsAccessSchema.optional(),
-      image: z.url().optional(),
-      color: z.string().optional(),
-      shape: z
-        .object({
-          height: z.number().optional(),
-          width: z.number().optional(),
-          depth: z.number().optional(),
-        })
-        .optional(),
-      imageEntryPoint: z
-        .object({
-          x: z.int().min(-100).max(200),
-          y: z.int().min(-100).max(200),
-          side: z.enum(['left', 'right', 'top', 'bottom']),
-        })
-        .optional(),
-    })
-    .optional(),
-  collection: z
-    .object({
-      rrule: z.string().optional(),
-    })
-    .optional(),
-})
+export const ProcessInstructionsSchema = z
+  .object({
+    container: z
+      .object({
+        type: ProcessInstructionsContainerTypeSchema,
+        access: ProcessInstructionsAccessSchema.optional(),
+        image: z.url().optional(),
+        color: z.string().optional(),
+        shape: z
+          .object({
+            height: z.number().optional(),
+            width: z.number().optional(),
+            depth: z.number().optional(),
+          })
+          .optional(),
+        imageEntryPoint: z
+          .object({
+            x: z.int().min(-100).max(200),
+            y: z.int().min(-100).max(200),
+            side: z.enum(['left', 'right', 'top', 'bottom']),
+          })
+          .optional(),
+      })
+      .optional(),
+    collection: z
+      .object({
+        rrule: z.string().optional(),
+      })
+      .optional(),
+  })
+  .default({})
 
 export interface ProcessInstructions {
   // Description of the container to deposit

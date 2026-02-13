@@ -68,13 +68,13 @@ export class MaterialService {
 
   async findDirectAncestors(materialID: string, opts: CursorOptions<Material>) {
     const ancestors = await this.em
-      .createQueryBuilder(MaterialTree)
+      .createQueryBuilder(MaterialTree, 't')
       .joinAndSelect('ancestor', 'ancestor')
       .where({
         descendant: materialID,
         ancestor: { $ne: materialID },
+        't.depth': '1',
       })
-      .andWhere({ depth: 1, ancestor: opts.where.id })
       .limit(opts.options.limit)
       .getResult()
     return {
@@ -88,13 +88,13 @@ export class MaterialService {
     opts: CursorOptions<Material>,
   ) {
     const descendants = await this.em
-      .createQueryBuilder(MaterialTree)
+      .createQueryBuilder(MaterialTree, 't')
       .joinAndSelect('descendant', 'descendant')
       .where({
         ancestor: materialID,
         descendant: { $ne: materialID },
+        't.depth': '1',
       })
-      .andWhere({ depth: 1, descendant: opts.where.id })
       .limit(opts.options.limit)
       .getResult()
     return {

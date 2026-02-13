@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import {
-  BaseSchemaService,
-  TrArraySchema,
-  zToSchema,
-} from '@src/common/base.schema'
+import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import { TrArraySchema } from '@src/common/i18n'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { PlaceIDSchema } from '@src/geo/place.schema'
 import { RegionIDSchema } from '@src/geo/region.model'

@@ -10,12 +10,12 @@ import {
   Property,
   type Ref,
 } from '@mikro-orm/core'
-import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import {
   defaultTranslatedField,
   flattenTr,
   type TranslatedField,
-} from '@src/db/i18n'
+} from '@src/common/i18n'
+import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from './users.entity'

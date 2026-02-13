@@ -16,7 +16,7 @@ import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
 import _ from 'lodash'
 import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/db/i18n'
+import type { TranslatedField } from '@src/common/i18n'
 
 @Entity({ tableName: 'regions', schema: 'public' })
 @Index({ properties: ['geo'], type: 'gist' })

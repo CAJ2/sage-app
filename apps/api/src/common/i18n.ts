@@ -1,7 +1,6 @@
-import { GraphQLError } from 'graphql'
+import { map2to3 } from '@src/db/iso639'
 import _ from 'lodash'
 import { z } from 'zod/v4'
-import { map2to3 } from './iso639'
 import type { TransformFnParams } from 'class-transformer'
 
 export const Locales = ['en-US', 'sv-SE'] as const
@@ -15,7 +14,7 @@ const validFields = ['xx', ...Locales]
 for (const lang of Locales) {
   validFields.push(lang.split('-')[0])
 }
-export const TranslatedJSON = z.record(z.string(), z.string()).refine(
+export const TranslatedJSONSchema = z.record(z.string(), z.string()).refine(
   (data) => {
     const keys = Object.keys(data)
     for (const key of keys) {
@@ -38,17 +37,30 @@ export const TranslatedJSON = z.record(z.string(), z.string()).refine(
   },
 )
 
-type TF = z.infer<typeof TranslatedJSON>
+type TF = z.infer<typeof TranslatedJSONSchema>
 export type TranslatedField = TF
 
 export function defaultTranslatedField(): TranslatedField {
   return {}
 }
 
+export const LANG_REGEX = /^[a-z]{2,3}(-[A-Z]{2,8}(-[^-]{2,8})?)?$/
+export const TranslatedInputSchema = z.object({
+  lang: z.string().regex(LANG_REGEX).meta({
+    id: 'lang',
+    title: 'Language Code',
+  }),
+  text: z.string().max(100_000).optional(),
+  auto: z.boolean().default(false),
+})
+export const TrArraySchema = z.array(TranslatedInputSchema).optional()
+
+export type TrArray = z.infer<typeof TrArraySchema>
+
 export function isTranslatedField(
   data: Record<string, any>,
 ): data is TranslatedField {
-  const result = TranslatedJSON.safeParse(data)
+  const result = TranslatedJSONSchema.safeParse(data)
   return result.success
 }
 
@@ -101,73 +113,6 @@ export function translate(params: TransformFnParams): string | undefined {
   return field.en || field.xx
 }
 
-// Non class-transformer version of the translate function.
-export function tr(
-  field: TranslatedField | undefined,
-  lang: string[],
-): string | undefined {
-  return translate({
-    value: field,
-    obj: {
-      _lang: lang,
-    },
-  } as TransformFnParams)
-}
-
-// Modifies a TranslatedField JSON object to add a new translation.
-// Supports a single string or an array of lang, text objects.
-export function addTr(
-  obj: TranslatedField | undefined,
-  lang: string | undefined,
-  value: string | { lang: string; text?: string }[],
-  isAuto = false,
-) {
-  if (Array.isArray(value)) {
-    for (const v of value) {
-      if (!v.text) {
-        // TODO: Remove existing text when null?
-        continue
-      }
-      obj = addTr(obj, v.lang, v.text, isAuto)
-    }
-    return obj
-  }
-  if (!value) {
-    return obj
-  }
-  if (value.length > 100_000) {
-    throw new GraphQLError('Translation text is too long')
-  }
-  if (!lang) {
-    lang = 'xx'
-  }
-  const bits = lang.split('-')
-  if (bits.length >= 2) {
-    lang = bits[0]
-  }
-  if (isAuto) {
-    lang = `${lang};a`
-  }
-  if (!obj) obj = {}
-  obj[lang] = value
-  return obj
-}
-
-// Like addTr, but throws an error if the resulting object
-// is nullish (JSON object must have at least one translation).
-export function addTrReq(
-  obj: TranslatedField,
-  lang: string | undefined,
-  value: string | { lang: string; text?: string }[],
-  isAuto = false,
-): TranslatedField {
-  const tr = addTr(obj, lang, value, isAuto)
-  if (!tr) {
-    throw new GraphQLError('Invalid translated field')
-  }
-  return tr
-}
-
 const supported = Locales.map((support) => {
   const bits = support.split('-')
   const hasScript = bits.length === 3
@@ -182,7 +127,10 @@ const supported = Locales.map((support) => {
   return b.code.length - a.code.length
 })
 
-export function parseLanguageHeader(header: string): string[] {
+export function parseLanguageHeader(
+  header: string,
+  fallback?: string,
+): string[] {
   // From https://github.com/opentable/accept-language-parser
   const strings: string[] = header.split(',')
   const langs = strings
@@ -234,8 +182,8 @@ export function parseLanguageHeader(header: string): string[] {
       }
     }
   }
-  if (localeTypes.length === 0) {
-    localeTypes.push('en')
+  if (fallback && localeTypes.length === 0) {
+    localeTypes.push(fallback)
   }
   return localeTypes
 }

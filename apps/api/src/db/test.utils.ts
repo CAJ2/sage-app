@@ -36,8 +36,12 @@ export function getOrderedMetadata(
 export async function clearDatabase(
   orm: MikroORM,
   schema?: string,
+  excludeTables: string[] = [],
 ): Promise<void> {
   for (const meta of getOrderedMetadata(orm, schema).reverse()) {
+    if (excludeTables.includes(meta.tableName)) {
+      continue
+    }
     await orm.em
       .createQueryBuilder(
         meta.className,

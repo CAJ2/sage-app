@@ -5,9 +5,9 @@ import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
+import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
-import { addTr, addTrReq } from '@src/db/i18n'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Category } from './category.entity'
@@ -22,6 +22,7 @@ export class ItemService {
     private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly searchService: MeiliService,
+    private readonly i18n: I18nService,
   ) {}
 
   async findOneByID(id: string) {
@@ -113,7 +114,6 @@ export class ItemService {
     if (!isUsingChange(input)) {
       await this.setFields(item, input)
       await this.em.persistAndFlush(item)
-      await this.searchService.addDocs(item)
       return { item }
     }
     const change = await this.editService.findOneOrCreate(
@@ -139,7 +139,6 @@ export class ItemService {
     if (!change) {
       await this.setFields(item, input)
       await this.em.persistAndFlush(item)
-      await this.searchService.addDocs(item)
       return { item }
     }
     await this.editService.beginUpdateEntityEdit(change, item)
@@ -164,16 +163,16 @@ export class ItemService {
     change?: Change,
   ) {
     if (input.name) {
-      item.name = addTrReq(item.name, input.lang, input.name)
+      item.name = this.i18n.addTrReq(item.name, input.name, input.lang)
     }
     if (input.nameTr) {
-      item.name = addTrReq(item.name, input.lang, input.nameTr)
+      item.name = this.i18n.addTrReq(item.name, input.nameTr, input.lang)
     }
     if (input.desc) {
-      item.desc = addTr(item.desc, input.lang, input.desc)
+      item.desc = this.i18n.addTr(item.desc, input.desc, input.lang)
     }
     if (input.descTr) {
-      item.desc = addTr(item.desc, input.lang, input.descTr)
+      item.desc = this.i18n.addTr(item.desc, input.descTr, input.lang)
     }
     if (input.imageURL) {
       if (!item.files) {

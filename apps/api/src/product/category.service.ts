@@ -4,8 +4,8 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
+import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { addTr, addTrReq } from '@src/db/i18n'
 import {
   Category,
   CATEGORY_ROOT,
@@ -20,6 +20,7 @@ export class CategoryService {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
+    private readonly i18n: I18nService,
   ) {}
 
   async find(opts: CursorOptions<Category>) {
@@ -74,15 +75,15 @@ export class CategoryService {
     }
   }
 
-  async findDirectAncestors(childID: string, opts: CursorOptions<Category>) {
+  async findDirectAncestors(categoryID: string, opts: CursorOptions<Category>) {
     const ancestors = await this.em
-      .createQueryBuilder(CategoryTree)
+      .createQueryBuilder(CategoryTree, 't')
       .joinAndSelect('ancestor', 'ancestor')
       .where({
-        descendant: childID,
-        ancestor: { $ne: childID },
+        descendant: categoryID,
+        ancestor: { $ne: categoryID },
+        't.depth': '1',
       })
-      .andWhere({ depth: 1, ancestor: opts.where.id })
       .limit(opts.options.limit)
       .getResult()
     return {
@@ -91,15 +92,18 @@ export class CategoryService {
     }
   }
 
-  async findDirectDescendants(parentID: string, opts: CursorOptions<Category>) {
+  async findDirectDescendants(
+    categoryID: string,
+    opts: CursorOptions<Category>,
+  ) {
     const descendants = await this.em
-      .createQueryBuilder(CategoryTree)
+      .createQueryBuilder(CategoryTree, 't')
       .joinAndSelect('descendant', 'descendant')
       .where({
-        ancestor: parentID,
-        descendant: { $ne: parentID },
+        ancestor: categoryID,
+        descendant: { $ne: categoryID },
+        't.depth': '1',
       })
-      .andWhere({ depth: 1, descendant: opts.where.id })
       .limit(opts.options.limit)
       .getResult()
     return {
@@ -185,30 +189,34 @@ export class CategoryService {
     change?: Change,
   ) {
     if (input.name) {
-      category.name = addTrReq(category.name, input.lang, input.name)
+      category.name = this.i18n.addTrReq(category.name, input.name, input.lang)
     }
     if (input.nameTr) {
-      category.name = addTrReq(category.name, input.lang, input.nameTr)
+      category.name = this.i18n.addTrReq(
+        category.name,
+        input.nameTr,
+        input.lang,
+      )
     }
     if (input.descShort) {
-      category.descShort = addTr(
+      category.descShort = this.i18n.addTr(
         category.descShort,
-        input.lang,
         input.descShort,
+        input.lang,
       )
     }
     if (input.descShortTr) {
-      category.descShort = addTr(
+      category.descShort = this.i18n.addTr(
         category.descShort,
-        input.lang,
         input.descShortTr,
+        input.lang,
       )
     }
     if (input.desc) {
-      category.desc = addTr(category.desc, input.lang, input.desc)
+      category.desc = this.i18n.addTr(category.desc, input.desc, input.lang)
     }
     if (input.descTr) {
-      category.desc = addTr(category.desc, input.lang, input.descTr)
+      category.desc = this.i18n.addTr(category.desc, input.descTr, input.lang)
     }
     if (input.imageURL) {
       category.imageURL = input.imageURL

@@ -5,6 +5,7 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   CreateProcessInput,
@@ -23,6 +24,7 @@ export class ProcessResolver {
   constructor(
     private readonly processService: ProcessService,
     private readonly transform: TransformService,
+    private readonly z: ZService,
     private readonly processSchemaService: ProcessSchemaService,
   ) {}
 
@@ -73,6 +75,7 @@ export class ProcessResolver {
     @Args('input') input: CreateProcessInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateProcessOutput> {
+    input = await this.z.parse(CreateProcessInput.schema, input)
     const created = await this.processService.create(input, user.id)
     const model = await this.transform.entityToModel(Process, created.process)
     if (created.change) {

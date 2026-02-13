@@ -14,7 +14,7 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
 import { Item } from './item.entity'
 import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/db/i18n'
+import type { TranslatedField } from '@src/common/i18n'
 
 export const CATEGORY_ROOT = 'CATEGORY_ROOT'
 
@@ -67,8 +67,8 @@ export class CategoryTree extends BaseEntity {
   @ManyToOne({ primary: true })
   descendant!: Category
 
-  @Property({ default: 0 })
-  depth!: number
+  @Property({ type: 'number', default: 0 })
+  depth!: string
 }
 
 @Entity({ tableName: 'category_edges', schema: 'public' })

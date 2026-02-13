@@ -2,7 +2,8 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/db/i18n'
+import { translate, TrArraySchema } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import {
@@ -20,7 +21,13 @@ import { IsEnum, IsOptional } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 import { Material } from './material.model'
-import { Process as ProcessEntity, ProcessIntent } from './process.entity'
+import {
+  ProcessEfficiencySchema,
+  Process as ProcessEntity,
+  ProcessInstructionsSchema,
+  ProcessIntent,
+  ProcessRulesSchema,
+} from './process.entity'
 
 @ObjectType()
 export class ProcessEfficiency {
@@ -109,36 +116,72 @@ export class ProcessArgs extends PaginationBasicArgs {
 
 @InputType()
 export class ProcessMaterialInput {
+  static schema = z.object({
+    id: z.nanoid(),
+  })
+
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessVariantInput {
+  static schema = z.object({
+    id: z.nanoid(),
+  })
+
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessOrgInput {
+  static schema = z.object({
+    id: z.nanoid(),
+  })
+
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessRegionInput {
+  static schema = z.object({
+    id: z.string(),
+  })
+
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessPlaceInput {
+  static schema = z.object({
+    id: z.string(),
+  })
+
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class CreateProcessInput extends ChangeInputWithLang {
+  static schema = ChangeInputWithLang.schema.extend({
+    intent: z.enum(ProcessIntent),
+    name: z.string().optional(),
+    nameTr: TrArraySchema,
+    desc: z.string().optional(),
+    descTr: TrArraySchema,
+    instructions: ProcessInstructionsSchema,
+    efficiency: ProcessEfficiencySchema.optional(),
+    rules: ProcessRulesSchema.optional(),
+    material: ProcessMaterialInput.schema.optional(),
+    variant: ProcessVariantInput.schema.optional(),
+    org: ProcessOrgInput.schema.optional(),
+    region: ProcessRegionInput.schema.optional(),
+    place: ProcessPlaceInput.schema.optional(),
+  })
+
   @Field(() => String)
   @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
   intent!: ProcessIntent
@@ -156,13 +199,13 @@ export class CreateProcessInput extends ChangeInputWithLang {
   descTr?: TranslatedInput[]
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  instructions?: Record<string, any>
+  instructions?: JSONObject
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  efficiency?: Record<string, any>
+  efficiency?: JSONObject
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  rules?: Record<string, any>
+  rules?: JSONObject
 
   @Field(() => ProcessMaterialInput, { nullable: true })
   material?: ProcessMaterialInput
@@ -203,13 +246,13 @@ export class UpdateProcessInput extends ChangeInputWithLang {
   descTr?: TranslatedInput[]
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  instructions?: Record<string, any>
+  instructions?: JSONObject
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  efficiency?: Record<string, any>
+  efficiency?: JSONObject
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  rules?: Record<string, any>
+  rules?: JSONObject
 
   @Field(() => ProcessMaterialInput, { nullable: true })
   material?: ProcessMaterialInput

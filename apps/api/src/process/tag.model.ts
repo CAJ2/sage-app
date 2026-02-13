@@ -5,7 +5,8 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql'
-import { translate } from '@src/db/i18n'
+import { translate } from '@src/common/i18n'
+import { HTTPS_OR_ICON, type JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -74,6 +75,17 @@ export const TagDefinitionIDSchema = z.string().meta({
 
 @InputType()
 export class CreateTagDefinitionInput {
+  static schema = z.object({
+    name: z.string().max(100),
+    type: z.enum(TagType),
+    desc: z.string().max(100_000).optional(),
+    metaTemplate: z.json().optional(),
+    bgColor: z
+      .templateLiteral(['#', z.string().regex(/[0-9A-Fa-f]{6}/)])
+      .optional(),
+    image: z.url(HTTPS_OR_ICON).optional(),
+  })
+
   @Field(() => String)
   name!: string
 
@@ -84,7 +96,7 @@ export class CreateTagDefinitionInput {
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  metaTemplate?: Record<string, any>
+  metaTemplate?: JSONType
 
   @Field(() => String, { nullable: true })
   bgColor?: string
@@ -108,7 +120,7 @@ export class UpdateTagDefinitionInput {
   desc?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  metaTemplate?: Record<string, any>
+  metaTemplate?: JSONType
 
   @Field(() => String, { nullable: true })
   bgColor?: string

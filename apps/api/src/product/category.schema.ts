@@ -3,9 +3,9 @@ import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
   ImageOrIconSchema,
-  TrArraySchema,
   zToSchema,
 } from '@src/common/base.schema'
+import { TrArraySchema } from '@src/common/i18n'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { ValidateFunction } from 'ajv'

@@ -16,7 +16,7 @@ import { z } from 'zod/v4'
 import { Component } from './component.entity'
 import { Process } from './process.entity'
 import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/db/i18n'
+import type { TranslatedField } from '@src/common/i18n'
 import type { JsonLdDocument } from 'jsonld'
 
 export const MATERIAL_ROOT = 'MATERIAL_ROOT'
@@ -97,8 +97,9 @@ export class MaterialTree extends BaseEntity {
   @ManyToOne({ primary: true })
   descendant!: Material
 
-  @Property()
-  depth!: number
+  @Property({ type: 'number' })
+  // TODO(CAJ2): Using number doesn't work here, for some reason
+  depth!: string
 }
 
 @Entity({ tableName: 'material_edges', schema: 'public' })
