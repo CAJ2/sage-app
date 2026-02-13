@@ -96,42 +96,42 @@ export class TestMaterialSeeder extends Seeder {
     em.create(MaterialTree, {
       ancestor: root,
       descendant: plastic,
-      depth: 1,
+      depth: String(1),
     })
     em.create(MaterialTree, {
       ancestor: root,
       descendant: metal,
-      depth: 1,
+      depth: String(1),
     })
     em.create(MaterialTree, {
       ancestor: root,
       descendant: polyethylene,
-      depth: 2,
+      depth: String(2),
     })
     em.create(MaterialTree, {
       ancestor: root,
       descendant: aluminum,
-      depth: 2,
+      depth: String(2),
     })
     em.create(MaterialTree, {
       ancestor: root,
       descendant: steel,
-      depth: 2,
+      depth: String(2),
     })
     em.create(MaterialTree, {
       ancestor: plastic,
       descendant: polyethylene,
-      depth: 1,
+      depth: String(1),
     })
     em.create(MaterialTree, {
       ancestor: metal,
       descendant: aluminum,
-      depth: 1,
+      depth: String(1),
     })
     em.create(MaterialTree, {
       ancestor: metal,
       descendant: steel,
-      depth: 1,
+      depth: String(1),
     })
 
     await em.flush()

@@ -11,12 +11,13 @@ import { clearDatabase } from '@src/db/test.utils'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+import _ from 'lodash'
+import { MATERIAL_ROOT } from './material.entity'
 
 describe('MaterialResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
-  let materialID: string
-  let rootMaterialID: string
+  let plasticID: string
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,11 +36,7 @@ describe('MaterialResolver (integration)', () => {
 
     await gql.signIn('admin', 'password')
 
-    materialID = MATERIAL_IDS[0]
-
-    // Get the root material
-    const rootMaterial = await orm.em.findOne('Material', { parent: null })
-    rootMaterialID = (rootMaterial as any)?.id
+    plasticID = MATERIAL_IDS[0]
   })
 
   afterAll(async () => {
@@ -79,10 +76,10 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: materialID },
+      { id: plasticID },
     )
     expect(res.data?.material).toBeTruthy()
-    expect(res.data?.material?.id).toBe(materialID)
+    expect(res.data?.material?.id).toBe(plasticID)
   })
 
   test('should query the root material', async () => {
@@ -97,7 +94,7 @@ describe('MaterialResolver (integration)', () => {
       `),
     )
     expect(res.data?.materialRoot).toBeTruthy()
-    expect(res.data?.materialRoot?.id).toBe(rootMaterialID)
+    expect(res.data?.materialRoot?.id).toBe(MATERIAL_ROOT)
   })
 
   test('should query material parents with pagination', async () => {
@@ -116,7 +113,7 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: materialID, first: 10 },
+      { id: plasticID, first: 10 },
     )
     expect(res.data?.material?.parents).toBeTruthy()
     expect(Array.isArray(res.data?.material?.parents.nodes)).toBe(true)
@@ -138,10 +135,14 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: rootMaterialID, first: 10 },
+      { id: MATERIAL_ROOT, first: 10 },
     )
     expect(res.data?.material?.children).toBeTruthy()
-    expect(Array.isArray(res.data?.material?.children.nodes)).toBe(true)
+    expect(res.data?.material?.children.nodes?.length).toBeGreaterThan(0)
+    _.each(res.data?.material?.children.nodes, (child) => {
+      expect(child.id).toBeTruthy()
+      expect(['Metal', 'Plastic']).toContain(child.name)
+    })
   })
 
   test('should query material ancestors with pagination', async () => {
@@ -160,10 +161,15 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: materialID, first: 10 },
+      // Polyethylene
+      { id: MATERIAL_IDS[2], first: 10 },
     )
     expect(res.data?.material?.ancestors).toBeTruthy()
-    expect(Array.isArray(res.data?.material?.ancestors.nodes)).toBe(true)
+    expect(res.data?.material?.ancestors.nodes?.length).toBeGreaterThan(0)
+    _.each(res.data?.material?.ancestors.nodes, (ancestor) => {
+      expect(ancestor.id).toBeTruthy()
+      expect(['Plastic']).toContain(ancestor.name)
+    })
   })
 
   test('should query material descendants with pagination', async () => {
@@ -182,13 +188,43 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: rootMaterialID, first: 10 },
+      { id: MATERIAL_ROOT, first: 10 },
     )
     expect(res.data?.material?.descendants).toBeTruthy()
-    expect(Array.isArray(res.data?.material?.descendants.nodes)).toBe(true)
+    expect(res.data?.material?.descendants.nodes?.length).toBeGreaterThan(0)
   })
 
   test('should query material components with pagination', async () => {
+    // First create a component associated with the material
+    await gql.send(
+      graphql(`
+        mutation MaterialResolverCreateTestComponent($input: CreateComponentInput!) {
+          createComponent(input: $input) {
+            component {
+              id
+              name
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Test Plastic Component',
+          apply: true,
+          primaryMaterial: {
+            id: plasticID,
+            materialFraction: 1.0,
+          },
+          materials: [
+            {
+              id: plasticID,
+              materialFraction: 1.0,
+            },
+          ],
+        },
+      },
+    )
+
     const res = await gql.send(
       graphql(`
         query MaterialResolverGetMaterialComponents($id: ID!, $first: Int) {
@@ -204,13 +240,37 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: materialID, first: 10 },
+      { id: plasticID, first: 10 },
     )
     expect(res.data?.material?.components).toBeTruthy()
-    expect(Array.isArray(res.data?.material?.components.nodes)).toBe(true)
+    expect(res.data?.material?.components.nodes?.length).toBeGreaterThan(0)
   })
 
   test('should query material processes with pagination', async () => {
+    // First create a process associated with the material
+    await gql.send(
+      graphql(`
+        mutation MaterialResolverCreateTestProcess($input: CreateProcessInput!) {
+          createProcess(input: $input) {
+            process {
+              id
+              name
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Test Plastic Recycling Process',
+          intent: 'RECYCLE',
+          apply: true,
+          material: {
+            id: plasticID,
+          },
+        },
+      },
+    )
+
     const res = await gql.send(
       graphql(`
         query MaterialResolverGetMaterialProcesses($id: ID!, $first: Int) {
@@ -226,10 +286,10 @@ describe('MaterialResolver (integration)', () => {
           }
         }
       `),
-      { id: materialID, first: 10 },
+      { id: plasticID, first: 10 },
     )
     expect(res.data?.material?.processes).toBeTruthy()
-    expect(Array.isArray(res.data?.material?.processes.nodes)).toBe(true)
+    expect(res.data?.material?.processes.nodes?.length).toBeGreaterThan(0)
   })
 
   test('should return error for non-existent material', async () => {

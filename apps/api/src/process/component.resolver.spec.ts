@@ -2,7 +2,10 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
-import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import {
+  MATERIAL_IDS,
+  TestMaterialSeeder,
+} from '@src/db/seeds/TestMaterialSeeder'
 import {
   COMPONENT_IDS,
   TestVariantSeeder,
@@ -164,6 +167,9 @@ describe('ComponentResolver (integration)', () => {
       {
         input: {
           name: 'Test Component',
+          primaryMaterial: {
+            id: MATERIAL_IDS[0],
+          },
         },
       },
     )

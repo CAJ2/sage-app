@@ -97,8 +97,9 @@ export class MaterialTree extends BaseEntity {
   @ManyToOne({ primary: true })
   descendant!: Material
 
-  @Property()
-  depth!: number
+  @Property({ type: 'number' })
+  // TODO(CAJ2): Using number doesn't work here, for some reason
+  depth!: string
 }
 
 @Entity({ tableName: 'material_edges', schema: 'public' })
