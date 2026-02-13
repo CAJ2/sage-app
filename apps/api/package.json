@@ -6,12 +6,13 @@
   "private": true,
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build && ./db-defs.sh",
+    "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "generate": "graphql-codegen --config graphql-codegen.ts && ./db-defs.sh",
+    "generate": "graphql-codegen --config graphql-codegen.ts",
+    "generate:db": "./db-defs.sh",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
@@ -21,9 +22,29 @@
   },
   "nx": {
     "targets": {
+      "generate:db": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/src/**/*.entity.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/temp/**/*"
+        ]
+      },
+      "build": {
+        "dependsOn": [
+          "generate*"
+        ]
+      },
       "test": {
         "dependsOn": [
-          "generate"
+          "generate*"
+        ]
+      },
+      "test:watch": {
+        "continuous": true,
+        "dependsOn": [
+          "generate*"
         ]
       }
     }
