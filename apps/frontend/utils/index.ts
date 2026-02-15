@@ -57,7 +57,6 @@ export const sanitizeFormData = <T, U extends object>(
   try {
     validate = ajv.compile(schema)
   } catch (error) {
-    console.error('Error compiling schema', error)
     throw new Error(`Invalid schema: ${error}`)
   }
   validate(data)

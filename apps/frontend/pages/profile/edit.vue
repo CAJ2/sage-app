@@ -48,8 +48,6 @@ const form = useForm({
         .min(8, { message: 'Password must be at least 8 characters' }),
     }),
   },
-  onSubmit: async ({ value }) => {
-    console.log(value)
-  },
+  onSubmit: () => {},
 })
 </script>

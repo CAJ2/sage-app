@@ -126,7 +126,7 @@
 import { watchDebounced } from '@vueuse/core'
 
 onMounted(() => {
-  document.getElementById('search')?.focus()
+  ;(document.querySelector('#search') as HTMLElement)?.focus()
 })
 
 const searchQuery = gql`

@@ -33,6 +33,7 @@ import {
 
 const route = useRoute()
 const localeRoute = useLocaleRoute()
+const posthog = usePostHog()
 const changeID = route.params.id as string
 const categoryID = route.params.category_id as string
 
@@ -99,7 +100,7 @@ if (categoryID !== 'new') {
 }
 const readOnly = computed<boolean | undefined>(() => {
   if (changeStatus.value !== ChangeStatus.Merged) {
-    return undefined
+    return
   }
   return true
 })
@@ -149,7 +150,6 @@ const onChange = async (event: JsonFormsChangeEvent) => {
   }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      console.error('Form errors:', event.errors)
       saveStatus.value = 'error'
       return
     }
@@ -175,9 +175,13 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           }
         })
         .catch((error) => {
-          console.error('Error creating category:', error)
+          posthog?.captureException(error, {
+            tags: {
+              feature: 'categories',
+              action: 'create',
+            },
+          })
           saveStatus.value = 'error'
-          return
         })
     } else {
       updateData.value = event.data
@@ -193,7 +197,12 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           saveStatus.value = 'saved'
         })
         .catch((error) => {
-          console.error('Error updating category:', error)
+          posthog?.captureException(error, {
+            tags: {
+              feature: 'categories',
+              action: 'update',
+            },
+          })
           saveStatus.value = 'error'
         })
     }

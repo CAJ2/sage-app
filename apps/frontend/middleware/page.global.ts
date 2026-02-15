@@ -12,8 +12,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   const toSeg = to.path.split('/')[1]
   const fromSeg = from.path.split('/')[1]
-  const lastToSeg = to.path.split('/').slice(-1)[0]
-  const lastFromSeg = from.path.split('/').slice(-1)[0]
+  const lastToSeg = to.path.split('/').at(-1)
+  const lastFromSeg = from.path.split('/').at(-1)
   if (toSeg !== fromSeg) {
     // We are changing tabs, no transition
     setTransition('none')

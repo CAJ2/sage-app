@@ -96,7 +96,7 @@ if (componentID !== 'new') {
 }
 const readOnly = computed<boolean | undefined>(() => {
   if (changeStatus.value !== ChangeStatus.Merged) {
-    return undefined
+    return
   }
   return true
 })
@@ -146,7 +146,6 @@ const onChange = async (event: JsonFormsChangeEvent) => {
   }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      console.error('Form errors:', event.errors)
       saveStatus.value = 'error'
       return
     }
@@ -171,10 +170,8 @@ const onChange = async (event: JsonFormsChangeEvent) => {
             )
           }
         })
-        .catch((error) => {
-          console.error('Error creating component:', error)
+        .catch(() => {
           saveStatus.value = 'error'
-          return
         })
     } else {
       updateData.value = event.data
@@ -189,8 +186,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
         .then(() => {
           saveStatus.value = 'saved'
         })
-        .catch((error) => {
-          console.error('Error updating component:', error)
+        .catch(() => {
           saveStatus.value = 'error'
         })
     }

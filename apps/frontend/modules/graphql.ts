@@ -1,3 +1,4 @@
+// oxlint-disable no-console
 // From https://github.com/genu/nuxt-codegen/blob/master/src/module.ts
 // and licensed under the MIT License
 import { defineNuxtModule } from '@nuxt/kit'

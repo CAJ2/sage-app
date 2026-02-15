@@ -326,8 +326,6 @@ const deleteChange = async () => {
   const result = await changeDelete.mutate()
   if (result?.data) {
     navigateTo(localeRoute('/contribute/changes'))
-  } else {
-    console.error('Failed to delete change:', result)
   }
 }
 
@@ -363,8 +361,6 @@ const mergeChange = async () => {
   const result = await changeMerge.mutate()
   if (result?.data) {
     await refetchChangeData()
-  } else {
-    console.error('Failed to merge change:', result)
   }
 }
 </script>

@@ -130,7 +130,6 @@ let markers: Pick<maplibregl.Marker, 'remove'>[] = []
 watch(
   () => search.result.value,
   () => {
-    console.log('Search result gotten')
     if (map.value && search.result.value && search.result.value.search.nodes) {
       markers.forEach((marker) => {
         marker.remove()
@@ -163,7 +162,7 @@ watch(
   },
 )
 
-const refreshSearch = async (newSearch: string) => {
+const refreshSearch = (newSearch: string) => {
   if (!mapBounds.value) {
     return
   }
@@ -177,7 +176,7 @@ const refreshSearch = async (newSearch: string) => {
     ],
   })
 }
-const refreshBounds = async (newBounds: [number, number][] | null) => {
+const refreshBounds = (newBounds: [number, number][] | null) => {
   if (!newBounds) {
     return
   }

@@ -42,7 +42,5 @@ if (result?.data?.updateCategory?.change?.id) {
       replace: true,
     },
   )
-} else {
-  console.error('Failed to create change:', result)
 }
 </script>

@@ -9,7 +9,7 @@ export default defineNuxtPlugin(({ hook }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultClient: ApolloClient<any> = (clients as any).default
 
-  const ctxLink = setContext(async (_, { headers }) => {
+  const ctxLink = setContext((_, { headers }) => {
     const locale = $i18n.locale.value
     let lang = (navigator && navigator.language) || ''
     if (locale) {
@@ -25,6 +25,7 @@ export default defineNuxtPlugin(({ hook }) => {
   provideApolloClient(defaultClient as any)
 
   hook('apollo:error', (error) => {
+    // oxlint-disable-next-line no-console
     console.log('error: ', error)
   })
 })

@@ -1,6 +1,7 @@
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 import globals from 'globals'
 import withNuxt from './.nuxt/eslint.config.mjs'
+import oxlint from 'eslint-plugin-oxlint'
 
 const baseConfig = [
   {
@@ -47,4 +48,5 @@ export default withNuxt([
   eslintPluginPrettier,
   ...prettier,
   ...disabledRules,
+  ...oxlint.configs['flat/recommended'],
 ])
