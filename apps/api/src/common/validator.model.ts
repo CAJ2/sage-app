@@ -1,12 +1,12 @@
 import { registerDecorator, ValidatorConstraint } from 'class-validator'
-import _ from 'lodash'
-import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
 import type {
   ValidationArguments,
   ValidationOptions,
   ValidatorConstraintInterface,
 } from 'class-validator'
+import _ from 'lodash'
+import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 
 @ValidatorConstraint({ name: 'nanoid', async: false })
 export class IsNanoID implements ValidatorConstraintInterface {
@@ -14,9 +14,7 @@ export class IsNanoID implements ValidatorConstraintInterface {
     return (
       text.length === 21 &&
       _.every(text, (c) =>
-        'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict'.includes(
-          c,
-        ),
+        'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict'.includes(c),
       )
     )
   }
@@ -42,10 +40,7 @@ export class IsDateTime implements ValidatorConstraintInterface {
   }
 }
 
-export function ZodValid(
-  schema: z.ZodType,
-  validationOptions?: ValidationOptions,
-) {
+export function ZodValid(schema: z.ZodType, validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'ZodValid',

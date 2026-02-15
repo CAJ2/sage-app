@@ -4,6 +4,7 @@ import { betterAuth } from 'better-auth'
 import { admin, organization, username } from 'better-auth/plugins'
 import { KyselyKnexDialect, PGColdDialect } from 'kysely-knex'
 import { nanoid } from 'nanoid'
+
 import { reservedUsernames } from './reserved-usernames'
 
 export const configureAuth = (orm: MikroORM) => {

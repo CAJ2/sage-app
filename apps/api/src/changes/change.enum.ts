@@ -7,6 +7,7 @@ import { Process } from '@src/process/process.model'
 import { Category } from '@src/product/category.model'
 import { Item } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.model'
+
 import { ChangeStatus } from './change.entity'
 
 registerEnumType(ChangeStatus, {
@@ -16,17 +17,7 @@ registerEnumType(ChangeStatus, {
 
 export const EditModel = createUnionType({
   name: 'EditModel',
-  types: () =>
-    [
-      Place,
-      Region,
-      Component,
-      Material,
-      Process,
-      Category,
-      Item,
-      Variant,
-    ] as const,
+  types: () => [Place, Region, Component, Material, Process, Category, Item, Variant] as const,
 })
 
 export enum EditModelType {

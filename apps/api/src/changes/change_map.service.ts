@@ -1,4 +1,5 @@
 import { EntityManager } from '@mikro-orm/core'
+import type { Loaded } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
@@ -11,8 +12,8 @@ import { ItemService } from '@src/product/item.service'
 import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
 import _ from 'lodash'
+
 import type { Edit as EditModel } from './change.model'
-import type { Loaded } from '@mikro-orm/postgresql'
 
 export interface IEntityService {
   findOneByID<T, U extends Loaded<T, any>>(id: string): Promise<U | null>
@@ -43,36 +44,28 @@ export class ChangeMapService {
     private readonly processSchema: ProcessSchemaService,
   ) {
     this.serviceMap['Category'] = this.categoryService as IEntityService
-    this.createEditFns['Category'] =
-      this.categorySchema.categoryCreateEdit.bind(this.categorySchema)
-    this.updateEditFns['Category'] =
-      this.categorySchema.categoryUpdateEdit.bind(this.categorySchema)
+    this.createEditFns['Category'] = this.categorySchema.categoryCreateEdit.bind(
+      this.categorySchema,
+    )
+    this.updateEditFns['Category'] = this.categorySchema.categoryUpdateEdit.bind(
+      this.categorySchema,
+    )
     this.serviceMap['Item'] = this.itemService as IEntityService
-    this.createEditFns['Item'] = this.itemSchema.itemCreateEdit.bind(
-      this.itemSchema,
-    )
-    this.updateEditFns['Item'] = this.itemSchema.itemUpdateEdit.bind(
-      this.itemSchema,
-    )
+    this.createEditFns['Item'] = this.itemSchema.itemCreateEdit.bind(this.itemSchema)
+    this.updateEditFns['Item'] = this.itemSchema.itemUpdateEdit.bind(this.itemSchema)
     this.serviceMap['Variant'] = this.variantService as IEntityService
-    this.createEditFns['Variant'] = this.variantSchema.variantCreateEdit.bind(
-      this.variantSchema,
-    )
-    this.updateEditFns['Variant'] = this.variantSchema.variantUpdateEdit.bind(
-      this.variantSchema,
-    )
+    this.createEditFns['Variant'] = this.variantSchema.variantCreateEdit.bind(this.variantSchema)
+    this.updateEditFns['Variant'] = this.variantSchema.variantUpdateEdit.bind(this.variantSchema)
     this.serviceMap['Component'] = this.componentService as IEntityService
-    this.createEditFns['Component'] =
-      this.componentSchema.componentCreateEdit.bind(this.componentSchema)
-    this.updateEditFns['Component'] =
-      this.componentSchema.componentUpdateEdit.bind(this.componentSchema)
+    this.createEditFns['Component'] = this.componentSchema.componentCreateEdit.bind(
+      this.componentSchema,
+    )
+    this.updateEditFns['Component'] = this.componentSchema.componentUpdateEdit.bind(
+      this.componentSchema,
+    )
     this.serviceMap['Process'] = this.processService as IEntityService
-    this.createEditFns['Process'] = this.processSchema.processCreateEdit.bind(
-      this.processSchema,
-    )
-    this.updateEditFns['Process'] = this.processSchema.processUpdateEdit.bind(
-      this.processSchema,
-    )
+    this.createEditFns['Process'] = this.processSchema.processCreateEdit.bind(this.processSchema)
+    this.updateEditFns['Process'] = this.processSchema.processUpdateEdit.bind(this.processSchema)
   }
 
   findEditServices(entityName?: string) {
@@ -111,10 +104,7 @@ export class ChangeMapService {
     }
     meta.relations.forEach((rel) => {
       // Skip history and tree relations
-      if (
-        rel.name.startsWith('history') ||
-        ['ancestors', 'descendants'].includes(rel.name)
-      ) {
+      if (rel.name.startsWith('history') || ['ancestors', 'descendants'].includes(rel.name)) {
         return
       }
       // Populate 1:m relations

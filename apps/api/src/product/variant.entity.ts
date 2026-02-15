@@ -20,6 +20,7 @@ import { Tag } from '@src/process/tag.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { z } from 'zod/v4'
+
 import { Item } from './item.entity'
 
 export const VariantComponentUnitSchema = z.enum(['g', 'ml']).optional()
@@ -29,9 +30,7 @@ export enum VariantComponentUnit {
   LITERS = 'ml',
 }
 
-export const VariantOrgRoleSchema = z
-  .enum(['PRODUCER', 'DISTRIBUTOR'])
-  .optional()
+export const VariantOrgRoleSchema = z.enum(['PRODUCER', 'DISTRIBUTOR']).optional()
 
 export type VariantOrgRole = z.infer<typeof VariantOrgRoleSchema>
 

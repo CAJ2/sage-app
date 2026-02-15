@@ -1,6 +1,7 @@
 import { Args, Query, Resolver } from '@nestjs/graphql'
 import { BadRequestErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+
 import { SearchArgs, SearchResultPage } from './search.model'
 import { SearchService } from './search.service'
 

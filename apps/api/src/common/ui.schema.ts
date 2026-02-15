@@ -286,7 +286,8 @@ export interface LabelElement extends BaseUISchemaElement, Internationalizable {
  * to which part of the schema the control should be bound.
  */
 export interface ControlElement
-  extends BaseUISchemaElement,
+  extends
+    BaseUISchemaElement,
     Scoped,
     Labelable<string | boolean | LabelDescription>,
     Internationalizable {
@@ -305,10 +306,7 @@ export interface Category extends Layout, Labeled, Internationalizable {
  * A child element may either be itself a Categorization or a Category, hence
  * the categorization element can be used to represent recursive structures like trees.
  */
-export interface Categorization
-  extends BaseUISchemaElement,
-    Labeled,
-    Internationalizable {
+export interface Categorization extends BaseUISchemaElement, Labeled, Internationalizable {
   type: 'Categorization'
   /**
    * The child elements of this categorization which are either of type

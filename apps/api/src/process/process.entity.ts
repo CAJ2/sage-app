@@ -10,7 +10,9 @@ import {
   PrimaryKeyProp,
   Property,
 } from '@mikro-orm/core'
+import type { Ref } from '@mikro-orm/core'
 import { Source } from '@src/changes/source.entity'
+import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
@@ -18,9 +20,8 @@ import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
 import { z } from 'zod/v4'
+
 import { Material } from './material.entity'
-import type { Ref } from '@mikro-orm/core'
-import type { TranslatedField } from '@src/common/i18n'
 
 export enum ProcessIntent {
   // Reuse a functional product.
@@ -69,11 +70,7 @@ export enum ProcessInstructionsContainerType {
   UNKNOWN = 'UNKNOWN',
 }
 
-export const ProcessInstructionsAccessSchema = z.enum([
-  'PUBLIC',
-  'PRIVATE',
-  'RESTRICTED',
-])
+export const ProcessInstructionsAccessSchema = z.enum(['PUBLIC', 'PRIVATE', 'RESTRICTED'])
 
 export enum ProcessInstructionsAccess {
   PUBLIC = 'PUBLIC',
@@ -161,9 +158,7 @@ export const MatchRuleSchema = z.object({
 export const ProcessRulesSchema = z
   .object({
     match: z
-      .array(
-        z.union([MatchRuleSchema, z.object({ or: z.array(MatchRuleSchema) })]),
-      )
+      .array(z.union([MatchRuleSchema, z.object({ or: z.array(MatchRuleSchema) })]))
       .optional(),
   })
   .optional()

@@ -1,13 +1,9 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
+
 import { Component } from './component.entity'
-import {
-  Material,
-  MATERIAL_ROOT,
-  MaterialEdge,
-  MaterialTree,
-} from './material.entity'
+import { Material, MATERIAL_ROOT, MaterialEdge, MaterialTree } from './material.entity'
 import { Process } from './process.entity'
 
 @Injectable()
@@ -24,11 +20,7 @@ export class MaterialService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(
-      Material,
-      { id },
-      { populate: ['parents', 'children'] },
-    )
+    return await this.em.findOne(Material, { id }, { populate: ['parents', 'children'] })
   }
 
   async findRoot() {
@@ -83,10 +75,7 @@ export class MaterialService {
     }
   }
 
-  async findDirectDescendants(
-    materialID: string,
-    opts: CursorOptions<Material>,
-  ) {
+  async findDirectDescendants(materialID: string, opts: CursorOptions<Material>) {
     const descendants = await this.em
       .createQueryBuilder(MaterialTree, 't')
       .joinAndSelect('descendant', 'descendant')

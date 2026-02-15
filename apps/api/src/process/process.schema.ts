@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
@@ -12,6 +13,7 @@ import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
+
 import { MaterialIDSchema } from './material.model'
 import {
   ProcessEfficiencySchema,
@@ -19,7 +21,6 @@ import {
   ProcessIntent,
   ProcessRulesSchema,
 } from './process.entity'
-import type { Edit } from '@src/changes/change.model'
 
 export const ProcessIDSchema = z.string().meta({
   id: 'Process',

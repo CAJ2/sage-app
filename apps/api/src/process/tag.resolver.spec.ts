@@ -82,7 +82,9 @@ describe('TagResolver (integration)', () => {
     )
     expect(res.data?.createTagDefinition?.tag).toBeTruthy()
     expect(res.data?.createTagDefinition?.tag?.name).toBe('Test Tag')
-    tagID = res.data?.createTagDefinition?.tag?.id!
+    if (res.data?.createTagDefinition?.tag?.id) {
+      tagID = res.data?.createTagDefinition?.tag?.id
+    }
   })
 
   test('should query a single tag', async () => {

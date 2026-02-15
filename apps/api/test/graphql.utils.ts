@@ -34,17 +34,13 @@ export class GraphQLTestClient {
       .send({ username, password })
 
     if (res.status !== 200) {
-      throw new Error(
-        `Sign in failed with status ${res.status}: ${JSON.stringify(res.body)}`,
-      )
+      throw new Error(`Sign in failed with status ${res.status}: ${JSON.stringify(res.body)}`)
     }
 
     // Extract and store cookies from the response
     const setCookieHeaders = res.headers['set-cookie']
     if (setCookieHeaders) {
-      this.cookies = Array.isArray(setCookieHeaders)
-        ? setCookieHeaders
-        : [setCookieHeaders]
+      this.cookies = Array.isArray(setCookieHeaders) ? setCookieHeaders : [setCookieHeaders]
     }
   }
 
@@ -59,9 +55,7 @@ export class GraphQLTestClient {
    * Set the language(s) for the request using the Accept-Language header.
    */
   setLanguage(lang: string | string[]): void {
-    this.headers!['Accept-Language'] = Array.isArray(lang)
-      ? lang.join(',')
-      : lang
+    this.headers!['Accept-Language'] = Array.isArray(lang) ? lang.join(',') : lang
   }
 
   /**
@@ -78,10 +72,7 @@ export class GraphQLTestClient {
 
     // Apply stored cookies if any
     if (this.cookies.length > 0) {
-      req = req.set(
-        'Cookie',
-        this.cookies.map((c) => c.split(';')[0]).join('; '),
-      )
+      req = req.set('Cookie', this.cookies.map((c) => c.split(';')[0]).join('; '))
     }
 
     // Apply custom headers

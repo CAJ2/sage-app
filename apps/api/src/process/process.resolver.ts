@@ -7,6 +7,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+
 import {
   CreateProcessInput,
   CreateProcessOutput,
@@ -30,17 +31,9 @@ export class ProcessResolver {
 
   @Query(() => ProcessPage, { name: 'processes' })
   async processes(@Args() args: ProcessArgs): Promise<ProcessPage> {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ProcessArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessArgs, args)
     const cursor = await this.processService.find(filter)
-    return this.transform.entityToPaginated(
-      Process,
-      ProcessPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Process, ProcessPage, cursor, parsedArgs)
   }
 
   @Query(() => Process, { name: 'process', nullable: true })
@@ -105,9 +98,7 @@ export class ProcessResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteProcess', nullable: true })
   @UseGuards(AuthGuard)
-  async deleteProcess(
-    @Args('input') input: DeleteInput,
-  ): Promise<DeleteOutput> {
+  async deleteProcess(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const process = await this.processService.delete(input)
     return { success: true, id: process.id }
   }

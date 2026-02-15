@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
@@ -10,7 +11,6 @@ import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
-import type { Edit } from '@src/changes/change.model'
 
 export const PlaceIDSchema = z.string().meta({
   id: 'Place',
@@ -155,11 +155,7 @@ export class PlaceSchemaService {
   async placeUpdateEdit(edit: Edit) {
     const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
     if (data) {
-      data.tags = this.baseSchema.collectionToInput(
-        data.place_tags || [],
-        'place',
-        'tag',
-      )
+      data.tags = this.baseSchema.collectionToInput(data.place_tags || [], 'place', 'tag')
     }
     this.UpdateValidator(data)
     return data

@@ -8,6 +8,7 @@ import { Category } from '@src/product/category.model'
 import { Item } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
+
 import { SearchType } from './search.model'
 
 @Injectable()

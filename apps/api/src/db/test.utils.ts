@@ -1,13 +1,6 @@
-import {
-  CommitOrderCalculator,
-  EntityMetadata,
-  MikroORM,
-} from '@mikro-orm/postgresql'
+import { CommitOrderCalculator, EntityMetadata, MikroORM } from '@mikro-orm/postgresql'
 
-export function getOrderedMetadata(
-  orm: MikroORM,
-  schema?: string,
-): EntityMetadata[] {
+export function getOrderedMetadata(orm: MikroORM, schema?: string): EntityMetadata[] {
   const metadata = Object.values(orm.getMetadata().getAll()).filter((meta) => {
     const isRootEntity = meta.root.className === meta.className
     return isRootEntity && !meta.embeddable && !meta.virtual
@@ -43,11 +36,7 @@ export async function clearDatabase(
       continue
     }
     await orm.em
-      .createQueryBuilder(
-        meta.className,
-        orm.em?.getTransactionContext(),
-        'write',
-      )
+      .createQueryBuilder(meta.className, orm.em?.getTransactionContext(), 'write')
       .withSchema(schema)
       .delete({})
       .execute()

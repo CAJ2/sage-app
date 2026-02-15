@@ -4,9 +4,7 @@ import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { core, z } from 'zod/v4'
 
-export const zToSchema = (
-  schema: core.$ZodType,
-): core.JSONSchema.BaseSchema => {
+export const zToSchema = (schema: core.$ZodType): core.JSONSchema.BaseSchema => {
   return z.toJSONSchema(schema, {
     io: 'input',
     override: (ctx) => {
@@ -53,11 +51,7 @@ export class BaseSchemaService {
     })
   }
 
-  collectionToInput(
-    collection: Record<string, string>[],
-    refField: string,
-    foreignField: string,
-  ) {
+  collectionToInput(collection: Record<string, string>[], refField: string, foreignField: string) {
     return collection.map((item) => {
       const obj = {
         id: item[foreignField],

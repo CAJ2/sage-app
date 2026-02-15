@@ -4,12 +4,9 @@ import { Source, SourceType } from '@src/changes/source.entity'
 import { Component } from '@src/process/component.entity'
 import { Material } from '@src/process/material.entity'
 import { Item } from '@src/product/item.entity'
-import {
-  Variant,
-  VariantsComponents,
-  VariantsSources,
-} from '@src/product/variant.entity'
+import { Variant, VariantsComponents, VariantsSources } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
+
 import { MATERIAL_IDS } from './TestMaterialSeeder'
 
 export const USER_ID = '4s12cfhkIlVUXlJufjOmL'

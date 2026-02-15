@@ -11,6 +11,7 @@ import {
 } from '@nestjs/graphql'
 import { IsOptional } from 'class-validator'
 import { z } from 'zod/v4'
+
 import { BaseModel } from './base.model'
 
 export const DEFAULT_PAGE_SIZE = 20
@@ -34,16 +35,15 @@ export interface IPaginatedType<T> {
   pageInfo: IPageInfoType
 }
 
-export class EdgeType<T extends BaseModel<S>, S extends BaseEntity>
-  implements IEdgeType<T>
-{
+export class EdgeType<T extends BaseModel<S>, S extends BaseEntity> implements IEdgeType<T> {
   cursor: string = ''
   node!: T
 }
 
-export class PaginatedType<T extends BaseModel<S>, S extends BaseEntity>
-  implements IPaginatedType<T>
-{
+export class PaginatedType<
+  T extends BaseModel<S>,
+  S extends BaseEntity,
+> implements IPaginatedType<T> {
   edges?: IEdgeType<T>[]
   nodes?: T[]
   totalCount: number = 0

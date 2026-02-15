@@ -1,13 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import {
-  Args,
-  ID,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
@@ -15,6 +7,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+
 import {
   Component,
   ComponentRecycleArgs,
@@ -40,17 +33,9 @@ export class ComponentResolver {
 
   @Query(() => ComponentsPage, { name: 'components' })
   async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ComponentsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentsArgs, args)
     const cursor = await this.componentService.find(filter)
-    return this.transform.entityToPaginated(
-      Component,
-      ComponentsPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Component, ComponentsPage, cursor, parsedArgs)
   }
 
   @Query(() => Component, { name: 'component', nullable: true })
@@ -82,10 +67,7 @@ export class ComponentResolver {
 
   @ResolveField()
   async primaryMaterial(@Parent() component: Component) {
-    const material = await this.componentService.primaryMaterial(
-      component.id,
-      component.entity,
-    )
+    const material = await this.componentService.primaryMaterial(component.id, component.entity)
     if (!material) {
       return null
     }
@@ -105,14 +87,8 @@ export class ComponentResolver {
   }
 
   @ResolveField()
-  async recycle(
-    @Parent() component: Component,
-    @Args() args: ComponentRecycleArgs,
-  ) {
-    const recycle = await this.componentService.recycle(
-      component.id,
-      args.regionID,
-    )
+  async recycle(@Parent() component: Component, @Args() args: ComponentRecycleArgs) {
+    const recycle = await this.componentService.recycle(component.id, args.regionID)
     if (!recycle) {
       return null
     }
@@ -120,14 +96,8 @@ export class ComponentResolver {
   }
 
   @ResolveField()
-  async recycleScore(
-    @Parent() component: Component,
-    @Args() args: ComponentRecycleArgs,
-  ) {
-    const score = await this.componentService.recycleScore(
-      component.id,
-      args.regionID,
-    )
+  async recycleScore(@Parent() component: Component, @Args() args: ComponentRecycleArgs) {
+    const score = await this.componentService.recycleScore(component.id, args.regionID)
     if (!score) {
       return null
     }
@@ -145,10 +115,7 @@ export class ComponentResolver {
   ): Promise<CreateComponentOutput> {
     input = await this.z.parse(CreateComponentInput.schema, input)
     const created = await this.componentService.create(input, user.id)
-    const model = await this.transform.entityToModel(
-      Component,
-      created.component,
-    )
+    const model = await this.transform.entityToModel(Component, created.component)
     if (created.change) {
       const change = await this.transform.entityToModel(Change, created.change)
       return { component: model, change }
@@ -166,10 +133,7 @@ export class ComponentResolver {
     @AuthUser() user: ReqUser,
   ): Promise<UpdateComponentOutput> {
     const updated = await this.componentService.update(input, user.id)
-    const model = await this.transform.entityToModel(
-      Component,
-      updated.component,
-    )
+    const model = await this.transform.entityToModel(Component, updated.component)
     if (updated.change) {
       const change = await this.transform.entityToModel(Change, updated.change)
       return { component: model, change }
@@ -179,9 +143,7 @@ export class ComponentResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteComponent', nullable: true })
   @UseGuards(AuthGuard)
-  async deleteComponent(
-    @Args('input') input: DeleteInput,
-  ): Promise<DeleteOutput> {
+  async deleteComponent(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const component = await this.componentService.delete(input)
     return { success: true, id: component.id }
   }

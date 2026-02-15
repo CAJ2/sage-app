@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { ClsService } from 'nestjs-cls'
 import type { Session, User } from 'better-auth'
+import { ClsService } from 'nestjs-cls'
 
 @Injectable()
 export class AuthUserService {

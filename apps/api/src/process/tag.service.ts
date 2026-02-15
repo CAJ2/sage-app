@@ -4,6 +4,7 @@ import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { AjvTemplateSchema, JSONObject } from '@src/common/z.schema'
 import { type JSONSchemaType } from 'ajv/dist/2020'
+
 import { Tag, TagMetaTemplateSchema } from './tag.entity'
 import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'
 
@@ -56,9 +57,7 @@ export class TagService {
     }
     if (input.meta) {
       if (tag.metaTemplate && tag.metaTemplate.schema) {
-        const validator = AjvTemplateSchema.compile(
-          tag.metaTemplate.schema as JSONSchemaType<any>,
-        )
+        const validator = AjvTemplateSchema.compile(tag.metaTemplate.schema as JSONSchemaType<any>)
         const valid = validator(input.meta)
         if (!valid) {
           throw new Error(
@@ -73,10 +72,7 @@ export class TagService {
     return tag
   }
 
-  async setFields(
-    tag: Tag,
-    input: Partial<CreateTagDefinitionInput | UpdateTagDefinitionInput>,
-  ) {
+  async setFields(tag: Tag, input: Partial<CreateTagDefinitionInput | UpdateTagDefinitionInput>) {
     if (input.name) {
       tag.name = this.i18n.addTrReq(tag.name, input.name)
     }

@@ -1,8 +1,8 @@
+import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 import { Material, MATERIAL_ROOT } from '@src/process/material.entity'
 import { Category, CATEGORY_ROOT } from '@src/product/category.entity'
 import { Org } from '@src/users/org.entity'
-import type { EntityManager } from '@mikro-orm/core'
 
 export class BaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {

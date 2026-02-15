@@ -9,6 +9,7 @@ import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { Validate } from 'class-validator'
+
 import { Org as OrgEntity } from './org.entity'
 import { User, UserPage } from './users.model'
 

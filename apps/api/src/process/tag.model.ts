@@ -1,10 +1,4 @@
-import {
-  ArgsType,
-  Field,
-  InputType,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql'
+import { ArgsType, Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 import { translate } from '@src/common/i18n'
 import { HTTPS_OR_ICON, type JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
@@ -13,6 +7,7 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
+
 import { Tag as TagEntity, TagType } from './tag.entity'
 
 registerEnumType(TagType, {
@@ -23,10 +18,7 @@ registerEnumType(TagType, {
 @ObjectType({
   implements: () => [Named],
 })
-export class TagDefinition
-  extends IDCreatedUpdated<TagEntity>
-  implements Named
-{
+export class TagDefinition extends IDCreatedUpdated<TagEntity> implements Named {
   @Field(() => String)
   @Transform(translate)
   name!: string
@@ -80,9 +72,7 @@ export class CreateTagDefinitionInput {
     type: z.enum(TagType),
     desc: z.string().max(100_000).optional(),
     metaTemplate: z.json().optional(),
-    bgColor: z
-      .templateLiteral(['#', z.string().regex(/[0-9A-Fa-f]{6}/)])
-      .optional(),
+    bgColor: z.templateLiteral(['#', z.string().regex(/[0-9A-Fa-f]{6}/)]).optional(),
     image: z.url(HTTPS_OR_ICON).optional(),
   })
 

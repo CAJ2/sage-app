@@ -28,12 +28,7 @@ describe('VariantResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(
-      BaseSeeder,
-      UserSeeder,
-      TestMaterialSeeder,
-      TestVariantSeeder,
-    )
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
 
     await gql.signIn('admin', 'password')
 

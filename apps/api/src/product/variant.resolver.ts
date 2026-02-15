@@ -1,13 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import {
-  Args,
-  ID,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
@@ -15,6 +7,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
+
 import { Item, ItemsPage } from './item.model'
 import {
   CreateVariantInput,
@@ -47,17 +40,9 @@ export class VariantResolver {
 
   @Query(() => VariantsPage, { name: 'variants' })
   async variants(@Args() args: VariantsArgs): Promise<VariantsPage> {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      VariantsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantsArgs, args)
     const cursor = await this.variantService.find(filter)
-    return this.transform.entityToPaginated(
-      Variant,
-      VariantsPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Variant, VariantsPage, cursor, parsedArgs)
   }
 
   @Query(() => Variant, { name: 'variant', nullable: true })
@@ -86,48 +71,28 @@ export class VariantResolver {
 
   @ResolveField()
   async items(@Parent() variant: Variant, @Args() args: VariantItemsArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      VariantItemsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantItemsArgs, args)
     const cursor = await this.variantService.items(variant.id, filter)
     return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
   }
 
   @ResolveField()
   async orgs(@Parent() variant: Variant, @Args() args: VariantOrgsArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      VariantOrgsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantOrgsArgs, args)
     const cursor = await this.variantService.orgs(variant.id, filter)
-    return this.transform.entityToPaginated(
-      VariantOrg,
-      VariantOrgsPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(VariantOrg, VariantOrgsPage, cursor, parsedArgs)
   }
 
   @ResolveField()
   async tags(@Parent() variant: Variant, @Args() args: VariantTagsArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      VariantTagsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantTagsArgs, args)
     const cursor = await this.variantService.tags(variant.id, filter)
     return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }
 
   @ResolveField()
-  async components(
-    @Parent() variant: Variant,
-    @Args() args: VariantComponentsArgs,
-  ) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      VariantComponentsArgs,
-      args,
-    )
+  async components(@Parent() variant: Variant, @Args() args: VariantComponentsArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantComponentsArgs, args)
     const cursor = await this.variantService.components(variant.id, filter)
     return this.transform.entityToPaginated(
       VariantComponent,
@@ -138,14 +103,8 @@ export class VariantResolver {
   }
 
   @ResolveField()
-  async recycleScore(
-    @Parent() variant: Variant,
-    @Args() args: VariantRecycleArgs,
-  ) {
-    const score = await this.variantService.recycleScore(
-      variant.id,
-      args.regionID,
-    )
+  async recycleScore(@Parent() variant: Variant, @Args() args: VariantRecycleArgs) {
+    const score = await this.variantService.recycleScore(variant.id, args.regionID)
     if (!score) {
       return null
     }
@@ -190,9 +149,7 @@ export class VariantResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteVariant', nullable: true })
   @UseGuards(AuthGuard)
-  async deleteVariant(
-    @Args('input') input: DeleteInput,
-  ): Promise<DeleteOutput> {
+  async deleteVariant(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const variant = await this.variantService.delete(input)
     if (!variant) {
       throw NotFoundErr(`Variant with ID "${input.id}" not found`)

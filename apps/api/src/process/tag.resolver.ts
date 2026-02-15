@@ -4,6 +4,7 @@ import { AuthGuard } from '@src/auth/auth.guard'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
+
 import {
   CreateTagDefinitionInput,
   CreateTagDefinitionOutput,
@@ -25,10 +26,7 @@ export class TagResolver {
 
   @Query(() => TagPage, { name: 'tags' })
   async tags(@Args() args: TagArgs): Promise<TagPage> {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      TagArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(TagArgs, args)
     const cursor = await this.tagService.find(filter)
     return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }

@@ -30,8 +30,7 @@ export enum SearchType {
 
 export const SearchResultItem = createUnionType({
   name: 'SearchResultItem',
-  types: () =>
-    [Category, Item, Variant, Component, Org, Place, Region, Material] as const,
+  types: () => [Category, Item, Variant, Component, Org, Place, Region, Material] as const,
   resolveType: (value) => {
     return value._type
   },
@@ -47,9 +46,7 @@ class SearchResultItemEdge {
 }
 
 @ObjectType()
-export class SearchResultPage
-  implements IPaginatedType<typeof SearchResultItem>
-{
+export class SearchResultPage implements IPaginatedType<typeof SearchResultItem> {
   @Field(() => [SearchResultItemEdge], { nullable: true })
   edges?: SearchResultItemEdge[]
 

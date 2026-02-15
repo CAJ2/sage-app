@@ -15,6 +15,7 @@ import {
 import { clearDatabase } from '@src/db/test.utils'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { ProcessModule } from '@src/process/process.module'
+
 import { VariantService } from './variant.service'
 
 describe('VariantService', () => {
@@ -39,9 +40,7 @@ describe('VariantService', () => {
 
     await clearDatabase(orm, 'auth')
     await clearDatabase(orm, 'public')
-    await orm
-      .getSeeder()
-      .seed(BaseSeeder, TestMaterialSeeder, TestVariantSeeder)
+    await orm.getSeeder().seed(BaseSeeder, TestMaterialSeeder, TestVariantSeeder)
   }, 60000)
 
   afterAll(async () => {

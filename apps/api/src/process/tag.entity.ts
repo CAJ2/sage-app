@@ -1,11 +1,4 @@
-import {
-  Collection,
-  Entity,
-  Enum,
-  ManyToMany,
-  Property,
-  Unique,
-} from '@mikro-orm/core'
+import { Collection, Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/core'
 import { type TranslatedField } from '@src/common/i18n'
 import { AjvTemplateSchema, JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
@@ -14,6 +7,7 @@ import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
 import { JSONSchemaType } from 'ajv/dist/2020'
 import { z } from 'zod/v4'
+
 import { Component } from './component.entity'
 
 export enum TagType {

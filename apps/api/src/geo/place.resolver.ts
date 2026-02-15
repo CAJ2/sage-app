@@ -1,15 +1,9 @@
-import {
-  Args,
-  ID,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { Tag } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
+
 import { Place, PlacesArgs, PlacesPage } from './place.model'
 import { PlaceService } from './place.service'
 
@@ -22,17 +16,9 @@ export class PlaceResolver {
 
   @Query(() => PlacesPage, { name: 'places' })
   async places(@Args() args: PlacesArgs): Promise<PlacesPage> {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      PlacesArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(PlacesArgs, args)
     const cursor = await this.placeService.find(filter)
-    return this.transform.entityToPaginated(
-      Place,
-      PlacesPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Place, PlacesPage, cursor, parsedArgs)
   }
 
   @Query(() => Place, { name: 'place', nullable: true })

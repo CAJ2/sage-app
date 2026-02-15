@@ -17,21 +17,12 @@ import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
 import { Transform, Type } from 'class-transformer'
-import {
-  IsOptional,
-  IsPositive,
-  IsUrl,
-  MaxLength,
-  Validate,
-} from 'class-validator'
+import { IsOptional, IsPositive, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
+
 import { ItemsPage } from './item.model'
-import {
-  Variant as VariantEntity,
-  VariantsComponents,
-  VariantsOrgs,
-} from './variant.entity'
+import { Variant as VariantEntity, VariantsComponents, VariantsOrgs } from './variant.entity'
 
 @ObjectType({
   implements: () => [Named],

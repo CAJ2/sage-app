@@ -102,7 +102,9 @@ describe('ProcessResolver (integration)', () => {
     )
     expect(res.data?.createProcess?.process).toBeTruthy()
     expect(res.data?.createProcess?.process?.name).toBe('Test Process')
-    processID = res.data?.createProcess?.process?.id!
+    if (res.data?.createProcess?.process?.id) {
+      processID = res.data?.createProcess?.process?.id
+    }
   })
 
   test('should query a single process', async () => {

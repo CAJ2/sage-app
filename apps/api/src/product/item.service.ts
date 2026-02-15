@@ -10,6 +10,7 @@ import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
+
 import { Category } from './category.entity'
 import { Item, ItemsTags } from './item.entity'
 import { CreateItemInput, UpdateItemInput } from './item.model'
@@ -26,11 +27,7 @@ export class ItemService {
   ) {}
 
   async findOneByID(id: string) {
-    return await this.em.findOne(
-      Item,
-      { id },
-      { populate: ['categories', 'itemTags'] },
-    )
+    return await this.em.findOne(Item, { id }, { populate: ['categories', 'itemTags'] })
   }
 
   async find(opts: CursorOptions<Item>) {
@@ -116,11 +113,7 @@ export class ItemService {
       await this.em.persistAndFlush(item)
       return { item }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(item, input, change)
     await this.editService.createEntityEdit(change, item)
     await this.em.persistAndFlush(change)
@@ -129,10 +122,14 @@ export class ItemService {
   }
 
   async update(input: UpdateItemInput, userID: string) {
-    const { entity: item, change } =
-      await this.editService.findOneWithChangeInput(input, userID, Item, {
+    const { entity: item, change } = await this.editService.findOneWithChangeInput(
+      input,
+      userID,
+      Item,
+      {
         id: input.id,
-      })
+      },
+    )
     if (!item) {
       throw new Error('Item not found')
     }
@@ -157,11 +154,7 @@ export class ItemService {
     return deleted
   }
 
-  async setFields(
-    item: Item,
-    input: Partial<CreateItemInput & UpdateItemInput>,
-    change?: Change,
-  ) {
+  async setFields(item: Item, input: Partial<CreateItemInput & UpdateItemInput>, change?: Change) {
     if (input.name) {
       item.name = this.i18n.addTrReq(item.name, input.name, input.lang)
     }
@@ -216,11 +209,7 @@ export class ItemService {
       }
     }
     if (input.removeTags) {
-      item.tags = await this.editService.removeFromCollection(
-        item.tags,
-        Tag,
-        input.removeTags,
-      )
+      item.tags = await this.editService.removeFromCollection(item.tags, Tag, input.removeTags)
     }
   }
 }

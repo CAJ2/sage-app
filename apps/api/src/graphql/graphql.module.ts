@@ -1,5 +1,6 @@
 import { IncomingMessage } from 'http'
 import { join } from 'path'
+
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { DynamicModule, Module } from '@nestjs/common'
@@ -7,10 +8,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { Int, GraphQLModule as NestGraphQLModule } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { DirectiveLocation, GraphQLBoolean, GraphQLDirective } from 'graphql'
+import type { GraphQLFormattedError } from 'graphql'
 import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
+
 import { CacheControlScopeEnum } from './cache-control'
 import { Context, IncomingMessageWithAuthCode } from './graphql.context'
-import type { GraphQLFormattedError } from 'graphql'
 
 @Module({})
 export class GraphQLModule {
@@ -51,9 +53,7 @@ export class GraphQLModule {
                 name: 'cacheControl',
               }),
             ],
-            scalarsMap: [
-              { type: () => JSONObjectDefinition, scalar: JSONObjectResolver },
-            ],
+            scalarsMap: [{ type: () => JSONObjectDefinition, scalar: JSONObjectResolver }],
           },
           sortSchema: true,
           playground: false,
@@ -72,8 +72,7 @@ export class GraphQLModule {
             JSONObject: JSONObjectResolver,
           },
           status400ForVariableCoercionErrors: true,
-          formatError: (err: GraphQLFormattedError) =>
-            this.formatError(err, context),
+          formatError: (err: GraphQLFormattedError) => this.formatError(err, context),
         }
       },
     })
@@ -86,12 +85,12 @@ export class GraphQLModule {
     }
   }
 
-  private static formatError(
-    error: GraphQLFormattedError,
-    ctx: Context,
-  ): GraphQLFormattedError {
+  private static formatError(error: GraphQLFormattedError, ctx: Context): GraphQLFormattedError {
     const msg = ctx.req as IncomingMessageWithAuthCode
-    console.error('GraphQL Error:', error)
+    if (!['PRODUCTION', 'TEST'].includes(process.env.NODE_ENV || '')) {
+      // oxlint-disable-next-line no-console
+      console.error('GraphQL Error:', error)
+    }
     if (msg.authCode) {
       if (msg.authCode === 401) {
         return {

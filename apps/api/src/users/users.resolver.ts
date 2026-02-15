@@ -1,13 +1,7 @@
-import {
-  Args,
-  ID,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+
 import { Org, OrgsPage } from './org.model'
 import { User, UsersOrgsArgs } from './users.model'
 import { UsersService } from './users.service'
@@ -31,10 +25,7 @@ export class UsersResolver {
 
   @ResolveField()
   async orgs(@Parent() user: User, @Args() args: UsersOrgsArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      UsersOrgsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(UsersOrgsArgs, args)
     const cursor = await this.usersService.orgs(user.id, filter)
     return this.transform.entityToPaginated(Org, OrgsPage, cursor, parsedArgs)
   }

@@ -5,11 +5,7 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
-import {
-  IDCreatedUpdated,
-  registerModel,
-  TranslatedInput,
-} from '@src/graphql/base.model'
+import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
@@ -18,6 +14,7 @@ import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
+
 import { CategoriesPage } from './category.model'
 import { Item as ItemEntity } from './item.entity'
 import { VariantsPage } from './variant.model'

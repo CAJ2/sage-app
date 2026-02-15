@@ -1,17 +1,10 @@
 import { UseGuards } from '@nestjs/common'
-import {
-  Args,
-  ID,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+
 import {
   CreateOrgInput,
   CreateOrgOutput,
@@ -42,10 +35,7 @@ export class OrgResolver {
 
   @ResolveField()
   async users(@Parent() org: Org, @Args() args: OrgUsersArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      OrgUsersArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(OrgUsersArgs, args)
     const cursor = await this.orgService.users(org.id, filter)
     return this.transform.entityToPaginated(User, UserPage, cursor, parsedArgs)
   }

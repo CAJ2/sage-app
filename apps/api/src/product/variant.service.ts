@@ -15,13 +15,9 @@ import { StreamService } from '@src/process/stream.service'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Org } from '@src/users/org.entity'
+
 import { Item } from './item.entity'
-import {
-  Variant,
-  VariantsComponents,
-  VariantsOrgs,
-  VariantsTags,
-} from './variant.entity'
+import { Variant, VariantsComponents, VariantsOrgs, VariantsTags } from './variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 @Injectable()
@@ -39,13 +35,7 @@ export class VariantService {
       Variant,
       { id },
       {
-        populate: [
-          'variantSources',
-          'variantItems',
-          'variantTags',
-          'variantComponents',
-          'orgs',
-        ],
+        populate: ['variantSources', 'variantItems', 'variantTags', 'variantComponents', 'orgs'],
       },
     )
   }
@@ -113,11 +103,7 @@ export class VariantService {
   async components(variantID: string, opts: CursorOptions<VariantsComponents>) {
     opts.where.variant = this.em.getReference(Variant, variantID)
     opts.options.populate = ['component']
-    const components = await this.em.find(
-      VariantsComponents,
-      opts.where,
-      opts.options,
-    )
+    const components = await this.em.find(VariantsComponents, opts.where, opts.options)
     const count = await this.em.count(VariantsComponents, {
       variant: opts.where.variant,
     })
@@ -145,22 +131,15 @@ export class VariantService {
     }
     let totalScore = 0
     for (const component of variant.components.getItems()) {
-      const score = await this.streamService.recycleComponentScore(
-        component.id,
-        regionID,
-      )
+      const score = await this.streamService.recycleComponentScore(component.id, regionID)
       if (score && score.score) {
         totalScore += score.score
       }
     }
     const variantScore = new StreamScore()
-    variantScore.score = Math.floor(
-      totalScore / variant.components.getItems().length,
-    )
+    variantScore.score = Math.floor(totalScore / variant.components.getItems().length)
     variantScore.rating = StreamScoreRating.VERY_GOOD
-    variantScore.ratingF = this.i18n.t(
-      `stream.scoreRating.${variantScore.rating}`,
-    )
+    variantScore.ratingF = this.i18n.t(`stream.scoreRating.${variantScore.rating}`)
     return variantScore
   }
 
@@ -171,11 +150,7 @@ export class VariantService {
       await this.em.persistAndFlush(variant)
       return { variant }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(variant, input, change)
     await this.editService.createEntityEdit(change, variant)
     await this.em.persistAndFlush(change)
@@ -184,10 +159,14 @@ export class VariantService {
   }
 
   async update(input: UpdateVariantInput, userID: string) {
-    const { entity: variant, change } =
-      await this.editService.findOneWithChangeInput(input, userID, Variant, {
+    const { entity: variant, change } = await this.editService.findOneWithChangeInput(
+      input,
+      userID,
+      Variant,
+      {
         id: input.id,
-      })
+      },
+    )
     if (!variant) {
       throw new Error('Variant not found')
     }
@@ -262,11 +241,7 @@ export class VariantService {
           }
           variant.items.add(ref(itemEntity))
         } else {
-          const itemEntity = await this.editService.findRefWithChange(
-            change,
-            Item,
-            { id: item.id },
-          )
+          const itemEntity = await this.editService.findRefWithChange(change, Item, { id: item.id })
           if (variant.items.contains(itemEntity)) {
             variant.items.remove(itemEntity)
           }
@@ -282,11 +257,7 @@ export class VariantService {
             variant.items.remove(ref(itemEntity))
           }
         } else {
-          const itemEntity = await this.editService.findRefWithChange(
-            change,
-            Item,
-            { id: item },
-          )
+          const itemEntity = await this.editService.findRefWithChange(change, Item, { id: item })
           if (variant.items.contains(itemEntity)) {
             variant.items.remove(itemEntity)
           }
@@ -300,11 +271,9 @@ export class VariantService {
         })
         variant.region = ref(region)
       } else {
-        const region = await this.editService.findRefWithChange(
-          change,
-          Region,
-          { id: input.region.id },
-        )
+        const region = await this.editService.findRefWithChange(change, Region, {
+          id: input.region.id,
+        })
         variant.region = region
       }
     }
@@ -386,11 +355,9 @@ export class VariantService {
           }
           variant.components.add(ref(comp))
         } else {
-          const comp = await this.editService.findRefWithChange(
-            change,
-            Component,
-            { id: component.id },
-          )
+          const comp = await this.editService.findRefWithChange(change, Component, {
+            id: component.id,
+          })
           variant.components.add(comp)
         }
       }
@@ -403,11 +370,9 @@ export class VariantService {
           })
           variant.components.remove(ref(comp))
         } else {
-          const comp = await this.editService.findRefWithChange(
-            change,
-            Component,
-            { id: component },
-          )
+          const comp = await this.editService.findRefWithChange(change, Component, {
+            id: component,
+          })
           variant.components.remove(comp)
         }
       }

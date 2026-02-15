@@ -1,26 +1,42 @@
-import { DataloaderType, defineConfig, EntityManager, GeneratedCacheAdapter } from '@mikro-orm/postgresql'
-import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
-import { Migrator } from '@mikro-orm/migrations'
 import { join } from 'path'
-import dotenv from 'dotenv-flow'
-import { CustomMigrationGenerator } from './db/migration.gen'
+
+import { Migrator } from '@mikro-orm/migrations'
+import { DataloaderType, defineConfig, GeneratedCacheAdapter } from '@mikro-orm/postgresql'
 import { SeedManager } from '@mikro-orm/seeder'
-import { Variant, VariantHistory, VariantsComponents, VariantsItems, VariantsOrgs, VariantsSources, VariantsTags } from './product/variant.entity'
-import { Region, RegionHistory } from './geo/region.entity'
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
+import dotenv from 'dotenv-flow'
+
 import { Account } from './auth/account.entity'
-import { Category, CategoryEdge, CategoryHistory, CategoryTree } from './product/category.entity'
-import { Change, ChangeEdits, ChangesSources } from './changes/change.entity'
-import { Component, ComponentHistory, ComponentsMaterials, ComponentsSources, ComponentsTags } from './process/component.entity'
-import { ExternalSource, Source } from './changes/source.entity'
-import { Invitation, Org, OrgHistory } from './users/org.entity'
-import { Item, ItemHistory, ItemsCategories, ItemsTags } from './product/item.entity'
-import { Material, MaterialEdge, MaterialHistory, MaterialTree } from './process/material.entity'
-import { Place, PlaceHistory, PlacesTag } from './geo/place.entity'
-import { Process, ProcessHistory, ProcessSources } from './process/process.entity'
 import { Session } from './auth/session.entity'
-import { Tag } from './process/tag.entity'
-import { User, UsersOrgs } from './users/users.entity'
 import { Verification } from './auth/verification.entity'
+import { Change, ChangeEdits, ChangesSources } from './changes/change.entity'
+import { ExternalSource, Source } from './changes/source.entity'
+import { CustomMigrationGenerator } from './db/migration.gen'
+import { Place, PlaceHistory, PlacesTag } from './geo/place.entity'
+import { Region, RegionHistory } from './geo/region.entity'
+import {
+  Component,
+  ComponentHistory,
+  ComponentsMaterials,
+  ComponentsSources,
+  ComponentsTags,
+} from './process/component.entity'
+import { Material, MaterialEdge, MaterialHistory, MaterialTree } from './process/material.entity'
+import { Process, ProcessHistory, ProcessSources } from './process/process.entity'
+import { Tag } from './process/tag.entity'
+import { Category, CategoryEdge, CategoryHistory, CategoryTree } from './product/category.entity'
+import { Item, ItemHistory, ItemsCategories, ItemsTags } from './product/item.entity'
+import {
+  Variant,
+  VariantHistory,
+  VariantsComponents,
+  VariantsItems,
+  VariantsOrgs,
+  VariantsSources,
+  VariantsTags,
+} from './product/variant.entity'
+import { Invitation, Org, OrgHistory } from './users/org.entity'
+import { User, UsersOrgs } from './users/users.entity'
 
 if (dotenv) {
   dotenv.config()

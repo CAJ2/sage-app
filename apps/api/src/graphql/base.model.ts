@@ -1,3 +1,4 @@
+import type { Loaded } from '@mikro-orm/core'
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { TranslatedInputSchema } from '@src/common/i18n'
@@ -6,13 +7,9 @@ import { Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
-import type { Loaded } from '@mikro-orm/core'
 
 export const ModelRegistry: Record<string, new () => BaseModel<any>> = {}
-export function registerModel<T extends BaseModel<any>>(
-  name: string,
-  model: new () => T,
-): void {
+export function registerModel<T extends BaseModel<any>>(name: string, model: new () => T): void {
   if (ModelRegistry[name]) {
     throw new Error(`Model ${name} is already registered.`)
   }

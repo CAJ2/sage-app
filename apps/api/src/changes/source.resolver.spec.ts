@@ -29,12 +29,7 @@ describe('SourceResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(
-      BaseSeeder,
-      UserSeeder,
-      TestMaterialSeeder,
-      TestVariantSeeder,
-    )
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
 
     await gql.signIn('admin', 'password')
 
@@ -186,7 +181,10 @@ describe('SourceResolver (integration)', () => {
         },
       },
     )
-    const idToDelete = createRes.data?.createSource?.source?.id!
+    const idToDelete = createRes.data?.createSource?.source?.id
+    if (!idToDelete) {
+      throw new Error('Failed to create source for deletion test')
+    }
 
     const res = await gql.send(
       graphql(`

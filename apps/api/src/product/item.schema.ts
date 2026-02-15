@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { EditService } from '@src/changes/edit.service'
 import {
@@ -15,8 +16,8 @@ import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
+
 import { CategoryIDSchema } from './category.schema'
-import type { Edit } from '@src/changes/change.model'
 
 export const ItemIDSchema = z.string().meta({
   id: 'Item',
@@ -147,11 +148,7 @@ export class ItemSchemaService {
   async itemUpdateEdit(edit: Edit) {
     const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
     if (data) {
-      data.tags = this.baseSchema.collectionToInput(
-        data.item_tags || [],
-        'item',
-        'tag',
-      )
+      data.tags = this.baseSchema.collectionToInput(data.item_tags || [], 'item', 'tag')
     }
     this.UpdateValidator(data)
     return data

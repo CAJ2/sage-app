@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common'
+import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import {
-  BaseSchemaService,
-  ImageOrIconSchema,
-  zToSchema,
-} from '@src/common/base.schema'
+import { BaseSchemaService, ImageOrIconSchema, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
@@ -16,9 +13,9 @@ import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
 import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
+
 import { ItemIDSchema } from './item.schema'
 import { VariantComponentUnitSchema } from './variant.entity'
-import type { Edit } from '@src/changes/change.model'
 
 export const VariantIDSchema = z.string().meta({
   id: 'Variant',
@@ -217,21 +214,9 @@ export class VariantSchemaService {
   async variantUpdateEdit(edit: Edit) {
     const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
     if (data) {
-      data.items = this.baseSchema.collectionToInput(
-        data.addItems || [],
-        'variant',
-        'item',
-      )
-      data.orgs = this.baseSchema.collectionToInput(
-        data.variant_orgs || [],
-        'variant',
-        'org',
-      )
-      data.tags = this.baseSchema.collectionToInput(
-        data.variant_tags || [],
-        'variant',
-        'tag',
-      )
+      data.items = this.baseSchema.collectionToInput(data.addItems || [], 'variant', 'item')
+      data.orgs = this.baseSchema.collectionToInput(data.variant_orgs || [], 'variant', 'org')
+      data.tags = this.baseSchema.collectionToInput(data.variant_tags || [], 'variant', 'tag')
       data.components = this.baseSchema.collectionToInput(
         data.variant_components || [],
         'variant',

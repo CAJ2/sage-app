@@ -1,4 +1,5 @@
 import path from 'path'
+
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
@@ -19,12 +20,8 @@ import dotenv from 'dotenv-flow'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
 import { ClsModule, ClsService } from 'nestjs-cls'
-import {
-  AcceptLanguageResolver,
-  HeaderResolver,
-  I18nModule,
-  QueryResolver,
-} from 'nestjs-i18n'
+import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n'
+
 import { MIKRO_CONFIG } from './mikro-orm.config'
 
 if (dotenv) {

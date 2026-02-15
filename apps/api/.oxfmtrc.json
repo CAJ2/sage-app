@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "singleQuote": true,
+  "experimentalSortImports": {
+    "type": "alphabetical",
+    "order": "asc",
+    "ignoreCase": true,
+    "fallbackSort": {
+      "type": "subgroup-order",
+      "order": "asc"
+    },
+    "groups": [
+      "builtin",
+      ["external", "subpath"],
+      "src",
+      "internal",
+      ["parent", "sibling", "index"],
+      "style",
+      "side-effect",
+      "side-effect-style",
+      "unknown"
+    ],
+    "newlinesBetween": true,
+    "internalPattern": ["^@src"],
+    "customGroups": [
+      {
+        "elementNamePattern": ["src"],
+        "groupName": "src"
+      }
+    ]
+  },
+  "experimentalTailwindcss": {
+    "stylesheet": "./assets/css/main.css",
+    "functions": ["clsx", "cn"]
+  },
+  "ignorePatterns": ["**/.snapshot-sage.json", "schema/schema.gql", "test/gql/**/*"]
+}

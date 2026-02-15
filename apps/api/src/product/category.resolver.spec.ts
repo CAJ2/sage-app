@@ -2,15 +2,13 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
-import {
-  CATEGORY_IDS,
-  TestCategorySeeder,
-} from '@src/db/seeds/TestCategorySeeder'
+import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+
 import { CATEGORY_ROOT } from './category.entity'
 
 describe('CategoryResolver (integration)', () => {

@@ -98,9 +98,7 @@ export class Migration20250320130239 extends Migration {
                    "org_id" varchar(255) null,
                    constraint "places_pkey" primary key ("id")
                  );`)
-    this.addSql(
-      `create index "places_location_index" on "places" using gist ("location");`,
-    )
+    this.addSql(`create index "places_location_index" on "places" using gist ("location");`)
 
     this.addSql(`create table "place_tags" (
                    "place_id" varchar(255) not null,
@@ -119,9 +117,7 @@ export class Migration20250320130239 extends Migration {
                    "geo" geography (multipolygon) null,
                    constraint "regions_pkey" primary key ("id")
                  );`)
-    this.addSql(
-      `create index "regions_geo_index" on "regions" using gist ("geo");`,
-    )
+    this.addSql(`create index "regions_geo_index" on "regions" using gist ("geo");`)
 
     this.addSql(`create table "processes" (
                    "id" varchar(255) not null,
@@ -201,12 +197,8 @@ export class Migration20250320130239 extends Migration {
                    "user_id" varchar(255) not null,
                    constraint "sessions_pkey" primary key ("id")
                  );`)
-    this.addSql(
-      `create index "sessions_token_index" on "auth"."sessions" ("token");`,
-    )
-    this.addSql(
-      `create index "sessions_user_id_index" on "auth"."sessions" ("user_id");`,
-    )
+    this.addSql(`create index "sessions_token_index" on "auth"."sessions" ("token");`)
+    this.addSql(`create index "sessions_user_id_index" on "auth"."sessions" ("user_id");`)
 
     this.addSql(`create table "region_history" (
                    "region_id" varchar(255) not null,
@@ -274,12 +266,8 @@ export class Migration20250320130239 extends Migration {
                    "expires_at" timestamptz not null,
                    constraint "invitations_pkey" primary key ("id")
                  );`)
-    this.addSql(
-      `create index "invitations_inviter_id_index" on "invitations" ("inviter_id");`,
-    )
-    this.addSql(
-      `create index "invitations_org_id_index" on "invitations" ("org_id");`,
-    )
+    this.addSql(`create index "invitations_inviter_id_index" on "invitations" ("inviter_id");`)
+    this.addSql(`create index "invitations_org_id_index" on "invitations" ("org_id");`)
 
     this.addSql(`create table "component_history" (
                    "component_id" varchar(255) not null,
@@ -315,9 +303,7 @@ export class Migration20250320130239 extends Migration {
                    "user_id" varchar(255) not null,
                    constraint "accounts_pkey" primary key ("id")
                  );`)
-    this.addSql(
-      `create index "accounts_user_id_index" on "auth"."accounts" ("user_id");`,
-    )
+    this.addSql(`create index "accounts_user_id_index" on "auth"."accounts" ("user_id");`)
 
     this.addSql(`create table "users_orgs" (
                    "id" varchar(255) not null,
@@ -328,12 +314,8 @@ export class Migration20250320130239 extends Migration {
                    "role" varchar(255) not null default 'member',
                    constraint "users_orgs_pkey" primary key ("id")
                  );`)
-    this.addSql(
-      `create index "users_orgs_user_id_index" on "users_orgs" ("user_id");`,
-    )
-    this.addSql(
-      `create index "users_orgs_org_id_index" on "users_orgs" ("org_id");`,
-    )
+    this.addSql(`create index "users_orgs_user_id_index" on "users_orgs" ("user_id");`)
+    this.addSql(`create index "users_orgs_org_id_index" on "users_orgs" ("org_id");`)
 
     this.addSql(`create table "variants" (
                    "id" varchar(255) not null,

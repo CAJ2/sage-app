@@ -10,6 +10,7 @@ import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
+
 import { Material } from './material.entity'
 import { Process } from './process.entity'
 import { CreateProcessInput, UpdateProcessInput } from './process.model'
@@ -47,14 +48,7 @@ export class ProcessService {
       Process,
       { id },
       {
-        populate: [
-          'material',
-          'variant',
-          'org',
-          'processSources',
-          'region',
-          'place',
-        ],
+        populate: ['material', 'variant', 'org', 'processSources', 'region', 'place'],
       },
     )
   }
@@ -69,11 +63,7 @@ export class ProcessService {
         change: null,
       }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(process, input, change)
     await this.editService.createEntityEdit(change, process)
     await this.em.persistAndFlush(change)
@@ -85,10 +75,14 @@ export class ProcessService {
   }
 
   async update(input: UpdateProcessInput, userID: string) {
-    const { entity: process, change } =
-      await this.editService.findOneWithChangeInput(input, userID, Process, {
+    const { entity: process, change } = await this.editService.findOneWithChangeInput(
+      input,
+      userID,
+      Process,
+      {
         id: input.id,
-      })
+      },
+    )
     if (!process) {
       throw new Error(`Process with ID "${input.id}" not found`)
     }

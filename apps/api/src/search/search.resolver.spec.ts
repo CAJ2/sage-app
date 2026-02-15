@@ -13,6 +13,7 @@ import { SearchType } from '@test/gql/graphql'
 import { GraphQLTestClient } from '@test/graphql.utils'
 import { nanoid } from 'nanoid'
 import { type Mock } from 'vitest'
+
 import { SearchService } from './search.service'
 
 describe('SearchResolver (integration)', () => {
@@ -46,12 +47,7 @@ describe('SearchResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(
-      BaseSeeder,
-      UserSeeder,
-      TestMaterialSeeder,
-      TestVariantSeeder,
-    )
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
 
     await gql.signIn('admin', 'password')
   })
@@ -100,7 +96,7 @@ describe('SearchResolver (integration)', () => {
     expect(res.data?.search).toBeTruthy()
     expect(res.data?.search.totalCount).toBe(1)
     expect(res.data?.search.nodes?.[0]?.__typename).toBe('Variant')
-    expect((res.data?.search.nodes?.[0] as any).name).toBe('Test Variant')
+    expect((res.data?.search.nodes?.[0] as any)?.name).toBe('Test Variant')
   })
 
   test('should search with specific types', async () => {

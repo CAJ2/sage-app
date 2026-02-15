@@ -6,12 +6,8 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import {
-  Category,
-  CATEGORY_ROOT,
-  CategoryEdge,
-  CategoryTree,
-} from './category.entity'
+
+import { Category, CATEGORY_ROOT, CategoryEdge, CategoryTree } from './category.entity'
 import { CreateCategoryInput, UpdateCategoryInput } from './category.model'
 import { Item } from './item.entity'
 
@@ -33,11 +29,7 @@ export class CategoryService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(
-      Category,
-      { id },
-      { populate: ['parents', 'children'] },
-    )
+    return await this.em.findOne(Category, { id }, { populate: ['parents', 'children'] })
   }
 
   async findRoot() {
@@ -92,10 +84,7 @@ export class CategoryService {
     }
   }
 
-  async findDirectDescendants(
-    categoryID: string,
-    opts: CursorOptions<Category>,
-  ) {
+  async findDirectDescendants(categoryID: string, opts: CursorOptions<Category>) {
     const descendants = await this.em
       .createQueryBuilder(CategoryTree, 't')
       .joinAndSelect('descendant', 'descendant')
@@ -133,11 +122,7 @@ export class CategoryService {
 
   async create(input: CreateCategoryInput, userID: string) {
     const category = new Category()
-    const change = await this.editService.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(category, input, change)
     await this.editService.createEntityEdit(change, category)
     await this.em.persistAndFlush(change)
@@ -149,10 +134,14 @@ export class CategoryService {
   }
 
   async update(input: UpdateCategoryInput, userID: string) {
-    const { entity: category, change } =
-      await this.editService.findOneWithChangeInput(input, userID, Category, {
+    const { entity: category, change } = await this.editService.findOneWithChangeInput(
+      input,
+      userID,
+      Category,
+      {
         id: input.id,
-      })
+      },
+    )
     if (!category) {
       throw new Error(`Category with ID "${input.id}" not found`)
     }
@@ -192,25 +181,13 @@ export class CategoryService {
       category.name = this.i18n.addTrReq(category.name, input.name, input.lang)
     }
     if (input.nameTr) {
-      category.name = this.i18n.addTrReq(
-        category.name,
-        input.nameTr,
-        input.lang,
-      )
+      category.name = this.i18n.addTrReq(category.name, input.nameTr, input.lang)
     }
     if (input.descShort) {
-      category.descShort = this.i18n.addTr(
-        category.descShort,
-        input.descShort,
-        input.lang,
-      )
+      category.descShort = this.i18n.addTr(category.descShort, input.descShort, input.lang)
     }
     if (input.descShortTr) {
-      category.descShort = this.i18n.addTr(
-        category.descShort,
-        input.descShortTr,
-        input.lang,
-      )
+      category.descShort = this.i18n.addTr(category.descShort, input.descShortTr, input.lang)
     }
     if (input.desc) {
       category.desc = this.i18n.addTr(category.desc, input.desc, input.lang)

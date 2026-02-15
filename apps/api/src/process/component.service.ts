@@ -6,11 +6,8 @@ import { EditService } from '@src/changes/edit.service'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { Region } from '@src/geo/region.entity'
-import {
-  Component,
-  ComponentsMaterials,
-  ComponentsTags,
-} from './component.entity'
+
+import { Component, ComponentsMaterials, ComponentsTags } from './component.entity'
 import { CreateComponentInput, UpdateComponentInput } from './component.model'
 import { Material } from './material.entity'
 import { StreamService } from './stream.service'
@@ -89,18 +86,12 @@ export class ComponentService {
   }
 
   async recycle(componentId: string, regionId?: string) {
-    const recycle = await this.streamService.recycleComponent(
-      componentId,
-      regionId,
-    )
+    const recycle = await this.streamService.recycleComponent(componentId, regionId)
     return recycle
   }
 
   async recycleScore(componentId: string, regionId?: string) {
-    const score = await this.streamService.recycleComponentScore(
-      componentId,
-      regionId,
-    )
+    const score = await this.streamService.recycleComponentScore(componentId, regionId)
     return score
   }
 
@@ -114,11 +105,7 @@ export class ComponentService {
         change: null,
       }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(component, input, change)
     await this.editService.createEntityEdit(change, component)
     await this.em.persistAndFlush(change)
@@ -130,10 +117,14 @@ export class ComponentService {
   }
 
   async update(input: UpdateComponentInput, userID: string) {
-    const { entity: component, change } =
-      await this.editService.findOneWithChangeInput(input, userID, Component, {
+    const { entity: component, change } = await this.editService.findOneWithChangeInput(
+      input,
+      userID,
+      Component,
+      {
         id: input.id,
-      })
+      },
+    )
     if (!component) {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
@@ -170,18 +161,10 @@ export class ComponentService {
     change?: Change,
   ) {
     if (input.name) {
-      component.name = this.i18n.addTrReq(
-        component.name,
-        input.name,
-        input.lang,
-      )
+      component.name = this.i18n.addTrReq(component.name, input.name, input.lang)
     }
     if (input.nameTr) {
-      component.name = this.i18n.addTrReq(
-        component.name,
-        input.nameTr,
-        input.lang,
-      )
+      component.name = this.i18n.addTrReq(component.name, input.nameTr, input.lang)
     }
     if (input.desc) {
       component.desc = this.i18n.addTr(component.desc, input.desc, input.lang)
@@ -203,9 +186,7 @@ export class ComponentService {
         id: input.primaryMaterial.id,
       })
       if (!material) {
-        throw new Error(
-          `Material with ID "${input.primaryMaterial.id}" not found`,
-        )
+        throw new Error(`Material with ID "${input.primaryMaterial.id}" not found`)
       }
       component.primaryMaterial = ref(Material, material.id)
     }

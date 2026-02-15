@@ -3,21 +3,11 @@ import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { type TransformFnParams } from 'class-transformer'
 import { GraphQLError } from 'graphql'
 import { ClsService } from 'nestjs-cls'
-import {
-  I18nService as I18nBaseService,
-  Path,
-  PathValue,
-  TranslateOptions,
-} from 'nestjs-i18n'
+import { I18nService as I18nBaseService, Path, PathValue, TranslateOptions } from 'nestjs-i18n'
 import { IfAnyOrNever } from 'nestjs-i18n/dist/types'
 import { z } from 'zod/v4'
-import {
-  LANG_REGEX,
-  translate,
-  TranslatedField,
-  TrArray,
-  TrArraySchema,
-} from './i18n'
+
+import { LANG_REGEX, translate, TranslatedField, TrArray, TrArraySchema } from './i18n'
 
 @Injectable()
 export class I18nService {
@@ -108,10 +98,7 @@ export class I18nService {
 
     const reqLang = this.cls.get('lang')
     const langResult = z
-      .union([
-        z.string().regex(LANG_REGEX),
-        z.array(z.string().regex(LANG_REGEX)),
-      ])
+      .union([z.string().regex(LANG_REGEX), z.array(z.string().regex(LANG_REGEX))])
       .default(reqLang)
       .transform((lang, ctx) => {
         // Always use the first (preferred) language if multiple are provided

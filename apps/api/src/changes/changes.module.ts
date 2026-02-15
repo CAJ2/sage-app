@@ -10,6 +10,7 @@ import { GeoModule } from '@src/geo/geo.module'
 import { ProcessModule } from '@src/process/process.module'
 import { ProductModule } from '@src/product/product.module'
 import { UsersModule } from '@src/users/users.module'
+
 import { ChangeMapService } from './change_map.service'
 import { EditsModule } from './edits.module'
 
@@ -24,13 +25,7 @@ import { EditsModule } from './edits.module'
     GeoModule,
     EditsModule,
   ],
-  providers: [
-    ChangeResolver,
-    SourceResolver,
-    ChangeService,
-    SourceService,
-    ChangeMapService,
-  ],
+  providers: [ChangeResolver, SourceResolver, ChangeService, SourceService, ChangeMapService],
   exports: [ChangeService, SourceService, ChangeMapService],
 })
 export class ChangesModule {}

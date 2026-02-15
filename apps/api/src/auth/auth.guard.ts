@@ -5,16 +5,14 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
+import type { CanActivate, ContextType, ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import type { getSession } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
 import { ClsService } from 'nestjs-cls'
-import {
-  type AuthModuleOptions,
-  MODULE_OPTIONS_TOKEN,
-} from './auth-module-definition'
+
+import { type AuthModuleOptions, MODULE_OPTIONS_TOKEN } from './auth-module-definition'
 import { getRequestFromContext } from './utils'
-import type { CanActivate, ContextType, ExecutionContext } from '@nestjs/common'
-import type { getSession } from 'better-auth/api'
 
 /**
  * Lazy-load GraphQLError to make graphql an optional dependency
@@ -39,9 +37,7 @@ function getGraphQLError() {
  * Type representing a valid user session after authentication
  * Excludes null and undefined values from the session return type
  */
-export type BaseUserSession = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getSession>>>
->
+export type BaseUserSession = NonNullable<Awaited<ReturnType<ReturnType<typeof getSession>>>>
 
 export type UserSession = BaseUserSession & {
   user: BaseUserSession['user'] & {
@@ -168,9 +164,7 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = getRequestFromContext(context)
     const session: UserSession | null = await this.options.auth.api.getSession({
-      headers: fromNodeHeaders(
-        request.headers || request?.handshake?.headers || [],
-      ),
+      headers: fromNodeHeaders(request.headers || request?.handshake?.headers || []),
     })
 
     // Store session in CLS for access in AuthUserService
@@ -195,9 +189,7 @@ export class AuthGuard implements CanActivate {
     const ctxType = context.getType()
     if (!session) throw AuthContextErrorMap[ctxType].UNAUTHORIZED()
 
-    const headers = fromNodeHeaders(
-      request.headers || request?.handshake?.headers || [],
-    )
+    const headers = fromNodeHeaders(request.headers || request?.handshake?.headers || [])
 
     // Check @Roles() - user.role only (admin plugin)
     const requiredRoles = this.reflector.getAllAndOverride<string[]>('ROLES', [
@@ -211,17 +203,13 @@ export class AuthGuard implements CanActivate {
     }
 
     // Check @OrgRoles() - organization member role only
-    const requiredOrgRoles = this.reflector.getAllAndOverride<string[]>(
-      'ORG_ROLES',
-      [context.getHandler(), context.getClass()],
-    )
+    const requiredOrgRoles = this.reflector.getAllAndOverride<string[]>('ORG_ROLES', [
+      context.getHandler(),
+      context.getClass(),
+    ])
 
     if (requiredOrgRoles && requiredOrgRoles.length > 0) {
-      const hasOrgRole = await this.checkOrgRole(
-        session,
-        headers,
-        requiredOrgRoles,
-      )
+      const hasOrgRole = await this.checkOrgRole(session, headers, requiredOrgRoles)
       if (!hasOrgRole) throw AuthContextErrorMap[ctxType].FORBIDDEN()
     }
 
@@ -258,9 +246,7 @@ export class AuthGuard implements CanActivate {
    * @param headers - The request headers containing session cookies
    * @returns The member's role in the organization, or undefined if not found
    */
-  private async getMemberRoleInOrganization(
-    headers: Headers,
-  ): Promise<string | undefined> {
+  private async getMemberRoleInOrganization(headers: Headers): Promise<string | undefined> {
     // eslint-disable-next-line no-useless-catch
     try {
       // Better Auth organization plugin exposes getActiveMemberRole or getActiveMember API
@@ -280,6 +266,7 @@ export class AuthGuard implements CanActivate {
       }
 
       return undefined
+      // oxlint-disable-next-line no-useless-catch
     } catch (error) {
       // Re-throw to surface organization plugin errors
       throw error
@@ -293,10 +280,7 @@ export class AuthGuard implements CanActivate {
    * @param requiredRoles - Array of roles that grant access
    * @returns True if user.role matches any required role
    */
-  private checkUserRole(
-    session: UserSession,
-    requiredRoles: string[],
-  ): boolean {
+  private checkUserRole(session: UserSession, requiredRoles: string[]): boolean {
     return this.matchesRequiredRole(session.user.role, requiredRoles)
   }
 
@@ -325,6 +309,7 @@ export class AuthGuard implements CanActivate {
     } catch (error) {
       // Log error for debugging but return false to trigger 403 Forbidden
       // instead of letting the error propagate as a 500
+      // oxlint-disable-next-line no-console
       console.error('Organization plugin error:', error)
       return false
     }

@@ -1,12 +1,15 @@
 import { BaseEntity } from '@mikro-orm/core'
+import type { EntityDTO, FindOptions, Loaded, ObjectQuery, QueryOrderMap } from '@mikro-orm/core'
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 import { plainToInstance } from 'class-transformer'
+import type { ClassConstructor, ClassTransformOptions, TransformFnParams } from 'class-transformer'
 import { validateOrReject } from 'class-validator'
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
 import { ClsService } from 'nestjs-cls'
+
 import {
   DEFAULT_PAGE_SIZE,
   EdgeType,
@@ -15,18 +18,6 @@ import {
   PaginatedType,
   PaginationArgsSchema,
 } from '../graphql/paginated'
-import type {
-  EntityDTO,
-  FindOptions,
-  Loaded,
-  ObjectQuery,
-  QueryOrderMap,
-} from '@mikro-orm/core'
-import type {
-  ClassConstructor,
-  ClassTransformOptions,
-  TransformFnParams,
-} from 'class-transformer'
 
 export type EntityDTOCtx<T> = EntityDTO<T> & {
   _lang?: string[]
@@ -65,10 +56,7 @@ export class TransformService {
     return inst
   }
 
-  async objectToModel<T, S extends object>(
-    model: new () => S,
-    object: T,
-  ): Promise<S> {
+  async objectToModel<T, S extends object>(model: new () => S, object: T): Promise<S> {
     const obj = object as EntityDTOCtx<T>
     ;(obj as any)._lang = this.cls.get('lang')
     const inst = plainToInstance(model, obj, {
@@ -93,10 +81,7 @@ export class TransformService {
     return models
   }
 
-  async objectsToModels<T, S extends object>(
-    model: new () => S,
-    objects: T[],
-  ): Promise<S[]> {
+  async objectsToModels<T, S extends object>(model: new () => S, objects: T[]): Promise<S[]> {
     const models: S[] = []
     for (const obj of objects) {
       const inst = await this.objectToModel(model, obj)
@@ -119,19 +104,13 @@ export class TransformService {
     let decoded = ''
     if (args.after || args.before) {
       try {
-        decoded = Buffer.from(
-          (args.after || args.before) as string,
-          'base64',
-        ).toString('utf8')
+        decoded = Buffer.from((args.after || args.before) as string, 'base64').toString('utf8')
       } catch (e) {
         throw new GraphQLError('Invalid cursor')
       }
     }
     let orderDirection = args.orderDir()[0] || 'ASC'
-    if (
-      (args.after && orderDirection === 'ASC') ||
-      (args.before && orderDirection === 'DESC')
-    ) {
+    if ((args.after && orderDirection === 'ASC') || (args.before && orderDirection === 'DESC')) {
       where[orderByField] = { $gte: decoded }
     } else if (args.after || args.before) {
       where[orderByField] = { $lte: decoded }
@@ -139,9 +118,7 @@ export class TransformService {
     if (args.before || args.last) {
       // Need to flip order direction, then reverse the results
       orderDirection =
-        orderDirection === OrderDirection.DESC
-          ? OrderDirection.ASC
-          : OrderDirection.DESC
+        orderDirection === OrderDirection.DESC ? OrderDirection.ASC : OrderDirection.DESC
     }
     const options: CursorOptions<any> = {
       where,
@@ -237,11 +214,7 @@ export class TransformService {
     relation: string,
     opts: CursorOptions<T>,
   ): Promise<Cursor<T, '*'>> {
-    const [items, totalCount] = await em.findAndCount(
-      entity,
-      opts.where,
-      opts.options,
-    )
+    const [items, totalCount] = await em.findAndCount(entity, opts.where, opts.options)
     return {
       items,
       count: totalCount,
@@ -292,9 +265,7 @@ export class TransformService {
   }
 }
 
-export function transformUnion(
-  field: string,
-): (params: TransformFnParams) => object {
+export function transformUnion(field: string): (params: TransformFnParams) => object {
   return (params: TransformFnParams) => {
     const obj = params.obj as any
     if (!obj || !obj[field]) {
@@ -313,11 +284,7 @@ export function transformUnion(
   }
 }
 
-export function entityToModelRegistry(
-  entity: string,
-  obj: object,
-  lang: string[],
-) {
+export function entityToModelRegistry(entity: string, obj: object, lang: string[]) {
   if (!obj) {
     return {}
   }
@@ -368,12 +335,7 @@ function callTransform(obj: any, src: any, depth = 0, maxDepth = 5) {
 
     if (Array.isArray(value)) {
       for (let i = 0; i < value.length; i++) {
-        callTransform(
-          value[i],
-          srcValue ? srcValue[i] : undefined,
-          depth + 1,
-          maxDepth,
-        )
+        callTransform(value[i], srcValue ? srcValue[i] : undefined, depth + 1, maxDepth)
       }
     } else if (value && typeof value === 'object') {
       callTransform(value, srcValue, depth + 1, maxDepth)

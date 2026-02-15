@@ -2,6 +2,7 @@ import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
+
 import { Source } from './source.entity'
 import { CreateSourceInput, UpdateSourceInput } from './source.model'
 
@@ -19,11 +20,7 @@ export class SourceService {
   }
 
   async findOneByID(id: string) {
-    const source = await this.em.findOne(
-      Source,
-      { id },
-      { populate: ['user', 'changes'] },
-    )
+    const source = await this.em.findOne(Source, { id }, { populate: ['user', 'changes'] })
 
     if (!source) {
       throw new NotFoundException(`Source with ID "${id}" not found`)
@@ -60,10 +57,7 @@ export class SourceService {
     return true
   }
 
-  async setFields(
-    source: Source,
-    input: Partial<CreateSourceInput & UpdateSourceInput>,
-  ) {
+  async setFields(source: Source, input: Partial<CreateSourceInput & UpdateSourceInput>) {
     if (input.type) source.type = input.type
     if (input.location) source.location = input.location
     if (input.content) {

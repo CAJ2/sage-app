@@ -3,21 +3,14 @@ import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
 import { IsNanoID } from '@src/common/validator.model'
 import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
-import {
-  OrderDirection,
-  Paginated,
-  PaginationBasicArgs,
-} from '@src/graphql/paginated'
+import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
-import {
-  ChangeEdits,
-  Change as ChangeEntity,
-  ChangeStatus,
-} from './change.entity'
+
+import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from './change.entity'
 import { EditModel, EditModelType } from './change.enum'
 
 @ObjectType()
