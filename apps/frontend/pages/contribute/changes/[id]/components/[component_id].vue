@@ -1,15 +1,11 @@
 <template>
   <div>
     <NavTopbar
-      :title="
-        route.params.componentID === 'new'
-          ? 'Create Component'
-          : 'Edit Component'
-      "
+      :title="route.params.componentID === 'new' ? 'Create Component' : 'Edit Component'"
       back="true"
-    ></NavTopbar>
+    />
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
+      <div class="w-full max-w-2xl p-5">
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -81,10 +77,7 @@ if (componentID !== 'new') {
     id: componentID,
     changeID,
   })
-  if (
-    data?.value?.change?.edits.nodes &&
-    data.value.change.edits.nodes.length > 0
-  ) {
+  if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
       data.value.change.edits.nodes[0].updateChanges,

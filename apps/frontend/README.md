@@ -43,4 +43,5 @@ nx run frontend:android:build
 # iOS
 nx run frontend:ios:open
 ```
+
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

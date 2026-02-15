@@ -1,12 +1,9 @@
 <template>
   <div>
-    <NavTopbar
-      :title="processID === 'new' ? 'New Process' : 'Edit Process'"
-      back="true"
-    />
+    <NavTopbar :title="processID === 'new' ? 'New Process' : 'Edit Process'" back="true" />
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
-        <FormChangeSaveStatus :status="saveStatus"></FormChangeSaveStatus>
+      <div class="w-full max-w-2xl p-5">
+        <FormChangeSaveStatus :status="saveStatus" />
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -81,10 +78,7 @@ if (processID !== 'new') {
     id: processID,
     changeID: route.params.id as string,
   })
-  if (
-    data?.value?.change?.edits.nodes &&
-    data.value.change.edits.nodes.length > 0
-  ) {
+  if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
       data.value.change.edits.nodes[0].updateChanges,

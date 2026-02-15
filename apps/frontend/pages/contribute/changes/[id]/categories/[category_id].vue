@@ -1,15 +1,9 @@
 <template>
   <div>
-    <NavTopbar
-      :title="categoryID === 'new' ? 'New Category' : 'Edit Category'"
-      back="true"
-    />
+    <NavTopbar :title="categoryID === 'new' ? 'New Category' : 'Edit Category'" back="true" />
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
-        <FormChangeSaveStatus
-          v-if="!readOnly"
-          :status="saveStatus"
-        ></FormChangeSaveStatus>
+      <div class="w-full max-w-2xl p-5">
+        <FormChangeSaveStatus v-if="!readOnly" :status="saveStatus" />
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -85,10 +79,7 @@ if (categoryID !== 'new') {
     id: categoryID,
     changeID,
   })
-  if (
-    data?.value?.change?.edits.nodes &&
-    data.value.change.edits.nodes.length > 0
-  ) {
+  if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
       data.value.change.edits.nodes[0].updateChanges,

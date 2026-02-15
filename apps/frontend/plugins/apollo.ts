@@ -1,7 +1,7 @@
-import { provideApolloClient } from '@vue/apollo-composable'
 import type { ApolloClient } from '@apollo/client/core'
 import { from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
+import { provideApolloClient } from '@vue/apollo-composable'
 
 export default defineNuxtPlugin(({ hook }) => {
   const { $i18n } = useNuxtApp()

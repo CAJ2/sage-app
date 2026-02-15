@@ -6,28 +6,26 @@
       :use-image="true"
       :image="data?.variant?.imageURL || undefined"
       back="true"
-    ></NavTopbar>
+    />
     <div class="flex flex-col p-4">
       <UiImage
         v-if="data?.variant?.imageURL"
         :src="data?.variant?.imageURL"
-        class="rounded-box shadow-md w-32 h-32 object-cover mb-4"
+        class="mb-4 h-32 w-32 rounded-box object-cover shadow-md"
       />
-      <h2 class="text-lg font-semibold mb-2">{{ data?.variant?.name }}</h2>
-      <p class="text-sm text-center">
+      <h2 class="mb-2 text-lg font-semibold">{{ data?.variant?.name }}</h2>
+      <p class="text-center text-sm">
         {{ data?.variant?.desc }}
       </p>
     </div>
     <Collapsible v-model:open="reuseOpen">
       <CollapsibleTrigger as-child>
-        <div
-          class="flex items-center justify-between space-x-4 p-3 border-t-1 border-neutral-700"
-        >
+        <div class="flex items-center justify-between space-x-4 border-t-1 border-neutral-700 p-3">
           <h4 class="text-md font-semibold">Reuse</h4>
           <Button variant="ghost" size="sm" class="w-9 p-0">
             <font-awesome-icon
               icon="fa-solid fa-chevron-down"
-              class="w-4 h-4 transition-transform"
+              class="h-4 w-4 transition-transform"
               :class="{ 'rotate-180': reuseOpen }"
             />
             <span class="sr-only">Toggle</span>
@@ -41,19 +39,16 @@
       </CollapsibleContent>
     </Collapsible>
 
-    <Collapsible
-      v-model:open="recyclingOpen"
-      class="space-y-2 pb-2 border-b-1 border-neutral-700"
-    >
+    <Collapsible v-model:open="recyclingOpen" class="space-y-2 border-b-1 border-neutral-700 pb-2">
       <CollapsibleTrigger as-child>
         <div
-          class="flex items-center justify-between space-x-4 p-3 mb-0 border-t-1 border-b-0 border-neutral-700"
+          class="mb-0 flex items-center justify-between space-x-4 border-t-1 border-b-0 border-neutral-700 p-3"
         >
           <h4 class="text-md font-semibold">Recycle</h4>
           <Button variant="ghost" size="sm" class="w-9 p-0">
             <font-awesome-icon
               icon="fa-solid fa-chevron-down"
-              class="w-4 h-4 transition-transform"
+              class="h-4 w-4 transition-transform"
               :class="{ 'rotate-180': recyclingOpen }"
             />
             <span class="sr-only">Toggle</span>
@@ -62,18 +57,15 @@
       </CollapsibleTrigger>
       <CollapsibleContent class="space-y-2">
         <div v-if="recyclingResult" class="px-3 pb-4">
-          <ScoreBar
-            size="medium"
-            :score="recyclingResult.variant?.recycleScore?.score"
-          ></ScoreBar>
+          <ScoreBar size="medium" :score="recyclingResult.variant?.recycleScore?.score" />
         </div>
-        <ul class="list bg-base-100 rounded-box shadow-md">
-          <li class="px-4 pb-2 text-sm opacity-80 tracking-wide">Components</li>
-          <div class="divider my-0"></div>
+        <ul class="list rounded-box bg-base-100 shadow-md">
+          <li class="px-4 pb-2 text-sm tracking-wide opacity-80">Components</li>
+          <div class="divider my-0" />
           <li v-if="loadingRecycling" class="list-row">
-            <div class="skeleton h-4 w-28"></div>
-            <div class="skeleton h-4 w-full"></div>
-            <div class="skeleton h-4 w-full"></div>
+            <div class="h-4 w-28 skeleton" />
+            <div class="h-4 w-full skeleton" />
+            <div class="h-4 w-full skeleton" />
           </li>
 
           <div
@@ -105,7 +97,7 @@
                 :key="recycle.stream?.name || undefined"
                 :image="component.component.imageURL"
                 :recycle="recycle"
-              ></RecycleContainer>
+              />
             </div>
           </div>
 
@@ -233,8 +225,7 @@ const {
   load: loadRecycling,
   loading: loadingRecycling,
 } = useLazyQuery(variantRecycling, {
-  id:
-    typeof route.params.id === 'string' ? route.params.id : route.params.id[0],
+  id: typeof route.params.id === 'string' ? route.params.id : route.params.id[0],
   region: useRegionStore().selectedRegion,
 })
 watch(

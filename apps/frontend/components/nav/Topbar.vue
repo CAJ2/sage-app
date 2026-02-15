@@ -1,42 +1,33 @@
 <template>
-  <div
-    class="sticky top-0 z-1 flex justify-between items-center bg-base-200 p-2"
-  >
-    <button v-if="back" class="btn btn-ghost ml-1" @click.prevent="goBack">
-      <font-awesome-icon icon="fa-solid fa-angle-left" class="w-5 min-h-5" />
+  <div class="sticky top-0 z-1 flex items-center justify-between bg-base-200 p-2">
+    <button v-if="back" class="btn ml-1 btn-ghost" @click.prevent="goBack">
+      <font-awesome-icon icon="fa-solid fa-angle-left" class="min-h-5 w-5" />
     </button>
-    <div v-if="useImage" class="flex items-center mx-2">
-      <img
-        v-if="image"
-        :src="image"
-        class="w-10 h-10 rounded-full bg-base-100"
-      />
+    <div v-if="useImage" class="mx-2 flex items-center">
+      <img v-if="image" :src="image" class="h-10 w-10 rounded-full bg-base-100" />
       <font-awesome-icon
         v-if="!image"
         :icon="icon || 'fa-solid fa-image'"
-        class="w-6 h-6! pt-1 text-neutral-700 dark:text-neutral-300"
+        class="h-6! w-6 pt-1 text-neutral-700 dark:text-neutral-300"
       />
     </div>
-    <div class="flex-1 flex flex-col">
+    <div class="flex flex-1 flex-col">
       <h2
-        class="text-xl m-3 font-bold text-base-content line-clamp-1"
+        class="m-3 line-clamp-1 text-xl font-bold text-base-content"
         :class="{ 'my-1': !!subtitle }"
       >
         {{ title }}
       </h2>
       <h4
         v-if="subtitle"
-        class="text-xs text-base-content mx-3 line-clamp-1"
+        class="mx-3 line-clamp-1 text-xs text-base-content"
         :class="{ 'mb-1': !!subtitle }"
       >
         {{ subtitle }}
       </h4>
     </div>
-    <button v-if="context" class="btn btn-ghost mx-3">
-      <font-awesome-icon
-        icon="fa-solid fa-ellipsis-vertical"
-        class="w-5 min-h-5"
-      />
+    <button v-if="context" class="btn mx-3 btn-ghost">
+      <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" class="min-h-5 w-5" />
     </button>
   </div>
 </template>

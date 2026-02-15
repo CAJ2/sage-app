@@ -21,7 +21,7 @@ const emits = defineEmits<{
     <DrawerHeader>
       <DrawerTitle>{{ t('settings.language.select_title') }}</DrawerTitle>
     </DrawerHeader>
-    <div class="p-4 pb-0 min-h-[400px]">
+    <div class="min-h-[400px] p-4 pb-0">
       <ul class="divide-y">
         <li
           v-for="locale in locales"
@@ -29,12 +29,12 @@ const emits = defineEmits<{
           class="list-item py-3 dark:border-neutral-400"
           @click="selected = locale.code"
         >
-          <div class="flex justify-between items-center">
+          <div class="flex items-center justify-between">
             <h2>{{ locale.name }}</h2>
             <font-awesome-icon
               v-if="locale.code === selected"
               icon="fa-solid fa-check"
-              class="w-4 h-4 text-neutral-500 px-2"
+              class="h-4 w-4 px-2 text-neutral-500"
             />
           </div>
         </li>
@@ -44,9 +44,7 @@ const emits = defineEmits<{
       <DrawerClose as-child>
         <div class="flex gap-2">
           <Button class="flex-1" variant="outline"> Cancel </Button>
-          <Button class="flex-1" @click="emits('select', selected)">
-            Save
-          </Button>
+          <Button class="flex-1" @click="emits('select', selected)"> Save </Button>
         </div>
       </DrawerClose>
     </DrawerFooter>

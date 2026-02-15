@@ -1,16 +1,10 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "import",
-    "unicorn",
-    "promise",
-    "vitest",
-    "vue"
-  ],
+  "plugins": ["import", "unicorn", "promise", "vitest", "vue"],
   "categories": {
     "correctness": "error",
     "pedantic": "error",
-    "perf": "error",
+    "perf": "error"
   },
   "env": {
     "builtin": true,
@@ -475,10 +469,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "**/*.ts",
-        "**/*.vue"
-      ],
+      "files": ["**/*.ts", "**/*.vue"],
       "rules": {
         "no-class-assign": "off",
         "no-const-assign": "off",
@@ -540,14 +531,10 @@
         "valid-typeof": "off",
         "@typescript-eslint/no-import-type-side-effects": "error"
       },
-      "plugins": [
-        "typescript"
-      ]
+      "plugins": ["typescript"]
     },
     {
-      "files": [
-        "**/*.ts",
-      ],
+      "files": ["**/*.ts"],
       "rules": {
         "@typescript-eslint/consistent-type-imports": [
           "error",
@@ -557,14 +544,10 @@
           }
         ]
       },
-      "plugins": [
-        "typescript"
-      ]
+      "plugins": ["typescript"]
     },
     {
-      "files": [
-        "**/*.vue"
-      ],
+      "files": ["**/*.vue"],
       "rules": {
         "vue/no-arrow-functions-in-watch": "error",
         "vue/no-deprecated-destroyed-lifecycle": "error",
@@ -576,9 +559,7 @@
         "vue/no-multiple-slot-args": "warn",
         "vue/no-required-prop-with-default": "warn"
       },
-      "plugins": [
-        "vue"
-      ]
+      "plugins": ["vue"]
     }
   ]
 }

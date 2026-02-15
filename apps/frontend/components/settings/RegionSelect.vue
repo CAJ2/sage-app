@@ -1,14 +1,10 @@
 <template>
   <div>
-    <div class="flex items-center mb-4 cursor-pointer">
+    <div class="mb-4 flex cursor-pointer items-center">
       <div class="flex grow flex-col gap-1">
         <h4 class="text-sm opacity-60">Selected Region:</h4>
         <h3 class="text-lg font-bold">
-          {{
-            regionStatus !== 'idle'
-              ? regionData?.region.name
-              : 'No region selected'
-          }}
+          {{ regionStatus !== 'idle' ? regionData?.region.name : 'No region selected' }}
         </h3>
         <p class="text-sm opacity-70">
           {{ regionStatus !== 'idle' ? placeType : '' }}
@@ -16,7 +12,7 @@
       </div>
       <button
         v-if="regionStore.selectedRegion"
-        class="btn btn-ghost btn-square mx-3"
+        class="btn mx-3 btn-square btn-ghost"
         @click="selectRegion('')"
       >
         <font-awesome-icon icon="fa-solid fa-xmark" class="size-[1.2em]" />
@@ -31,45 +27,30 @@
           placeholder="Search..."
           class="pl-10"
         />
-        <span
-          class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
-        >
-          <font-awesome-icon
-            icon="fa-solid fa-magnifying-glass"
-            class="text-neutral-700"
-          ></font-awesome-icon>
+        <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
+          <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="text-neutral-700" />
         </span>
       </div>
-      <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
-        <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
+      <ul class="list mt-4 mb-6 rounded-box bg-base-100 shadow-md">
+        <li class="px-4 py-2 text-xs tracking-wide opacity-60">
           Search Results ({{ searchData?.search.totalCount || 0 }})
         </li>
         <li v-if="searchStatus === 'pending'" class="list-row">
-          <div class="skeleton h-4 w-28"></div>
-          <div class="skeleton h-4 w-full"></div>
-          <div class="skeleton h-4 w-full"></div>
+          <div class="h-4 w-28 skeleton" />
+          <div class="h-4 w-full skeleton" />
+          <div class="h-4 w-full skeleton" />
         </li>
 
-        <div
-          v-if="searchData && searchStatus !== 'pending'"
-          class="divide-y border-neutral-200"
-        >
-          <li
-            v-for="res in searchData.search.nodes"
-            :key="res.id"
-            class="border-neutral-200"
-          >
+        <div v-if="searchData && searchStatus !== 'pending'" class="divide-y border-neutral-200">
+          <li v-for="res in searchData.search.nodes" :key="res.id" class="border-neutral-200">
             <div v-if="res.id" class="list-row flex flex-col gap-0 pt-2 pb-3">
               <div class="flex items-center gap-2">
                 <span
-                  class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
+                  class="flex size-12 items-center justify-center rounded-box border-1 border-neutral-200"
                 >
-                  <font-awesome-icon
-                    icon="fa-solid fa-globe"
-                    class="size-6 h-6! p-1"
-                  />
+                  <font-awesome-icon icon="fa-solid fa-globe" class="size-6 h-6! p-1" />
                 </span>
-                <div class="flex-1 px-2 flex flex-col">
+                <div class="flex flex-1 flex-col px-2">
                   <div class="text-bold">
                     {{ res.name }}
                   </div>
@@ -77,21 +58,13 @@
                     {{ formatPlaceType(res.placetype) }}
                   </p>
                 </div>
-                <button
-                  class="btn btn-primary"
-                  @click.stop="selectRegion(res.id)"
-                >
-                  Select
-                </button>
+                <button class="btn btn-primary" @click.stop="selectRegion(res.id)">Select</button>
               </div>
             </div>
           </li>
         </div>
 
-        <li
-          v-if="searchData?.search.nodes.length === 0 && searchInput.length > 0"
-          class="list-row"
-        >
+        <li v-if="searchData?.search.nodes.length === 0 && searchInput.length > 0" class="list-row">
           No results found for "{{ searchInput }}"
         </li>
         <li
@@ -163,20 +136,19 @@ const searchInput = ref('')
 const searchData = ref<SearchResult | null>(null)
 const searchStatus = ref('idle')
 
-const { data: regionData, status: regionStatus } =
-  await useLazyAsyncQuery<RegionResult>(regionQuery, {
+const { data: regionData, status: regionStatus } = await useLazyAsyncQuery<RegionResult>(
+  regionQuery,
+  {
     id: regionStore.selectedRegion,
-  })
+  },
+)
 
 watchDebounced(
   searchInput,
   async () => {
-    const { data, status } = await useLazyAsyncQuery<SearchResult>(
-      searchQuery,
-      {
-        query: searchInput.value,
-      },
-    )
+    const { data, status } = await useLazyAsyncQuery<SearchResult>(searchQuery, {
+      query: searchInput.value,
+    })
     searchData.value = data.value
     searchStatus.value = status.value
   },

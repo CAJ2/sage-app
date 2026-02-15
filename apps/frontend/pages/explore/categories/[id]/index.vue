@@ -1,13 +1,7 @@
 <template>
   <div>
-    <NavTopbar
-      :title="data?.category.name || 'Category'"
-      back="true"
-    ></NavTopbar>
-    <ModelCategoryChildren
-      :status="status"
-      :data="data?.category.children"
-    ></ModelCategoryChildren>
+    <NavTopbar :title="data?.category.name || 'Category'" back="true" />
+    <ModelCategoryChildren :status="status" :data="data?.category.children" />
     <UiList
       v-if="sessionData && data"
       :items="[
@@ -18,7 +12,7 @@
           icon: 'fa-solid fa-pen-to-square',
         },
       ]"
-    ></UiList>
+    />
   </div>
 </template>
 
@@ -68,8 +62,5 @@ type CategoryResult = {
   }
 }
 
-const { status, data } = await useLazyAsyncQuery<CategoryResult>(
-  categoriesQuery,
-  vars,
-)
+const { status, data } = await useLazyAsyncQuery<CategoryResult>(categoriesQuery, vars)
 </script>

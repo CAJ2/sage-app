@@ -1,11 +1,7 @@
 <template>
   <div>
-    <NavTopbar title="Categories" back="true"></NavTopbar>
-    <ModelCategoryChildren
-      v-if="data"
-      :status="status"
-      :data="data.categoryRoot.children"
-    ></ModelCategoryChildren>
+    <NavTopbar title="Categories" back="true" />
+    <ModelCategoryChildren v-if="data" :status="status" :data="data.categoryRoot.children" />
   </div>
 </template>
 

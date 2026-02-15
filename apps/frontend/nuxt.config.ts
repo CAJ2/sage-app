@@ -1,6 +1,6 @@
+import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
-import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   devtools: { enabled: !process.env.TAURI_DEV_HOST },
 
@@ -73,7 +73,7 @@ export default defineNuxtConfig({
     },
     experimental: {
       autoImportTranslationFunctions: true,
-    }
+    },
   },
 
   apollo: {
@@ -83,7 +83,7 @@ export default defineNuxtConfig({
         httpEndpoint: () => useRuntimeConfig().public.apiurl + '/graphql',
         httpLinkOptions: {
           credentials: 'include',
-        }
+        },
       },
     },
   },
@@ -92,7 +92,7 @@ export default defineNuxtConfig({
     public: {
       baseurl: 'https://dev.sageleaf.app',
       apiurl: 'https://api.dev.sageleaf.app',
-    }
+    },
   },
 
   icon: {
@@ -102,7 +102,7 @@ export default defineNuxtConfig({
     localApiEndpoint: '/api/icons',
     fallbackToApi: true,
     serverBundle: {
-      collections: ['material-symbols-light']
+      collections: ['material-symbols-light'],
     },
   },
 
@@ -118,7 +118,7 @@ export default defineNuxtConfig({
     rollupConfig: {
       output: {
         sourcemapExcludeSources: false,
-      }
+      },
     },
   },
 

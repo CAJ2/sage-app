@@ -31,9 +31,7 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     nuxt.hook('build:done', async () => {
-      const { generate, loadCodegenConfig } = await import(
-        '@graphql-codegen/cli'
-      )
+      const { generate, loadCodegenConfig } = await import('@graphql-codegen/cli')
       const { config } = await loadCodegenConfig({
         configFilePath: options.configFile,
       })
@@ -62,15 +60,13 @@ export default defineNuxtModule<ModuleOptions>({
       }
       const time = Date.now() - start
 
-      console.info(
-        `NuxtCodegen: Finished in ${(time / 1000).toPrecision(2)} seconds `,
-      )
+      console.info(`NuxtCodegen: Finished in ${(time / 1000).toPrecision(2)} seconds `)
     })
 
     nuxt.hook('builder:watch', (_event: WatchEvent, path: string) => {
       const modifiedConfig = basename(path) === basename(options.configFile)
-      const modifiedWatchedExtension = options.extensions.some(
-        (extension: string) => path.endsWith(extension),
+      const modifiedWatchedExtension = options.extensions.some((extension: string) =>
+        path.endsWith(extension),
       )
 
       if (!modifiedWatchedExtension && !modifiedConfig) {

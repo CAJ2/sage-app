@@ -2,16 +2,11 @@
   <div>
     <NavTopbar title="Sign In" back="true" />
     <div class="flex grow items-center justify-center p-6 lg:p-10">
-      <form
-        class="grid w-full max-w-sm grid-cols-1 gap-8"
-        @submit.prevent.stop="form.handleSubmit"
-      >
+      <form class="grid w-full max-w-sm grid-cols-1 gap-8" @submit.prevent.stop="form.handleSubmit">
         <div class="mt-4">
           <form.Field name="email">
             <template #default="{ field }">
-              <FormLabel :for="field.name" class="text-md my-3"
-                >Email</FormLabel
-              >
+              <FormLabel :for="field.name" class="text-md my-3">Email</FormLabel>
               <FormInput
                 :id="field.name"
                 :name="field.name"
@@ -19,16 +14,9 @@
                 type="email"
                 class="mt-4"
                 @blur="field.handleBlur"
-                @input="
-                  (e: any) =>
-                    field.handleChange((e.target as HTMLInputElement).value)
-                "
+                @input="(e: any) => field.handleChange((e.target as HTMLInputElement).value)"
               />
-              <Alert
-                v-if="!field.state.meta.isValid"
-                variant="error"
-                class="mt-4"
-              >
+              <Alert v-if="!field.state.meta.isValid" variant="error" class="mt-4">
                 <AlertDescription>{{
                   field.state.meta.errors.map((e) => e && e.message).join(', ')
                 }}</AlertDescription>
@@ -39,9 +27,7 @@
         <div class="">
           <form.Field name="password">
             <template #default="{ field }">
-              <FormLabel :for="field.name" class="text-md my-3"
-                >Password</FormLabel
-              >
+              <FormLabel :for="field.name" class="text-md my-3">Password</FormLabel>
               <FormInput
                 :id="field.name"
                 :name="field.name"
@@ -49,16 +35,9 @@
                 type="password"
                 class="mt-4"
                 @blur="field.handleBlur"
-                @input="
-                  (e: any) =>
-                    field.handleChange((e.target as HTMLInputElement).value)
-                "
+                @input="(e: any) => field.handleChange((e.target as HTMLInputElement).value)"
               />
-              <Alert
-                v-if="!field.state.meta.isValid"
-                variant="error"
-                class="mt-4"
-              >
+              <Alert v-if="!field.state.meta.isValid" variant="error" class="mt-4">
                 <AlertDescription>{{
                   field.state.meta.errors.map((e) => e && e.message).join(', ')
                 }}</AlertDescription>
@@ -68,11 +47,7 @@
         </div>
         <div class="flex items-center justify-between">
           <div class="grid grid-cols-[1.125rem_1fr] gap-x-4 gap-y-1">
-            <FormCheckbox
-              id="remember"
-              class="inline-flex my-1"
-              :default-value="true"
-            />
+            <FormCheckbox id="remember" class="my-1 inline-flex" :default-value="true" />
             <FormLabel for="remember" class="text-md">Remember me</FormLabel>
           </div>
           <NuxtLinkLocale
@@ -84,11 +59,7 @@
         <div>
           <form.Subscribe>
             <template #default="{ canSubmit, isSubmitting }">
-              <button
-                type="submit"
-                :disabled="!canSubmit"
-                class="btn btn-primary btn-block"
-              >
+              <button type="submit" :disabled="!canSubmit" class="btn btn-block btn-primary">
                 {{ isSubmitting ? '...' : 'Sign In' }}
               </button>
             </template>
@@ -123,9 +94,7 @@ const form = useForm({
   validators: {
     onBlur: z.object({
       email: z.string().email(),
-      password: z
-        .string()
-        .min(8, { message: 'Password must be at least 8 characters' }),
+      password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
     }),
   },
   onSubmit: async ({ value }) => {

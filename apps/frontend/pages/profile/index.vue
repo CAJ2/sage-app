@@ -1,47 +1,40 @@
 <template>
   <div>
     <div class="grid grid-cols-4 md:grid-cols-12">
-      <div class="p-5 col-span-4 md:col-span-6 md:col-start-4 bg-base-200">
+      <div class="col-span-4 bg-base-200 p-5 md:col-span-6 md:col-start-4">
         <div v-if="session.data" class="flex justify-between">
           <div class="flex-1">
             <p><strong>Name:</strong> {{ session.data.user.name }}</p>
             <p><strong>Email:</strong> {{ session.data.user.email }}</p>
           </div>
-          <button class="btn btn-ghost btn-circle" @click="signOut">
+          <button class="btn btn-circle btn-ghost" @click="signOut">
             <font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
           </button>
         </div>
         <div v-if="session.isPending" class="flex w-52 flex-col gap-4">
           <div class="flex items-center gap-4">
-            <div class="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+            <div class="h-16 w-16 shrink-0 skeleton rounded-full" />
             <div class="flex flex-col gap-4">
-              <div class="skeleton h-4 w-20"></div>
-              <div class="skeleton h-4 w-28"></div>
+              <div class="h-4 w-20 skeleton" />
+              <div class="h-4 w-28 skeleton" />
             </div>
           </div>
-          <div class="skeleton h-32 w-full"></div>
+          <div class="h-32 w-full skeleton" />
         </div>
         <div v-if="!session.data && !session.isPending">
-          <h1 class="text-2xl py-3">Sign in to your Account</h1>
+          <h1 class="py-3 text-2xl">Sign in to your Account</h1>
           <p class="py-3">Contribute to the project and save your settings.</p>
-          <button class="btn btn-primary btn-block">
-            <NuxtLinkLocale to="/profile/sign_in"
-              >Sign in with Email</NuxtLinkLocale
-            >
+          <button class="btn btn-block btn-primary">
+            <NuxtLinkLocale to="/profile/sign_in">Sign in with Email</NuxtLinkLocale>
           </button>
         </div>
       </div>
-      <div class="col-span-4 md:col-span-6 md:col-start-4 py-3">
+      <div class="col-span-4 py-3 md:col-span-6 md:col-start-4">
         <ul>
           <NuxtLinkLocale to="/profile/region">
-            <li class="p-1 flex gap-2 items-center">
+            <li class="flex items-center gap-2 p-1">
               <div class="ml-3 p-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 32 32"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
                   <g fill="none">
                     <path
                       fill="#fff"
@@ -66,7 +59,7 @@
                   </g>
                 </svg>
               </div>
-              <div class="flex-1 flex flex-col">
+              <div class="flex flex-1 flex-col">
                 <div class="">
                   <h2>Region</h2>
                   <p class="text-xs opacity-70">
@@ -77,14 +70,9 @@
             </li>
           </NuxtLinkLocale>
           <NuxtLinkLocale v-if="session.data" to="/profile/edit">
-            <li class="p-4 flex gap-2">
+            <li class="flex gap-2 p-4">
               <div class="flex-none px-2 text-accent">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
                     d="M21.008 3c.548 0 .992.445.992.993v16.014a1 1 0 0 1-.992.993H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3zM20 5H4v14h16zm-2 10v2H6v-2zm-6-8v6H6V7zm6 4v2h-4v-2zm-8-2H8v2h2zm8-2v2h-4V7z"
@@ -96,7 +84,7 @@
           </NuxtLinkLocale>
           <Drawer>
             <DrawerTrigger as-child>
-              <li class="p-4 flex gap-2 items-center">
+              <li class="flex items-center gap-2 p-4">
                 <div class="flex-none px-2 text-accent">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -127,17 +115,12 @@
                 :locales="locales"
                 :current="locale"
                 @select="setLocale($event as any)"
-              ></SettingsLocaleSelect>
+              />
             </DrawerContent>
           </Drawer>
-          <li class="p-4 flex align-center">
+          <li class="align-center flex p-4">
             <div class="flex-none px-2 text-accent">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                 <g fill="none">
                   <path
                     fill="currentColor"
@@ -156,15 +139,15 @@
             <div class="flex-1">
               <h2 class="px-2">Dark Mode</h2>
             </div>
-            <div class="flex-none mx-2">
+            <div class="mx-2 flex-none">
               <RekaSwitchRoot
                 id="dark-mode"
                 v-model="isDark"
-                class="w-[40px] h-[24px] shadow-sm flex data-[state=unchecked]:bg-stone-300 data-[state=checked]:bg-stone-800 dark:data-[state=unchecked]:bg-stone-800 dark:data-[state=checked]:bg-stone-700 border border-stone-300 data-[state=checked]:border-stone-700 dark:border-stone-700 rounded-full relative transition-[background] focus-within:outline-none focus-within:shadow-[0_0_0_1px] focus-within:border-stone-800 focus-within:shadow-stone-800"
+                class="relative flex h-[24px] w-[40px] rounded-full border border-stone-300 shadow-sm transition-[background] focus-within:border-stone-800 focus-within:shadow-[0_0_0_1px] focus-within:shadow-stone-800 focus-within:outline-none data-[state=checked]:border-stone-700 data-[state=checked]:bg-stone-800 data-[state=unchecked]:bg-stone-300 dark:border-stone-700 dark:data-[state=checked]:bg-stone-700 dark:data-[state=unchecked]:bg-stone-800"
                 @click="toggleDark()"
               >
                 <RekaSwitchThumb
-                  class="w-4 h-4 my-auto bg-white text-xs flex items-center justify-center shadow-xl rounded-full transition-transform translate-x-0.5 will-change-transform data-[state=checked]:translate-x-full"
+                  class="my-auto flex h-4 w-4 translate-x-0.5 items-center justify-center rounded-full bg-white text-xs shadow-xl transition-transform will-change-transform data-[state=checked]:translate-x-full"
                 />
               </RekaSwitchRoot>
             </div>

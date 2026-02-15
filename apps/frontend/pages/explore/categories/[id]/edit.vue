@@ -4,8 +4,8 @@
       title="Edit Category"
       subtitle="Manage your category details and changes."
       back="true"
-    ></NavTopbar>
-    <div class="flex flex-col items-center"></div>
+    />
+    <div class="flex flex-col items-center" />
   </div>
 </template>
 
@@ -36,11 +36,8 @@ const mutation = useMutation(updateQuery, {
 const result = await mutation.mutate()
 if (result?.data?.updateCategory?.change?.id) {
   const changeID = result.data.updateCategory.change.id
-  navigateTo(
-    localeRoute(`/contribute/changes/${changeID}/categories/${categoryId}`),
-    {
-      replace: true,
-    },
-  )
+  navigateTo(localeRoute(`/contribute/changes/${changeID}/categories/${categoryId}`), {
+    replace: true,
+  })
 }
 </script>

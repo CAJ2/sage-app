@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "singleQuote": true,
+  "experimentalSortImports": {
+    "type": "alphabetical",
+    "order": "asc",
+    "ignoreCase": true,
+    "fallbackSort": {
+      "type": "subgroup-order",
+      "order": "asc"
+    },
+    "groups": [
+      ["side-effect"],
+      ["builtin"],
+      ["external", "type-external"],
+      ["internal", "type-internal"],
+      ["parent", "type-parent"],
+      ["sibling", "type-sibling"],
+      ["index", "type-index"]
+    ]
+  },
+  "experimentalTailwindcss": {
+    "stylesheet": "./assets/css/main.css",
+    "functions": ["clsx", "cn"]
+  },
+  "ignorePatterns": ["gql/**/*"]
+}

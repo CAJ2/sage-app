@@ -4,25 +4,20 @@
       :title="changeData?.change?.title || 'Change'"
       :subtitle="changeData?.change?.description || undefined"
       back="true"
-    ></NavTopbar>
+    />
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
+      <div class="w-full max-w-2xl p-5">
         <Card class="mb-4">
           <CardContent v-if="changeData" class="p-4">
             <div class="flex items-center pb-3">
               <div
                 class="badge badge-md"
                 :class="{
-                  'badge-primary':
-                    changeData.change?.status === ChangeStatus.Merged,
-                  'badge-error':
-                    changeData.change?.status === ChangeStatus.Rejected,
-                  'badge-warning':
-                    changeData.change?.status === ChangeStatus.Draft,
-                  'badge-info':
-                    changeData.change?.status === ChangeStatus.Proposed,
-                  'badge-success':
-                    changeData.change?.status === ChangeStatus.Approved,
+                  'badge-primary': changeData.change?.status === ChangeStatus.Merged,
+                  'badge-error': changeData.change?.status === ChangeStatus.Rejected,
+                  'badge-warning': changeData.change?.status === ChangeStatus.Draft,
+                  'badge-info': changeData.change?.status === ChangeStatus.Proposed,
+                  'badge-success': changeData.change?.status === ChangeStatus.Approved,
                 }"
               >
                 {{ changeData.change?.status }}
@@ -31,9 +26,7 @@
                 {{ changeData.change?.user.username }}
                 <span class="opacity-70"
                   >created on
-                  {{
-                    new Date(changeData.change?.createdAt).toLocaleDateString()
-                  }}
+                  {{ new Date(changeData.change?.createdAt).toLocaleDateString() }}
                 </span>
               </div>
             </div>
@@ -48,14 +41,11 @@
                     description: changeData.change?.description || '',
                   }"
                   @submit="submitTitleForm"
-                ></FormChangeTitle>
+                />
               </DrawerContent>
             </Drawer>
             <div class="flex flex-col" @click="openEditTitle = true">
-              <h2
-                class="text-lg font-bold"
-                :class="{ italic: !changeData.change?.title }"
-              >
+              <h2 class="text-lg font-bold" :class="{ italic: !changeData.change?.title }">
                 {{ changeData.change?.title || 'Untitled Change' }}
               </h2>
               <p
@@ -64,46 +54,32 @@
                   italic: !changeData.change?.description,
                 }"
               >
-                {{
-                  changeData.change?.description || 'No description provided.'
-                }}
+                {{ changeData.change?.description || 'No description provided.' }}
               </p>
             </div>
-            <div
-              v-if="changeData?.change"
-              class="flex justify-center space-x-2 my-3"
-            >
+            <div v-if="changeData?.change" class="my-3 flex justify-center space-x-2">
               <button
                 v-if="changeData.change.status === ChangeStatus.Draft"
-                class="grow btn btn-primary btn-sm"
+                class="btn grow btn-sm btn-primary"
                 @click="setStatus(ChangeStatus.Proposed)"
               >
-                <font-awesome-icon
-                  icon="fa-solid fa-upload"
-                  class="size-4 mr-2"
-                />
+                <font-awesome-icon icon="fa-solid fa-upload" class="mr-2 size-4" />
                 Publish Change
               </button>
               <button
                 v-if="changeData.change.status === ChangeStatus.Proposed"
-                class="grow btn btn-primary btn-sm"
+                class="btn grow btn-sm btn-primary"
                 @click="setStatus(ChangeStatus.Draft)"
               >
-                <font-awesome-icon
-                  icon="fa-solid fa-pencil"
-                  class="size-4 mr-2"
-                />
+                <font-awesome-icon icon="fa-solid fa-pencil" class="mr-2 size-4" />
                 Revert to Draft
               </button>
               <button
                 v-if="changeData.change.status === ChangeStatus.Approved"
-                class="grow btn btn-primary btn-sm"
+                class="btn grow btn-sm btn-primary"
                 @click="mergeChange"
               >
-                <font-awesome-icon
-                  icon="fa-solid fa-pencil"
-                  class="size-4 mr-2"
-                />
+                <font-awesome-icon icon="fa-solid fa-pencil" class="mr-2 size-4" />
                 Merge Change
               </button>
               <button
@@ -111,7 +87,7 @@
                   changeData.change.status !== ChangeStatus.Merged &&
                   changeData.change.status !== ChangeStatus.Rejected
                 "
-                class="btn btn-danger btn-sm"
+                class="btn-danger btn btn-sm"
                 @click="deleteChange"
               >
                 <font-awesome-icon icon="fa-solid fa-trash" class="size-4" />
@@ -128,7 +104,7 @@
               class="border-neutral-300"
             >
               <NuxtLinkLocale :to="getEditSubLink(edit as Edit)">
-                <div v-if="edit.changes" class="my-4 mx-3">
+                <div v-if="edit.changes" class="mx-3 my-4">
                   <div class="flex items-center">
                     <div class="badge badge-sm badge-secondary">
                       {{ edit.entityName }}
@@ -136,10 +112,7 @@
                     <div class="flex-1 px-2">
                       <span
                         :class="{
-                          italic: !(
-                            (edit.changes as any).name_req ||
-                            (edit.changes as any).name
-                          ),
+                          italic: !((edit.changes as any).name_req || (edit.changes as any).name),
                         }"
                         >{{
                           (edit.changes as any).name_req ||
@@ -152,7 +125,7 @@
                       <font-awesome-icon
                         icon="fa-solid fa-chevron-right"
                         class="text-neutral-300"
-                      ></font-awesome-icon>
+                      />
                     </div>
                   </div>
                 </div>
@@ -160,14 +133,12 @@
             </li>
             <span
               v-if="changeData.change.edits.nodes?.length === 0"
-              class="text-neutral-500 text-sm"
+              class="text-sm text-neutral-500"
               >No edits found</span
             >
           </ul>
           <UiList
-            v-if="
-              changeData && changeData.change?.status !== ChangeStatus.Merged
-            "
+            v-if="changeData && changeData.change?.status !== ChangeStatus.Merged"
             class="pt-4"
             :items="[
               {
@@ -183,7 +154,7 @@
                 icon: 'fa-solid fa-plus',
               },
             ]"
-          ></UiList>
+          />
         </div>
       </div>
     </div>
@@ -263,12 +234,9 @@ const changeQuery = graphql(`
     }
   }
 `)
-const { result: changeData, refetch: refetchChangeData } = useQuery(
-  changeQuery,
-  {
-    id: route.params.id as string,
-  },
-)
+const { result: changeData, refetch: refetchChangeData } = useQuery(changeQuery, {
+  id: route.params.id as string,
+})
 
 const entityToPage: Record<string, string> = {
   Variant: 'variants',
@@ -329,10 +297,7 @@ const deleteChange = async () => {
   }
 }
 
-const submitTitleForm = async (data: {
-  title: string
-  description: string
-}) => {
+const submitTitleForm = async (data: { title: string; description: string }) => {
   await changeEdit.mutate({
     input: {
       id: route.params.id as string,
