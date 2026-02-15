@@ -35,8 +35,7 @@ export const defaultStyles: Styles = {
     itemWrapper: 'array-list-item-wrapper',
     noData: 'array-list-no-data',
     item: 'array-list-item',
-    itemToolbar:
-      'array-list-item-toolbar flex items-center justify-end cursor-pointer',
+    itemToolbar: 'array-list-item-toolbar flex items-center justify-end cursor-pointer',
     itemLabel: 'array-list-item-label flex-1 pl-1 h-6 leading-6',
     itemContent: 'array-list-item-content hidden py-0 px-4',
     itemExpanded: 'expanded',

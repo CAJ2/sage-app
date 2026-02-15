@@ -22,9 +22,7 @@ const props = withDefaults(
     facingMode?: string
   }>(),
   {
-    onDetected: (result: QuaggaJSResultObject | null) => {
-      console.log('detected: ', result)
-    },
+    onDetected: (_result: QuaggaJSResultObject | null) => {},
     onProcessed: (result: QuaggaJSResultObject | null) => {
       const drawingCtx = Quagga.canvas.ctx.overlay
       const drawingCanvas = Quagga.canvas.dom.overlay
@@ -34,8 +32,8 @@ const props = withDefaults(
           drawingCtx.clearRect(
             0,
             0,
-            parseInt(drawingCanvas?.getAttribute('width') || '0'),
-            parseInt(drawingCanvas?.getAttribute('height') || '0'),
+            parseInt(drawingCanvas?.getAttribute('width') || '0', 10),
+            parseInt(drawingCanvas?.getAttribute('height') || '0', 10),
           )
           result.boxes
             .filter((box) => box !== result.box)
@@ -54,12 +52,10 @@ const props = withDefaults(
         }
 
         if (result.codeResult && result.codeResult.code) {
-          Quagga.ImageDebug.drawPath(
-            result.line,
-            { x: 'x', y: 'y' },
-            drawingCtx,
-            { color: 'red', lineWidth: 3 },
-          )
+          Quagga.ImageDebug.drawPath(result.line, { x: 'x', y: 'y' }, drawingCtx, {
+            color: 'red',
+            lineWidth: 3,
+          })
         }
       }
     },
@@ -109,10 +105,8 @@ watch(
 watch(
   () => props.onProcessed,
   (newValue, oldValue) => {
-    if (oldValue)
-      Quagga.offProcessed(oldValue as unknown as QuaggaJSResultCallbackFunction)
-    if (newValue)
-      Quagga.onProcessed(newValue as unknown as QuaggaJSResultCallbackFunction)
+    if (oldValue) Quagga.offProcessed(oldValue as unknown as QuaggaJSResultCallbackFunction)
+    if (newValue) Quagga.onProcessed(newValue as unknown as QuaggaJSResultCallbackFunction)
   },
 )
 
@@ -120,22 +114,18 @@ onMounted(() => {
   Quagga.init(quaggaState, (err: object | null) => {
     if (err) {
       quaggaError.value = `Failed to initialize the scanner.`
-      return console.error(err)
+      return
     }
     Quagga.start()
   })
   Quagga.onDetected(props.onDetected)
-  Quagga.onProcessed(
-    props.onProcessed as unknown as QuaggaJSResultCallbackFunction,
-  )
+  Quagga.onProcessed(props.onProcessed as unknown as QuaggaJSResultCallbackFunction)
 })
 
 onBeforeUnmount(() => {
   if (props.onDetected) Quagga.offDetected(props.onDetected)
   if (props.onProcessed)
-    Quagga.offProcessed(
-      props.onProcessed as unknown as QuaggaJSResultCallbackFunction,
-    )
+    Quagga.offProcessed(props.onProcessed as unknown as QuaggaJSResultCallbackFunction)
   Quagga.stop()
 })
 </script>

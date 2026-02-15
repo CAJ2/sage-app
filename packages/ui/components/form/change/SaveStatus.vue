@@ -1,15 +1,12 @@
 <template>
   <div class="sticky top-0 z-2 flex justify-center">
-    <div class="bg-base-200 w-fit">
+    <div class="w-fit bg-base-200">
       <div
-        class="flex items-center justify-center space-x-2 py-1 px-4 rounded-lg shadow-sm"
+        class="flex items-center justify-center space-x-2 rounded-lg px-4 py-1 shadow-sm"
         :class="colorClass.text + ' ' + colorClass.shadow + ' ' + colorClass.bg"
       >
         <font-awesome-icon :icon="iconClass" class="text-xl" />
-        <span
-          v-if="status === 'saving'"
-          class="loading loading-spinner loading-md"
-        ></span>
+        <span v-if="status === 'saving'" class="loading loading-md loading-spinner"></span>
         <span class="text-lg">
           {{ statusFmt }}
         </span>

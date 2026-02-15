@@ -1,11 +1,13 @@
 import { ArgsType, Field, ID, ObjectType } from '@nestjs/graphql'
+import { Transform } from 'class-transformer'
+import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
+
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Transform } from 'class-transformer'
-import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
+
 import { Region as RegionEntity } from './region.entity'
 
 function extractBbox(obj: RegionEntity): number[] | undefined {

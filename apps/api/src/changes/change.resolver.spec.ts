@@ -1,15 +1,17 @@
 import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
+import { AppTestModule } from '@test/app-test.module'
+import { graphql } from '@test/gql'
+import { GraphQLTestClient } from '@test/graphql.utils'
+
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { TestVariantSeeder, VARIANT_IDS } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { User } from '@src/users/users.entity'
-import { AppTestModule } from '@test/app-test.module'
-import { graphql } from '@test/gql'
-import { GraphQLTestClient } from '@test/graphql.utils'
+
 import { ChangeService } from './change.service'
 
 describe('ChangeResolver (integration)', () => {
@@ -32,12 +34,7 @@ describe('ChangeResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(
-      BaseSeeder,
-      UserSeeder,
-      TestMaterialSeeder,
-      TestVariantSeeder,
-    )
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
 
     const user = await orm.em.findOne(User, {
       username: 'admin',

@@ -1,18 +1,4 @@
 import { BaseEntity, EntityManager, ref, rel } from '@mikro-orm/postgresql'
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { AuthUserService } from '@src/auth/authuser.service'
-import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
-import { User } from '@src/users/users.entity'
-import _ from 'lodash'
-import {
-  CreateChangeInput,
-  DeleteInput,
-  IChangeInputWithLang,
-  isUsingChange,
-} from './change-ext.model'
-import { Change, ChangeEdits, ChangeStatus } from './change.entity'
-import { MergeInput, UpdateChangeInput } from './change.model'
-import { Source } from './source.entity'
 import type {
   Collection,
   EntityDTO,
@@ -23,14 +9,28 @@ import type {
   Reference,
   RequiredEntityData,
 } from '@mikro-orm/postgresql'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import _ from 'lodash'
+
+import { AuthUserService } from '@src/auth/authuser.service'
+import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
+import { User } from '@src/users/users.entity'
+
+import {
+  CreateChangeInput,
+  DeleteInput,
+  IChangeInputWithLang,
+  isUsingChange,
+} from './change-ext.model'
+import { Change, ChangeEdits, ChangeStatus } from './change.entity'
+import { MergeInput, UpdateChangeInput } from './change.model'
+import { Source } from './source.entity'
 
 export interface IEntityService {
   findOneByID<T extends BaseEntity>(id: string): Promise<T | null>
 }
 
-type PivotInput =
-  | { id: string; [key: string]: any }
-  | { id: string; [key: string]: any }[]
+type PivotInput = { id: string; [key: string]: any } | { id: string; [key: string]: any }[]
 
 @Injectable()
 export class EditService {
@@ -40,11 +40,7 @@ export class EditService {
   ) {}
 
   async findOne(id: string) {
-    const change = await this.em.findOne(
-      Change,
-      { id },
-      { populate: ['user', 'sources', 'edits'] },
-    )
+    const change = await this.em.findOne(Change, { id }, { populate: ['user', 'sources', 'edits'] })
 
     if (!change) {
       throw new NotFoundException(`Change with ID "${id}" not found`)
@@ -53,11 +49,7 @@ export class EditService {
     return change
   }
 
-  async findOneOrCreate(
-    id?: string,
-    input?: CreateChangeInput,
-    userID?: string,
-  ) {
+  async findOneOrCreate(id?: string, input?: CreateChangeInput, userID?: string) {
     if (!id && !input) {
       throw NotFoundErr('Must provide either a Change ID or Change input')
     }
@@ -88,11 +80,7 @@ export class EditService {
     changeID: string,
     entity: EntityName<T>,
   ): Promise<ChangeEdits[]> {
-    const change = await this.em.findOne(
-      Change,
-      { id: changeID },
-      { populate: ['edits'] },
-    )
+    const change = await this.em.findOne(Change, { id: changeID }, { populate: ['edits'] })
     if (!change) {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
@@ -133,9 +121,7 @@ export class EditService {
     if (input.description) change.description = input.description
     if (input.status) change.status = input.status
     if (input.sources) {
-      const removed = change.sources.filter(
-        (source) => !input.sources!.includes(source.id),
-      )
+      const removed = change.sources.filter((source) => !input.sources!.includes(source.id))
       for (const source of removed) {
         change.sources.remove(source)
       }
@@ -153,10 +139,7 @@ export class EditService {
     return change
   }
 
-  async setOrAddCollection<
-    T extends object & { id: string },
-    U extends { id: string },
-  >(
+  async setOrAddCollection<T extends object & { id: string }, U extends { id: string }>(
     collection: Collection<T>,
     entity: EntityName<T>,
     toSet?: U | U[],
@@ -180,11 +163,9 @@ export class EditService {
         }
         collection.set(foundItems)
       } else {
-        const foundItem = await this.em.findOne(
-          entity,
-          { id: toSet.id } as any,
-          { populate: false },
-        )
+        const foundItem = await this.em.findOne(entity, { id: toSet.id } as any, {
+          populate: false,
+        })
         if (!foundItem) {
           throw NotFoundErr(`No ${entity} found for ID: ${toSet.id}`)
         }
@@ -209,11 +190,9 @@ export class EditService {
         }
         collection.add(foundItems)
       } else {
-        const foundItem = await this.em.findOne(
-          entity,
-          { id: toAdd.id } as any,
-          { populate: false },
-        )
+        const foundItem = await this.em.findOne(entity, { id: toAdd.id } as any, {
+          populate: false,
+        })
         if (!foundItem) {
           throw NotFoundErr(`No ${entity} found for ID: ${toAdd.id}`)
         }
@@ -230,11 +209,9 @@ export class EditService {
   ): Promise<Collection<T>> {
     if (toRemove) {
       if (Array.isArray(toRemove)) {
-        const foundItems = await this.em.find(
-          entity,
-          { id: { $in: toRemove } } as any,
-          { populate: false },
-        )
+        const foundItems = await this.em.find(entity, { id: { $in: toRemove } } as any, {
+          populate: false,
+        })
         if (foundItems.length !== toRemove.length) {
           const foundIds = foundItems.map((item) => item.id)
           throw NotFoundErr(
@@ -245,11 +222,9 @@ export class EditService {
         }
         collection.remove(foundItems)
       } else {
-        const foundItem = await this.em.findOne(
-          entity,
-          { id: toRemove } as any,
-          { populate: false },
-        )
+        const foundItem = await this.em.findOne(entity, { id: toRemove } as any, {
+          populate: false,
+        })
         if (!foundItem) {
           throw NotFoundErr(`No ${entity} found for ID: ${toRemove}`)
         }
@@ -330,11 +305,9 @@ export class EditService {
         })
         collection.set(toSetEntities)
       } else {
-        const foundItem = await this.em.findOne(
-          relEntity,
-          { id: toSet.id } as any,
-          { populate: false },
-        )
+        const foundItem = await this.em.findOne(relEntity, { id: toSet.id } as any, {
+          populate: false,
+        })
         if (!foundItem) {
           throw NotFoundErr(`No ${relEntity} found for ID: ${toSet.id}`)
         }
@@ -385,7 +358,6 @@ export class EditService {
               persist: !changeID,
             },
           )
-          console.log(`Created new entity for ${pivotEntity}:`, newEntity)
           if (!changeID) {
             this.em.persist(newEntity)
           }
@@ -393,11 +365,9 @@ export class EditService {
         })
         collection.add(toAddEntities)
       } else {
-        const foundItem = await this.em.findOne(
-          relEntity,
-          { id: toAdd.id } as any,
-          { populate: false },
-        )
+        const foundItem = await this.em.findOne(relEntity, { id: toAdd.id } as any, {
+          populate: false,
+        })
         if (!foundItem) {
           throw NotFoundErr(`No ${relEntity} found for ID: ${toAdd.id}`)
         }
@@ -457,11 +427,9 @@ export class EditService {
     }
     if (toRemove) {
       if (Array.isArray(toRemove)) {
-        const foundItems = await this.em.find(
-          relEntity,
-          { id: { $in: toRemove } } as any,
-          { populate: false },
-        )
+        const foundItems = await this.em.find(relEntity, { id: { $in: toRemove } } as any, {
+          populate: false,
+        })
         if (foundItems.length !== toRemove.length) {
           const foundIds = foundItems.map((item) => item.id)
           throw NotFoundErr(
@@ -470,21 +438,15 @@ export class EditService {
               .join(', ')}`,
           )
         }
-        collection.remove(
-          toRemove.map((id) => rel(pivotMeta.class, { [relField]: id } as any)),
-        )
+        collection.remove(toRemove.map((id) => rel(pivotMeta.class, { [relField]: id } as any)))
       } else {
-        const foundItem = await this.em.findOne(
-          relEntity,
-          { id: toRemove } as any,
-          { populate: false },
-        )
+        const foundItem = await this.em.findOne(relEntity, { id: toRemove } as any, {
+          populate: false,
+        })
         if (!foundItem) {
           throw NotFoundErr(`No ${relEntity} found for ID: ${toRemove}`)
         }
-        collection.remove(
-          rel(pivotMeta.class, { [collField]: foundItem.id } as any),
-        )
+        collection.remove(rel(pivotMeta.class, { [collField]: foundItem.id } as any))
       }
     }
     return collection
@@ -507,19 +469,13 @@ export class EditService {
       return this.em.getReference(model, edit.entityID as any) as any
     }
     // If not, check if it exists in the database
-    const entity = await this.em.findOne<T>(
-      model,
-      where as FilterQuery<T>,
-      options,
-    )
+    const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
     if (!entity) {
       const entityName = model.toString()
       throw NotFoundErr(`${entityName} with ID "${where.id}" not found`)
     }
     // TODO: Type this correctly?
-    return entity.toReference() as unknown as { id: string } & Reference<
-      Loaded<T>
-    >
+    return entity.toReference() as unknown as { id: string } & Reference<Loaded<T>>
   }
 
   async findOneWithChangeInput<T extends BaseEntity>(
@@ -533,18 +489,10 @@ export class EditService {
       if (!this.authUser.admin()) {
         throw BadRequestErr('Admin privileges are required to directly edit')
       }
-      const entity = await this.em.findOne<T>(
-        model,
-        where as FilterQuery<T>,
-        options,
-      )
+      const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
       return { entity: entity as Loaded<T> }
     }
-    const change = await this.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.findOneOrCreate(input.changeID, input.change, userID)
     const meta = this.em.getMetadata().get(model)
     // First check if it exists in the change
     const edit = change.edits.find((e) => {
@@ -565,20 +513,14 @@ export class EditService {
         )
         return { entity: entity as Loaded<T>, change }
       } else {
-        throw NotFoundErr(
-          `Edit for entity "${meta.name}" with ID "${where.id}" not found`,
-        )
+        throw NotFoundErr(`Edit for entity "${meta.name}" with ID "${where.id}" not found`)
       }
     }
     // If not, check if it exists in the database
     if (!options) {
       options = { disableIdentityMap: isUsingChange(input) }
     }
-    const entity = await this.em.findOne<T>(
-      model,
-      where as FilterQuery<T>,
-      options,
-    )
+    const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
     if (!entity) {
       throw NotFoundErr(`${meta.name} with ID "${where.id}" not found`)
     }
@@ -593,11 +535,7 @@ export class EditService {
     if (!userID) {
       throw BadRequestErr('User ID is required for delete operation')
     }
-    const change = await this.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.findOneOrCreate(input.changeID, input.change, userID)
     if (!this.authUser.sameUserOrAdmin(change.user.id)) {
       throw BadRequestErr('You can only delete your own changes')
     }
@@ -624,11 +562,7 @@ export class EditService {
     }
     // If not, check if it exists in the database
     const options = { disableIdentityMap: isUsingChange(input) }
-    const entity = await this.em.findOne<T>(
-      model,
-      { id: input.id } as FilterQuery<T>,
-      options,
-    )
+    const entity = await this.em.findOne<T>(model, { id: input.id } as FilterQuery<T>, options)
     if (!entity) {
       throw NotFoundErr(`${meta.name} with ID "${input.id}" not found`)
     }
@@ -636,25 +570,18 @@ export class EditService {
     newEdit.entityName = meta.name
     newEdit.entityID = input.id
     newEdit.userID = userID
-    newEdit.original = this.entityToChangePOJO(
-      meta.name,
-      entity as BaseEntity & { id: string },
-    )
+    newEdit.original = this.entityToChangePOJO(meta.name, entity as BaseEntity & { id: string })
     change.edits.add(newEdit)
     await this.em.persistAndFlush(change)
     return { id: input.id }
   }
 
-  async beginUpdateEntityEdit(
-    change: Change,
-    entity: BaseEntity & { id: string },
-  ) {
+  async beginUpdateEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
     if (!this.authUser.sameUserOrAdmin(change.user.id)) {
       throw BadRequestErr('You can only update edits for your own changes')
     }
     let edit = change.edits.find(
-      (e) =>
-        e.entityName === entity.constructor.name && e.entityID === entity.id,
+      (e) => e.entityName === entity.constructor.name && e.entityID === entity.id,
     )
     if (!edit) {
       edit = new ChangeEdits()
@@ -668,8 +595,7 @@ export class EditService {
 
   async updateEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
     const edit = change.edits.find(
-      (e) =>
-        e.entityName === entity.constructor.name && e.entityID === entity.id,
+      (e) => e.entityName === entity.constructor.name && e.entityID === entity.id,
     )
     if (!edit) {
       throw NotFoundErr(
@@ -707,9 +633,7 @@ export class EditService {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
     if (change.status !== ChangeStatus.APPROVED) {
-      throw BadRequestErr(
-        `Change with ID "${changeID}" is not approved and cannot be merged`,
-      )
+      throw BadRequestErr(`Change with ID "${changeID}" is not approved and cannot be merged`)
     }
     return this.merge(change)
   }
@@ -724,19 +648,12 @@ export class EditService {
           })
           if (!entity && edit.original) {
             // TODO: Entity could have been deleted, handle stale edits
-            throw NotFoundErr(
-              `Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`,
-            )
+            throw NotFoundErr(`Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`)
           }
           if (!entity && !edit.original && edit.changes) {
             // This is a create
             this.em.create(edit.entityName, edit.changes)
-            this.createHistory<BaseEntity>(
-              edit.entityName,
-              change.user.id,
-              undefined,
-              edit.changes,
-            )
+            this.createHistory<BaseEntity>(edit.entityName, change.user.id, undefined, edit.changes)
           } else if (entity && edit.original && !edit.changes) {
             // This is a delete
             this.em.remove(entity)
@@ -744,9 +661,7 @@ export class EditService {
             // This is an update
             _.merge(entity, edit.changes)
           } else {
-            throw BadRequestErr(
-              `Edit for entity "${edit.entityName}" is invalid`,
-            )
+            throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
           }
           this.createHistory<BaseEntity>(
             edit.entityName,
@@ -797,15 +712,11 @@ export class EditService {
     if (!meta) {
       throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
     }
-    const flattenRefs: { ref: string; fieldKey: string; foreignKey: string }[] =
-      []
+    const flattenRefs: { ref: string; fieldKey: string; foreignKey: string }[] = []
     const changeOmit: string[] = []
     meta.relations.forEach((rel) => {
       // Skip history and tree relations
-      if (
-        rel.name.startsWith('history') ||
-        ['ancestors', 'descendants'].includes(rel.name)
-      ) {
+      if (rel.name.startsWith('history') || ['ancestors', 'descendants'].includes(rel.name)) {
         return
       }
       // Populate 1:m relations
@@ -831,16 +742,10 @@ export class EditService {
       if (pojo[ref.ref] && Array.isArray(pojo[ref.ref])) {
         pojo[ref.ref] = pojo[ref.ref].map((item: any) => {
           if (!item) return item
-          if (
-            !_.isString(item[ref.fieldKey]) &&
-            _.has(item[ref.fieldKey], 'id')
-          ) {
+          if (!_.isString(item[ref.fieldKey]) && _.has(item[ref.fieldKey], 'id')) {
             item[ref.fieldKey] = item[ref.fieldKey].id
           }
-          if (
-            !_.isString(item[ref.foreignKey]) &&
-            _.has(item[ref.foreignKey], 'id')
-          ) {
+          if (!_.isString(item[ref.foreignKey]) && _.has(item[ref.foreignKey], 'id')) {
             item[ref.foreignKey] = item[ref.foreignKey].id
           }
           return item

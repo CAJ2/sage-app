@@ -1,28 +1,15 @@
 <template>
   <div>
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
-        <Tabs
-          v-model:model-value="activeTab"
-          class="w-full"
-          default-value="search"
-        >
-          <TabsList
-            aria-label="Manage your account"
-            class="grid w-full grid-cols-2"
-          >
+      <div class="w-full max-w-2xl p-5">
+        <Tabs v-model:model-value="activeTab" class="w-full" default-value="search">
+          <TabsList aria-label="Manage your account" class="grid w-full grid-cols-2">
             <TabsTrigger value="search">
-              <font-awesome-icon
-                icon="fa-solid fa-magnifying-glass"
-                class="w-4 h-4 mr-2"
-              />
+              <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="mr-2 h-4 w-4" />
               Search
             </TabsTrigger>
             <TabsTrigger value="scan">
-              <font-awesome-icon
-                icon="fa-solid fa-qrcode"
-                class="w-4 h-4 mr-2"
-              />
+              <font-awesome-icon icon="fa-solid fa-qrcode" class="mr-2 h-4 w-4" />
               Scan
             </TabsTrigger>
           </TabsList>
@@ -35,44 +22,32 @@
                 placeholder="Search..."
                 class="pl-10"
               />
-              <span
-                class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
-              >
-                <font-awesome-icon
-                  icon="fa-solid fa-magnifying-glass"
-                  class="text-neutral-700"
-                ></font-awesome-icon>
+              <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
+                <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="text-neutral-700" />
               </span>
             </div>
-            <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
-              <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
+            <ul class="list mt-4 mb-6 rounded-box bg-base-100 shadow-md">
+              <li class="px-4 py-2 text-xs tracking-wide opacity-60">
                 Search Results ({{ data?.search.totalCount || 0 }})
               </li>
               <li v-if="status === 'pending'" class="list-row">
-                <div class="skeleton h-4 w-28"></div>
-                <div class="skeleton h-4 w-full"></div>
-                <div class="skeleton h-4 w-full"></div>
+                <div class="h-4 w-28 skeleton" />
+                <div class="h-4 w-full skeleton" />
+                <div class="h-4 w-full skeleton" />
               </li>
 
               <div v-if="data && status !== 'pending'">
                 <li v-for="res in data.search.nodes" :key="res.id">
                   <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
-                    <div
-                      v-if="res.id"
-                      class="list-row flex flex-col gap-0 pt-2 pb-3"
-                    >
-                      <p class="text-xs text-neutral-500 uppercase pb-2">
+                    <div v-if="res.id" class="list-row flex flex-col gap-0 pt-2 pb-3">
+                      <p class="pb-2 text-xs text-neutral-500 uppercase">
                         {{ formatType(res.__typename) }}
                       </p>
                       <div class="flex items-center gap-2">
-                        <img
-                          v-if="res.imageURL"
-                          class="size-12 rounded-box"
-                          :src="res.imageURL"
-                        />
+                        <img v-if="res.imageURL" class="size-12 rounded-box" :src="res.imageURL" />
                         <span
                           v-else
-                          class="flex items-center justify-center rounded-box border-1 border-neutral-200 size-12"
+                          class="flex size-12 items-center justify-center rounded-box border-1 border-neutral-200"
                         >
                           <font-awesome-icon
                             :icon="placeholderIcon(res.__typename)"
@@ -88,10 +63,7 @@
                           </div>
                         </div>
                         <button class="btn btn-square btn-ghost">
-                          <font-awesome-icon
-                            icon="fa-solid fa-angle-right"
-                            class="size-[1.2em]"
-                          />
+                          <font-awesome-icon icon="fa-solid fa-angle-right" class="size-[1.2em]" />
                         </button>
                       </div>
                     </div>
@@ -99,10 +71,7 @@
                 </li>
               </div>
 
-              <li
-                v-if="data?.search.nodes.length === 0 && searchInput.length > 0"
-                class="list-row"
-              >
+              <li v-if="data?.search.nodes.length === 0 && searchInput.length > 0" class="list-row">
                 No results found for "{{ searchInput }}"
               </li>
               <li
@@ -114,7 +83,7 @@
             </ul>
           </TabsContent>
           <TabsContent value="scan">
-            <SearchScanner></SearchScanner>
+            <SearchScanner />
           </TabsContent>
         </Tabs>
       </div>
@@ -126,7 +95,7 @@
 import { watchDebounced } from '@vueuse/core'
 
 onMounted(() => {
-  document.getElementById('search')?.focus()
+  ;(document.querySelector('#search') as HTMLElement)?.focus()
 })
 
 const searchQuery = gql`

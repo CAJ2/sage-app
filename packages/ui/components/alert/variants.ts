@@ -6,8 +6,7 @@ export const alertVariants = cva(
     variants: {
       variant: {
         default: 'bg-background text-foreground',
-        error:
-          'border-error/50 text-error dark:border-error [&>svg]:text-error',
+        error: 'border-error/50 text-error dark:border-error [&>svg]:text-error',
       },
     },
     defaultVariants: {

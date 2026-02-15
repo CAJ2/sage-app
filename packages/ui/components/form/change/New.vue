@@ -1,9 +1,6 @@
 <template>
   <div>
-    <form
-      class="grid w-full max-w-sm grid-cols-1 gap-8"
-      @submit.prevent.stop="form.handleSubmit"
-    >
+    <form class="grid w-full max-w-sm grid-cols-1 gap-8" @submit.prevent.stop="form.handleSubmit">
       <div class="mt-4">
         <form.Field name="title">
           <template #default="{ field }">
@@ -17,16 +14,9 @@
                 onBlur: z.string().min(2).max(100),
               }"
               @blur="field.handleBlur"
-              @input="
-                (e: any) =>
-                  field.handleChange((e.target as HTMLInputElement).value)
-              "
+              @input="(e: any) => field.handleChange((e.target as HTMLInputElement).value)"
             />
-            <Alert
-              v-if="!field.state.meta.isValid"
-              variant="error"
-              class="mt-4"
-            >
+            <Alert v-if="!field.state.meta.isValid" variant="error" class="mt-4">
               <AlertDescription>{{
                 field.state.meta.errors.map((e) => e).join(', ')
               }}</AlertDescription>
@@ -37,9 +27,7 @@
       <div class="">
         <form.Field name="description">
           <template #default="{ field }">
-            <FormLabel :for="field.name" class="text-md my-3"
-              >Description</FormLabel
-            >
+            <FormLabel :for="field.name" class="text-md my-3">Description</FormLabel>
             <FormInput
               :id="field.name"
               :name="field.name"
@@ -49,16 +37,9 @@
                 onBlur: z.string().min(2).max(2000),
               }"
               @blur="field.handleBlur"
-              @input="
-                (e: any) =>
-                  field.handleChange((e.target as HTMLInputElement).value)
-              "
+              @input="(e: any) => field.handleChange((e.target as HTMLInputElement).value)"
             />
-            <Alert
-              v-if="!field.state.meta.isValid"
-              variant="error"
-              class="mt-4"
-            >
+            <Alert v-if="!field.state.meta.isValid" variant="error" class="mt-4">
               <AlertDescription>{{
                 field.state.meta.errors.map((e) => e).join(', ')
               }}</AlertDescription>
@@ -69,11 +50,7 @@
       <div>
         <form.Subscribe>
           <template #default="{ canSubmit, isSubmitting }">
-            <button
-              type="submit"
-              :disabled="!canSubmit"
-              class="btn btn-primary btn-block"
-            >
+            <button type="submit" :disabled="!canSubmit" class="btn btn-block btn-primary">
               {{ isSubmitting ? '...' : 'Create Change' }}
             </button>
           </template>
@@ -93,8 +70,6 @@ const form = useForm({
     description: '',
   },
   validators: {},
-  onSubmit: async ({ value }) => {
-    console.log('Submitted value:', value)
-  },
+  onSubmit: () => {},
 })
 </script>

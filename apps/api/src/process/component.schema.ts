@@ -1,4 +1,10 @@
 import { Injectable } from '@nestjs/common'
+import { ValidateFunction } from 'ajv'
+import _ from 'lodash'
+import { I18nService } from 'nestjs-i18n'
+import { z } from 'zod/v4'
+
+import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -10,17 +16,10 @@ import { TrArraySchema } from '@src/common/i18n'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
-import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
-import { z } from 'zod/v4'
-import {
-  ComponentPhysicalSchema,
-  ComponentVisualSchema,
-} from './component.entity'
+
+import { ComponentPhysicalSchema, ComponentVisualSchema } from './component.entity'
 import { MaterialIDSchema } from './material.model'
 import { TagDefinitionIDSchema } from './tag.model'
-import type { Edit } from '@src/changes/change.model'
 
 export const ComponentIDSchema = z.string().meta({
   id: 'Component',
@@ -222,11 +221,7 @@ export class ComponentSchemaService {
         'component',
         'material',
       )
-      data.tags = this.baseSchema.collectionToInput(
-        data.componentTags || [],
-        'component',
-        'tag',
-      )
+      data.tags = this.baseSchema.collectionToInput(data.componentTags || [], 'component', 'tag')
     }
     this.UpdateValidator(data)
     return data

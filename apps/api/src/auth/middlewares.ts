@@ -1,7 +1,8 @@
-import * as express from 'express'
-import type { OptionsJson } from 'body-parser'
-import type { NextFunction, Request, Response } from 'express'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+
+import type { OptionsJson } from 'body-parser'
+import * as express from 'express'
+import type { NextFunction, Request, Response } from 'express'
 
 export interface SkipBodyParsingMiddlewareOptions {
   /**
@@ -44,14 +45,10 @@ const rawBodyParser = (
  * Factory that returns a Nest middleware which skips body parsing for the
  * configured basePath.
  */
-export function SkipBodyParsingMiddleware(
-  options: SkipBodyParsingMiddlewareOptions = {},
-) {
+export function SkipBodyParsingMiddleware(options: SkipBodyParsingMiddlewareOptions = {}) {
   const { basePath = '/api/auth', enableRawBodyParser = false } = options
 
-  const jsonParserOptions: OptionsJson = enableRawBodyParser
-    ? { verify: rawBodyParser }
-    : {}
+  const jsonParserOptions: OptionsJson = enableRawBodyParser ? { verify: rawBodyParser } : {}
 
   // Return a middleware function compatible with Nest's consumer.apply()
   // NestJS consumer.apply() accepts plain functions directly

@@ -4,8 +4,8 @@
       <slot />
     </div>
     <div class="relative">
-      <div class="fixed bottom-0 left-0 right-0">
-        <NavTabs></NavTabs>
+      <div class="fixed right-0 bottom-0 left-0">
+        <NavTabs />
       </div>
     </div>
   </div>

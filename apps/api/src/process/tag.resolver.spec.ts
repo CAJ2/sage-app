@@ -1,13 +1,14 @@
 import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
-import { UserSeeder } from '@src/db/seeds/UserSeeder'
-import { clearDatabase } from '@src/db/test.utils'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { TagType } from '@test/gql/graphql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+
+import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
+import { UserSeeder } from '@src/db/seeds/UserSeeder'
+import { clearDatabase } from '@src/db/test.utils'
 
 describe('TagResolver (integration)', () => {
   let app: INestApplication
@@ -82,7 +83,9 @@ describe('TagResolver (integration)', () => {
     )
     expect(res.data?.createTagDefinition?.tag).toBeTruthy()
     expect(res.data?.createTagDefinition?.tag?.name).toBe('Test Tag')
-    tagID = res.data?.createTagDefinition?.tag?.id!
+    if (res.data?.createTagDefinition?.tag?.id) {
+      tagID = res.data?.createTagDefinition?.tag?.id
+    }
   })
 
   test('should query a single tag', async () => {

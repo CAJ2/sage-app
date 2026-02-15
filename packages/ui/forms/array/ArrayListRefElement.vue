@@ -48,14 +48,10 @@ const listItem = defineComponent({
   },
   computed: {
     contentClasses(): string {
-      return classes`${this.styles.arrayList.itemContent} ${
-        this.styles.arrayList.itemExpanded
-      }`
+      return classes`${this.styles.arrayList.itemContent} ${this.styles.arrayList.itemExpanded}`
     },
     toolbarClasses(): string {
-      return classes`${this.styles.arrayList.itemToolbar} ${
-        this.styles.arrayList.itemExpanded
-      }`
+      return classes`${this.styles.arrayList.itemToolbar} ${this.styles.arrayList.itemExpanded}`
     },
   },
   methods: {

@@ -6,6 +6,8 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql'
+import { z } from 'zod/v4'
+
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { IPaginatedType, PageInfo } from '@src/graphql/paginated'
@@ -15,7 +17,6 @@ import { Category } from '@src/product/category.model'
 import { Item } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
-import { z } from 'zod/v4'
 
 export enum SearchType {
   CATEGORY = 'category',
@@ -30,8 +31,7 @@ export enum SearchType {
 
 export const SearchResultItem = createUnionType({
   name: 'SearchResultItem',
-  types: () =>
-    [Category, Item, Variant, Component, Org, Place, Region, Material] as const,
+  types: () => [Category, Item, Variant, Component, Org, Place, Region, Material] as const,
   resolveType: (value) => {
     return value._type
   },
@@ -47,9 +47,7 @@ class SearchResultItemEdge {
 }
 
 @ObjectType()
-export class SearchResultPage
-  implements IPaginatedType<typeof SearchResultItem>
-{
+export class SearchResultPage implements IPaginatedType<typeof SearchResultItem> {
   @Field(() => [SearchResultItemEdge], { nullable: true })
   edges?: SearchResultItemEdge[]
 

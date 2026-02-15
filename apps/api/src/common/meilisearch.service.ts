@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { Searchable } from '@src/db/base.entity'
 import _ from 'lodash'
 import { MeiliSearch, RecordAny } from 'meilisearch'
+
+import { Searchable } from '@src/db/base.entity'
 
 export enum SearchIndex {
   CATEGORIES = 'categories',
@@ -74,22 +75,14 @@ export class MeiliService {
           delete r[key]
         }
         if (key.startsWith('desc_short_')) {
-          r.desc_short = _.set(
-            r.desc_short || {},
-            key.replace('desc_short_', ''),
-            r[key],
-          )
+          r.desc_short = _.set(r.desc_short || {}, key.replace('desc_short_', ''), r[key])
           delete r[key]
         } else if (key.startsWith('desc_')) {
           r.desc = _.set(r.desc || {}, key.replace('desc_', ''), r[key])
           delete r[key]
         }
         if (key.startsWith('address_')) {
-          r.address = _.set(
-            r.address || {},
-            key.replace('address_', ''),
-            r[key],
-          )
+          r.address = _.set(r.address || {}, key.replace('address_', ''), r[key])
           delete r[key]
         }
       }

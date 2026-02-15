@@ -1,5 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql'
 import { Inject, Logger, Module } from '@nestjs/common'
+import type { DynamicModule, MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common'
 import { normalizePath } from '@nestjs/common/utils/shared.utils.js'
 import {
   APP_GUARD,
@@ -12,6 +13,8 @@ import {
 import { mapToExcludeRoute } from '@nestjs/core/middleware/utils.js'
 import { toNodeHandler } from 'better-auth/node'
 import { createAuthMiddleware } from 'better-auth/plugins'
+import type { Request, Response } from 'express'
+
 import { configureAuth } from './auth'
 import {
   type ASYNC_OPTIONS_TYPE,
@@ -25,13 +28,6 @@ import { AuthService } from './auth.service'
 import { AuthUserService } from './authuser.service'
 import { SkipBodyParsingMiddleware } from './middlewares'
 import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './symbols'
-import type {
-  DynamicModule,
-  MiddlewareConsumer,
-  NestModule,
-  OnModuleInit,
-} from '@nestjs/common'
-import type { Request, Response } from 'express'
 
 const HOOKS = [
   { metadataKey: BEFORE_HOOK_KEY, hookType: 'before' as const },
@@ -50,10 +46,7 @@ export type Auth = any
   providers: [AuthService],
   exports: [AuthService],
 })
-export class BetterAuthModule
-  extends ConfigurableModuleClass
-  implements NestModule, OnModuleInit
-{
+export class BetterAuthModule extends ConfigurableModuleClass implements NestModule, OnModuleInit {
   private readonly logger = new Logger(BetterAuthModule.name)
   private readonly basePath: string
 
@@ -79,23 +72,17 @@ export class BetterAuthModule
     // Add exclusion to global prefix for Better Auth routes
     const globalPrefixOptions = this.applicationConfig.getGlobalPrefixOptions()
     this.applicationConfig.setGlobalPrefixOptions({
-      exclude: [
-        ...(globalPrefixOptions.exclude ?? []),
-        ...mapToExcludeRoute([this.basePath]),
-      ],
+      exclude: [...(globalPrefixOptions.exclude ?? []), ...mapToExcludeRoute([this.basePath])],
     })
   }
 
   onModuleInit(): void {
     const providers = this.discoveryService
       .getProviders()
-      .filter(
-        ({ metatype }) => metatype && Reflect.getMetadata(HOOK_KEY, metatype),
-      )
+      .filter(({ metatype }) => metatype && Reflect.getMetadata(HOOK_KEY, metatype))
 
     const hasHookProviders = providers.length > 0
-    const hooksConfigured =
-      typeof this.options.auth?.options?.hooks === 'object'
+    const hooksConfigured = typeof this.options.auth?.options?.hooks === 'object'
 
     if (hasHookProviders && !hooksConfigured)
       throw new Error(
@@ -127,11 +114,7 @@ export class BetterAuthModule
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
       })
-    } else if (
-      trustedOrigins &&
-      !this.options.disableTrustedOriginsCors &&
-      !isNotFunctionBased
-    )
+    } else if (trustedOrigins && !this.options.disableTrustedOriginsCors && !isNotFunctionBased)
       throw new Error(
         'Function-based trustedOrigins not supported in NestJS. Use string array or disable CORS with disableTrustedOriginsCors: true.',
       )
@@ -172,17 +155,15 @@ export class BetterAuthModule
       const hookPath = Reflect.getMetadata(metadataKey, providerMethod)
 
       const originalHook = this.options.auth.options.hooks[hookType]
-      this.options.auth.options.hooks[hookType] = createAuthMiddleware(
-        async (ctx) => {
-          if (originalHook) {
-            await originalHook(ctx)
-          }
+      this.options.auth.options.hooks[hookType] = createAuthMiddleware(async (ctx) => {
+        if (originalHook) {
+          await originalHook(ctx)
+        }
 
-          if (hookPath && hookPath !== ctx.path) return
+        if (hookPath && hookPath !== ctx.path) return
 
-          await providerMethod.apply(providerClass, [ctx])
-        },
-      )
+        await providerMethod.apply(providerClass, [ctx])
+      })
     }
   }
 
@@ -192,12 +173,8 @@ export class BetterAuthModule
 
     return {
       ...forRootAsyncResult,
-      module: options.disableControllers
-        ? AuthModuleWithoutControllers
-        : module,
-      controllers: options.disableControllers
-        ? []
-        : forRootAsyncResult.controllers,
+      module: options.disableControllers ? AuthModuleWithoutControllers : module,
+      controllers: options.disableControllers ? [] : forRootAsyncResult.controllers,
       providers: [
         ...(forRootAsyncResult.providers ?? []),
         ...(!options.disableGlobalAuthGuard
@@ -218,9 +195,7 @@ export class BetterAuthModule
 
     return {
       ...forRootResult,
-      module: options.disableControllers
-        ? AuthModuleWithoutControllers
-        : module,
+      module: options.disableControllers ? AuthModuleWithoutControllers : module,
       controllers: options.disableControllers ? [] : forRootResult.controllers,
       providers: [
         ...(forRootResult.providers ?? []),

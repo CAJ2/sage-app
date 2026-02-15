@@ -19,19 +19,10 @@ import type {
   GroupLayout,
   UISchemaElement,
 } from '@jsonforms/core'
-import {
-  rankWith,
-  Generate,
-  findUISchema,
-  isObjectControl,
-} from '@jsonforms/core'
+import { rankWith, Generate, findUISchema, isObjectControl } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
-import {
-  DispatchRenderer,
-  rendererProps,
-  useJsonFormsControlWithDetail,
-} from '@jsonforms/vue'
+import { DispatchRenderer, rendererProps, useJsonFormsControlWithDetail } from '@jsonforms/vue'
 import { useVanillaControl } from '../util'
 import isEmpty from 'lodash/isEmpty'
 

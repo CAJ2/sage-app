@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common'
-import { parseLanguageHeader } from '@src/common/i18n'
 import { ClsService } from 'nestjs-cls'
 import { z, ZodObject } from 'zod/v4'
 import * as z4 from 'zod/v4/core'
+
+import { parseLanguageHeader } from '@src/common/i18n'
 
 @Injectable()
 export class ZService {
   constructor(private readonly cls: ClsService) {}
 
-  async parse<S extends z4.$ZodType>(
-    schema: S,
-    input: unknown,
-  ): Promise<z4.output<S>> {
+  async parse<S extends z4.$ZodType>(schema: S, input: unknown): Promise<z4.output<S>> {
     if (schema instanceof ZodObject) {
       for (const key in schema.shape) {
         const field = schema.shape[key]

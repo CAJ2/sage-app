@@ -2,6 +2,9 @@
   "name": "@sageleaf/science",
   "version": "0.1.0",
   "private": true,
+  "files": [
+    ".output"
+  ],
   "type": "module",
   "scripts": {
     "build": "pnpm exec nuxi build",
@@ -10,29 +13,11 @@
     "generate:prod": "pnpm exec nuxi generate --dotenv=config/production/.env",
     "preview": "pnpm exec nuxi preview",
     "postinstall": "pnpm exec nuxi prepare",
-    "lint": "pnpm exec eslint --fix",
-    "lint:ci": "pnpm exec eslint . --max-warnings 0",
+    "lint": "pnpm exec oxlint --fix && pnpm exec eslint --fix",
+    "lint:ci": "pnpm exec oxlint --deny-warnings && pnpm exec eslint . --max-warnings 0",
+    "fmt": "pnpm exec oxfmt",
+    "fmt:ci": "pnpm exec oxfmt --check",
     "codegen": "graphql-codegen --config codegen.ts"
-  },
-  "devDependencies": {
-    "@graphql-codegen/cli": "5.0.7",
-    "@graphql-codegen/client-preset": "4.8.2",
-    "@graphql-typed-document-node/core": "^3.2.0",
-    "@nuxt/devtools": "^2.5.0",
-    "@nuxt/eslint": "^1.4.1",
-    "@nuxt/icon": "^1.13.0",
-    "@nuxt/image": "1.10.0",
-    "@nuxtjs/apollo": "5.0.0-alpha.14",
-    "@nuxtjs/color-mode": "^3.5.2",
-    "@nuxtjs/i18n": "9.5.5",
-    "@types/lodash": "^4.17.14",
-    "@types/node": "=22.14.0",
-    "daisyui": "^5.0.40",
-    "eslint": "^9.27.0",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.16",
-    "vue-router": "^4.5.1",
-    "vue-tsc": "^2.2.10"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -81,19 +66,45 @@
     "vaul-vue": "^0.4.1",
     "vue-i18n": "^11.1.5",
     "webrtc-adapter": "^9.0.3",
-    "zod": "^3.25.32"
+    "zod": "^4.3.6"
   },
-  "files": [
-    ".output"
-  ],
+  "devDependencies": {
+    "@graphql-codegen/cli": "5.0.7",
+    "@graphql-codegen/client-preset": "4.8.2",
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "@nuxt/devtools": "^2.5.0",
+    "@nuxt/eslint": "^1.4.1",
+    "@nuxt/icon": "^1.13.0",
+    "@nuxt/image": "1.10.0",
+    "@nuxtjs/apollo": "5.0.0-alpha.14",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/i18n": "9.5.5",
+    "@types/lodash": "^4.17.14",
+    "@types/node": "=22.14.0",
+    "daisyui": "^5.0.40",
+    "eslint": "^9.27.0",
+    "eslint-plugin-oxlint": "^1.46.0",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.47.0",
+    "typescript": "^5.8.3",
+    "vue": "^3.5.16",
+    "vue-router": "^4.5.1",
+    "vue-tsc": "^2.2.10"
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
   "nx": {
     "targets": {
       "lint:ci": {
         "dependsOn": [
           "build"
         ]
+      },
+      "codegen": {
+        "dependsOn": [
+          "lint",
+          "fmt"
+        ]
       }
     }
-  },
-  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
+  }
 }

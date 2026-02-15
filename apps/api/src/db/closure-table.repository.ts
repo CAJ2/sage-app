@@ -1,11 +1,10 @@
+import type { Constructor } from '@mikro-orm/core'
 // Adapted from https://gist.github.com/alexy4744/50edc40d2ed6eb706f2fcf3027dbe806
 import { EntityRepository, Knex, QueryBuilder } from '@mikro-orm/postgresql'
-import type { Constructor } from '@mikro-orm/core'
 
 type Node = string
 
-export interface ClosureTableRepository<Entity extends object>
-  extends EntityRepository<Entity> {
+export interface ClosureTableRepository<Entity extends object> extends EntityRepository<Entity> {
   containsDescendant(parent: Node, descendant: Node): Promise<boolean>
   findDescendants(parent: Node): QueryBuilder<any>
   insertLeafNode(leaf: Node, parent: Node): Promise<void>
@@ -31,9 +30,7 @@ export const DefineClosureTableRepository = <Entity extends object>(
   {
     private readonly ancestorColumn = this.getColumnName(options.ancestorColumn)
     private readonly depthColumn = this.getColumnName(options.depthColumn)
-    private readonly descendantColumn = this.getColumnName(
-      options.descendantColumn,
-    )
+    private readonly descendantColumn = this.getColumnName(options.descendantColumn)
 
     private readonly tableName = this.getTableName(this.entityName.toString())
 
@@ -113,10 +110,7 @@ export const DefineClosureTableRepository = <Entity extends object>(
               .select(this.ancestorColumn)
               .from(this.tableName)
               .where(this.descendantColumn, source)
-              .andWhereNot(
-                this.ancestorColumn,
-                this.knex.ref(this.descendantColumn),
-              ),
+              .andWhereNot(this.ancestorColumn, this.knex.ref(this.descendantColumn)),
           ),
       )
 
@@ -127,9 +121,7 @@ export const DefineClosureTableRepository = <Entity extends object>(
               this.knex.ref(`supertree.${this.ancestorColumn}`),
               this.knex.ref(`subtree.${this.descendantColumn}`),
               // can't use .ref() here because knex gets confused with the + operator
-              this.knex.raw(
-                `supertree.${this.depthColumn} + subtree.${this.depthColumn} + 1`,
-              ),
+              this.knex.raw(`supertree.${this.depthColumn} + subtree.${this.depthColumn} + 1`),
             )
             .from({ supertree: this.tableName })
             .crossJoin(this.knex.ref(`${this.tableName} as subtree`))

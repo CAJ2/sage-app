@@ -1,10 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="w-full px-5 mb-10">
-      <FormChangeSaveStatus
-        v-if="!readOnly"
-        :status="saveStatus"
-      ></FormChangeSaveStatus>
+    <div class="mb-10 w-full px-5">
+      <FormChangeSaveStatus v-if="!readOnly" :status="saveStatus"></FormChangeSaveStatus>
       <FormJsonSchema
         v-if="jsonSchema && uiSchema"
         :schema="jsonSchema"
@@ -13,10 +10,7 @@
         :readonly="readOnly"
         @change="onChange"
       />
-      <Button
-        v-if="!autoSave || !changeId"
-        class="btn-block sticky bottom-0"
-        @click="saveForm"
+      <Button v-if="!autoSave || !changeId" class="sticky bottom-0 btn-block" @click="saveForm"
         >Save</Button
       >
     </div>
@@ -32,42 +26,35 @@ import type { JSONSchemaType } from 'ajv'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SchemaQuery = any
-const {
-  changeId,
-  modelId,
-  schemaQuery,
-  createMutation,
-  updateMutation,
-  createModelKey,
-  autoSave,
-} = defineProps<{
-  changeId: string | undefined
-  modelId: string
-  schemaQuery: TypedDocumentNode<
-    SchemaQuery,
-    Exact<{
-      [key: string]: never
-    }>
-  >
-  createMutation: TypedDocumentNode<
-    { [key: string]: unknown },
-    {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      input: any
-    }
-  >
-  updateMutation: TypedDocumentNode<
-    { [key: string]: unknown },
-    Exact<{
-      input: {
-        id: string
-        [key: string]: unknown
+const { changeId, modelId, schemaQuery, createMutation, updateMutation, createModelKey, autoSave } =
+  defineProps<{
+    changeId: string | undefined
+    modelId: string
+    schemaQuery: TypedDocumentNode<
+      SchemaQuery,
+      Exact<{
+        [key: string]: never
+      }>
+    >
+    createMutation: TypedDocumentNode<
+      { [key: string]: unknown },
+      {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        input: any
       }
-    }>
-  >
-  createModelKey: string
-  autoSave?: boolean
-}>()
+    >
+    updateMutation: TypedDocumentNode<
+      { [key: string]: unknown },
+      Exact<{
+        input: {
+          id: string
+          [key: string]: unknown
+        }
+      }>
+    >
+    createModelKey: string
+    autoSave?: boolean
+  }>()
 
 const emits = defineEmits<{
   (e: 'created' | 'saved', id: string): void
@@ -162,7 +149,7 @@ if (modelId !== 'new' && changeId) {
 }
 const readOnly = computed<boolean | undefined>(() => {
   if (changeStatus.value !== ChangeStatus.Merged) {
-    return undefined
+    return
   }
   return true
 })
@@ -188,13 +175,12 @@ const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
   modelId === 'new' ? 'not_saved' : 'saved',
 )
 let firstChange = false
-const onChange = async (event: JsonFormsChangeEvent) => {
+const onChange = (event: JsonFormsChangeEvent) => {
   if (changeStatus.value === ChangeStatus.Merged) {
     return
   }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      console.error('Form errors:', event.errors)
       saveStatus.value = 'error'
       return
     }
@@ -223,7 +209,6 @@ if (changeId && autoSave && modelId === 'new') {
       })
       .then((modelResult) => {
         if (!modelResult?.data) {
-          console.error('Create model failed:', modelResult)
           saveStatus.value = 'error'
           return
         }
@@ -239,10 +224,8 @@ if (changeId && autoSave && modelId === 'new') {
           emits('saved', modelReturned.id)
         }
       })
-      .catch((error) => {
-        console.error('Error creating model:', error)
+      .catch(() => {
         saveStatus.value = 'error'
-        return
       })
   })
 } else if (changeId && autoSave && modelId !== 'new') {
@@ -260,8 +243,7 @@ if (changeId && autoSave && modelId === 'new') {
         saveStatus.value = 'saved'
         emits('saved', modelId)
       })
-      .catch((error) => {
-        console.error('Error updating model:', error)
+      .catch(() => {
         saveStatus.value = 'error'
       })
   })
@@ -280,7 +262,6 @@ const saveForm = async () => {
       })
       .then((modelResult) => {
         if (!modelResult?.data) {
-          console.error('Create model failed:', modelResult)
           saveStatus.value = 'error'
           return
         }
@@ -296,10 +277,8 @@ const saveForm = async () => {
           emits('saved', modelReturned.id)
         }
       })
-      .catch((error) => {
-        console.error('Error creating model:', error)
+      .catch(() => {
         saveStatus.value = 'error'
-        return
       })
   } else {
     await update
@@ -314,8 +293,7 @@ const saveForm = async () => {
         saveStatus.value = 'saved'
         emits('saved', modelId)
       })
-      .catch((error) => {
-        console.error('Error updating model:', error)
+      .catch(() => {
         saveStatus.value = 'error'
       })
   }

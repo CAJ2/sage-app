@@ -1,15 +1,11 @@
 <template>
   <div>
     <NavTopbar
-      :title="
-        route.params.componentID === 'new'
-          ? 'Create Component'
-          : 'Edit Component'
-      "
+      :title="route.params.componentID === 'new' ? 'Create Component' : 'Edit Component'"
       back="true"
-    ></NavTopbar>
+    />
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
+      <div class="w-full max-w-2xl p-5">
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -81,10 +77,7 @@ if (componentID !== 'new') {
     id: componentID,
     changeID,
   })
-  if (
-    data?.value?.change?.edits.nodes &&
-    data.value.change.edits.nodes.length > 0
-  ) {
+  if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
       data.value.change.edits.nodes[0].updateChanges,
@@ -96,7 +89,7 @@ if (componentID !== 'new') {
 }
 const readOnly = computed<boolean | undefined>(() => {
   if (changeStatus.value !== ChangeStatus.Merged) {
-    return undefined
+    return
   }
   return true
 })
@@ -146,7 +139,6 @@ const onChange = async (event: JsonFormsChangeEvent) => {
   }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      console.error('Form errors:', event.errors)
       saveStatus.value = 'error'
       return
     }
@@ -171,10 +163,8 @@ const onChange = async (event: JsonFormsChangeEvent) => {
             )
           }
         })
-        .catch((error) => {
-          console.error('Error creating component:', error)
+        .catch(() => {
           saveStatus.value = 'error'
-          return
         })
     } else {
       updateData.value = event.data
@@ -189,8 +179,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
         .then(() => {
           saveStatus.value = 'saved'
         })
-        .catch((error) => {
-          console.error('Error updating component:', error)
+        .catch(() => {
           saveStatus.value = 'error'
         })
     }

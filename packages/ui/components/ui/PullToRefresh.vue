@@ -28,11 +28,7 @@
           <span v-if="refreshing" class="loading loading-spinner"></span>
           <font-awesome-icon
             v-else
-            :icon="
-              canRefresh || goingUp
-                ? 'fa-solid fa-arrow-up'
-                : 'fa-solid fa-arrow-down'
-            "
+            :icon="canRefresh || goingUp ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'"
           />
         </div>
       </slot>
@@ -51,11 +47,8 @@
 function clamp(value: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, value))
 }
-function convertToUnit(
-  str: string | number | null | undefined,
-  unit = 'px',
-): string | undefined {
-  if (str == null || str === '') {
+function convertToUnit(str: string | number | null | undefined, unit = 'px'): string | undefined {
+  if (str === null || str === '') {
     return undefined
   }
   const num = Number(str)
@@ -63,9 +56,8 @@ function convertToUnit(
     return String(str)
   } else if (!isFinite(num)) {
     return undefined
-  } else {
-    return `${num}${unit}`
   }
+  return `${num}${unit}`
 }
 function hasScrollbar(el?: Element | null) {
   if (!el || el.nodeType !== Node.ELEMENT_NODE) return false
@@ -109,24 +101,18 @@ const refreshing = shallowRef(false)
 const goingUp = shallowRef(false)
 const touching = shallowRef(false)
 
-const canRefresh = computed(
-  () => touchDiff.value >= props.pullDownThreshold && !refreshing.value,
-)
-const topOffset = computed(() =>
-  clamp(touchDiff.value, 0, props.pullDownThreshold),
-)
+const canRefresh = computed(() => touchDiff.value >= props.pullDownThreshold && !refreshing.value)
+const topOffset = computed(() => clamp(touchDiff.value, 0, props.pullDownThreshold))
 
 function onTouchstart(e: TouchEvent | MouseEvent) {
   if (refreshing.value || props.disabled) return
   touching.value = true
-  touchstartY =
-    'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
+  touchstartY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
 }
 function onTouchmove(e: TouchEvent | MouseEvent) {
   if (refreshing.value || !touching.value || props.disabled) return
-  const touchY =
-    'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
-  if (scrollParents.length && !scrollParents[0].scrollTop) {
+  const touchY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
+  if (scrollParents.length > 0 && !scrollParents[0].scrollTop) {
     touchDiff.value = touchY - touchstartY
   }
 }
@@ -134,7 +120,7 @@ function onTouchend(_e: TouchEvent | MouseEvent) {
   if (refreshing.value || props.disabled) return
   touching.value = false
   if (canRefresh.value) {
-    function done() {
+    const done = () => {
       if (!refreshing.value) return
       touchDiff.value = 0
       refreshing.value = false
@@ -151,11 +137,9 @@ onMounted(() => {
 })
 
 watch([topOffset, refreshing], () => {
-  if (scrollParents.length) {
+  if (scrollParents.length > 0) {
     const stopScrolling = topOffset.value && !refreshing.value
-    scrollParents.forEach(
-      (p) => (p.style.overflow = stopScrolling ? 'hidden' : 'auto'),
-    )
+    scrollParents.forEach((p) => (p.style.overflow = stopScrolling ? 'hidden' : 'auto'))
   }
 })
 

@@ -1,7 +1,8 @@
-import { map2to3 } from '@src/db/iso639'
+import type { TransformFnParams } from 'class-transformer'
 import _ from 'lodash'
 import { z } from 'zod/v4'
-import type { TransformFnParams } from 'class-transformer'
+
+import { map2to3 } from '@src/db/iso639'
 
 export const Locales = ['en-US', 'sv-SE'] as const
 
@@ -57,9 +58,7 @@ export const TrArraySchema = z.array(TranslatedInputSchema).optional()
 
 export type TrArray = z.infer<typeof TrArraySchema>
 
-export function isTranslatedField(
-  data: Record<string, any>,
-): data is TranslatedField {
+export function isTranslatedField(data: Record<string, any>): data is TranslatedField {
   const result = TranslatedJSONSchema.safeParse(data)
   return result.success
 }
@@ -74,9 +73,6 @@ export function translate(params: TransformFnParams): string | undefined {
   const lang: string[] | undefined = obj._lang || (opts as any).lang
   if (!value) {
     return value
-  }
-  if (!isTranslatedField(value)) {
-    console.error('Invalid translated field', value)
   }
   // Set Tr property to full translation object
   obj[params.key + 'Tr'] = _.map(value, (text, lang) => {
@@ -127,10 +123,7 @@ const supported = Locales.map((support) => {
   return b.code.length - a.code.length
 })
 
-export function parseLanguageHeader(
-  header: string,
-  fallback?: string,
-): string[] {
+export function parseLanguageHeader(header: string, fallback?: string): string[] {
   // From https://github.com/opentable/accept-language-parser
   const strings: string[] = header.split(',')
   const langs = strings

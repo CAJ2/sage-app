@@ -7,13 +7,8 @@
             <NuxtLinkLocale :to="'/'">
               <div class="p-3"><img src="/favicon-32x32.png" /></div>
             </NuxtLinkLocale>
-            <div class="grow px-2 text-lg text-bold text-base-content">
-              Sage
-            </div>
-            <SidebarTrigger
-              v-if="sidebarOpen"
-              class="self-start text-base-content/70"
-            />
+            <div class="text-bold grow px-2 text-lg text-base-content">Sage</div>
+            <SidebarTrigger v-if="sidebarOpen" class="self-start text-base-content/70" />
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -40,16 +35,8 @@
                       'text-primary dark:text-accent': activeTab === item.url,
                     }"
                   >
-                    <NuxtLinkLocale
-                      :to="item.url"
-                      class="flex content-center items-center"
-                    >
-                      <UiImage
-                        :src="item.icon"
-                        :width="6"
-                        :height="6"
-                        class="p-0"
-                      />
+                    <NuxtLinkLocale :to="item.url" class="flex content-center items-center">
+                      <UiImage :src="item.icon" :width="6" :height="6" class="p-0" />
                       <span class="pl-2">{{ item.title }}</span>
                     </NuxtLinkLocale>
                   </SidebarMenuButton>
@@ -74,9 +61,7 @@
                       }"
                     >
                       <div class="w-8 rounded-full">
-                        <span
-                          v-if="!session?.data?.user.image"
-                          class="text-neutral-400"
+                        <span v-if="!session?.data?.user.image" class="text-neutral-400"
                           ><svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -89,16 +74,13 @@
                             />
                           </svg>
                         </span>
-                        <img
-                          v-if="session?.data?.user.image"
-                          :src="session.data.user.image"
-                        />
+                        <img v-if="session?.data?.user.image" :src="session.data.user.image" />
                       </div>
                     </div>
                     {{ session?.data?.user.name || 'Sign in' }}
                     <svg
                       v-if="session?.data?.user"
-                      class="ml-auto mr-1"
+                      class="mr-1 ml-auto"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
@@ -124,11 +106,7 @@
                     </svg>
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  v-if="session?.data?.user"
-                  side="top"
-                  class="w-48"
-                >
+                <DropdownMenuContent v-if="session?.data?.user" side="top" class="w-48">
                   <DropdownMenuItem @click="signOut">
                     <span>Sign out</span>
                   </DropdownMenuItem>
@@ -139,21 +117,19 @@
         </SidebarFooter>
       </Sidebar>
       <main class="flex w-full flex-col bg-base-200">
-        <div class="flex w-full h-12 items-center">
+        <div class="flex h-12 w-full items-center">
           <SidebarTrigger v-if="!sidebarOpen" class="ml-2 text-neutral-400" />
           <Dialog>
             <DialogTrigger as-child>
               <Button
-                class="btn mx-3 w-48 bg-zinc-600/30 hover:bg-zinc-300/50 justify-start"
+                class="btn mx-3 w-48 justify-start bg-zinc-600/30 hover:bg-zinc-300/50"
                 variant="ghost"
               >
                 Search...
               </Button>
             </DialogTrigger>
-            <DialogContent class="sm:max-w-[475px] p-0">
-              <div
-                class="flex h-full w-full flex-col overflow-hidden rounded-md bg-base-200"
-              >
+            <DialogContent class="p-0 sm:max-w-[475px]">
+              <div class="flex h-full w-full flex-col overflow-hidden rounded-md bg-base-200">
                 <div class="flex items-center border-b px-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -174,13 +150,10 @@
                   </svg>
                   <FormInput
                     id="search"
-                    class="flex h-10 w-full rounded-md bg-transparent my-1 py-3 text-md outline-none border-0 focus:border-0"
+                    class="text-md my-1 flex h-10 w-full rounded-md border-0 bg-transparent py-3 outline-none focus:border-0"
                   />
                 </div>
-                <div
-                  class="max-h-[300px] overflow-y-auto overflow-x-hidden"
-                  role="listbox"
-                ></div>
+                <div class="max-h-[300px] overflow-x-hidden overflow-y-auto" role="listbox"></div>
               </div>
             </DialogContent>
           </Dialog>

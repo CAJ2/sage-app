@@ -1,5 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+
 import { isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
@@ -7,6 +8,7 @@ import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
+
 import { Org } from './org.entity'
 import { CreateOrgInput, UpdateOrgInput } from './org.model'
 import { User } from './users.entity'
@@ -37,10 +39,7 @@ export class OrgService {
   async create(input: CreateOrgInput, userID: string) {
     const checkOrg = await this.em.findOne(Org, { slug: input.slug })
     if (checkOrg) {
-      throw ConflictErr(
-        'ORG_CONFLICT',
-        `Org with slug ${input.slug} already exists`,
-      )
+      throw ConflictErr('ORG_CONFLICT', `Org with slug ${input.slug} already exists`)
     }
     const org = new Org()
     if (!isUsingChange(input)) {
@@ -48,11 +47,7 @@ export class OrgService {
       await this.em.persistAndFlush(org)
       return { org }
     }
-    const change = await this.editService.findOneOrCreate(
-      input.changeID,
-      input.change,
-      userID,
-    )
+    const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(org, input, change)
     await this.editService.createEntityEdit(change, org)
     await this.em.persistAndFlush(change)
@@ -61,10 +56,14 @@ export class OrgService {
   }
 
   async update(input: UpdateOrgInput, userID: string) {
-    const { entity: org, change } =
-      await this.editService.findOneWithChangeInput(input, userID, Org, {
+    const { entity: org, change } = await this.editService.findOneWithChangeInput(
+      input,
+      userID,
+      Org,
+      {
         id: input.id,
-      })
+      },
+    )
     if (!org) {
       throw NotFoundErr('ORG_NOT_FOUND', `Org with id ${input.id} not found`)
     }
@@ -81,11 +80,7 @@ export class OrgService {
     return { org, change }
   }
 
-  async setFields(
-    org: Org,
-    input: Partial<CreateOrgInput & UpdateOrgInput>,
-    change?: Change,
-  ) {
+  async setFields(org: Org, input: Partial<CreateOrgInput & UpdateOrgInput>, change?: Change) {
     if (input.name) {
       org.name = input.name
     }

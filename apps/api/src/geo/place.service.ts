@@ -1,8 +1,10 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+
 import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
 import { Tag } from '@src/process/tag.entity'
+
 import { Place, PlacesTag } from './place.entity'
 
 @Injectable()
@@ -19,11 +21,7 @@ export class PlaceService {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(
-      Place,
-      { id },
-      { populate: ['org', 'place_tags'] },
-    )
+    return await this.em.findOne(Place, { id }, { populate: ['org', 'place_tags'] })
   }
 
   async tags(placeID: string) {

@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker'
 import { Factory } from '@mikro-orm/seeder'
-import { Org } from '@src/users/org.entity'
 import _ from 'lodash'
+
+import { Org } from '@src/users/org.entity'
 
 export class OrgFactory extends Factory<Org> {
   model = Org

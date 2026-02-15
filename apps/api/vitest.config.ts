@@ -1,16 +1,15 @@
-import { defineConfig } from 'vitest/config'
-import swc from 'unplugin-swc'
 import path from 'path'
 
+import swc from 'unplugin-swc'
+import { defineConfig } from 'vitest/config'
+
 export default defineConfig({
-  plugins: [
-    swc.vite(),
-  ],
+  plugins: [swc.vite()],
   resolve: {
     alias: {
-      "@src": path.resolve(__dirname, "./src"),
-      "@test": path.resolve(__dirname, "./test"),
-    }
+      '@src': path.resolve(__dirname, './src'),
+      '@test': path.resolve(__dirname, './test'),
+    },
   },
   test: {
     globals: true,
@@ -19,7 +18,7 @@ export default defineConfig({
     deps: {
       interopDefault: true,
     },
-    environment: "node",
+    environment: 'node',
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

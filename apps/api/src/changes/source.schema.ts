@@ -1,4 +1,5 @@
 import { z } from 'zod/v4'
+
 import { SourceType } from './source.entity'
 
 export const SourceIDSchema = z.string().meta({
@@ -13,9 +14,7 @@ export const CreateSourceInputSchema = z.strictObject({
   contentURL: z.url().optional(),
   metadata: z.record(z.string(), z.json()).optional(),
 })
-export const CreateSourceInputJSONSchema = z.toJSONSchema(
-  CreateSourceInputSchema,
-)
+export const CreateSourceInputJSONSchema = z.toJSONSchema(CreateSourceInputSchema)
 
 export const UpdateSourceInputSchema = z.strictObject({
   id: SourceIDSchema,
@@ -25,6 +24,4 @@ export const UpdateSourceInputSchema = z.strictObject({
   contentURL: z.url().optional(),
   metadata: z.record(z.string(), z.json()).optional(),
 })
-export const UpdateSourceInputJSONSchema = z.toJSONSchema(
-  UpdateSourceInputSchema,
-)
+export const UpdateSourceInputJSONSchema = z.toJSONSchema(UpdateSourceInputSchema)

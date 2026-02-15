@@ -1,23 +1,22 @@
 import { createParamDecorator, SetMetadata } from '@nestjs/common'
-import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './symbols'
-import { getRequestFromContext } from './utils'
 import type { CustomDecorator, ExecutionContext } from '@nestjs/common'
 import type { createAuthMiddleware } from 'better-auth/api'
+
+import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './symbols'
+import { getRequestFromContext } from './utils'
 
 /**
  * Allows unauthenticated (anonymous) access to a route or controller.
  * When applied, the AuthGuard will not perform authentication checks.
  */
-export const AllowAnonymous = (): CustomDecorator<string> =>
-  SetMetadata('PUBLIC', true)
+export const AllowAnonymous = (): CustomDecorator<string> => SetMetadata('PUBLIC', true)
 
 /**
  * Marks a route or controller as having optional authentication.
  * When applied, the AuthGuard allows the request to proceed
  * even if no session is present.
  */
-export const OptionalAuth = (): CustomDecorator<string> =>
-  SetMetadata('OPTIONAL', true)
+export const OptionalAuth = (): CustomDecorator<string> => SetMetadata('OPTIONAL', true)
 
 /**
  * Specifies the user-level roles required to access a route or controller.
@@ -32,8 +31,7 @@ export const OptionalAuth = (): CustomDecorator<string> =>
  * @Roles(['admin'])  // Only users with user.role = 'admin' can access
  * ```
  */
-export const Roles = (roles: string[]): CustomDecorator =>
-  SetMetadata('ROLES', roles)
+export const Roles = (roles: string[]): CustomDecorator => SetMetadata('ROLES', roles)
 
 /**
  * Specifies the organization-level roles required to access a route or controller.
@@ -48,8 +46,7 @@ export const Roles = (roles: string[]): CustomDecorator =>
  * @OrgRoles(['owner', 'admin'])  // Only org owners/admins can access
  * ```
  */
-export const OrgRoles = (roles: string[]): CustomDecorator =>
-  SetMetadata('ORG_ROLES', roles)
+export const OrgRoles = (roles: string[]): CustomDecorator => SetMetadata('ORG_ROLES', roles)
 
 /**
  * @deprecated Use AllowAnonymous() instead.
@@ -66,18 +63,17 @@ export const Optional = OptionalAuth
  * Provides easy access to the authenticated user's session data in controller methods.
  * Works with both HTTP and GraphQL execution contexts.
  */
-export const Session: ReturnType<typeof createParamDecorator> =
-  createParamDecorator((_data: unknown, context: ExecutionContext): unknown => {
+export const Session: ReturnType<typeof createParamDecorator> = createParamDecorator(
+  (_data: unknown, context: ExecutionContext): unknown => {
     const request = getRequestFromContext(context)
     return request.session
-  })
+  },
+)
 /**
  * Represents the context object passed to hooks.
  * This type is derived from the parameters of the createAuthMiddleware function.
  */
-export type AuthHookContext = Parameters<
-  Parameters<typeof createAuthMiddleware>[0]
->[0]
+export type AuthHookContext = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0]
 
 /**
  * Registers a method to be executed before a specific auth route is processed.

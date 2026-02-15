@@ -6,8 +6,7 @@ expect.extend({
     const { isNot } = this
     return {
       pass: received.data && _.each(received.data, (value) => !!value),
-      message: () =>
-        `Expected response to ${isNot ? 'not ' : ''}have valid data`,
+      message: () => `Expected response to ${isNot ? 'not ' : ''}have valid data`,
     }
   },
 })

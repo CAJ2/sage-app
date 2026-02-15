@@ -1,9 +1,11 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
+
 import { AuthModule } from '@src/auth/auth.module'
 import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
 import { ProcessModule } from '@src/process/process.module'
+
 import { CategoryResolver } from './category.resolver'
 import { CategorySchemaService } from './category.schema'
 import { CategoryService } from './category.service'
@@ -15,13 +17,7 @@ import { VariantSchemaService } from './variant.schema'
 import { VariantService } from './variant.service'
 
 @Module({
-  imports: [
-    CommonModule,
-    MikroOrmModule.forFeature([]),
-    AuthModule,
-    EditsModule,
-    ProcessModule,
-  ],
+  imports: [CommonModule, MikroOrmModule.forFeature([]), AuthModule, EditsModule, ProcessModule],
   providers: [
     CategoryResolver,
     CategoryService,

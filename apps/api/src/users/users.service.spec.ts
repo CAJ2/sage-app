@@ -1,6 +1,8 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
+
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
+
 import { UsersService } from './users.service'
 
 describe('UsersService', () => {

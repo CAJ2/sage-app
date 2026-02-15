@@ -1,9 +1,13 @@
 {
   "name": "@sageleaf/api",
   "version": "0.1.0",
+  "private": true,
   "description": "",
   "author": "",
-  "private": true,
+  "files": [
+    "dist",
+    "temp"
+  ],
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -11,43 +15,16 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "generate": "graphql-codegen --config graphql-codegen.ts",
-    "generate:db": "./db-defs.sh",
+    "codegen": "graphql-codegen --config graphql-codegen.ts",
+    "codegen:db": "./db-defs.sh",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
-    "lint": "pnpm exec eslint --fix",
-    "lint:ci": "pnpm exec eslint . --max-warnings 0",
+    "lint": "pnpm exec oxlint --fix",
+    "lint:ci": "pnpm exec oxlint --deny-warnings",
+    "fmt": "pnpm exec oxfmt",
+    "fmt:ci": "pnpm exec oxfmt --check",
     "check:migrations": "pnpm exec mikro-orm migration:check"
-  },
-  "nx": {
-    "targets": {
-      "generate:db": {
-        "cache": true,
-        "inputs": [
-          "{projectRoot}/src/**/*.entity.ts"
-        ],
-        "outputs": [
-          "{projectRoot}/temp/**/*"
-        ]
-      },
-      "build": {
-        "dependsOn": [
-          "generate*"
-        ]
-      },
-      "test": {
-        "dependsOn": [
-          "generate*"
-        ]
-      },
-      "test:watch": {
-        "continuous": true,
-        "dependsOn": [
-          "generate*"
-        ]
-      }
-    }
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -113,6 +90,8 @@
     "@types/node": "=22.14.0",
     "@types/supertest": "^6.0.2",
     "graphql-tag": "^2.12.6",
+    "oxfmt": "^0.32.0",
+    "oxlint": "^1.47.0",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
     "ts-loader": "^9.5.2",
@@ -121,9 +100,34 @@
     "unplugin-swc": "^1.5.9",
     "vitest": "^4.0.18"
   },
-  "files": [
-    "dist",
-    "temp"
-  ],
-  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
+  "nx": {
+    "targets": {
+      "codegen:db": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/src/**/*.entity.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/temp/**/*"
+        ]
+      },
+      "build": {
+        "dependsOn": [
+          "codegen*"
+        ]
+      },
+      "test": {
+        "dependsOn": [
+          "codegen*"
+        ]
+      },
+      "test:watch": {
+        "continuous": true,
+        "dependsOn": [
+          "codegen*"
+        ]
+      }
+    }
+  }
 }

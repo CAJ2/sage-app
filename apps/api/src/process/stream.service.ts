@@ -1,8 +1,10 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { ClsService } from 'nestjs-cls'
+
 import { I18nService } from '@src/common/i18n.service'
 import { Region } from '@src/geo/region.entity'
-import { ClsService } from 'nestjs-cls'
+
 import { Component } from './component.entity'
 import { ComponentRecycle } from './component.model'
 import { Process } from './process.entity'
@@ -75,8 +77,7 @@ export class StreamService {
       }
     }
     score.score = validScores > 0 ? totalScore / validScores : undefined
-    score.rating =
-      validScores > 0 ? StreamScoreRating.GOOD : StreamScoreRating.UNKNOWN
+    score.rating = validScores > 0 ? StreamScoreRating.GOOD : StreamScoreRating.UNKNOWN
     score.ratingF = this.i18n.t(`stream.scoreRating.${score.rating}`)
     return score
   }

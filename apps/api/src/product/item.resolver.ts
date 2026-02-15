@@ -1,13 +1,6 @@
 import { UseGuards } from '@nestjs/common'
-import {
-  Args,
-  ID,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
+
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
@@ -15,6 +8,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
+
 import { CategoriesPage, Category } from './category.model'
 import {
   CreateItemInput,
@@ -42,10 +36,7 @@ export class ItemResolver {
 
   @Query(() => ItemsPage, { name: 'items' })
   async items(@Args() args: ItemsArgs): Promise<ItemsPage> {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ItemsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ItemsArgs, args)
     const cursor = await this.itemService.find(filter)
     return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
   }
@@ -76,42 +67,23 @@ export class ItemResolver {
 
   @ResolveField()
   async categories(@Parent() item: Item, @Args() args: ItemCategoriesArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ItemCategoriesArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ItemCategoriesArgs, args)
     const cursor = await this.itemService.categories(item.id, filter)
-    return this.transform.entityToPaginated(
-      Category,
-      CategoriesPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
   }
 
   @ResolveField()
   async tags(@Parent() item: Item, @Args() args: ItemTagsArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ItemTagsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ItemTagsArgs, args)
     const cursor = await this.itemService.tags(item.id, filter)
     return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }
 
   @ResolveField()
   async variants(@Parent() item: Item, @Args() args: ItemVariantsArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ItemVariantsArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ItemVariantsArgs, args)
     const cursor = await this.itemService.variants(item.id, filter)
-    return this.transform.entityToPaginated(
-      Variant,
-      VariantsPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Variant, VariantsPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateItemOutput, { name: 'createItem', nullable: true })

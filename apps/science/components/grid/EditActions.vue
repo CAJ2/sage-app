@@ -1,9 +1,5 @@
 <template>
-  <Button
-    v-for="btn in btns"
-    :key="btn.action"
-    variant="outline"
-    @click="triggerAction(btn.action)"
+  <Button v-for="btn in btns" :key="btn.action" variant="outline" @click="triggerAction(btn.action)"
     ><font-awesome-icon v-if="btn.icon" :icon="btn.icon" />
     {{ btn.text }}
   </Button>

@@ -1,11 +1,10 @@
-import {
-  ArgsType,
-  Field,
-  Float,
-  ID,
-  InputType,
-  ObjectType,
-} from '@nestjs/graphql'
+import { ArgsType, Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Transform } from 'class-transformer'
+import { IsOptional, MaxLength, Validate } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
+import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
+
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
@@ -13,18 +12,10 @@ import { translate, TrArraySchema } from '@src/common/i18n'
 import { IsNanoID, ZodValid } from '@src/common/validator.model'
 import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
 import { Region } from '@src/geo/region.model'
-import {
-  IDCreatedUpdated,
-  registerModel,
-  TranslatedInput,
-} from '@src/graphql/base.model'
+import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Transform } from 'class-transformer'
-import { IsOptional, MaxLength, Validate } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
-import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
+
 import {
   Component as ComponentEntity,
   type ComponentPhysical,
@@ -57,10 +48,7 @@ export class ComponentRecycle {
 @ObjectType({
   implements: () => [Named],
 })
-export class Component
-  extends IDCreatedUpdated<ComponentEntity>
-  implements Named
-{
+export class Component extends IDCreatedUpdated<ComponentEntity> implements Named {
   @Field(() => String, { nullable: true })
   @Transform(translate)
   @MaxLength(1024)

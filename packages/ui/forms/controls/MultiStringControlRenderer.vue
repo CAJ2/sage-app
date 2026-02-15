@@ -20,16 +20,8 @@
 </template>
 
 <script lang="ts">
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-} from '@jsonforms/core'
-import {
-  rankWith,
-  isStringControl,
-  isMultiLineControl,
-  and,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
+import { rankWith, isStringControl, isMultiLineControl, and } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
@@ -46,10 +38,7 @@ const controlRenderer = defineComponent({
     ...rendererProps<ControlElement>(),
   },
   setup(props: RendererProps<ControlElement>) {
-    return useVanillaControl(
-      useJsonFormsControl(props),
-      (target) => target.value || undefined,
-    )
+    return useVanillaControl(useJsonFormsControl(props), (target) => target.value || undefined)
   },
 })
 

@@ -1,13 +1,10 @@
 <template>
   <div>
     <div
-      class="fixed top-0 z-10 w-[calc(100vw-70px)] max-w-2xl bg-white shadow-md text-black m-4 rounded-full focus-visible:outline-hidden flex"
+      class="fixed top-0 z-10 m-4 flex w-[calc(100vw-70px)] max-w-2xl rounded-full bg-white text-black shadow-md focus-visible:outline-hidden"
     >
       <span class="flex items-center justify-center px-2">
-        <font-awesome-icon
-          icon="fa-solid fa-magnifying-glass"
-          class="text-neutral-700 mx-2"
-        ></font-awesome-icon>
+        <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="mx-2 text-neutral-700" />
       </span>
       <input
         id="search"
@@ -18,7 +15,7 @@
       />
     </div>
     <div class="map-wrap">
-      <div ref="mapContainer" class="map"></div>
+      <div ref="mapContainer" class="map" />
     </div>
     <Drawer v-model:open="openDetails" :set-background-color-on-scale="false">
       <DrawerContent class="min-h-[50vh] p-3">
@@ -38,12 +35,7 @@
         >
           <Button class="w-full" variant="outline"
             >Open in Maps
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M14 3v2h3.59l-9.83 9.83l1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2z"
@@ -58,11 +50,7 @@
 
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
-import maplibregl, {
-  Map,
-  NavigationControl,
-  type LngLatLike,
-} from 'maplibre-gl'
+import maplibregl, { Map, NavigationControl, type LngLatLike } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'
 import { graphql } from '~/gql'
@@ -130,7 +118,6 @@ let markers: Pick<maplibregl.Marker, 'remove'>[] = []
 watch(
   () => search.result.value,
   () => {
-    console.log('Search result gotten')
     if (map.value && search.result.value && search.result.value.search.nodes) {
       markers.forEach((marker) => {
         marker.remove()
@@ -163,7 +150,7 @@ watch(
   },
 )
 
-const refreshSearch = async (newSearch: string) => {
+const refreshSearch = (newSearch: string) => {
   if (!mapBounds.value) {
     return
   }
@@ -177,18 +164,13 @@ const refreshSearch = async (newSearch: string) => {
     ],
   })
 }
-const refreshBounds = async (newBounds: [number, number][] | null) => {
+const refreshBounds = (newBounds: [number, number][] | null) => {
   if (!newBounds) {
     return
   }
   search.refetch({
     search: searchInput.value,
-    latLong: [
-      newBounds[1][1],
-      newBounds[1][0],
-      newBounds[0][1],
-      newBounds[0][0],
-    ],
+    latLong: [newBounds[1][1], newBounds[1][0], newBounds[0][1], newBounds[0][0]],
   })
 }
 
@@ -259,9 +241,7 @@ onUnmounted(() => {
 .map-wrap {
   position: relative;
   width: 100%;
-  height: calc(
-    100vh - 64px
-  ); /* calculate height of the screen minus the nav bar */
+  height: calc(100vh - 64px); /* calculate height of the screen minus the nav bar */
 }
 
 .map {

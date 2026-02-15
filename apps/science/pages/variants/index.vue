@@ -19,24 +19,16 @@
       :type="EditModelType.Variant"
     >
       <template #default="{ node }">
-        <ModelListVariant
-          :variant="node.changes"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListVariant :variant="node.changes" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModelChanges>
     <GridModel title="Variants" :query="variantsQuery" :query-name="'variants'">
       <template #default="{ node }">
-        <ModelListVariant
-          :variant="node"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListVariant :variant="node" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModel>
     <Dialog v-model:open="showEdit">
-      <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
+      <DialogContent class="max-h-[80vh] overflow-auto sm:max-w-[70vw]">
         <DialogTitle>
           <span v-if="editId === 'new'">Create Variant</span>
           <span v-else>Edit Variant</span>
@@ -70,12 +62,7 @@ const actionButton = (btn: string, id: string) => {
 }
 
 const variantsQuery = graphql(`
-  query VariantsQuery(
-    $first: Int
-    $last: Int
-    $before: String
-    $after: String
-  ) {
+  query VariantsQuery($first: Int, $last: Int, $before: String, $after: String) {
     variants(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListVariantFragment
@@ -100,13 +87,7 @@ const variantsChangesQuery = graphql(`
     $after: String
   ) {
     change(id: $changeID) {
-      edits(
-        type: $type
-        first: $first
-        last: $last
-        before: $before
-        after: $after
-      ) {
+      edits(type: $type, first: $first, last: $last, before: $before, after: $after) {
         nodes {
           changes {
             ...ListVariantFragment

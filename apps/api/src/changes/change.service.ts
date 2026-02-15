@@ -1,22 +1,16 @@
 import { EntityManager, ref, wrap } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { ClsService } from 'nestjs-cls'
+
 import { AuthUserService } from '@src/auth/authuser.service'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
-import {
-  CursorOptions,
-  entityToModelRegistry,
-  TransformService,
-} from '@src/common/transform'
+import { CursorOptions, entityToModelRegistry, TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
-import { ClsService } from 'nestjs-cls'
+
 import { CreateChangeInput } from './change-ext.model'
 import { Change, ChangeEdits, ChangeStatus } from './change.entity'
 import { EditModel as EditEnum, EditModelType } from './change.enum'
-import {
-  DirectEdit,
-  Edit as EditModel,
-  UpdateChangeInput,
-} from './change.model'
+import { DirectEdit, Edit as EditModel, UpdateChangeInput } from './change.model'
 import { ChangeMapService } from './change_map.service'
 import { Source } from './source.entity'
 
@@ -40,11 +34,7 @@ export class ChangeService {
   }
 
   async findOne(id: string) {
-    const change = await this.em.findOne(
-      Change,
-      { id },
-      { populate: ['user', 'sources', 'edits'] },
-    )
+    const change = await this.em.findOne(Change, { id }, { populate: ['user', 'sources', 'edits'] })
 
     if (!change) {
       throw new NotFoundException(`Change with ID "${id}" not found`)
@@ -54,19 +44,13 @@ export class ChangeService {
   }
 
   async edits(changeID: string, editID?: string, editType?: EditModelType) {
-    const change = await this.em.findOne(
-      Change,
-      { id: changeID },
-      { populate: ['edits'] },
-    )
+    const change = await this.em.findOne(Change, { id: changeID }, { populate: ['edits'] })
     if (!change) {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
     if (editID) {
       let edit = change.edits.find(
-        (e) =>
-          e.entityID === editID &&
-          (editType ? e.entityName === editType : true),
+        (e) => e.entityID === editID && (editType ? e.entityName === editType : true),
       )
       if (!edit) {
         const directEdit = await this.directEdit(editID, editType)
@@ -86,28 +70,16 @@ export class ChangeService {
       }
       edit._type = EditModel
       const editModel = await this.transform.objectToModel(EditModel, edit)
-      editModel.createChanges = await this.changeMapService.createEdit(
-        edit.entityName,
-        editModel,
-      )
-      editModel.updateChanges = await this.changeMapService.updateEdit(
-        edit.entityName,
-        editModel,
-      )
+      editModel.createChanges = await this.changeMapService.createEdit(edit.entityName, editModel)
+      editModel.updateChanges = await this.changeMapService.updateEdit(edit.entityName, editModel)
       return [editModel]
     }
     return Promise.all(
       change.edits.map(async (edit) => {
         edit._type = EditModel
         const editModel = await this.transform.entityToModel(EditModel, edit)
-        editModel.createChanges = await this.changeMapService.createEdit(
-          edit.entityName,
-          editModel,
-        )
-        editModel.updateChanges = await this.changeMapService.updateEdit(
-          edit.entityName,
-          editModel,
-        )
+        editModel.createChanges = await this.changeMapService.createEdit(edit.entityName, editModel)
+        editModel.updateChanges = await this.changeMapService.updateEdit(edit.entityName, editModel)
         return editModel
       }),
     )
@@ -115,9 +87,7 @@ export class ChangeService {
 
   async directEdit(id?: string, entityName?: string) {
     if (!id && !entityName) {
-      throw BadRequestErr(
-        'Must provide either ID or entity name for direct edit',
-      )
+      throw BadRequestErr('Must provide either ID or entity name for direct edit')
     }
     const svcs = this.changeMapService.findEditServices(entityName)
     if (id) {
@@ -131,28 +101,20 @@ export class ChangeService {
           )
           const directEdit = new DirectEdit()
           if (!(entity as any).id) {
-            throw NotFoundErr(
-              `Entity with ID "${id}" not found in "${svc.name}"`,
-            )
+            throw NotFoundErr(`Entity with ID "${id}" not found in "${svc.name}"`)
           }
           directEdit.id = (entity as any).id
           directEdit.entityName = svc.name
           directEdit.original = editModel as typeof EditEnum
           directEdit.changes = editModel as typeof EditEnum
-          directEdit.updateModel = await this.changeMapService.updateEdit(
-            svc.name,
-            directEdit,
-          )
+          directEdit.updateModel = await this.changeMapService.updateEdit(svc.name, directEdit)
           return directEdit
         }
       }
     } else if (entityName) {
       const editModel = new DirectEdit()
       editModel.entityName = entityName
-      editModel.createModel = await this.changeMapService.createEdit(
-        entityName,
-        editModel,
-      )
+      editModel.createModel = await this.changeMapService.createEdit(entityName, editModel)
       return editModel
     }
     return null
@@ -207,9 +169,7 @@ export class ChangeService {
     if (input.description) change.description = input.description
     if (input.status) change.status = input.status
     if (input.sources) {
-      const removed = change.sources.filter(
-        (source) => !input.sources!.includes(source.id),
-      )
+      const removed = change.sources.filter((source) => !input.sources!.includes(source.id))
       for (const source of removed) {
         change.sources.remove(source)
       }

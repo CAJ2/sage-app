@@ -1,4 +1,5 @@
 import { z } from 'zod/v4'
+
 import { ChangeStatus } from './change.entity'
 import { SourceIDSchema } from './source.schema'
 
@@ -14,9 +15,7 @@ export const CreateChangeInputSchema = z.strictObject({
   sources: z.array(SourceIDSchema).default([]),
   metadata: z.record(z.string(), z.any()).optional(),
 })
-export const CreateChangeInputJSONSchema = z.toJSONSchema(
-  CreateChangeInputSchema,
-)
+export const CreateChangeInputJSONSchema = z.toJSONSchema(CreateChangeInputSchema)
 
 export const UpdateChangeInputSchema = z.strictObject({
   id: ChangeIDSchema,
@@ -26,9 +25,7 @@ export const UpdateChangeInputSchema = z.strictObject({
   sources: z.array(SourceIDSchema).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
 })
-export const UpdateChangeInputJSONSchema = z.toJSONSchema(
-  UpdateChangeInputSchema,
-)
+export const UpdateChangeInputJSONSchema = z.toJSONSchema(UpdateChangeInputSchema)
 
 export const ChangeInputWithLangSchema = z.strictObject({
   changeID: ChangeIDSchema.optional(),

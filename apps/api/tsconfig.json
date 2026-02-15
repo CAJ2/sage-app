@@ -13,12 +13,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@src/*": [
-        "src/*"
-      ],
-      "@test/*": [
-        "test/*"
-      ],
+      "@src/*": ["src/*"],
+      "@test/*": ["test/*"]
     },
     "strict": true,
     "incremental": true,
@@ -29,8 +25,6 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "isolatedModules": true,
-    "types": [
-      "vitest/globals"
-    ],
+    "types": ["vitest/globals"]
   }
 }

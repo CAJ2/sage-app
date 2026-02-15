@@ -1,7 +1,7 @@
 import type { Translator } from '@jsonforms/core'
+import Ajv, { type JSONSchemaType } from 'ajv/dist/2020'
 import { createAuthClient } from 'better-auth/vue'
 import _ from 'lodash'
-import Ajv, { type JSONSchemaType } from 'ajv/dist/2020'
 
 export const useAuthClient = () => {
   const config = useRuntimeConfig()
@@ -21,11 +21,7 @@ export const useAuthSession = () => {
 export const formTranslate = (): Translator => {
   const { t } = useI18n()
 
-  return ((
-    id: string,
-    defaultMessage: string | undefined,
-    values: object,
-  ): string | undefined => {
+  return ((id: string, defaultMessage: string | undefined, values: object): string | undefined => {
     if (!defaultMessage) {
       return undefined
     }
@@ -58,7 +54,6 @@ export const sanitizeFormData = <T, U extends object>(
   try {
     validate = ajv.compile(schema)
   } catch (error) {
-    console.error('Error compiling schema', error)
     throw new Error(`Invalid schema: ${error}`)
   }
   validate(data)

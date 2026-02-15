@@ -1,6 +1,8 @@
 import { EntityManager, raw } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+
 import { CursorOptions } from '@src/common/transform'
+
 import { Region } from './region.entity'
 
 @Injectable()
@@ -20,10 +22,7 @@ export class RegionService {
     return this.em.findOne(Region, { id })
   }
 
-  async searchByPoint(
-    args: { latitude: number; longitude: number },
-    opts: CursorOptions<Region>,
-  ) {
+  async searchByPoint(args: { latitude: number; longitude: number }, opts: CursorOptions<Region>) {
     const { latitude, longitude } = args
     const where = {
       ...opts.where,

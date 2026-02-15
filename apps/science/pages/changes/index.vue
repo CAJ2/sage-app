@@ -13,7 +13,7 @@
         Add Change
       </Button>
     </div>
-    <Card class="m-3 bg-base-100 border-0 shadow-md">
+    <Card class="m-3 border-0 bg-base-100 shadow-md">
       <CardHeader>
         <CardTitle>Changes</CardTitle>
         <CardDescription></CardDescription>
@@ -52,7 +52,6 @@ const { setChange } = useChangeStore()
 const selectChange = (btn: string, id: string) => {
   if (btn === 'select') {
     setChange(id)
-    return
   } else if (btn === 'edit') {
     editId.value = id
     showEdit.value = true
@@ -99,13 +98,8 @@ const _updateChangeMutation = graphql(`
 const showEdit = ref(false)
 const editId = ref<string>('new')
 
-const visibleButtons = (
-  change: ListChangeFragmentFragment,
-): ('select' | 'edit' | 'delete')[] => {
-  if (
-    change.status === ChangeStatus.Merged ||
-    change.status === ChangeStatus.Rejected
-  ) {
+const visibleButtons = (change: ListChangeFragmentFragment): ('select' | 'edit' | 'delete')[] => {
+  if (change.status === ChangeStatus.Merged || change.status === ChangeStatus.Rejected) {
     return ['edit']
   }
   return ['select', 'edit', 'delete']

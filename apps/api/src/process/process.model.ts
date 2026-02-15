@@ -1,4 +1,9 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Transform } from 'class-transformer'
+import { IsEnum, IsOptional } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
+import { z } from 'zod/v4'
+
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
@@ -6,20 +11,13 @@ import { translate, TrArraySchema } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
-import {
-  IDCreatedUpdated,
-  registerModel,
-  TranslatedInput,
-} from '@src/graphql/base.model'
+import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
-import { Transform } from 'class-transformer'
-import { IsEnum, IsOptional } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
-import { z } from 'zod/v4'
+
 import { Material } from './material.model'
 import {
   ProcessEfficiencySchema,

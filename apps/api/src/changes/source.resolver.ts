@@ -1,7 +1,9 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
+
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { TransformService } from '@src/common/transform'
+
 import {
   CreateSourceInput,
   CreateSourceOutput,
@@ -25,19 +27,11 @@ export class SourceResolver {
   @Query(() => SourcesPage)
   @UseGuards(AuthGuard)
   async sources(@Args() args: SourcesArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      SourcesArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(SourcesArgs, args)
     if (args.type) filter.where.type = args.type
 
     const cursor = await this.sourceService.find(filter)
-    return this.transform.entityToPaginated(
-      Source,
-      SourcesPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Source, SourcesPage, cursor, parsedArgs)
   }
 
   @Query(() => Source, { name: 'source', nullable: true })
@@ -62,9 +56,7 @@ export class SourceResolver {
 
   @Mutation(() => UpdateSourceOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async updateSource(
-    @Args('input') input: UpdateSourceInput,
-  ): Promise<UpdateSourceOutput> {
+  async updateSource(@Args('input') input: UpdateSourceInput): Promise<UpdateSourceOutput> {
     const source = await this.sourceService.update(input)
     const model = await this.transform.entityToModel(Source, source)
     return {
@@ -85,9 +77,7 @@ export class SourceResolver {
 
   @Mutation(() => DeleteSourceOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async deleteSource(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<DeleteSourceOutput> {
+  async deleteSource(@Args('id', { type: () => ID }) id: string): Promise<DeleteSourceOutput> {
     await this.sourceService.remove(id)
     return {
       success: true,

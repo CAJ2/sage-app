@@ -9,9 +9,7 @@ export class Migration20250422152408 extends Migration {
                    "child_id" varchar(255) not null,
                    constraint "material_edges_pkey" primary key ("parent_id", "child_id")
                  );`)
-    this.addSql(
-      `create index "material_edges_child_id_index" on "material_edges" ("child_id");`,
-    )
+    this.addSql(`create index "material_edges_child_id_index" on "material_edges" ("child_id");`)
 
     this.addSql(`alter table "material_edges"
                  add constraint "material_edges_parent_id_foreign" foreign key ("parent_id") references "materials" ("id") on update cascade;`)

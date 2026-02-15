@@ -1,5 +1,7 @@
 import { EntityRepository, Knex, QueryBuilder } from '@mikro-orm/postgresql'
+
 import { ClosureTableRepository } from '@src/db/closure-table.repository'
+
 import { CategoryTree } from './category.entity'
 
 type Node = string
@@ -91,10 +93,7 @@ export class CategoryTreeRepository
             .select(this.ancestorColumn)
             .from(this.tableName)
             .where(this.descendantColumn, source)
-            .andWhereNot(
-              this.ancestorColumn,
-              this.knex.ref(this.descendantColumn),
-            ),
+            .andWhereNot(this.ancestorColumn, this.knex.ref(this.descendantColumn)),
         ),
     )
 
@@ -105,9 +104,7 @@ export class CategoryTreeRepository
             this.knex.ref(`supertree.${this.ancestorColumn}`),
             this.knex.ref(`subtree.${this.descendantColumn}`),
             // can't use .ref() here because knex gets confused with the + operator
-            this.knex.raw(
-              `supertree.${this.depthColumn} + subtree.${this.depthColumn} + 1`,
-            ),
+            this.knex.raw(`supertree.${this.depthColumn} + subtree.${this.depthColumn} + 1`),
           )
           .from({ supertree: this.tableName })
           .crossJoin(this.knex.ref(`${this.tableName} as subtree`))

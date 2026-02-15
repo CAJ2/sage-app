@@ -1,19 +1,17 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { ChangeInputWithLang } from '@src/changes/change-ext.model'
-import { Change } from '@src/changes/change.model'
-import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
-import {
-  CreatedUpdated,
-  registerModel,
-  TranslatedInput,
-} from '@src/graphql/base.model'
-import { Named } from '@src/graphql/interfaces.model'
-import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
+
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { translate } from '@src/common/i18n'
+import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+
 import { ComponentsPage } from './component.model'
 import { Material as MaterialEntity } from './material.entity'
 import { ProcessPage } from './process.model'

@@ -43,10 +43,7 @@ export class MultiPolygon {
   constructor(public wkt: string) {}
 }
 
-export class MultiPolygonType extends Type<
-  MultiPolygon | undefined,
-  string | undefined
-> {
+export class MultiPolygonType extends Type<MultiPolygon | undefined, string | undefined> {
   convertToDatabaseValue(value: MultiPolygon | undefined): string | undefined {
     if (!value) {
       return value

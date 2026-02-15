@@ -1,18 +1,10 @@
 <template>
   <div>
-    <NavTopbar
-      title="Changes"
-      subtitle="View and manage your contributions."
-      back="true"
-    ></NavTopbar>
+    <NavTopbar title="Changes" subtitle="View and manage your contributions." back="true" />
     <ModelChangeList
       v-if="result"
       :data="result.changes"
-      :total-edits="
-        result.changes.nodes
-          ? result.changes.nodes[0]?.edits?.totalCount
-          : undefined
-      "
+      :total-edits="result.changes.nodes ? result.changes.nodes[0]?.edits?.totalCount : undefined"
     />
   </div>
 </template>

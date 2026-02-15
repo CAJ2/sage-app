@@ -1,12 +1,9 @@
 <template>
   <div>
-    <NavTopbar
-      :title="processID === 'new' ? 'New Process' : 'Edit Process'"
-      back="true"
-    />
+    <NavTopbar :title="processID === 'new' ? 'New Process' : 'Edit Process'" back="true" />
     <div class="flex justify-center">
-      <div class="w-full p-5 max-w-2xl">
-        <FormChangeSaveStatus :status="saveStatus"></FormChangeSaveStatus>
+      <div class="w-full max-w-2xl p-5">
+        <FormChangeSaveStatus :status="saveStatus" />
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -81,10 +78,7 @@ if (processID !== 'new') {
     id: processID,
     changeID: route.params.id as string,
   })
-  if (
-    data?.value?.change?.edits.nodes &&
-    data.value.change.edits.nodes.length > 0
-  ) {
+  if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
       data.value.change.edits.nodes[0].updateChanges,
@@ -96,7 +90,7 @@ if (processID !== 'new') {
 }
 const readOnly = computed<boolean | undefined>(() => {
   if (changeStatus.value !== ChangeStatus.Merged) {
-    return undefined
+    return
   }
   return true
 })
@@ -146,7 +140,6 @@ const onChange = async (event: JsonFormsChangeEvent) => {
   }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      console.error('Form errors:', event.errors)
       saveStatus.value = 'not_saved'
       return
     }
@@ -171,10 +164,8 @@ const onChange = async (event: JsonFormsChangeEvent) => {
             )
           }
         })
-        .catch((error) => {
-          console.error('Error creating process:', error)
+        .catch(() => {
           saveStatus.value = 'error'
-          return
         })
     } else {
       updateData.value = event.data
@@ -189,8 +180,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
         .then(() => {
           saveStatus.value = 'saved'
         })
-        .catch((error) => {
-          console.error('Error updating process:', error)
+        .catch(() => {
           saveStatus.value = 'error'
         })
     }

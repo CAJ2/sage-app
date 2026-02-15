@@ -39,7 +39,5 @@ const emits = defineEmits<{
   (e: 'button', btn: string, id: string): void
 }>()
 
-const component = computed(() =>
-  useFragment(ListComponentFragment, props.component),
-)
+const component = computed(() => useFragment(ListComponentFragment, props.component))
 </script>

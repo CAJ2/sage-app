@@ -56,11 +56,7 @@
         <button :onclick="onCancel" :class="styles.dialog.buttonSecondary">
           {{ translations.clearDialogDecline }}
         </button>
-        <button
-          ref="confirm"
-          :onclick="onConfirm"
-          :class="styles.dialog.buttonPrimary"
-        >
+        <button ref="confirm" :onclick="onConfirm" :class="styles.dialog.buttonPrimary">
           {{ translations.clearDialogAccept }}
         </button>
       </div>
@@ -85,11 +81,7 @@ import {
   rankWith,
 } from '@jsonforms/core'
 import type { RendererProps } from '@jsonforms/vue'
-import {
-  DispatchRenderer,
-  rendererProps,
-  useJsonFormsOneOfControl,
-} from '@jsonforms/vue'
+import { DispatchRenderer, rendererProps, useJsonFormsOneOfControl } from '@jsonforms/vue'
 import isEmpty from 'lodash/isEmpty'
 import { defineComponent, inject, nextTick, ref } from 'vue'
 import { useVanillaControl } from '../util'

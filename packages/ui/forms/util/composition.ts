@@ -1,21 +1,15 @@
+import { composePaths, findUISchema, getFirstPrimitiveProp, Resolve } from '@jsonforms/core'
+import cloneDeep from 'lodash/cloneDeep'
+import merge from 'lodash/merge'
+import { computed, ref } from 'vue'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useStyles } from '../styles'
-import { computed, ref } from 'vue'
-import merge from 'lodash/merge'
-import cloneDeep from 'lodash/cloneDeep'
-import {
-  composePaths,
-  findUISchema,
-  getFirstPrimitiveProp,
-  Resolve,
-} from '@jsonforms/core'
 
 /**
  * Adds styles, isFocused, appliedOptions and onChange
  */
-export const useVanillaControl = <
-  I extends { control: any; handleChange: any },
->(
+export const useVanillaControl = <I extends { control: any; handleChange: any }>(
   input: I,
   adaptTarget: (target: any) => any = (v) => v.value,
 ) => {
@@ -33,8 +27,7 @@ export const useVanillaControl = <
   }
 
   const controlWrapper = computed(() => {
-    const { id, description, errors, label, visible, required } =
-      input.control.value
+    const { id, description, errors, label, visible, required } = input.control.value
     return { id, description, errors, label, visible, required }
   })
 
@@ -53,11 +46,7 @@ export const useVanillaControl = <
  */
 export const useVanillaLayout = <I extends { layout: any }>(input: I) => {
   const appliedOptions = computed(() =>
-    merge(
-      {},
-      cloneDeep(input.layout.value.config),
-      cloneDeep(input.layout.value.uischema.options),
-    ),
+    merge({}, cloneDeep(input.layout.value.config), cloneDeep(input.layout.value.uischema.options)),
   )
   return {
     ...input,
@@ -71,11 +60,7 @@ export const useVanillaLayout = <I extends { layout: any }>(input: I) => {
  */
 export const useVanillaLabel = <I extends { label: any }>(input: I) => {
   const appliedOptions = computed(() =>
-    merge(
-      {},
-      cloneDeep(input.label.value.config),
-      cloneDeep(input.label.value.uischema.options),
-    ),
+    merge({}, cloneDeep(input.label.value.config), cloneDeep(input.label.value.uischema.options)),
   )
   return {
     ...input,
@@ -87,9 +72,7 @@ export const useVanillaLabel = <I extends { label: any }>(input: I) => {
 /**
  * Adds styles, appliedOptions and childUiSchema
  */
-export const useVanillaArrayControl = <I extends { control: any }>(
-  input: I,
-) => {
+export const useVanillaArrayControl = <I extends { control: any }>(input: I) => {
   const appliedOptions = computed(() =>
     merge(
       {},
@@ -123,20 +106,14 @@ export const useVanillaArrayControl = <I extends { control: any }>(
     )
     // When using a select with oneOf, use the title for the selected option
     if (input.control.value.schema.properties[childLabelProp].oneOf) {
-      const findOne = input.control.value.schema.properties[
-        childLabelProp
-      ].oneOf.find(
+      const findOne = input.control.value.schema.properties[childLabelProp].oneOf.find(
         (o: { const: string; title?: string }) => o.const === labelValue,
       )
       if (findOne) {
         return `${findOne.title ?? findOne.const}`
       }
     }
-    if (
-      labelValue === undefined ||
-      labelValue === null ||
-      Number.isNaN(labelValue)
-    ) {
+    if (labelValue === undefined || labelValue === null || Number.isNaN(labelValue)) {
       return ''
     }
     return `${labelValue}`

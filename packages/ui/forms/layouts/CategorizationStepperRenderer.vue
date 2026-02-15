@@ -1,18 +1,13 @@
 <template>
   <div :class="styles.categorization.root">
     <div :class="styles.categorization.stepper">
-      <template
-        v-for="(category, index) in visibleCategories"
-        :key="`tab-${index}`"
-      >
+      <template v-for="(category, index) in visibleCategories" :key="`tab-${index}`">
         <div v-if="category.value.visible" @click="selected = index">
           <button
             :class="[selected === index ? styles.categorization.selected : '']"
             :disabled="!category.value.enabled"
           >
-            <span :class="styles.categorization.stepperBadge">{{
-              index + 1
-            }}</span>
+            <span :class="styles.categorization.stepperBadge">{{ index + 1 }}</span>
 
             <label>{{ category.value.label }}</label>
           </button>
@@ -37,10 +32,7 @@
       />
     </div>
 
-    <footer
-      v-if="appliedOptions?.showNavButtons"
-      :class="styles.categorization.stepperFooter"
-    >
+    <footer v-if="appliedOptions?.showNavButtons" :class="styles.categorization.stepperFooter">
       <div
         v-if="selected > 0"
         :class="styles.categorization.stepperButtonBack"
@@ -110,11 +102,7 @@ export const entry: JsonFormsRendererRegistryEntry = {
   renderer: layoutRenderer,
   tester: rankWith(
     3,
-    and(
-      isCategorization,
-      categorizationHasCategory,
-      optionIs('variant', 'stepper'),
-    ),
+    and(isCategorization, categorizationHasCategory, optionIs('variant', 'stepper')),
   ),
 }
 </script>

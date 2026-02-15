@@ -1,6 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { MikroORM } from '@mikro-orm/postgresql'
 import { Test, TestingModule } from '@nestjs/testing'
+
 import { AuthModule } from '@src/auth/auth.module'
 import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
@@ -15,6 +16,7 @@ import {
 import { clearDatabase } from '@src/db/test.utils'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { ProcessModule } from '@src/process/process.module'
+
 import { VariantService } from './variant.service'
 
 describe('VariantService', () => {
@@ -39,9 +41,7 @@ describe('VariantService', () => {
 
     await clearDatabase(orm, 'auth')
     await clearDatabase(orm, 'public')
-    await orm
-      .getSeeder()
-      .seed(BaseSeeder, TestMaterialSeeder, TestVariantSeeder)
+    await orm.getSeeder().seed(BaseSeeder, TestMaterialSeeder, TestVariantSeeder)
   }, 60000)
 
   afterAll(async () => {

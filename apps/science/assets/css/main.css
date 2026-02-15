@@ -1,6 +1,6 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
-@import "maplibre-gl/dist/maplibre-gl.css";
+@import 'tw-animate-css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 @source "../../../../packages/ui";
 
@@ -63,10 +63,10 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "dark";
+  name: 'dark';
   default: false;
   prefersdark: true;
-  color-scheme: "dark";
+  color-scheme: 'dark';
   --color-base-100: oklch(25.33% 0.016 252.42);
   --color-base-200: oklch(23.26% 0.014 253.1);
   --color-base-300: oklch(21.15% 0.012 254.09);
@@ -107,10 +107,10 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "light";
+  name: 'light';
   default: true;
   prefersdark: false;
-  color-scheme: "light";
+  color-scheme: 'light';
   --color-base-100: oklch(100% 0 0);
   --color-base-200: oklch(98% 0 0);
   --color-base-300: oklch(95% 0 0);
@@ -153,9 +153,9 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* JSON Forms */
-.control>.wrapper>input,
-.control>.wrapper>select,
-.control>.wrapper>textarea {
+.control > .wrapper > input,
+.control > .wrapper > select,
+.control > .wrapper > textarea {
   flex: 1;
 }
 
@@ -172,7 +172,7 @@
 .v-pull-to-refresh__pull-down {
   position: absolute;
   width: 100%;
-  transition: top .3s ease-out;
+  transition: top 0.3s ease-out;
 }
 
 .v-pull-to-refresh__pull-down--touching {
@@ -190,7 +190,7 @@
 
 .v-pull-to-refresh__scroll-container {
   position: relative;
-  transition: top .3s ease-out;
+  transition: top 0.3s ease-out;
 }
 
 .v-pull-to-refresh__scroll-container--touching {

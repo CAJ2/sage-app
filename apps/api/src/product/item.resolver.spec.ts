@@ -1,14 +1,15 @@
 import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
+import { AppTestModule } from '@test/app-test.module'
+import { graphql } from '@test/gql'
+import { GraphQLTestClient } from '@test/graphql.utils'
+
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { ITEM_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-import { AppTestModule } from '@test/app-test.module'
-import { graphql } from '@test/gql'
-import { GraphQLTestClient } from '@test/graphql.utils'
 
 describe('ItemResolver (integration)', () => {
   let app: INestApplication
@@ -28,12 +29,7 @@ describe('ItemResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(
-      BaseSeeder,
-      UserSeeder,
-      TestMaterialSeeder,
-      TestVariantSeeder,
-    )
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
 
     await gql.signIn('admin', 'password')
 

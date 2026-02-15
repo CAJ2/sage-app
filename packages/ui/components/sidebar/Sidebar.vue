@@ -21,28 +21,20 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
     v-if="collapsible === 'none'"
     data-slot="sidebar"
     :class="
-      cn(
-        'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col',
-        props.class,
-      )
+      cn('bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col', props.class)
     "
     v-bind="$attrs"
   >
     <slot />
   </div>
 
-  <Sheet
-    v-else-if="isMobile"
-    :open="openMobile"
-    v-bind="$attrs"
-    @update:open="setOpenMobile"
-  >
+  <Sheet v-else-if="isMobile" :open="openMobile" v-bind="$attrs" @update:open="setOpenMobile">
     <SheetContent
       data-sidebar="sidebar"
       data-slot="sidebar"
       data-mobile="true"
       :side="side"
-      class="bg-base-200 text-base-content w-(--sidebar-width) p-0 [&>button]:hidden"
+      class="w-(--sidebar-width) bg-base-200 p-0 text-base-content [&>button]:hidden"
       :style="{
         '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
       }"
@@ -59,7 +51,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
   <div
     v-else
-    class="group peer text-base-content hidden md:block"
+    class="group peer hidden text-base-content md:block"
     data-slot="sidebar"
     :data-state="state"
     :data-collapsible="state === 'collapsed' ? collapsible : ''"
@@ -89,7 +81,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
-            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) border-base-200 group-data-[side=left]:border-r group-data-[side=left]:shadow-[1px_0_10px_rgba(0,0,0,0.2)] group-data-[side=right]:border-l',
+            : 'border-base-200 group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:shadow-[1px_0_10px_rgba(0,0,0,0.2)] group-data-[side=right]:border-l',
           props.class,
         )
       "
@@ -97,7 +89,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
     >
       <div
         data-sidebar="sidebar"
-        class="bg-base-100 group-data-[variant=floating]:border-neutral-200 flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+        class="flex h-full w-full flex-col bg-base-100 group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-neutral-200 group-data-[variant=floating]:shadow-sm"
       >
         <slot />
       </div>

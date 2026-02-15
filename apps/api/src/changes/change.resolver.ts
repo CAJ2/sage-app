@@ -1,18 +1,12 @@
 import { UseGuards } from '@nestjs/common'
-import {
-  Args,
-  ID,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
+
 import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.model'
+
 import { CreateChangeInput } from './change-ext.model'
 import {
   Change,
@@ -46,17 +40,9 @@ export class ChangeResolver {
   @UseGuards(AuthGuard)
   @OptionalAuth()
   async changes(@Args() args: ChangesArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ChangesArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ChangesArgs, args)
     const cursor = await this.changeService.find(filter)
-    return this.transform.entityToPaginated(
-      Change,
-      ChangesPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Change, ChangesPage, cursor, parsedArgs)
   }
 
   @Query(() => Change, { name: 'change', nullable: true })
@@ -73,10 +59,7 @@ export class ChangeResolver {
   @Query(() => DirectEdit, { nullable: true })
   @UseGuards(AuthGuard)
   async directEdit(@Args() args: DirectEditArgs) {
-    const directEdit = await this.changeService.directEdit(
-      args.id,
-      args.entityName,
-    )
+    const directEdit = await this.changeService.directEdit(args.id, args.entityName)
     if (!directEdit) {
       throw NotFoundErr('Direct edit not found')
     }
@@ -98,9 +81,7 @@ export class ChangeResolver {
 
   @Mutation(() => UpdateChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async updateChange(
-    @Args('input') input: UpdateChangeInput,
-  ): Promise<UpdateChangeOutput> {
+  async updateChange(@Args('input') input: UpdateChangeInput): Promise<UpdateChangeOutput> {
     const change = await this.changeService.update(input)
     const model = await this.transform.entityToModel(Change, change)
     return {
@@ -110,9 +91,7 @@ export class ChangeResolver {
 
   @Mutation(() => DeleteChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async deleteChange(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<DeleteChangeOutput> {
+  async deleteChange(@Args('id', { type: () => ID }) id: string): Promise<DeleteChangeOutput> {
     await this.changeService.remove(id)
     return {
       success: true,
@@ -121,9 +100,7 @@ export class ChangeResolver {
 
   @Mutation(() => MergeChangeOutput, { nullable: true })
   @UseGuards(AuthGuard)
-  async mergeChange(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<MergeChangeOutput> {
+  async mergeChange(@Args('id', { type: () => ID }) id: string): Promise<MergeChangeOutput> {
     const result = await this.editService.mergeID(id)
     if (!result) {
       throw NotFoundErr('Change not found or already merged')
@@ -148,10 +125,7 @@ export class ChangeResolver {
   }
 
   @ResolveField(() => ChangeEditsPage, { nullable: true })
-  async edits(
-    @Parent() change: Change,
-    @Args() args: ChangeEditsArgs,
-  ): Promise<ChangeEditsPage> {
+  async edits(@Parent() change: Change, @Args() args: ChangeEditsArgs): Promise<ChangeEditsPage> {
     const edits = await this.changeService.edits(change.id, args.id, args.type)
     return this.transform.objectsToPaginated(
       ChangeEditsPage,
@@ -162,17 +136,9 @@ export class ChangeResolver {
 
   @ResolveField(() => SourcesPage, { nullable: true })
   async sources(@Parent() change: Change, @Args() args: ChangeSourcesArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(
-      ChangeSourcesArgs,
-      args,
-    )
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ChangeSourcesArgs, args)
     const cursor = await this.changeService.sources(change.id, filter)
-    return this.transform.entityToPaginated(
-      Source,
-      SourcesPage,
-      cursor,
-      parsedArgs,
-    )
+    return this.transform.entityToPaginated(Source, SourcesPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => User, { nullable: true })
