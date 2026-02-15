@@ -15,15 +15,11 @@
     </div>
     <GridModel title="Items" :query="itemsQuery" :query-name="'items'">
       <template #default="{ node }">
-        <ModelListItem
-          :item="node"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListItem :item="node" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModel>
     <Dialog v-model:open="showEditItem">
-      <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
+      <DialogContent class="max-h-[80vh] overflow-auto sm:max-w-[70vw]">
         <DialogTitle>
           <span v-if="editItemId === 'new'">Create Item</span>
           <span v-else>Edit Item</span>

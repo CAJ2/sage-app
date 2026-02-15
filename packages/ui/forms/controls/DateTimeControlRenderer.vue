@@ -21,10 +21,7 @@
 </template>
 
 <script lang="ts">
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { rankWith, isDateTimeControl } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
@@ -46,13 +43,11 @@ const controlRenderer = defineComponent({
     ...rendererProps<ControlElement>(),
   },
   setup(props: RendererProps<ControlElement>) {
-    return useVanillaControl(useJsonFormsControl(props), (target) =>
-      toISOString(target.value),
-    )
+    return useVanillaControl(useJsonFormsControl(props), (target) => toISOString(target.value))
   },
   computed: {
     dataTime(): string {
-      return (this.control.data ?? '').substr(0, 16)
+      return (this.control.data ?? '').slice(0, 16)
     },
   },
 })

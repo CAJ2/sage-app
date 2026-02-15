@@ -1,23 +1,15 @@
 <template>
   <div v-if="selectedChange">
-    <Card class="m-3 bg-base-100 border-0 shadow-md">
+    <Card class="m-3 border-0 bg-base-100 shadow-md">
       <CardHeader class="pb-2">
         <CardTitle class="flex justify-between">
           <span>Current Edits</span>
           <div class="flex justify-end gap-3">
-            <Button
-              :disabled="!hasPreviousPage"
-              variant="outline"
-              @click="prevPage"
-            >
+            <Button :disabled="!hasPreviousPage" variant="outline" @click="prevPage">
               <font-awesome-icon icon="fa-solid fa-caret-left" />
               Prev
             </Button>
-            <Button
-              :disabled="!hasNextPage"
-              variant="outline"
-              @click="nextPage"
-            >
+            <Button :disabled="!hasNextPage" variant="outline" @click="nextPage">
               Next
               <font-awesome-icon icon="fa-solid fa-caret-right" />
             </Button>
@@ -28,18 +20,11 @@
       <CardContent>
         <div>
           <ul class="list">
-            <div
-              v-for="n in nodes"
-              :key="n.changes.id"
-              class="flex items-center"
-            >
+            <div v-for="n in nodes" :key="n.changes.id" class="flex items-center">
               <div class="flex-1">
                 <slot :node="n" />
               </div>
-              <button
-                class="btn btn-square btn-ghost"
-                @click="discardEdit(n.changes.id)"
-              >
+              <button class="btn btn-square btn-ghost" @click="discardEdit(n.changes.id)">
                 <font-awesome-icon icon="fa-solid fa-trash-can" />
               </button>
             </div>

@@ -1,6 +1,7 @@
-import type { Styles } from './styles'
 import cloneDeep from 'lodash/cloneDeep'
 import mergeWith from 'lodash/mergeWith'
+
+import type { Styles } from './styles'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const classes = (strings: TemplateStringsArray, ...variables: any[]) => {
@@ -28,7 +29,6 @@ export const mergeStyles = (
     if (typeof aValue === 'string' && typeof bValue === 'string') {
       return `${aValue} ${bValue}`
     }
-    return undefined
   })
   return styles
 }

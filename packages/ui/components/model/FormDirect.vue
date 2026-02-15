@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="w-full px-5 mb-10">
+    <div class="mb-10 w-full px-5">
       <FormChangeSaveStatus :status="saveStatus"></FormChangeSaveStatus>
       <FormJsonSchema
         v-if="jsonSchema && uiSchema"
@@ -10,7 +10,7 @@
         @change="onChange"
       />
     </div>
-    <Button class="btn-block sticky bottom-0" @click="saveForm">Save</Button>
+    <Button class="sticky bottom-0 btn-block" @click="saveForm">Save</Button>
   </div>
 </template>
 
@@ -23,33 +23,32 @@ import type { JSONSchemaType } from 'ajv'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SchemaQuery = any
-const { modelId, schemaQuery, createMutation, updateMutation, createModelKey } =
-  defineProps<{
-    modelId: string
-    schemaQuery: TypedDocumentNode<
-      SchemaQuery,
-      Exact<{
-        [key: string]: never
-      }>
-    >
-    createMutation: TypedDocumentNode<
-      { [key: string]: unknown },
-      {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        input: any
+const { modelId, schemaQuery, createMutation, updateMutation, createModelKey } = defineProps<{
+  modelId: string
+  schemaQuery: TypedDocumentNode<
+    SchemaQuery,
+    Exact<{
+      [key: string]: never
+    }>
+  >
+  createMutation: TypedDocumentNode<
+    { [key: string]: unknown },
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      input: any
+    }
+  >
+  updateMutation: TypedDocumentNode<
+    { [key: string]: unknown },
+    Exact<{
+      input: {
+        id: string
+        [key: string]: unknown
       }
-    >
-    updateMutation: TypedDocumentNode<
-      { [key: string]: unknown },
-      Exact<{
-        input: {
-          id: string
-          [key: string]: unknown
-        }
-      }>
-    >
-    createModelKey: string
-  }>()
+    }>
+  >
+  createModelKey: string
+}>()
 
 const emits = defineEmits<{
   (e: 'created' | 'saved', id: string): void
@@ -127,10 +126,9 @@ const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
   modelId === 'new' ? 'not_saved' : 'saved',
 )
 let firstChange = false
-const onChange = async (event: JsonFormsChangeEvent) => {
+const onChange = (event: JsonFormsChangeEvent) => {
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      console.error('Form errors:', event.errors)
       saveStatus.value = 'error'
       return
     }
@@ -160,7 +158,6 @@ const saveForm = async () => {
       })
       .then((modelResult) => {
         if (!modelResult?.data) {
-          console.error('Create model failed:', modelResult)
           saveStatus.value = 'error'
           return
         }
@@ -176,10 +173,8 @@ const saveForm = async () => {
           emits('saved', modelReturned.id)
         }
       })
-      .catch((error) => {
-        console.error('Error creating model:', error)
+      .catch(() => {
         saveStatus.value = 'error'
-        return
       })
   } else {
     await update
@@ -193,8 +188,7 @@ const saveForm = async () => {
         saveStatus.value = 'saved'
         emits('saved', modelId)
       })
-      .catch((error) => {
-        console.error('Error updating model:', error)
+      .catch(() => {
         saveStatus.value = 'error'
       })
   }

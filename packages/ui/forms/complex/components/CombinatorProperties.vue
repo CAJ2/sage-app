@@ -1,10 +1,6 @@
 <template>
   <div v-if="isLayoutWithElements">
-    <dispatch-renderer
-      :schema="otherProps"
-      :path="path"
-      :uischema="foundUISchema"
-    />
+    <dispatch-renderer :schema="otherProps" :path="path" :uischema="foundUISchema" />
   </div>
 </template>
 
@@ -47,10 +43,7 @@ export default defineComponent({
     },
   },
   setup(props: CombinatorProps) {
-    const otherProps: JsonSchema = omit(
-      props.schema,
-      props.combinatorKeyword,
-    ) as JsonSchema
+    const otherProps: JsonSchema = omit(props.schema, props.combinatorKeyword) as JsonSchema
     const foundUISchema: UISchemaElement = Generate.uiSchema(
       otherProps,
       'VerticalLayout',

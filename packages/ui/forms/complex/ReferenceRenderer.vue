@@ -6,7 +6,7 @@
     :applied-options="appliedOptions"
     :label="refType"
   >
-    <div class="flex gap-2 w-full items-center">
+    <div class="flex w-full items-center gap-2">
       <Dialog v-model:open="dialogOpen">
         <DialogTrigger as-child>
           <Button variant="outline" :disabled="!control.enabled">
@@ -17,9 +17,7 @@
           <DialogTitle>
             {{ refType }}
           </DialogTitle>
-          <DialogDescription>
-            Search for a {{ refType }} to link
-          </DialogDescription>
+          <DialogDescription> Search for a {{ refType }} to link </DialogDescription>
           <p>{{ control.description }}</p>
           <FormInput
             :id="control.id + '-input'"
@@ -32,24 +30,21 @@
             @focus="isFocused = true"
             @blur="isFocused = false"
           />
-          <ul class="list bg-base-100 rounded-box shadow-md mt-4 mb-6">
-            <li class="px-4 py-2 text-xs opacity-60 tracking-wide">
+          <ul class="list mt-4 mb-6 rounded-box bg-base-100 shadow-md">
+            <li class="px-4 py-2 text-xs tracking-wide opacity-60">
               Search Results ({{ searchData?.search.totalCount || 0 }})
             </li>
             <li v-if="searchLoading" class="list-row flex flex-col">
               <div v-for="i in 3" :key="i" class="flex gap-2">
-                <div class="skeleton h-8 w-8 p-4"></div>
-                <div class="flex flex-col grow gap-2">
-                  <div class="skeleton h-4 w-48"></div>
-                  <div class="skeleton h-4 w-24"></div>
+                <div class="h-8 w-8 skeleton p-4"></div>
+                <div class="flex grow flex-col gap-2">
+                  <div class="h-4 w-48 skeleton"></div>
+                  <div class="h-4 w-24 skeleton"></div>
                 </div>
               </div>
             </li>
 
-            <div
-              v-if="searchNodes && !searchLoading"
-              class="divide-y border-neutral-200"
-            >
+            <div v-if="searchNodes && !searchLoading" class="divide-y border-neutral-200">
               <div v-if="refType === 'Category'">
                 <ModelListCategory
                   v-for="(category, i) in searchNodes"
@@ -125,11 +120,7 @@
             </div>
 
             <li
-              v-if="
-                searchNodes &&
-                searchNodes.length === 0 &&
-                searchInput.length > 0
-              "
+              v-if="searchNodes && searchNodes.length === 0 && searchInput.length > 0"
               class="list-row"
             >
               No results found for "{{ searchInput }}"
@@ -151,17 +142,8 @@
 </template>
 
 <script lang="ts">
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-} from '@jsonforms/core'
-import {
-  rankWith,
-  and,
-  uiTypeIs,
-  schemaMatches,
-  schemaTypeIs,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
+import { rankWith, and, uiTypeIs, schemaMatches, schemaTypeIs } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
@@ -171,7 +153,7 @@ import { graphql } from '~/gql'
 import { watchDebounced } from '@vueuse/core'
 import { SearchType } from '~/gql/graphql'
 
-const supportedTypes = [
+const supportedTypes = new Set([
   'Category',
   'Item',
   'Variant',
@@ -180,7 +162,7 @@ const supportedTypes = [
   'Region',
   'Org',
   'Material',
-]
+])
 
 const controlRenderer = defineComponent({
   name: 'ReferenceRenderer',
@@ -238,13 +220,13 @@ const controlRenderer = defineComponent({
       searchInput,
       async (newValue) => {
         if (newValue.length > 0) {
-          if (!searchData.value) {
+          if (searchData.value) {
+            await refetch({ input: newValue, type: filterTypes[refType] })
+          } else {
             await load(searchQuery, {
               input: newValue,
               type: filterTypes[refType],
             })
-          } else {
-            await refetch({ input: newValue, type: filterTypes[refType] })
           }
         }
       },
@@ -291,10 +273,7 @@ export const entry: JsonFormsRendererRegistryEntry = {
       uiTypeIs('Control'),
       schemaMatches((schema) => {
         const sch = schema as { $id: string }
-        return (
-          Object.prototype.hasOwnProperty.call(schema, '$id') &&
-          supportedTypes.includes(sch.$id)
-        )
+        return Object.prototype.hasOwnProperty.call(schema, '$id') && supportedTypes.has(sch.$id)
       }),
       schemaTypeIs('string'),
     ),

@@ -8,13 +8,7 @@
       :checked="dataHasEnum(checkElement.value)"
       :disabled="!control.enabled"
       :placeholder="appliedOptions?.placeholder"
-      @change="
-        (event) =>
-          toggle(
-            checkElement.value,
-            (event.target as HTMLInputElement)?.checked,
-          )
-      "
+      @change="(event) => toggle(checkElement.value, (event.target as HTMLInputElement)?.checked)"
     />
     <label :for="control.id + `-input-${index}`">
       {{ checkElement.label }}
@@ -26,11 +20,7 @@
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsMultiEnumControl } from '@jsonforms/vue'
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-  JsonSchema,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry, JsonSchema } from '@jsonforms/core'
 import {
   rankWith,
   uiTypeIs,
@@ -88,9 +78,7 @@ export const entry: JsonFormsRendererRegistryEntry = {
       and(
         schemaMatches(
           (schema) =>
-            hasType(schema, 'array') &&
-            !Array.isArray(schema.items) &&
-            schema.uniqueItems === true,
+            hasType(schema, 'array') && !Array.isArray(schema.items) && schema.uniqueItems === true,
         ),
         schemaSubPathMatches('items', (schema) => {
           return hasOneOfItems(schema) || hasEnumItems(schema)

@@ -1,5 +1,6 @@
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
+import oxlint from 'eslint-plugin-oxlint'
 import globals from 'globals'
+
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 const baseConfig = [
@@ -20,31 +21,13 @@ const baseConfig = [
   },
 ]
 
-const prettier = [
-  {
-    rules: {
-      'prettier/prettier': [
-        'error',
-        {
-          semi: false,
-          singleQuote: true,
-        },
-      ],
-    },
-  },
-]
-
 const disabledRules = [
   {
     rules: {
       'vue/require-default-prop': 'off',
+      'vue/html-self-closing': 'off',
     },
   },
 ]
 
-export default withNuxt([
-  ...baseConfig,
-  eslintPluginPrettier,
-  ...prettier,
-  ...disabledRules,
-])
+export default withNuxt([...baseConfig, ...disabledRules, ...oxlint.configs['flat/recommended']])

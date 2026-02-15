@@ -19,28 +19,16 @@
       :type="EditModelType.Category"
     >
       <template #default="{ node }">
-        <ModelListCategory
-          :category="node.changes"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListCategory :category="node.changes" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModelChanges>
-    <GridModel
-      title="Categories"
-      :query="categoriesQuery"
-      :query-name="'categories'"
-    >
+    <GridModel title="Categories" :query="categoriesQuery" :query-name="'categories'">
       <template #default="{ node }">
-        <ModelListCategory
-          :category="node"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListCategory :category="node" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModel>
     <Dialog v-model:open="showEdit">
-      <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
+      <DialogContent class="max-h-[80vh] overflow-auto sm:max-w-[70vw]">
         <DialogTitle>
           <span v-if="editId === 'new'">Create Category</span>
           <span v-else>Edit Category</span>
@@ -74,12 +62,7 @@ const actionButton = (btn: string, id: string) => {
 }
 
 const categoriesQuery = graphql(`
-  query GridCategoriesQuery(
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
+  query GridCategoriesQuery($first: Int, $last: Int, $after: String, $before: String) {
     categories(first: $first, last: $last, after: $after, before: $before) {
       nodes {
         ...ListCategoryFragment
@@ -104,13 +87,7 @@ const categoriesChangesQuery = graphql(`
     $after: String
   ) {
     change(id: $changeID) {
-      edits(
-        type: $type
-        first: $first
-        last: $last
-        before: $before
-        after: $after
-      ) {
+      edits(type: $type, first: $first, last: $last, before: $before, after: $after) {
         nodes {
           changes {
             ...ListCategoryFragment

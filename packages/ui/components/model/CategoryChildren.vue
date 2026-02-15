@@ -1,19 +1,16 @@
 <template>
   <div>
-    <ul class="list bg-base-100 rounded-box shadow-md">
-      <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Categories</li>
+    <ul class="list rounded-box bg-base-100 shadow-md">
+      <li class="p-4 pb-2 text-xs tracking-wide opacity-60">Categories</li>
       <li v-if="status === 'pending'" class="list-row">
-        <div class="skeleton h-4 w-28"></div>
-        <div class="skeleton h-4 w-full"></div>
-        <div class="skeleton h-4 w-full"></div>
+        <div class="h-4 w-28 skeleton"></div>
+        <div class="h-4 w-full skeleton"></div>
+        <div class="h-4 w-full skeleton"></div>
       </li>
 
       <div v-if="data">
         <li v-for="category in data.nodes" :key="category.id">
-          <NuxtLinkLocale
-            :to="`/explore/categories/${category.id}`"
-            class="list-row"
-          >
+          <NuxtLinkLocale :to="`/explore/categories/${category.id}`" class="list-row">
             <div>
               <UiImage class="size-10" :src="category.imageURL"></UiImage>
             </div>
@@ -27,11 +24,7 @@
               class="btn btn-square btn-ghost"
               @click.prevent.stop="() => console.log('favorite', category.id)"
             >
-              <svg
-                class="size-[1.2em]"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
+              <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <g
                   stroke-linejoin="round"
                   stroke-linecap="round"
@@ -61,9 +54,7 @@ import type { Category } from '~/gql/types.generated'
 const { data } = defineProps<{
   status?: string
   data?: {
-    nodes?:
-      | Pick<Category, 'id' | 'name' | 'descShort' | 'desc' | 'imageURL'>[]
-      | null
+    nodes?: Pick<Category, 'id' | 'name' | 'descShort' | 'desc' | 'imageURL'>[] | null
   }
 }>()
 </script>

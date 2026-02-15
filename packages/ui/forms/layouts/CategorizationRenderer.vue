@@ -1,10 +1,7 @@
 <template>
   <div :class="styles.categorization.root">
     <div :class="styles.categorization.category">
-      <template
-        v-for="(category, index) in categories"
-        :key="`category-${index}`"
-      >
+      <template v-for="(category, index) in categories" :key="`category-${index}`">
         <div v-if="category.value.visible" @click="selected = index">
           <button
             :class="[selected === index ? styles.categorization.selected : '']"
@@ -33,12 +30,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import type { JsonFormsRendererRegistryEntry, Layout } from '@jsonforms/core'
-import {
-  and,
-  categorizationHasCategory,
-  isCategorization,
-  rankWith,
-} from '@jsonforms/core'
+import { and, categorizationHasCategory, isCategorization, rankWith } from '@jsonforms/core'
 import {
   DispatchRenderer,
   rendererProps,

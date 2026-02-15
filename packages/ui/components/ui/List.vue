@@ -7,28 +7,24 @@
             <font-awesome-icon
               v-if="i.icon"
               :icon="i.icon"
-              class="p-3 w-6 min-h-6 text-muted-foreground"
+              class="text-muted-foreground min-h-6 w-6 p-3"
             />
-            <div class="grow flex flex-col justify-around mx-2">
+            <div class="mx-2 flex grow flex-col justify-around">
               <p class="text-md leading-none">
                 {{ t(i.title) }}
               </p>
-              <p v-if="i.subtitle" class="text-sm text-muted-foreground">
+              <p v-if="i.subtitle" class="text-muted-foreground text-sm">
                 {{ t(i.subtitle) }}
               </p>
             </div>
           </div>
         </NuxtLinkLocale>
         <div v-else class="list-row divide-y">
-          <font-awesome-icon
-            v-if="i.icon"
-            :icon="i.icon"
-            class="size-5 text-muted-foreground"
-          />
-          <p class="text-sm font-medium leading-none">
+          <font-awesome-icon v-if="i.icon" :icon="i.icon" class="text-muted-foreground size-5" />
+          <p class="text-sm leading-none font-medium">
             {{ t(i.title) }}
           </p>
-          <p v-if="i.subtitle" class="text-sm text-muted-foreground">
+          <p v-if="i.subtitle" class="text-muted-foreground text-sm">
             {{ t(i.subtitle) }}
           </p>
         </div>

@@ -7,9 +7,7 @@
       <button
         :class="styles.arrayList.addButton"
         type="button"
-        :disabled="
-          !control.enabled || (appliedOptions.restrict && maxItemsReached)
-        "
+        :disabled="!control.enabled || (appliedOptions.restrict && maxItemsReached)"
         @click="addButtonClick"
       >
         +
@@ -22,9 +20,7 @@
     >
       <array-list-element
         v-if="!isRefList"
-        :move-shown="
-          !control.uischema.options || control.uischema.options.showSortButtons
-        "
+        :move-shown="!control.uischema.options || control.uischema.options.showSortButtons"
         :move-up="moveUp ? moveUp(control.path, index) : undefined"
         :move-up-enabled="control.enabled && index > 0"
         :move-down="moveDown ? moveDown(control.path, index) : undefined"
@@ -85,11 +81,7 @@ import {
 } from '@jsonforms/core'
 import { defineComponent, inject } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
-import {
-  DispatchRenderer,
-  rendererProps,
-  useJsonFormsArrayControl,
-} from '@jsonforms/vue'
+import { DispatchRenderer, rendererProps, useJsonFormsArrayControl } from '@jsonforms/vue'
 import { useVanillaArrayControl } from '../util'
 import ArrayListElement from './ArrayListElement.vue'
 import ArrayListRefElement from './ArrayListRefElement.vue'
@@ -113,11 +105,7 @@ const controlRenderer = defineComponent({
       return !this.control.data || this.control.data.length === 0
     },
     arraySchema(): JsonSchema | undefined {
-      return Resolve.schema(
-        this.schema,
-        this.control.uischema.scope,
-        this.control.rootSchema,
-      )
+      return Resolve.schema(this.schema, this.control.uischema.scope, this.control.rootSchema)
     },
     maxItemsReached(): boolean | undefined {
       return (
@@ -151,8 +139,7 @@ const controlRenderer = defineComponent({
         this.arraySchema.items &&
         _.isObjectLike(this.arraySchema.items) &&
         (this.arraySchema.items as JsonSchema).type === 'object' &&
-        _.keys((this.arraySchema.items as JsonSchema).properties).length ===
-          1 &&
+        _.keys((this.arraySchema.items as JsonSchema).properties).length === 1 &&
         _.has(this.arraySchema.items, 'properties.id.$ref')
       )
     },

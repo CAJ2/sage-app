@@ -1,23 +1,15 @@
 <template>
   <div>
-    <Card class="m-3 bg-base-100 border-0 shadow-md">
+    <Card class="m-3 border-0 bg-base-100 shadow-md">
       <CardHeader class="pb-2">
         <CardTitle class="flex justify-between">
           <span>{{ title }}</span>
           <div class="flex justify-end gap-3">
-            <Button
-              :disabled="!hasPreviousPage"
-              variant="outline"
-              @click="prevPage"
-            >
+            <Button :disabled="!hasPreviousPage" variant="outline" @click="prevPage">
               <font-awesome-icon icon="fa-solid fa-caret-left" />
               Prev
             </Button>
-            <Button
-              :disabled="!hasNextPage"
-              variant="outline"
-              @click="nextPage"
-            >
+            <Button :disabled="!hasNextPage" variant="outline" @click="nextPage">
               Next
               <font-awesome-icon icon="fa-solid fa-caret-right" />
             </Button>

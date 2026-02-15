@@ -19,28 +19,16 @@
       :type="EditModelType.Component"
     >
       <template #default="{ node }">
-        <ModelListComponent
-          :component="node.changes"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListComponent :component="node.changes" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModelChanges>
-    <GridModel
-      title="Components"
-      :query="componentQuery"
-      :query-name="'components'"
-    >
+    <GridModel title="Components" :query="componentQuery" :query-name="'components'">
       <template #default="{ node }">
-        <ModelListComponent
-          :component="node"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListComponent :component="node" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModel>
     <Dialog v-model:open="showEdit">
-      <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
+      <DialogContent class="max-h-[80vh] overflow-auto sm:max-w-[70vw]">
         <DialogTitle>
           <span v-if="editId === 'new'">Create Component</span>
           <span v-else>Edit Component</span>
@@ -74,12 +62,7 @@ const actionButton = (btn: string, id: string) => {
 }
 
 const componentQuery = graphql(`
-  query ComponentsQuery(
-    $first: Int
-    $last: Int
-    $before: String
-    $after: String
-  ) {
+  query ComponentsQuery($first: Int, $last: Int, $before: String, $after: String) {
     components(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListComponentFragment
@@ -104,13 +87,7 @@ const componentChangesQuery = graphql(`
     $after: String
   ) {
     change(id: $changeID) {
-      edits(
-        type: $type
-        first: $first
-        last: $last
-        before: $before
-        after: $after
-      ) {
+      edits(type: $type, first: $first, last: $last, before: $before, after: $after) {
         nodes {
           changes {
             ...ListComponentFragment

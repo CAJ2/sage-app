@@ -2,10 +2,7 @@
 import type { HTMLAttributes } from 'vue'
 import { Primitive, type PrimitiveProps } from 'reka-ui'
 import { cn } from '../lib/utils'
-import {
-  type SidebarMenuButtonVariants,
-  sidebarMenuButtonVariants,
-} from './variants'
+import { type SidebarMenuButtonVariants, sidebarMenuButtonVariants } from './variants'
 
 export interface SidebarMenuButtonProps extends PrimitiveProps {
   variant?: SidebarMenuButtonVariants['variant']

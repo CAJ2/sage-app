@@ -5,7 +5,7 @@
     :is-focused="isFocused"
     :applied-options="appliedOptions"
   >
-    <div class="flex gap-2 w-full items-center">
+    <div class="flex w-full items-center gap-2">
       <Dialog v-model:open="dialogOpen">
         <DialogTrigger as-child>
           <Button variant="outline" :disabled="!control.enabled">
@@ -16,14 +16,11 @@
           <DialogTitle> Upload an image or select an icon </DialogTitle>
           <DialogDescription></DialogDescription>
           <Tabs class="w-full" default-value="image">
-            <TabsList
-              aria-label="Manage your account"
-              class="grid w-full grid-cols-2"
-            >
+            <TabsList aria-label="Manage your account" class="grid w-full grid-cols-2">
               <TabsTrigger value="image"> Image </TabsTrigger>
               <TabsTrigger value="icon"> Icon </TabsTrigger>
             </TabsList>
-            <TabsContent value="image" class="flex justify-center my-3">
+            <TabsContent value="image" class="my-3 flex justify-center">
               <input
                 :id="control.id + '-input'"
                 type="file"
@@ -42,17 +39,13 @@
                 class="w-full"
                 placeholder="Search for an icon"
               />
-              <div class="grid grid-cols-4 my-4">
+              <div class="my-4 grid grid-cols-4">
                 <div
                   v-for="icon in iconResult?.icons || []"
                   :key="icon"
                   @click="onIconSelect(icon)"
                 >
-                  <UiImage
-                    :src="'icon://' + icon"
-                    class="w-12 h-12"
-                    :alt="icon"
-                  />
+                  <UiImage :src="'icon://' + icon" class="h-12 w-12" :alt="icon" />
                 </div>
               </div>
             </TabsContent>
@@ -60,29 +53,15 @@
         </DialogContent>
       </Dialog>
       <div v-if="control.data">
-        <UiImage
-          :src="control.data"
-          :alt="control.label"
-          class="w-16 h-16 object-cover"
-        />
+        <UiImage :src="control.data" :alt="control.label" class="h-16 w-16 object-cover" />
       </div>
     </div>
   </control-wrapper>
 </template>
 
 <script lang="ts">
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-} from '@jsonforms/core'
-import {
-  rankWith,
-  and,
-  uiTypeIs,
-  or,
-  formatIs,
-  optionIs,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
+import { rankWith, and, uiTypeIs, or, formatIs, optionIs } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
@@ -135,7 +114,7 @@ const controlRenderer = defineComponent({
   },
   computed: {
     dataTime(): string {
-      return (this.control.data ?? '').substr(0, 16)
+      return (this.control.data ?? '').slice(0, 16)
     },
   },
 })
@@ -144,9 +123,6 @@ export default controlRenderer
 
 export const entry: JsonFormsRendererRegistryEntry = {
   renderer: controlRenderer,
-  tester: rankWith(
-    2,
-    and(uiTypeIs('Control'), or(formatIs('uri'), optionIs('format', 'uri'))),
-  ),
+  tester: rankWith(2, and(uiTypeIs('Control'), or(formatIs('uri'), optionIs('format', 'uri')))),
 }
 </script>

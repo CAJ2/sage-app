@@ -1,8 +1,5 @@
 <template>
-  <form
-    class="grid mx-3 grid-cols-1 gap-8"
-    @submit.prevent.stop="form.handleSubmit"
-  >
+  <form class="mx-3 grid grid-cols-1 gap-8" @submit.prevent.stop="form.handleSubmit">
     <div class="mt-4">
       <form.Field name="title">
         <template #default="{ field }">
@@ -16,10 +13,7 @@
               onBlur: z.string().min(2).max(100),
             }"
             @blur="field.handleBlur"
-            @input="
-              (e: any) =>
-                field.handleChange((e.target as HTMLInputElement).value)
-            "
+            @input="(e: any) => field.handleChange((e.target as HTMLInputElement).value)"
           />
           <Alert v-if="!field.state.meta.isValid" variant="error" class="mt-4">
             <AlertDescription>{{
@@ -32,9 +26,7 @@
     <div class="">
       <form.Field name="description">
         <template #default="{ field }">
-          <FormLabel :for="field.name" class="text-md my-3"
-            >Description</FormLabel
-          >
+          <FormLabel :for="field.name" class="text-md my-3">Description</FormLabel>
           <FormTextArea
             :id="field.name"
             :name="field.name"
@@ -44,10 +36,7 @@
               onBlur: z.string().min(2).max(2000),
             }"
             @blur="field.handleBlur"
-            @input="
-              (e: any) =>
-                field.handleChange((e.target as HTMLTextAreaElement).value)
-            "
+            @input="(e: any) => field.handleChange((e.target as HTMLTextAreaElement).value)"
           />
           <Alert v-if="!field.state.meta.isValid" variant="error" class="mt-4">
             <AlertDescription>{{

@@ -39,7 +39,5 @@ const emits = defineEmits<{
   (e: 'button', btn: string, id: string): void
 }>()
 
-const category = computed(() =>
-  useFragment(ListCategoryFragment, props.category),
-)
+const category = computed(() => useFragment(ListCategoryFragment, props.category))
 </script>

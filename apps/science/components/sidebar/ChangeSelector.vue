@@ -1,19 +1,15 @@
 <template>
   <NuxtLinkLocale to="/changes" class="flex content-center">
-    <div v-if="isChangeSelected" class="grow flex flex-col">
+    <div v-if="isChangeSelected" class="flex grow flex-col">
       <div class="text-md font-bold">
         {{ result?.change?.title || 'Loading...' }}
       </div>
-      <div class="text-sm opacity-70 line-clamp-1">
+      <div class="line-clamp-1 text-sm opacity-70">
         {{ result?.change?.description || '' }}
       </div>
     </div>
-    <div v-else class="grow text-md opacity-70">No Change Selected</div>
-    <Button
-      v-if="selectedChange"
-      variant="ghost"
-      @click.stop.prevent="clearChange"
-    >
+    <div v-else class="text-md grow opacity-70">No Change Selected</div>
+    <Button v-if="selectedChange" variant="ghost" @click.stop.prevent="clearChange">
       <font-awesome-icon icon="fa-solid fa-xmark" width="5" height="5" />
     </Button>
   </NuxtLinkLocale>

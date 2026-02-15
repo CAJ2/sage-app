@@ -22,10 +22,7 @@
 </template>
 
 <script lang="ts">
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { rankWith, isNumberControl } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'

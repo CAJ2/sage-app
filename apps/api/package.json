@@ -15,8 +15,8 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "generate": "graphql-codegen --config graphql-codegen.ts",
-    "generate:db": "./db-defs.sh",
+    "codegen": "graphql-codegen --config graphql-codegen.ts",
+    "codegen:db": "./db-defs.sh",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
@@ -103,7 +103,7 @@
   "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
   "nx": {
     "targets": {
-      "generate:db": {
+      "codegen:db": {
         "cache": true,
         "inputs": [
           "{projectRoot}/src/**/*.entity.ts"
@@ -114,18 +114,18 @@
       },
       "build": {
         "dependsOn": [
-          "generate*"
+          "codegen*"
         ]
       },
       "test": {
         "dependsOn": [
-          "generate*"
+          "codegen*"
         ]
       },
       "test:watch": {
         "continuous": true,
         "dependsOn": [
-          "generate*"
+          "codegen*"
         ]
       }
     }

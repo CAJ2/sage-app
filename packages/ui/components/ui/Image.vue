@@ -8,15 +8,10 @@
       placeholder
       :img-attrs="{ class: 'object-contain', style: widthHeightStyle }"
     />
-    <Icon
-      v-if="src && srcType === 'icon'"
-      :name="iconName"
-      :alt="alt"
-      :style="iconStyle"
-    />
+    <Icon v-if="src && srcType === 'icon'" :name="iconName" :alt="alt" :style="iconStyle" />
     <div
       v-if="!src || srcType === 'unknown'"
-      class="skeleton h-full w-full shrink-0 rounded-xl"
+      class="h-full w-full shrink-0 skeleton rounded-xl"
       :class="{
         'animate-none': srcType === 'unknown',
       }"
@@ -45,9 +40,8 @@ const srcType = computed(() => {
     return 'img'
   } else if (props.src.startsWith('icon://')) {
     return 'icon'
-  } else {
-    return 'unknown'
   }
+  return 'unknown'
 })
 
 const iconName = computed(() => {

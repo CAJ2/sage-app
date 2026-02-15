@@ -1,11 +1,9 @@
 <template>
   <div v-if="recycle.stream && recycle.stream.container" class="m-3">
     <Card class="bg-base-200 shadow-lg">
-      <CardHeader class="p-4 pb-2 items-center">
-        <CardTitle class="text-md text-center mb-3">{{
-          recycle.stream.name
-        }}</CardTitle>
-        <div class="px-3 pb-2 w-full">
+      <CardHeader class="items-center p-4 pb-2">
+        <CardTitle class="text-md mb-3 text-center">{{ recycle.stream.name }}</CardTitle>
+        <div class="w-full px-3 pb-2">
           <ScoreBar
             size="small"
             :score="recycle.stream?.score?.score"
@@ -14,7 +12,7 @@
           ></ScoreBar>
         </div>
       </CardHeader>
-      <CardContent class="flex flex-col justify-center items-center px-4 pb-3">
+      <CardContent class="flex flex-col items-center justify-center px-4 pb-3">
         <div
           class="relative max-w-[256px]"
           :style="{
@@ -29,7 +27,7 @@
           <div
             v-if="recycle.stream.container.image"
             ref="compImage"
-            class="absolute border-2 rounded-xl bg-base-100 shadow-base-content shadow-md"
+            class="absolute rounded-xl border-2 bg-base-100 shadow-md shadow-base-content"
             :style="{
               top: `${compPercs.y}%`,
               left: `${compPercs.x}%`,
@@ -39,7 +37,7 @@
             <UiImage :src="image || ''" :width="12" :height="12" />
           </div>
         </div>
-        <span class="text-xs line-clamp-3">{{ recycle.stream.desc }}</span>
+        <span class="line-clamp-3 text-xs">{{ recycle.stream.desc }}</span>
       </CardContent>
     </Card>
   </div>
@@ -61,8 +59,7 @@ const compDims = useElementSize(compImage)
 
 const compPercs = computed(() => {
   if (!compDims.width.value || !compDims.height.value) return { x: 0, y: 0 }
-  if (!containerDims.width.value || !containerDims.height.value)
-    return { x: 0, y: 0 }
+  if (!containerDims.width.value || !containerDims.height.value) return { x: 0, y: 0 }
   if (!recycle?.stream?.container?.imageEntryPoint) return { x: 0, y: 0 }
   return {
     x:

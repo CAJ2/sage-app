@@ -11,9 +11,7 @@
       :model-value="control.data"
       :disabled="!control.enabled"
       :autofocus="appliedOptions.focus"
-      @update:model-value="
-        (value: any) => onChange({ target: { value } } as unknown as Event)
-      "
+      @update:model-value="(value: any) => onChange({ target: { value } } as unknown as Event)"
       @focus="isFocused = true"
       @blur="isFocused = false"
     >
@@ -28,8 +26,7 @@
             :value="optionElement.value"
             :label="
               optionElement.label ||
-              control.schema.oneOf?.find((o) => o.const === optionElement.value)
-                ?.title
+              control.schema.oneOf?.find((o) => o.const === optionElement.value)?.title
             "
             :class="styles.control.option"
             >{{ optionElement.label }}</SelectItem
@@ -41,10 +38,7 @@
 </template>
 
 <script lang="ts">
-import type {
-  ControlElement,
-  JsonFormsRendererRegistryEntry,
-} from '@jsonforms/core'
+import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { rankWith, isEnumControl } from '@jsonforms/core'
 import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'

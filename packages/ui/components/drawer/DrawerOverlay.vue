@@ -5,9 +5,7 @@ import { reactiveOmit } from '@vueuse/core'
 import { DrawerOverlay } from 'vaul-vue'
 import { cn } from '../lib/utils'
 
-const props = defineProps<
-  DialogOverlayProps & { class?: HTMLAttributes['class'] }
->()
+const props = defineProps<DialogOverlayProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>

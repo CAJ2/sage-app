@@ -19,28 +19,16 @@
       :type="EditModelType.Process"
     >
       <template #default="{ node }">
-        <ModelListProcess
-          :process="node.changes"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListProcess :process="node.changes" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModelChanges>
-    <GridModel
-      title="Processes"
-      :query="processQuery"
-      :query-name="'processes'"
-    >
+    <GridModel title="Processes" :query="processQuery" :query-name="'processes'">
       <template #default="{ node }">
-        <ModelListProcess
-          :process="node"
-          :buttons="['edit']"
-          @button="actionButton"
-        />
+        <ModelListProcess :process="node" :buttons="['edit']" @button="actionButton" />
       </template>
     </GridModel>
     <Dialog v-model:open="showEdit">
-      <DialogContent class="sm:max-w-[70vw] max-h-[80vh] overflow-auto">
+      <DialogContent class="max-h-[80vh] overflow-auto sm:max-w-[70vw]">
         <DialogTitle>
           <span v-if="editId === 'new'">Create Process</span>
           <span v-else>Edit Process</span>
@@ -74,12 +62,7 @@ const actionButton = (btn: string, id: string) => {
 }
 
 const processQuery = graphql(`
-  query ProcessesQuery(
-    $first: Int
-    $last: Int
-    $before: String
-    $after: String
-  ) {
+  query ProcessesQuery($first: Int, $last: Int, $before: String, $after: String) {
     processes(first: $first, last: $last, before: $before, after: $after) {
       nodes {
         ...ListProcessFragment
@@ -104,13 +87,7 @@ const processesChangesQuery = graphql(`
     $after: String
   ) {
     change(id: $changeID) {
-      edits(
-        type: $type
-        first: $first
-        last: $last
-        before: $before
-        after: $after
-      ) {
+      edits(type: $type, first: $first, last: $last, before: $before, after: $after) {
         nodes {
           changes {
             ...ListProcessFragment

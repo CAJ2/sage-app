@@ -1,6 +1,6 @@
+import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
-import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   modules: [
@@ -54,7 +54,7 @@ export default defineNuxtConfig({
     },
     experimental: {
       autoImportTranslationFunctions: true,
-    }
+    },
   },
 
   apollo: {
@@ -64,7 +64,7 @@ export default defineNuxtConfig({
         httpEndpoint: () => useRuntimeConfig().public.apiurl + '/graphql',
         httpLinkOptions: {
           credentials: 'include',
-        }
+        },
       },
     },
   },

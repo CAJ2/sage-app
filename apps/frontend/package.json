@@ -72,7 +72,7 @@
     "vaul-vue": "^0.4.1",
     "vue-i18n": "^11.1.5",
     "webrtc-adapter": "^9.0.3",
-    "zod": "^3.25.32"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.7",
@@ -101,6 +101,11 @@
   "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
   "nx": {
     "targets": {
+      "lint": {
+        "dependsOn": [
+          "build"
+        ]
+      },
       "lint:ci": {
         "dependsOn": [
           "build"

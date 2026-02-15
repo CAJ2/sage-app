@@ -1,3 +1,3 @@
-pnpm exec nx affected -t lint fmt build gen test check:migrations
+pnpm exec nx affected -t lint fmt build codegen test check:migrations
 git update-index --again
 pnpm exec nx affected -t lint:ci fmt:ci

@@ -1,18 +1,15 @@
 <template>
   <div>
-    <ul class="list bg-base-100 rounded-box shadow-md">
+    <ul class="list rounded-box bg-base-100 shadow-md">
       <li v-if="status === 'pending'" class="list-row">
-        <div class="skeleton h-4 w-28"></div>
-        <div class="skeleton h-4 w-full"></div>
-        <div class="skeleton h-4 w-full"></div>
+        <div class="h-4 w-28 skeleton"></div>
+        <div class="h-4 w-full skeleton"></div>
+        <div class="h-4 w-full skeleton"></div>
       </li>
 
       <div v-if="data">
         <li v-for="change in data.nodes" :key="change.id">
-          <NuxtLinkLocale
-            :to="`/contribute/changes/${change.id}`"
-            class="list-row"
-          >
+          <NuxtLinkLocale :to="`/contribute/changes/${change.id}`" class="list-row">
             <div class="flex flex-col gap-1">
               <span class="text-xs opacity-70">{{
                 new Date(change.updatedAt).toLocaleDateString() +
@@ -42,9 +39,7 @@
         </li>
       </div>
 
-      <li v-if="data && data.nodes?.length === 0" class="list-row">
-        There are no changes to show
-      </li>
+      <li v-if="data && data.nodes?.length === 0" class="list-row">There are no changes to show</li>
     </ul>
   </div>
 </template>
@@ -56,10 +51,7 @@ const { data } = defineProps<{
   status?: string
   data?: {
     nodes?:
-      | (Pick<
-          Change,
-          'id' | 'status' | 'title' | 'description' | 'updatedAt'
-        > & {
+      | (Pick<Change, 'id' | 'status' | 'title' | 'description' | 'updatedAt'> & {
           edits?: {
             totalCount: number
           }
