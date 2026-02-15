@@ -1,5 +1,6 @@
 import { EntityManager, raw } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+
 import { CursorOptions } from '@src/common/transform'
 
 import { Region } from './region.entity'

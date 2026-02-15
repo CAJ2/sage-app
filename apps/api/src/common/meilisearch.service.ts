@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { Searchable } from '@src/db/base.entity'
 import _ from 'lodash'
 import { MeiliSearch, RecordAny } from 'meilisearch'
+
+import { Searchable } from '@src/db/base.entity'
 
 export enum SearchIndex {
   CATEGORIES = 'categories',

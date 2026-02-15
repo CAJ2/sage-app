@@ -1,13 +1,14 @@
 import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
+import { AppTestModule } from '@test/app-test.module'
+import { graphql } from '@test/gql'
+import { GraphQLTestClient } from '@test/graphql.utils'
+
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { OrgSeeder } from '@src/db/seeds/OrgSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-import { AppTestModule } from '@test/app-test.module'
-import { graphql } from '@test/gql'
-import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { Org } from './org.entity'
 

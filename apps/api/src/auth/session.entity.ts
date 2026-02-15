@@ -1,4 +1,5 @@
 import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core'
+
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
 

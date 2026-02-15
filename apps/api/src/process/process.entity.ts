@@ -11,6 +11,8 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+import { z } from 'zod/v4'
+
 import { Source } from '@src/changes/source.entity'
 import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
@@ -19,7 +21,6 @@ import { Region } from '@src/geo/region.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
-import { z } from 'zod/v4'
 
 import { Material } from './material.entity'
 

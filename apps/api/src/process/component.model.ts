@@ -1,4 +1,10 @@
 import { ArgsType, Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Transform } from 'class-transformer'
+import { IsOptional, MaxLength, Validate } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
+import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
+
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
@@ -9,11 +15,6 @@ import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Transform } from 'class-transformer'
-import { IsOptional, MaxLength, Validate } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
-import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
 
 import {
   Component as ComponentEntity,

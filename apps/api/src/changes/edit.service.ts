@@ -10,10 +10,11 @@ import type {
   RequiredEntityData,
 } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import _ from 'lodash'
+
 import { AuthUserService } from '@src/auth/authuser.service'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { User } from '@src/users/users.entity'
-import _ from 'lodash'
 
 import {
   CreateChangeInput,

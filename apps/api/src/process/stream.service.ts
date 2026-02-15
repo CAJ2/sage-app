@@ -1,8 +1,9 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { ClsService } from 'nestjs-cls'
+
 import { I18nService } from '@src/common/i18n.service'
 import { Region } from '@src/geo/region.entity'
-import { ClsService } from 'nestjs-cls'
 
 import { Component } from './component.entity'
 import { ComponentRecycle } from './component.model'

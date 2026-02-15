@@ -1,5 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
+
 import { Org } from '@src/users/org.entity'
 
 export class OrgSeeder extends Seeder {

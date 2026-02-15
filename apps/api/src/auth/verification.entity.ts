@@ -1,4 +1,5 @@
 import { Entity, Index, Property } from '@mikro-orm/postgresql'
+
 import { IDCreatedUpdated } from '@src/db/base.entity'
 
 @Entity({ tableName: 'verifications', schema: 'auth' })

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { type TransformFnParams } from 'class-transformer'
 import { GraphQLError } from 'graphql'
 import { ClsService } from 'nestjs-cls'
 import { I18nService as I18nBaseService, Path, PathValue, TranslateOptions } from 'nestjs-i18n'
 import { IfAnyOrNever } from 'nestjs-i18n/dist/types'
 import { z } from 'zod/v4'
+
+import { I18nTranslations } from '@src/i18n/i18n.generated'
 
 import { LANG_REGEX, translate, TranslatedField, TrArray, TrArraySchema } from './i18n'
 

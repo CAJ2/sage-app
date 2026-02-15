@@ -1,4 +1,9 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Transform } from 'class-transformer'
+import { IsLatitude, IsLongitude, IsNumber, IsOptional, MaxLength, Validate } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
+import { DateTime } from 'luxon'
+
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
@@ -9,10 +14,6 @@ import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
-import { Transform } from 'class-transformer'
-import { IsLatitude, IsLongitude, IsNumber, IsOptional, MaxLength, Validate } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
-import { DateTime } from 'luxon'
 
 import { Place as PlaceEntity } from './place.entity'
 

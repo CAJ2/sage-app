@@ -1,5 +1,6 @@
 import { Collection, Entity, Enum, ManyToMany, ManyToOne, Property } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'

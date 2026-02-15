@@ -1,4 +1,5 @@
 import { EntityRepository, Knex, QueryBuilder } from '@mikro-orm/postgresql'
+
 import { ClosureTableRepository } from '@src/db/closure-table.repository'
 
 import { CategoryTree } from './category.entity'

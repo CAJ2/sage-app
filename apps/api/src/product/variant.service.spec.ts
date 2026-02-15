@@ -1,6 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { MikroORM } from '@mikro-orm/postgresql'
 import { Test, TestingModule } from '@nestjs/testing'
+
 import { AuthModule } from '@src/auth/auth.module'
 import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'

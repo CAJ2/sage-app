@@ -1,6 +1,7 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { translate } from '@src/common/i18n'
 import { Transform } from 'class-transformer'
+
+import { translate } from '@src/common/i18n'
 
 import { ProcessInstructionsAccess, ProcessInstructionsContainerType } from './process.entity'
 

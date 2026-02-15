@@ -10,11 +10,12 @@ import {
   Property,
   type Ref,
 } from '@mikro-orm/core'
+import { z } from 'zod/v4'
+
 import { flattenTr, type TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
 import { User } from '@src/users/users.entity'
-import { z } from 'zod/v4'
 
 import { Category } from './category.entity'
 import { Variant } from './variant.entity'

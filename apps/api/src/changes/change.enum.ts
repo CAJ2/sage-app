@@ -1,4 +1,5 @@
 import { createUnionType, registerEnumType } from '@nestjs/graphql'
+
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { Component } from '@src/process/component.model'

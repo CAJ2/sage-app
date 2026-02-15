@@ -1,5 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
+
 import { Category, CATEGORY_ROOT, CategoryEdge, CategoryTree } from '@src/product/category.entity'
 
 export const CATEGORY_IDS = [

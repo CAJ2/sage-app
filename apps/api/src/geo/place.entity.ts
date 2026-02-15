@@ -11,6 +11,7 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+
 import type { TranslatedField } from '@src/common/i18n'
 import { CreatedUpdated } from '@src/db/base.entity'
 import { Point, PointType } from '@src/db/custom.types'

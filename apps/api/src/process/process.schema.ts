@@ -1,4 +1,9 @@
 import { Injectable } from '@nestjs/common'
+import { ValidateFunction } from 'ajv'
+import _ from 'lodash'
+import { I18nService } from 'nestjs-i18n'
+import { z } from 'zod/v4'
+
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
@@ -9,10 +14,6 @@ import { RegionIDSchema } from '@src/geo/region.model'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { VariantIDSchema } from '@src/product/variant.schema'
 import { OrgIDSchema } from '@src/users/org.schema'
-import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
-import { z } from 'zod/v4'
 
 import { MaterialIDSchema } from './material.model'
 import {

@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common'
+import { ValidateFunction } from 'ajv'
+import _ from 'lodash'
+import { I18nService } from 'nestjs-i18n'
+import { z } from 'zod/v4'
+
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, ImageOrIconSchema, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
-import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
-import { z } from 'zod/v4'
 
 export const CategoryIDSchema = z.string().meta({
   id: 'Category',

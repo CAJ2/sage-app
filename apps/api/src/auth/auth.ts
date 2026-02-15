@@ -1,9 +1,10 @@
 import { MikroORM } from '@mikro-orm/postgresql'
-import { isProd } from '@src/common/common.utils'
 import { betterAuth } from 'better-auth'
 import { admin, organization, username } from 'better-auth/plugins'
 import { KyselyKnexDialect, PGColdDialect } from 'kysely-knex'
 import { nanoid } from 'nanoid'
+
+import { isProd } from '@src/common/common.utils'
 
 import { reservedUsernames } from './reserved-usernames'
 

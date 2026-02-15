@@ -11,11 +11,12 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+import type { JsonLdDocument } from 'jsonld'
+import { z } from 'zod/v4'
+
 import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
-import type { JsonLdDocument } from 'jsonld'
-import { z } from 'zod/v4'
 
 import { Component } from './component.entity'
 import { Process } from './process.entity'

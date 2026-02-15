@@ -11,6 +11,7 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+
 import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'

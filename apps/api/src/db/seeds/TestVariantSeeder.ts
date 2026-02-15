@@ -1,5 +1,6 @@
 import { type EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
+
 import { Source, SourceType } from '@src/changes/source.entity'
 import { Component } from '@src/process/component.entity'
 import { Material } from '@src/process/material.entity'

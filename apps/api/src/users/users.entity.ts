@@ -8,6 +8,7 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Opt } from '@mikro-orm/core'
+
 import { Account } from '@src/auth/account.entity'
 import { Session } from '@src/auth/session.entity'
 import { IDCreatedUpdated } from '@src/db/base.entity'

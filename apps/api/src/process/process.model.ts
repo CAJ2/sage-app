@@ -1,4 +1,9 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { Transform } from 'class-transformer'
+import { IsEnum, IsOptional } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
+import { z } from 'zod/v4'
+
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
@@ -12,10 +17,6 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
-import { Transform } from 'class-transformer'
-import { IsEnum, IsOptional } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
-import { z } from 'zod/v4'
 
 import { Material } from './material.model'
 import {

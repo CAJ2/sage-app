@@ -6,10 +6,11 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { DynamicModule, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { Int, GraphQLModule as NestGraphQLModule } from '@nestjs/graphql'
-import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { DirectiveLocation, GraphQLBoolean, GraphQLDirective } from 'graphql'
 import type { GraphQLFormattedError } from 'graphql'
 import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
+
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 
 import { CacheControlScopeEnum } from './cache-control'
 import { Context, IncomingMessageWithAuthCode } from './graphql.context'

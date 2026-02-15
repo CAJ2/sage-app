@@ -1,7 +1,8 @@
-import { map2to3 } from '@src/db/iso639'
 import type { TransformFnParams } from 'class-transformer'
 import _ from 'lodash'
 import { z } from 'zod/v4'
+
+import { map2to3 } from '@src/db/iso639'
 
 export const Locales = ['en-US', 'sv-SE'] as const
 

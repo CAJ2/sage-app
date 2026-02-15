@@ -2,13 +2,14 @@ import { BaseEntity } from '@mikro-orm/core'
 import type { EntityDTO, FindOptions, Loaded, ObjectQuery, QueryOrderMap } from '@mikro-orm/core'
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 import { plainToInstance } from 'class-transformer'
 import type { ClassConstructor, ClassTransformOptions, TransformFnParams } from 'class-transformer'
 import { validateOrReject } from 'class-validator'
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
 import { ClsService } from 'nestjs-cls'
+
+import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 
 import {
   DEFAULT_PAGE_SIZE,

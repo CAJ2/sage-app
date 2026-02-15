@@ -1,7 +1,8 @@
 import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
+import { IsEmail, IsOptional, IsUrl, MaxLength } from 'class-validator'
+
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { IsEmail, IsOptional, IsUrl, MaxLength } from 'class-validator'
 
 import { Org } from './org.model'
 import { User as UserEntity } from './users.entity'

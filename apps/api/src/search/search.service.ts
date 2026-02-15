@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+
 import { MeiliService, SearchIndex } from '@src/common/meilisearch.service'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'

@@ -10,10 +10,11 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+import { nanoid } from 'nanoid'
+
 import { Source } from '@src/changes/source.entity'
 import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
-import { nanoid } from 'nanoid'
 
 export enum ChangeStatus {
   DRAFT = 'DRAFT',

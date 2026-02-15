@@ -22,10 +22,9 @@
       "unknown"
     ],
     "newlinesBetween": true,
-    "internalPattern": ["^@src"],
     "customGroups": [
       {
-        "elementNamePattern": ["src"],
+        "elementNamePattern": ["@src/**"],
         "groupName": "src"
       }
     ]

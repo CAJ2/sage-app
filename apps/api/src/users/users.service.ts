@@ -1,5 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+
 import { BadRequestErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 

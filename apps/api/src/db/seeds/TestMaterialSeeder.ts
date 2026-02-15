@@ -1,5 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
+
 import { Material, MATERIAL_ROOT, MaterialEdge, MaterialTree } from '@src/process/material.entity'
 
 export const MATERIAL_IDS = [

@@ -1,9 +1,10 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import { type JSONSchemaType } from 'ajv/dist/2020'
+
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { AjvTemplateSchema, JSONObject } from '@src/common/z.schema'
-import { type JSONSchemaType } from 'ajv/dist/2020'
 
 import { Tag, TagMetaTemplateSchema } from './tag.entity'
 import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'

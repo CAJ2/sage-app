@@ -1,5 +1,6 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+
 import { CursorOptions } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
 

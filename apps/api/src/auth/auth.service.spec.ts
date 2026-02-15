@@ -1,5 +1,6 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
+
 import { CommonModule } from '@src/common/common.module'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { UsersService } from '@src/users/users.service'

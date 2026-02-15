@@ -1,6 +1,8 @@
 import { EntityManager } from '@mikro-orm/core'
 import type { Loaded } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import _ from 'lodash'
+
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { ProcessSchemaService } from '@src/process/process.schema'
@@ -11,7 +13,6 @@ import { ItemSchemaService } from '@src/product/item.schema'
 import { ItemService } from '@src/product/item.service'
 import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
-import _ from 'lodash'
 
 import type { Edit as EditModel } from './change.model'
 
