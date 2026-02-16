@@ -1,7 +1,7 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
@@ -31,6 +31,7 @@ export class CategoryResolver {
   ) {}
 
   @Query(() => CategoriesPage, { name: 'categories' })
+  @OptionalAuth()
   async categories(@Args() args: CategoriesArgs): Promise<CategoriesPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoriesArgs, args)
     const cursor = await this.categoryService.find(filter)
@@ -38,6 +39,7 @@ export class CategoryResolver {
   }
 
   @Query(() => Category, { name: 'category', nullable: true })
+  @OptionalAuth()
   async category(@Args('id', { type: () => ID }) id: string): Promise<Category> {
     const category = await this.categoryService.findOneByID(id)
     if (!category) {
@@ -48,6 +50,7 @@ export class CategoryResolver {
   }
 
   @Query(() => Category, { name: 'categoryRoot' })
+  @OptionalAuth()
   async categoryRoot(): Promise<Category> {
     const category = await this.categoryService.findRoot()
     if (!category) {
@@ -58,6 +61,7 @@ export class CategoryResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
+  @OptionalAuth()
   async categorySchema(): Promise<ModelEditSchema> {
     return {
       create: {
@@ -110,7 +114,6 @@ export class CategoryResolver {
     name: 'createCategory',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async createCategory(
     @Args('input') input: CreateCategoryInput,
     @AuthUser() user: ReqUser,
@@ -125,7 +128,6 @@ export class CategoryResolver {
     name: 'updateCategory',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async updateCategory(
     @Args('input') input: UpdateCategoryInput,
     @AuthUser() user: ReqUser,
@@ -140,7 +142,6 @@ export class CategoryResolver {
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteCategory', nullable: true })
-  @UseGuards(AuthGuard)
   async deleteCategory(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const deleted = await this.categoryService.delete(input)
     if (!deleted) {

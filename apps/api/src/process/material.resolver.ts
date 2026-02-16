@@ -1,5 +1,6 @@
 import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
+import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 
@@ -23,6 +24,7 @@ export class MaterialResolver {
   ) {}
 
   @Query(() => MaterialsPage, { name: 'materials' })
+  @OptionalAuth()
   async materials(@Args() args: MaterialsArgs): Promise<MaterialsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(MaterialsArgs, args)
     const cursor = await this.materialService.find(filter)
@@ -30,6 +32,7 @@ export class MaterialResolver {
   }
 
   @Query(() => Material, { name: 'material', nullable: true })
+  @OptionalAuth()
   async material(@Args('id', { type: () => ID }) id: string): Promise<Material> {
     const material = await this.materialService.findOneByID(id)
     if (!material) {
@@ -40,6 +43,7 @@ export class MaterialResolver {
   }
 
   @Query(() => Material, { name: 'materialRoot' })
+  @OptionalAuth()
   async materialRoot(): Promise<Material> {
     const material = await this.materialService.findRoot()
     if (!material) {

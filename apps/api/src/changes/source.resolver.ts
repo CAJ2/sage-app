@@ -1,9 +1,7 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
-import { TransformService } from '@src/common/transform'
-
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import {
   CreateSourceInput,
   CreateSourceOutput,
@@ -14,8 +12,9 @@ import {
   SourcesPage,
   UpdateSourceInput,
   UpdateSourceOutput,
-} from './source.model'
-import { SourceService } from './source.service'
+} from '@src/changes/source.model'
+import { SourceService } from '@src/changes/source.service'
+import { TransformService } from '@src/common/transform'
 
 @Resolver(() => Source)
 export class SourceResolver {
@@ -25,7 +24,7 @@ export class SourceResolver {
   ) {}
 
   @Query(() => SourcesPage)
-  @UseGuards(AuthGuard)
+  @OptionalAuth()
   async sources(@Args() args: SourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(SourcesArgs, args)
     if (args.type) filter.where.type = args.type
@@ -35,14 +34,13 @@ export class SourceResolver {
   }
 
   @Query(() => Source, { name: 'source', nullable: true })
-  @UseGuards(AuthGuard)
+  @OptionalAuth()
   async source(@Args('id', { type: () => ID }) id: string) {
     const source = await this.sourceService.findOneByID(id)
     return this.transform.entityToModel(Source, source)
   }
 
   @Mutation(() => CreateSourceOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async createSource(
     @Args('input') input: CreateSourceInput,
     @AuthUser() user: ReqUser,
@@ -55,7 +53,6 @@ export class SourceResolver {
   }
 
   @Mutation(() => UpdateSourceOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async updateSource(@Args('input') input: UpdateSourceInput): Promise<UpdateSourceOutput> {
     const source = await this.sourceService.update(input)
     const model = await this.transform.entityToModel(Source, source)
@@ -65,7 +62,6 @@ export class SourceResolver {
   }
 
   @Mutation(() => MarkSourceProcessedOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async markSourceProcessed(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<MarkSourceProcessedOutput> {
@@ -76,7 +72,6 @@ export class SourceResolver {
   }
 
   @Mutation(() => DeleteSourceOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async deleteSource(@Args('id', { type: () => ID }) id: string): Promise<DeleteSourceOutput> {
     await this.sourceService.remove(id)
     return {

@@ -1,15 +1,14 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
-
-import { Item, ItemsPage } from './item.model'
+import { Item, ItemsPage } from '@src/product/item.model'
 import {
   CreateVariantInput,
   CreateVariantOutput,
@@ -27,9 +26,9 @@ import {
   VariantsArgs,
   VariantsPage,
   VariantTagsArgs,
-} from './variant.model'
-import { VariantSchemaService } from './variant.schema'
-import { VariantService } from './variant.service'
+} from '@src/product/variant.model'
+import { VariantSchemaService } from '@src/product/variant.schema'
+import { VariantService } from '@src/product/variant.service'
 
 @Resolver(() => Variant)
 export class VariantResolver {
@@ -40,6 +39,7 @@ export class VariantResolver {
   ) {}
 
   @Query(() => VariantsPage, { name: 'variants' })
+  @OptionalAuth()
   async variants(@Args() args: VariantsArgs): Promise<VariantsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantsArgs, args)
     const cursor = await this.variantService.find(filter)
@@ -47,6 +47,7 @@ export class VariantResolver {
   }
 
   @Query(() => Variant, { name: 'variant', nullable: true })
+  @OptionalAuth()
   async variant(@Args('id', { type: () => ID }) id: string): Promise<Variant> {
     const variant = await this.variantService.findOneByID(id)
     if (!variant) {
@@ -57,6 +58,7 @@ export class VariantResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
+  @OptionalAuth()
   async variantSchema(): Promise<ModelEditSchema> {
     return {
       create: {
@@ -116,7 +118,6 @@ export class VariantResolver {
     name: 'createVariant',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async createVariant(
     @Args('input') input: CreateVariantInput,
     @AuthUser() user: ReqUser,
@@ -134,7 +135,6 @@ export class VariantResolver {
     name: 'updateVariant',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async updateVariant(
     @Args('input') input: UpdateVariantInput,
     @AuthUser() user: ReqUser,
@@ -149,7 +149,6 @@ export class VariantResolver {
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteVariant', nullable: true })
-  @UseGuards(AuthGuard)
   async deleteVariant(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const variant = await this.variantService.delete(input)
     if (!variant) {

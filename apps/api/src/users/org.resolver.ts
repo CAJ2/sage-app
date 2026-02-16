@@ -1,11 +1,10 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-
 import {
   CreateOrgInput,
   CreateOrgOutput,
@@ -13,9 +12,9 @@ import {
   OrgUsersArgs,
   UpdateOrgInput,
   UpdateOrgOutput,
-} from './org.model'
-import { OrgService } from './org.service'
-import { User, UserPage } from './users.model'
+} from '@src/users/org.model'
+import { OrgService } from '@src/users/org.service'
+import { User, UserPage } from '@src/users/users.model'
 
 @Resolver(() => Org)
 export class OrgResolver {
@@ -25,6 +24,7 @@ export class OrgResolver {
   ) {}
 
   @Query(() => Org, { name: 'org', nullable: true })
+  @OptionalAuth()
   async org(@Args('id', { type: () => ID }) id: string) {
     const org = await this.orgService.findOneByID(id)
     if (!org) {
@@ -42,7 +42,6 @@ export class OrgResolver {
   }
 
   @Mutation(() => CreateOrgOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async createOrg(
     @Args('input') input: CreateOrgInput,
     @AuthUser() user: ReqUser,
@@ -57,7 +56,6 @@ export class OrgResolver {
   }
 
   @Mutation(() => UpdateOrgOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async updateOrg(
     @Args('input') input: UpdateOrgInput,
     @AuthUser() user: ReqUser,

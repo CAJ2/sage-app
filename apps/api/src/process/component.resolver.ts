@@ -1,14 +1,13 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
-
 import {
   Component,
   ComponentRecycleArgs,
@@ -17,11 +16,11 @@ import {
   CreateComponentOutput,
   UpdateComponentInput,
   UpdateComponentOutput,
-} from './component.model'
-import { ComponentSchemaService } from './component.schema'
-import { ComponentService } from './component.service'
-import { ComponentsArgs, Material } from './material.model'
-import { Tag } from './tag.model'
+} from '@src/process/component.model'
+import { ComponentSchemaService } from '@src/process/component.schema'
+import { ComponentService } from '@src/process/component.service'
+import { ComponentsArgs, Material } from '@src/process/material.model'
+import { Tag } from '@src/process/tag.model'
 
 @Resolver(() => Component)
 export class ComponentResolver {
@@ -33,6 +32,7 @@ export class ComponentResolver {
   ) {}
 
   @Query(() => ComponentsPage, { name: 'components' })
+  @OptionalAuth()
   async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentsArgs, args)
     const cursor = await this.componentService.find(filter)
@@ -40,6 +40,7 @@ export class ComponentResolver {
   }
 
   @Query(() => Component, { name: 'component', nullable: true })
+  @OptionalAuth()
   async component(
     @Args('id', { type: () => ID }) id: string,
     @Args('withChange', { type: () => ID, nullable: true })
@@ -53,6 +54,7 @@ export class ComponentResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
+  @OptionalAuth()
   async componentSchema(): Promise<ModelEditSchema> {
     return {
       create: {
@@ -109,7 +111,6 @@ export class ComponentResolver {
     name: 'createComponent',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async createComponent(
     @Args('input') input: CreateComponentInput,
     @AuthUser() user: ReqUser,
@@ -128,7 +129,6 @@ export class ComponentResolver {
     name: 'updateComponent',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async updateComponent(
     @Args('input') input: UpdateComponentInput,
     @AuthUser() user: ReqUser,
@@ -143,7 +143,6 @@ export class ComponentResolver {
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteComponent', nullable: true })
-  @UseGuards(AuthGuard)
   async deleteComponent(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const component = await this.componentService.delete(input)
     return { success: true, id: component.id }

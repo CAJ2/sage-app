@@ -1,13 +1,8 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
-import { NotFoundErr } from '@src/common/exceptions'
-import { TransformService } from '@src/common/transform'
-import { User } from '@src/users/users.model'
-
-import { CreateChangeInput } from './change-ext.model'
+import { CreateChangeInput } from '@src/changes/change-ext.model'
 import {
   Change,
   ChangeEditsArgs,
@@ -23,10 +18,13 @@ import {
   MergeChangeOutput,
   UpdateChangeInput,
   UpdateChangeOutput,
-} from './change.model'
-import { ChangeService } from './change.service'
-import { EditService } from './edit.service'
-import { Source, SourcesPage } from './source.model'
+} from '@src/changes/change.model'
+import { ChangeService } from '@src/changes/change.service'
+import { EditService } from '@src/changes/edit.service'
+import { Source, SourcesPage } from '@src/changes/source.model'
+import { NotFoundErr } from '@src/common/exceptions'
+import { TransformService } from '@src/common/transform'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Change)
 export class ChangeResolver {
@@ -37,7 +35,6 @@ export class ChangeResolver {
   ) {}
 
   @Query(() => ChangesPage)
-  @UseGuards(AuthGuard)
   @OptionalAuth()
   async changes(@Args() args: ChangesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ChangesArgs, args)
@@ -46,7 +43,6 @@ export class ChangeResolver {
   }
 
   @Query(() => Change, { name: 'change', nullable: true })
-  @UseGuards(AuthGuard)
   @OptionalAuth()
   async change(@Args('id', { type: () => ID }) id: string) {
     const change = await this.changeService.findOne(id)
@@ -57,7 +53,6 @@ export class ChangeResolver {
   }
 
   @Query(() => DirectEdit, { nullable: true })
-  @UseGuards(AuthGuard)
   async directEdit(@Args() args: DirectEditArgs) {
     const directEdit = await this.changeService.directEdit(args.id, args.entityName)
     if (!directEdit) {
@@ -67,7 +62,6 @@ export class ChangeResolver {
   }
 
   @Mutation(() => CreateChangeOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async createChange(
     @Args('input') input: CreateChangeInput,
     @AuthUser() user: ReqUser,
@@ -80,7 +74,6 @@ export class ChangeResolver {
   }
 
   @Mutation(() => UpdateChangeOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async updateChange(@Args('input') input: UpdateChangeInput): Promise<UpdateChangeOutput> {
     const change = await this.changeService.update(input)
     const model = await this.transform.entityToModel(Change, change)
@@ -90,7 +83,6 @@ export class ChangeResolver {
   }
 
   @Mutation(() => DeleteChangeOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async deleteChange(@Args('id', { type: () => ID }) id: string): Promise<DeleteChangeOutput> {
     await this.changeService.remove(id)
     return {
@@ -99,7 +91,6 @@ export class ChangeResolver {
   }
 
   @Mutation(() => MergeChangeOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async mergeChange(@Args('id', { type: () => ID }) id: string): Promise<MergeChangeOutput> {
     const result = await this.editService.mergeID(id)
     if (!result) {
@@ -112,7 +103,6 @@ export class ChangeResolver {
   }
 
   @Mutation(() => DiscardEditOutput, { nullable: true })
-  @UseGuards(AuthGuard)
   async discardEdit(
     @Args('changeID', { type: () => ID }) changeID: string,
     @Args('editID', { type: () => ID }) editID: string,

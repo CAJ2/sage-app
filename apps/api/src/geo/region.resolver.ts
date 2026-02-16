@@ -1,10 +1,10 @@
 import { Args, ID, Query, Resolver } from '@nestjs/graphql'
 
+import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-
-import { Region, RegionsArgs, RegionsPage, RegionsSearchByPointArgs } from './region.model'
-import { RegionService } from './region.service'
+import { Region, RegionsArgs, RegionsPage, RegionsSearchByPointArgs } from '@src/geo/region.model'
+import { RegionService } from '@src/geo/region.service'
 
 @Resolver(() => Region)
 export class RegionResolver {
@@ -14,6 +14,7 @@ export class RegionResolver {
   ) {}
 
   @Query(() => RegionsPage, { name: 'regions' })
+  @OptionalAuth()
   async regions(@Args() args: RegionsArgs): Promise<RegionsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(RegionsArgs, args)
     const cursor = await this.regionService.find(filter)
@@ -21,6 +22,7 @@ export class RegionResolver {
   }
 
   @Query(() => Region, { name: 'region', nullable: true })
+  @OptionalAuth()
   async region(@Args('id', { type: () => ID }) id: string) {
     const region = await this.regionService.findOneByID(id)
     if (!region) {
@@ -30,6 +32,7 @@ export class RegionResolver {
   }
 
   @Query(() => RegionsPage, { name: 'searchRegionsByPoint' })
+  @OptionalAuth()
   async searchRegionsByPoint(@Args() args: RegionsSearchByPointArgs): Promise<RegionsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(RegionsSearchByPointArgs, args)
     const cursor = await this.regionService.searchByPoint(
