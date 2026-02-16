@@ -1,10 +1,10 @@
 import { Args, Query, Resolver } from '@nestjs/graphql'
 
+import { OptionalAuth } from '@src/auth/decorators'
 import { BadRequestErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-
-import { SearchArgs, SearchResultPage } from './search.model'
-import { SearchService } from './search.service'
+import { SearchArgs, SearchResultPage } from '@src/search/search.model'
+import { SearchService } from '@src/search/search.service'
 
 @Resolver(() => SearchResultPage)
 export class SearchResolver {
@@ -14,6 +14,7 @@ export class SearchResolver {
   ) {}
 
   @Query(() => SearchResultPage, { name: 'search' })
+  @OptionalAuth()
   async search(@Args() args: SearchArgs): Promise<any> {
     const result = SearchArgs.schema.safeParse(args)
     if (!result.success) {

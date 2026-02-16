@@ -1,11 +1,9 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
-
 import {
   CreateTagDefinitionInput,
   CreateTagDefinitionOutput,
@@ -14,8 +12,8 @@ import {
   TagPage,
   UpdateTagDefinitionInput,
   UpdateTagDefinitionOutput,
-} from './tag.model'
-import { TagService } from './tag.service'
+} from '@src/process/tag.model'
+import { TagService } from '@src/process/tag.service'
 
 @Resolver(() => Tag)
 export class TagResolver {
@@ -26,6 +24,7 @@ export class TagResolver {
   ) {}
 
   @Query(() => TagPage, { name: 'tags' })
+  @OptionalAuth()
   async tags(@Args() args: TagArgs): Promise<TagPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(TagArgs, args)
     const cursor = await this.tagService.find(filter)
@@ -33,6 +32,7 @@ export class TagResolver {
   }
 
   @Query(() => Tag, { name: 'tag', nullable: true })
+  @OptionalAuth()
   async tag(@Args('id', { type: () => ID }) id: string): Promise<Tag> {
     const tag = await this.tagService.findOneByID(id)
     if (!tag) {
@@ -45,7 +45,6 @@ export class TagResolver {
     name: 'createTagDefinition',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async createTagDefinition(
     @Args('input') input: CreateTagDefinitionInput,
   ): Promise<CreateTagDefinitionOutput> {
@@ -61,7 +60,6 @@ export class TagResolver {
     name: 'updateTagDefinition',
     nullable: true,
   })
-  @UseGuards(AuthGuard)
   async updateTagDefinition(
     @Args('input') input: UpdateTagDefinitionInput,
   ): Promise<UpdateTagDefinitionOutput> {

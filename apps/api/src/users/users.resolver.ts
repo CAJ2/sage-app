@@ -1,11 +1,11 @@
 import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
+import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-
-import { Org, OrgsPage } from './org.model'
-import { User, UsersOrgsArgs } from './users.model'
-import { UsersService } from './users.service'
+import { Org, OrgsPage } from '@src/users/org.model'
+import { User, UsersOrgsArgs } from '@src/users/users.model'
+import { UsersService } from '@src/users/users.service'
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -15,6 +15,7 @@ export class UsersResolver {
   ) {}
 
   @Query(() => User, { name: 'user', nullable: true })
+  @OptionalAuth()
   async user(@Args('id', { type: () => ID }) id: string) {
     const user = await this.usersService.findOneByID(id)
     if (!user) {

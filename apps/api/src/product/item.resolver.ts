@@ -1,15 +1,14 @@
-import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { AuthGuard, AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
+import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
-
-import { CategoriesPage, Category } from './category.model'
+import { CategoriesPage, Category } from '@src/product/category.model'
 import {
   CreateItemInput,
   CreateItemOutput,
@@ -21,10 +20,10 @@ import {
   ItemVariantsArgs,
   UpdateItemInput,
   UpdateItemOutput,
-} from './item.model'
-import { ItemSchemaService } from './item.schema'
-import { ItemService } from './item.service'
-import { Variant, VariantsPage } from './variant.model'
+} from '@src/product/item.model'
+import { ItemSchemaService } from '@src/product/item.schema'
+import { ItemService } from '@src/product/item.service'
+import { Variant, VariantsPage } from '@src/product/variant.model'
 
 @Resolver(() => Item)
 export class ItemResolver {
@@ -35,6 +34,7 @@ export class ItemResolver {
   ) {}
 
   @Query(() => ItemsPage, { name: 'items' })
+  @OptionalAuth()
   async items(@Args() args: ItemsArgs): Promise<ItemsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ItemsArgs, args)
     const cursor = await this.itemService.find(filter)
@@ -42,6 +42,7 @@ export class ItemResolver {
   }
 
   @Query(() => Item, { name: 'item', nullable: true })
+  @OptionalAuth()
   async item(@Args('id', { type: () => ID }) id: string): Promise<Item> {
     const item = await this.itemService.findOneByID(id)
     if (!item) {
@@ -52,6 +53,7 @@ export class ItemResolver {
   }
 
   @Query(() => ModelEditSchema, { nullable: true })
+  @OptionalAuth()
   async itemSchema(): Promise<ModelEditSchema> {
     return {
       create: {
@@ -87,7 +89,6 @@ export class ItemResolver {
   }
 
   @Mutation(() => CreateItemOutput, { name: 'createItem', nullable: true })
-  @UseGuards(AuthGuard)
   async createItem(
     @Args('input') input: CreateItemInput,
     @AuthUser() user: ReqUser,
@@ -103,7 +104,6 @@ export class ItemResolver {
   }
 
   @Mutation(() => UpdateItemOutput, { name: 'updateItem', nullable: true })
-  @UseGuards(AuthGuard)
   async updateItem(
     @Args('input') input: UpdateItemInput,
     @AuthUser() user: ReqUser,
@@ -118,7 +118,6 @@ export class ItemResolver {
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteItem', nullable: true })
-  @UseGuards(AuthGuard)
   async deleteItem(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
     const item = await this.itemService.delete(input)
     if (!item) {
