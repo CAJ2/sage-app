@@ -106,12 +106,19 @@ export class ChangeInputWithLang {
 
 @InputType()
 export class DeleteInput {
+  static schema = z.object({
+    id: z.nanoid(),
+    changeID: z.nanoid().optional(),
+    change: CreateChangeInput.schema.optional(),
+    addSources: SourceInput.schema.array().optional(),
+    removeSources: z.array(z.nanoid()).optional(),
+    apply: z.boolean().optional(),
+  })
+
   @Field(() => ID)
   id!: string
 
   @Field(() => ID, { nullable: true })
-  @IsOptional()
-  @Validate(IsNanoID)
   changeID?: string
 
   @Field(() => CreateChangeInput, { nullable: true })
@@ -124,6 +131,5 @@ export class DeleteInput {
   removeSources?: string[]
 
   @Field(() => Boolean, { nullable: true })
-  @IsOptional()
   apply?: boolean
 }
