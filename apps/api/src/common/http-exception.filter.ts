@@ -27,7 +27,7 @@ import {
   DriverException,
 )
 export class HttpExceptionFilter implements GqlExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const gql = GqlArgumentsHost.create(host)
     const ctx = gql.switchToHttp()
     const response = ctx.getResponse<Response>()
@@ -45,14 +45,16 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
     const resBody = {
       errors,
     }
-    if (exception.message) {
+    if (exception instanceof HttpException && exception.message) {
       errors.push({ message: exception.message })
     }
 
     if (response.status) {
       response.status(status).json(resBody)
     } else {
-      exception.message = 'Internal Server Error'
+      if (exception instanceof HttpException || exception instanceof BaseException) {
+        exception.message = 'Internal Server Error'
+      }
       return exception
     }
   }

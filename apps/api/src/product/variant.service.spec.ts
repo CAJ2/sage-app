@@ -13,6 +13,7 @@ import {
   TestVariantSeeder,
   VARIANT_IDS,
 } from '@src/db/seeds/TestVariantSeeder'
+import { ADMIN_USER_ID, UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { ProcessModule } from '@src/process/process.module'
@@ -39,9 +40,8 @@ describe('VariantService', () => {
     service = module.get<VariantService>(VariantService)
     orm = module.get<MikroORM>(MikroORM)
 
-    await clearDatabase(orm, 'auth')
-    await clearDatabase(orm, 'public')
-    await orm.getSeeder().seed(BaseSeeder, TestMaterialSeeder, TestVariantSeeder)
+    await clearDatabase(orm, 'public', ['users'])
+    await orm.getSeeder().seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
   }, 60000)
 
   afterAll(async () => {
@@ -91,5 +91,16 @@ describe('VariantService', () => {
     expect(result.items).toHaveLength(2)
     expect(result.items[0].component.id).toBe(COMPONENT_IDS[0])
     expect(result.items[1].component.id).toBe(COMPONENT_IDS[1])
+  })
+
+  test('should create a new variant', async () => {
+    const input = {
+      nameTr: [{ lang: 'en', text: 'New Variant', auto: false }],
+      descTr: [{ lang: 'en', text: 'Description for new variant', auto: false }],
+    }
+    const result = await service.create(input, ADMIN_USER_ID!)
+    expect(result).toBeDefined()
+    expect(result.variant.name).toStrictEqual({ en: 'New Variant' })
+    expect(result.variant.desc).toStrictEqual({ en: 'Description for new variant' })
   })
 })
