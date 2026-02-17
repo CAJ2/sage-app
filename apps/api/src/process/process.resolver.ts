@@ -88,6 +88,7 @@ export class ProcessResolver {
     @Args('input') input: UpdateProcessInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateProcessOutput> {
+    input = await this.z.parse(UpdateProcessInput.schema, input)
     const updated = await this.processService.update(input, user.id)
     const model = await this.transform.entityToModel(Process, updated.process)
     if (updated.change) {
@@ -99,6 +100,7 @@ export class ProcessResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteProcess', nullable: true })
   async deleteProcess(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
+    input = await this.z.parse(DeleteInput.schema, input)
     const process = await this.processService.delete(input)
     return { success: true, id: process.id }
   }

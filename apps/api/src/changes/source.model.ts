@@ -1,11 +1,10 @@
 import { ArgsType, Field, ID, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { IsEnum, IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { IsNanoID } from '@src/common/validator.model'
+import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
@@ -60,55 +59,58 @@ export class SourcesArgs extends PaginationBasicArgs {
 
 @InputType()
 export class CreateSourceInput {
+  static schema = z.object({
+    type: z.enum(SourceType),
+    location: z.string().max(2048).optional(),
+    content: ZJSONObject.optional(),
+    contentURL: z.url({ protocol: /^https:\/\// }).optional(),
+    metadata: ZJSONObject.optional(),
+  })
+
   @Field(() => SourceType)
-  @IsEnum(SourceType)
   type!: SourceType
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(2048)
   location?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  content?: Record<string, any>
+  content?: JSONObject
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @IsUrl({ protocols: ['https'] })
   contentURL?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  metadata?: Record<string, any>
+  metadata?: JSONObject
 }
 
 @InputType()
 export class UpdateSourceInput {
+  static schema = z.object({
+    id: z.nanoid(),
+    type: z.enum(SourceType).optional(),
+    location: z.string().max(2048).optional(),
+    content: ZJSONObject.optional(),
+    contentURL: z.url({ protocol: /^https:\/\// }).optional(),
+    metadata: ZJSONObject.optional(),
+  })
+
   @Field(() => ID)
-  @Validate(IsNanoID)
   id!: string
 
   @Field(() => SourceType, { nullable: true })
-  @IsOptional()
-  @IsEnum(SourceType)
   type?: SourceType
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(2048)
   location?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  @IsOptional()
-  content?: Record<string, any>
+  content?: JSONObject
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @IsUrl({ protocols: ['https'] })
   contentURL?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: JSONObject
 }
 
 @ObjectType()

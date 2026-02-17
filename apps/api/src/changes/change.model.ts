@@ -1,12 +1,10 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Transform } from 'class-transformer'
-import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
 import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
-import { IsNanoID } from '@src/common/validator.model'
 import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
 import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
@@ -136,26 +134,27 @@ export class DirectEditArgs {
 
 @InputType()
 export class UpdateChangeInput {
+  static schema = z.object({
+    id: z.nanoid(),
+    title: z.string().max(1000).optional(),
+    description: z.string().max(100_000).optional(),
+    status: z.enum(ChangeStatus).optional(),
+    sources: z.array(z.nanoid()).optional(),
+  })
+
   @Field(() => ID)
-  @Validate(IsNanoID)
   id!: string
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(1000)
   title?: string
 
   @Field(() => String, { nullable: true })
-  @IsOptional()
-  @MaxLength(100000)
   description?: string
 
   @Field(() => ChangeStatus, { nullable: true })
-  @IsOptional()
   status?: ChangeStatus & {}
 
   @Field(() => [ID], { nullable: true })
-  @IsOptional()
   sources?: string[]
 }
 

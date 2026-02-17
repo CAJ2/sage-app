@@ -6,6 +6,7 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Item, ItemsPage } from '@src/product/item.model'
@@ -35,6 +36,7 @@ export class VariantResolver {
   constructor(
     private readonly variantService: VariantService,
     private readonly transform: TransformService,
+    private readonly z: ZService,
     private readonly variantSchemaService: VariantSchemaService,
   ) {}
 
@@ -122,6 +124,7 @@ export class VariantResolver {
     @Args('input') input: CreateVariantInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateVariantOutput> {
+    input = await this.z.parse(CreateVariantInput.schema, input)
     const created = await this.variantService.create(input, user.id)
     const result = await this.transform.entityToModel(Variant, created.variant)
     if (!created.change) {
@@ -139,6 +142,7 @@ export class VariantResolver {
     @Args('input') input: UpdateVariantInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateVariantOutput> {
+    input = await this.z.parse(UpdateVariantInput.schema, input)
     const updated = await this.variantService.update(input, user.id)
     const result = await this.transform.entityToModel(Variant, updated.variant)
     if (!updated.change) {
@@ -150,6 +154,7 @@ export class VariantResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteVariant', nullable: true })
   async deleteVariant(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
+    input = await this.z.parse(DeleteInput.schema, input)
     const variant = await this.variantService.delete(input)
     if (!variant) {
       throw NotFoundErr(`Variant with ID "${input.id}" not found`)

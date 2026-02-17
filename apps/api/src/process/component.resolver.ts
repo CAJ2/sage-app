@@ -133,6 +133,7 @@ export class ComponentResolver {
     @Args('input') input: UpdateComponentInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateComponentOutput> {
+    input = await this.z.parse(UpdateComponentInput.schema, input)
     const updated = await this.componentService.update(input, user.id)
     const model = await this.transform.entityToModel(Component, updated.component)
     if (updated.change) {
@@ -144,6 +145,7 @@ export class ComponentResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteComponent', nullable: true })
   async deleteComponent(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
+    input = await this.z.parse(DeleteInput.schema, input)
     const component = await this.componentService.delete(input)
     return { success: true, id: component.id }
   }
