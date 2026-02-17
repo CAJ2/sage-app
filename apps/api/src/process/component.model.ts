@@ -1,6 +1,6 @@
 import { ArgsType, Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Transform } from 'class-transformer'
-import { IsOptional, MaxLength, Validate } from 'class-validator'
+import { IsOptional, MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
@@ -9,7 +9,6 @@ import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate, TrArraySchema } from '@src/common/i18n'
-import { IsNanoID, ZodValid } from '@src/common/validator.model'
 import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
 import { Region } from '@src/geo/region.model'
 import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
@@ -218,8 +217,26 @@ export class CreateComponentInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateComponentInput extends ChangeInputWithLang {
+  static schema = ChangeInputWithLang.schema.extend({
+    id: z.nanoid(),
+    name: z.string().max(1024).optional(),
+    nameTr: TrArraySchema,
+    desc: z.string().max(100_000).optional(),
+    descTr: TrArraySchema,
+    imageURL: z.string().optional(),
+    visual: ComponentVisualSchema.optional(),
+    physical: ComponentPhysicalSchema.optional(),
+    primaryMaterial: ComponentMaterialInput.schema.optional(),
+    materials: z.array(ComponentMaterialInput.schema).optional(),
+    addMaterials: z.array(ComponentMaterialInput.schema).optional(),
+    removeMaterials: z.array(z.nanoid()).optional(),
+    tags: z.array(ComponentTagsInput.schema).optional(),
+    addTags: z.array(ComponentTagsInput.schema).optional(),
+    removeTags: z.array(z.nanoid()).optional(),
+    region: ComponentRegionInput.schema.optional(),
+  })
+
   @Field(() => ID)
-  @Validate(IsNanoID)
   id!: string
 
   @Field(() => String, { nullable: true })
@@ -238,11 +255,9 @@ export class UpdateComponentInput extends ChangeInputWithLang {
   imageURL?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  @ZodValid(ComponentVisualSchema.optional())
   visual?: Record<string, any>
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  @ZodValid(ComponentPhysicalSchema.optional())
   physical?: Record<string, any>
 
   @Field(() => ComponentMaterialInput, { nullable: true })

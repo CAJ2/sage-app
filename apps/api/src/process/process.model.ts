@@ -166,9 +166,9 @@ export class ProcessPlaceInput {
 export class CreateProcessInput extends ChangeInputWithLang {
   static schema = ChangeInputWithLang.schema.extend({
     intent: z.enum(ProcessIntent),
-    name: z.string().optional(),
+    name: z.string().max(1000).optional(),
     nameTr: TrArraySchema,
-    desc: z.string().optional(),
+    desc: z.string().max(100_000).optional(),
     descTr: TrArraySchema,
     instructions: ProcessInstructionsSchema,
     efficiency: ProcessEfficiencySchema.optional(),
@@ -223,6 +223,23 @@ export class CreateProcessInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateProcessInput extends ChangeInputWithLang {
+  static schema = ChangeInputWithLang.schema.extend({
+    id: z.nanoid(),
+    intent: z.enum(ProcessIntent).optional(),
+    name: z.string().max(1000).optional(),
+    nameTr: TrArraySchema,
+    desc: z.string().max(100_000).optional(),
+    descTr: TrArraySchema,
+    instructions: ProcessInstructionsSchema.optional(),
+    efficiency: ProcessEfficiencySchema.optional(),
+    rules: ProcessRulesSchema.optional(),
+    material: ProcessMaterialInput.schema.optional(),
+    variant: ProcessVariantInput.schema.optional(),
+    org: ProcessOrgInput.schema.optional(),
+    region: ProcessRegionInput.schema.optional(),
+    place: ProcessPlaceInput.schema.optional(),
+  })
+
   @Field(() => ID)
   id!: string
 

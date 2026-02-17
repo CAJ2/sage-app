@@ -15,12 +15,14 @@ import {
 } from '@src/changes/source.model'
 import { SourceService } from '@src/changes/source.service'
 import { TransformService } from '@src/common/transform'
+import { ZService } from '@src/common/z.service'
 
 @Resolver(() => Source)
 export class SourceResolver {
   constructor(
     private readonly sourceService: SourceService,
     private readonly transform: TransformService,
+    private readonly z: ZService,
   ) {}
 
   @Query(() => SourcesPage)
@@ -45,6 +47,7 @@ export class SourceResolver {
     @Args('input') input: CreateSourceInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateSourceOutput> {
+    input = await this.z.parse(CreateSourceInput.schema, input)
     const source = await this.sourceService.create(input, user.id)
     const model = await this.transform.entityToModel(Source, source)
     return {
@@ -54,6 +57,7 @@ export class SourceResolver {
 
   @Mutation(() => UpdateSourceOutput, { nullable: true })
   async updateSource(@Args('input') input: UpdateSourceInput): Promise<UpdateSourceOutput> {
+    input = await this.z.parse(UpdateSourceInput.schema, input)
     const source = await this.sourceService.update(input)
     const model = await this.transform.entityToModel(Source, source)
     return {
