@@ -4,6 +4,9 @@ import { Seeder } from '@mikro-orm/seeder'
 import { Account } from '@src/auth/account.entity'
 import { User } from '@src/users/users.entity'
 
+export let ADMIN_USER_ID: string | null = null
+export let NORMAL_USER_ID: string | null = null
+
 export class UserSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     const admin = await em.findOne(User, {
@@ -30,6 +33,9 @@ export class UserSeeder extends Seeder {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
+      ADMIN_USER_ID = adminUser.id
+    } else {
+      ADMIN_USER_ID = admin.id
     }
 
     const user = await em.findOne(User, {
@@ -56,6 +62,9 @@ export class UserSeeder extends Seeder {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
+      NORMAL_USER_ID = normalUser.id
+    } else {
+      NORMAL_USER_ID = user.id
     }
   }
 }

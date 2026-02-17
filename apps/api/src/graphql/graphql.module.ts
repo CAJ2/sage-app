@@ -88,7 +88,7 @@ export class GraphQLModule {
 
   private static formatError(error: GraphQLFormattedError, ctx: Context): GraphQLFormattedError {
     const msg = ctx.req as IncomingMessageWithAuthCode
-    if (!['PRODUCTION', 'TEST'].includes(process.env.NODE_ENV || '')) {
+    if (!['PRODUCTION', 'TEST'].includes((process.env.NODE_ENV || '').toUpperCase())) {
       // oxlint-disable-next-line no-console
       console.error('GraphQL Error:', error)
     }

@@ -92,6 +92,7 @@ export class I18nService {
           ...current,
           ...result.data,
         }
+        return current
       } else {
         throw result.error
       }

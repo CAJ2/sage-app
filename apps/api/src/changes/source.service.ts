@@ -1,6 +1,7 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 
+import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
 
@@ -24,7 +25,7 @@ export class SourceService {
     const source = await this.em.findOne(Source, { id }, { populate: ['user', 'changes'] })
 
     if (!source) {
-      throw new NotFoundException(`Source with ID "${id}" not found`)
+      throw NotFoundErr(`Source with ID "${id}" not found`)
     }
 
     return source
