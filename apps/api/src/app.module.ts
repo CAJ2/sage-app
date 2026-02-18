@@ -23,6 +23,7 @@ import { ProductModule } from '@src/product/product.module'
 import { SearchModule } from '@src/search/search.module'
 import { UsersModule } from '@src/users/users.module'
 
+import { isProd } from './common/common.utils'
 import { MIKRO_CONFIG } from './mikro-orm.config'
 
 if (dotenv) {
@@ -61,7 +62,7 @@ if (dotenv) {
       fallbackLanguage: 'en',
       loaderOptions: {
         path: path.join(__dirname, '/i18n/'),
-        watch: true,
+        watch: !isProd(),
       },
       typesOutputPath: path.join(__dirname, '../src/i18n/i18n.generated.ts'),
       resolvers: [
