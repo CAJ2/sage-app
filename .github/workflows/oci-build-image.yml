@@ -125,7 +125,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
-            type=raw,value={{steps.default-branch.outputs.name}}-{{sha}}-{{date 'YYYYMMDDHHmmss'}}
+            type=raw,value={{branch}}-{{sha}}-{{date 'YYYYMMDDHHmmss'}}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         if: ${{ inputs.download_artifact != '' }}
