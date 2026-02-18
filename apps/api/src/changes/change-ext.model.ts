@@ -70,18 +70,14 @@ class SourceInput {
 
 @InputType()
 export class ChangeInputWithLang {
-  static schema = z
-    .object({
-      changeID: z.nanoid().optional(),
-      change: CreateChangeInput.schema.optional(),
-      addSources: SourceInput.schema.array().optional(),
-      removeSources: z.array(z.nanoid()).optional(),
-      apply: z.boolean().optional(),
-      lang: LangSchema,
-    })
-    .refine((data) => !data.changeID !== !data.change, {
-      error: 'Either changeID or change must be provided, but not both.',
-    })
+  static schema = z.object({
+    changeID: z.nanoid().optional(),
+    change: CreateChangeInput.schema.optional(),
+    addSources: SourceInput.schema.array().optional(),
+    removeSources: z.array(z.nanoid()).optional(),
+    apply: z.boolean().optional(),
+    lang: LangSchema,
+  })
 
   @Field(() => ID, { nullable: true })
   @IsOptional()

@@ -1,4 +1,3 @@
-import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express'
 import helmet from 'helmet'
@@ -23,14 +22,6 @@ async function bootstrap() {
       credentials: true,
     },
   })
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  )
   app.use(
     helmet({
       contentSecurityPolicy: {

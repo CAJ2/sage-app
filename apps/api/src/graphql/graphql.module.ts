@@ -72,7 +72,6 @@ export class GraphQLModule {
             DateTime: LuxonDateTimeResolver,
             JSONObject: JSONObjectResolver,
           },
-          status400ForVariableCoercionErrors: true,
           formatError: (err: GraphQLFormattedError) => this.formatError(err, context),
         }
       },
