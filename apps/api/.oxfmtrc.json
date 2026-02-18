@@ -17,8 +17,8 @@
       "internal",
       ["parent", "sibling", "index"],
       "style",
-      "side-effect",
-      "side-effect-style",
+      "side_effect",
+      "side_effect_style",
       "unknown"
     ],
     "newlinesBetween": true,

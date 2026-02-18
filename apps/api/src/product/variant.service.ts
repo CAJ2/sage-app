@@ -15,7 +15,6 @@ import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
-import { Org } from '@src/users/org.entity'
 
 import { Item } from './item.entity'
 import { Variant, VariantsComponents, VariantsOrgs, VariantsTags } from './variant.entity'
@@ -303,21 +302,21 @@ export class VariantService {
       }
     }
     if (input.orgs || input.addOrgs) {
-      variant.orgs = await this.editService.setOrAddPivot(
+      variant.variantOrgs = await this.editService.setOrAddPivot(
         variant.id,
         change?.id,
-        variant.orgs,
-        Org,
+        variant.variantOrgs,
+        Variant,
         VariantsOrgs,
         input.orgs,
         input.addOrgs,
       )
     }
     if (input.removeOrgs) {
-      variant.orgs = await this.editService.removeFromPivot(
+      variant.variantOrgs = await this.editService.removeFromPivot(
         change?.id,
-        variant.orgs,
-        Org,
+        variant.variantOrgs,
+        Variant,
         VariantsOrgs,
         input.removeOrgs,
       )
