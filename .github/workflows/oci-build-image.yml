@@ -4,19 +4,19 @@ on:
   workflow_call:
     inputs:
       runs-on:
-        type: 'string'
+        type: "string"
         required: false
         default: '["ubuntu-latest"]'
         description: string of a JSON array describing the run target.
       context:
         type: string
         required: false
-        default: '.'
-        description: 'The image build context path'
+        default: "."
+        description: "The image build context path"
       target:
         type: string
         required: false
-        default: ''
+        default: ""
         description: |
           The target stage to build
       codeql_enabled:
@@ -29,7 +29,7 @@ on:
       download_artifact:
         type: string
         required: false
-        default: ''
+        default: ""
         description: |
           If provided, the name of a artifact that will be downloaded prior to building the dockerfile
       download_artifact_path:
@@ -44,7 +44,7 @@ on:
       registry:
         type: string
         required: false
-        default: 'ghcr.io/caj2'
+        default: "ghcr.io/caj2"
       push_in_pr:
         type: boolean
         required: false
@@ -125,7 +125,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
-            type=raw,value={{date 'YYYYMMDD'}}-{{sha}}
+            type=raw,value={{steps.default-branch.outputs.name}}-{{sha}}-{{date 'YYYYMMDDHHmmss'}}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         if: ${{ inputs.download_artifact != '' }}
