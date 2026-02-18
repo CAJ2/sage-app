@@ -304,7 +304,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.13.8
-        version: 3.13.8(graphql-ws@6.0.7(crossws@0.3.5)(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(ws@8.19.0))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))
+        version: 3.13.8(graphql-ws@5.16.2(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))
       '@ericblade/quagga2':
         specifier: ^1.8.4
         version: 1.8.4
@@ -361,7 +361,7 @@ importers:
         version: 2.4.4
       '@vue/apollo-composable':
         specifier: ^4.2.2
-        version: 4.2.2(@apollo/client@3.13.8(graphql-ws@6.0.7(crossws@0.3.5)(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(ws@8.19.0))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
+        version: 4.2.2(@apollo/client@3.13.8(graphql-ws@5.16.2(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
       '@vueuse/core':
         specifier: ^13.3.0
         version: 13.3.0(vue@3.5.16(typescript@5.8.3))
@@ -493,8 +493,8 @@ importers:
         specifier: ^1.46.0
         version: 1.46.0
       oxfmt:
-        specifier: ^0.28.0
-        version: 0.28.0
+        specifier: ^0.33.0
+        version: 0.33.0
       oxlint:
         specifier: ^1.47.0
         version: 1.47.0
@@ -515,7 +515,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.13.8
-        version: 3.13.8(graphql-ws@5.16.2(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))
+        version: 3.13.8(graphql-ws@6.0.7(crossws@0.3.5)(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(ws@8.19.0))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))
       '@ericblade/quagga2':
         specifier: ^1.8.4
         version: 1.8.4
@@ -566,7 +566,7 @@ importers:
         version: 1.11.2(vue@3.5.16(typescript@5.8.3))
       '@vue/apollo-composable':
         specifier: ^4.2.2
-        version: 4.2.2(@apollo/client@3.13.8(graphql-ws@5.16.2(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
+        version: 4.2.2(@apollo/client@3.13.8(graphql-ws@6.0.7(crossws@0.3.5)(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(ws@8.19.0))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
       '@vueuse/core':
         specifier: ^13.3.0
         version: 13.3.0(vue@3.5.16(typescript@5.8.3))
@@ -701,8 +701,8 @@ importers:
         specifier: ^1.46.0
         version: 1.46.0
       oxfmt:
-        specifier: ^0.28.0
-        version: 0.28.0
+        specifier: ^0.33.0
+        version: 0.33.0
       oxlint:
         specifier: ^1.47.0
         version: 1.47.0
@@ -891,8 +891,8 @@ importers:
         specifier: ^1.46.0
         version: 1.46.0
       oxfmt:
-        specifier: ^0.28.0
-        version: 0.28.0
+        specifier: ^0.33.0
+        version: 0.33.0
       oxlint:
         specifier: ^1.47.0
         version: 1.47.0
