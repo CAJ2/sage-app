@@ -270,7 +270,7 @@ export class EditService {
       )
     }
     if (toSet) {
-      if (Array.isArray(toSet)) {
+      if (Array.isArray(toSet) && toSet.length > 0) {
         const foundItems = await this.em.find(
           relEntity,
           { id: { $in: toSet.map((item) => item.id) } } as any,
@@ -304,7 +304,7 @@ export class EditService {
           return newEntity
         })
         collection.set(toSetEntities)
-      } else {
+      } else if (!Array.isArray(toSet) && toSet.id) {
         const foundItem = await this.em.findOne(relEntity, { id: toSet.id } as any, {
           populate: false,
         })
@@ -330,7 +330,7 @@ export class EditService {
       }
     }
     if (toAdd) {
-      if (Array.isArray(toAdd)) {
+      if (Array.isArray(toAdd) && toAdd.length > 0) {
         const foundItems = await this.em.find(
           relEntity,
           { id: { $in: toAdd.map((item) => item.id) } } as any,
@@ -364,7 +364,7 @@ export class EditService {
           return newEntity
         })
         collection.add(toAddEntities)
-      } else {
+      } else if (!Array.isArray(toAdd) && toAdd.id) {
         const foundItem = await this.em.findOne(relEntity, { id: toAdd.id } as any, {
           populate: false,
         })

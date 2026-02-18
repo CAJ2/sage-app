@@ -33,5 +33,10 @@
     "stylesheet": "./assets/css/main.css",
     "functions": ["clsx", "cn"]
   },
-  "ignorePatterns": ["**/.snapshot-sage.json", "schema/schema.gql", "test/gql/**/*"]
+  "ignorePatterns": [
+    "**/.snapshot-sage.json",
+    "schema/schema.gql",
+    "test/gql/**/*",
+    "src/i18n/i18n.generated.ts"
+  ]
 }

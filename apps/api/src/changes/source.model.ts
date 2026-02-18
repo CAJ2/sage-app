@@ -63,7 +63,7 @@ export class CreateSourceInput {
     type: z.enum(SourceType),
     location: z.string().max(2048).optional(),
     content: ZJSONObject.optional(),
-    contentURL: z.url({ protocol: /^https:\/\// }).optional(),
+    contentURL: z.url({ protocol: /^https$/ }).optional(),
     metadata: ZJSONObject.optional(),
   })
 
@@ -90,7 +90,7 @@ export class UpdateSourceInput {
     type: z.enum(SourceType).optional(),
     location: z.string().max(2048).optional(),
     content: ZJSONObject.optional(),
-    contentURL: z.url({ protocol: /^https:\/\// }).optional(),
+    contentURL: z.url({ protocol: /^https$/ }).optional(),
     metadata: ZJSONObject.optional(),
   })
 
