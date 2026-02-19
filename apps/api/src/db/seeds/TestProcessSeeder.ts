@@ -4,9 +4,6 @@ import { Seeder } from '@mikro-orm/seeder'
 import { Region } from '@src/geo/region.entity'
 import { Process, ProcessIntent } from '@src/process/process.entity'
 import { Org } from '@src/users/org.entity'
-import { User } from '@src/users/users.entity'
-
-import { USER_ID } from './TestVariantSeeder'
 
 export const PROCESS_IDS = [
   'proc1_AAAAAAAAAAAAAAA',
@@ -20,11 +17,6 @@ export const REGION_IDS = ['wof__AAAAAAAAAAAAAAAA', 'wof__BBBBBBBBBBBBBBBB']
 
 export class TestProcessSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    const user = await em.findOne(User, USER_ID)
-    if (!user) {
-      throw new Error('TestProcessSeeder requires UserSeeder to run first')
-    }
-
     // Create test regions
     for (const id of REGION_IDS) {
       em.create(Region, {
