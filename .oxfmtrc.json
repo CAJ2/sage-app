@@ -34,5 +34,24 @@
     "stylesheet": "./assets/css/main.css",
     "functions": ["clsx", "cn"]
   },
-  "ignorePatterns": ["gql/**/*"]
+  "ignorePatterns": [
+    "apps/api/src/db/migrations/.snapshot-sage.json",
+    "apps/api/schema/schema.gql",
+    "apps/api/test/gql/**/*",
+    "apps/api/src/i18n/i18n.generated.ts",
+    "apps/frontend/gql/**/*",
+    "apps/science/gql/**/*",
+    "packages/ui/gql/**/*"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/frontend/**/*.vue"],
+      "options": {
+        "experimentalTailwindcss": {
+          "stylesheet": "apps/frontend/assets/css/main.css",
+          "functions": ["clsx", "cn"]
+        }
+      }
+    }
+  ]
 }
