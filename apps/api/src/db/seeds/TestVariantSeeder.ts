@@ -9,8 +9,8 @@ import { Variant, VariantsComponents, VariantsSources } from '@src/product/varia
 import { User } from '@src/users/users.entity'
 
 import { MATERIAL_IDS } from './TestMaterialSeeder'
+import { NORMAL_USER_ID } from './UserSeeder'
 
-export const USER_ID = '4s12cfhkIlVUXlJufjOmL'
 export const VARIANT_IDS = [
   '_cGUR-e0HHUYQAZTeN6ft',
   '0i9rvrZEznqaGCDGnbhxg',
@@ -29,21 +29,6 @@ export const COMPONENT_IDS = ['p90O7X3yt19lENUJWr-Am', 'qW9QAqg3WzWAhhmZfKcr_']
 
 export class TestVariantSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    let user = await em.findOne(User, USER_ID)
-    if (!user) {
-      user = em.create(User, {
-        id: USER_ID,
-        email: 'test@sageleaf.app',
-        username: 'testuser',
-        name: 'Test User',
-        displayUsername: 'Test User',
-        emailVerified: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      await em.persistAndFlush(user)
-    }
-
     for (const id of SOURCE_IDS) {
       em.create(Source, {
         id,
@@ -51,7 +36,7 @@ export class TestVariantSeeder extends Seeder {
         updatedAt: new Date(),
         type: SourceType.IMAGE,
         location: `https://sageleaf.app/source/${id}`,
-        user,
+        user: em.getReference(User, NORMAL_USER_ID!),
       })
     }
     const item1 = em.create(Item, {
@@ -69,7 +54,7 @@ export class TestVariantSeeder extends Seeder {
       source: [{ id: SOURCE_IDS[0] }],
     })
     try {
-      await em.persistAndFlush(item1)
+      await em.persist(item1).flush()
     } catch (error) {
       throw new Error(`Failed to persist item1: ${error}`)
     }
@@ -144,7 +129,7 @@ export class TestVariantSeeder extends Seeder {
         em.persist(component)
         variant.variantComponents.add(component)
       }
-      await em.persistAndFlush(variant)
+      await em.persist(variant).flush()
     }
   }
 }

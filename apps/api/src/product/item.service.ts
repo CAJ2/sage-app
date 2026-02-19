@@ -111,13 +111,13 @@ export class ItemService {
     const item = new Item()
     if (!isUsingChange(input)) {
       await this.setFields(item, input)
-      await this.em.persistAndFlush(item)
+      await this.em.persist(item).flush()
       return { item }
     }
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(item, input, change)
     await this.editService.createEntityEdit(change, item)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { item, change }
   }
@@ -130,19 +130,20 @@ export class ItemService {
       {
         id: input.id,
       },
+      { populate: ['categories', 'tags', 'itemTags'] },
     )
     if (!item) {
       throw new Error('Item not found')
     }
     if (!change) {
       await this.setFields(item, input)
-      await this.em.persistAndFlush(item)
+      await this.em.persist(item).flush()
       return { item }
     }
     await this.editService.beginUpdateEntityEdit(change, item)
     await this.setFields(item, input, change)
     await this.editService.updateEntityEdit(change, item)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { item, change }
   }

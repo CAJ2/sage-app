@@ -123,6 +123,9 @@ export class CategoryResolver {
     input = await this.z.parse(CreateCategoryInput.schema, input)
     const created = await this.categoryService.create(input, user.id)
     const model = await this.transform.entityToModel(Category, created.category)
+    if (!created.change) {
+      return { category: model }
+    }
     const change = await this.transform.entityToModel(Change, created.change)
     return { category: model, change }
   }

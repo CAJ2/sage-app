@@ -108,35 +108,15 @@ export class ItemTagsInput {
 
 @InputType()
 export class CreateItemInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema
-    .extend({
-      name: z.string().max(100).optional(),
-      nameTr: TranslatedInput.schema.array().optional(),
-      desc: z.string().max(100_000).optional(),
-      descTr: TranslatedInput.schema.array().optional(),
-      imageURL: z.string().max(1000).optional(),
-      categories: ItemCategoriesInput.schema.array().optional(),
-      tags: ItemTagsInput.schema.array().optional(),
-    })
-    .refine(
-      (data) => {
-        if (data.name && data.nameTr) return false
-        if (!data.name && !data.nameTr) return false
-        return true
-      },
-      {
-        error: 'Either name or nameTr must be provided, but not both.',
-      },
-    )
-    .refine(
-      (data) => {
-        if (data.desc && data.descTr) return false
-        return true
-      },
-      {
-        error: 'Either desc or descTr may be provided, but not both.',
-      },
-    )
+  static schema = ChangeInputWithLang.schema.extend({
+    name: z.string().max(100).optional(),
+    nameTr: TranslatedInput.schema.array().optional(),
+    desc: z.string().max(100_000).optional(),
+    descTr: TranslatedInput.schema.array().optional(),
+    imageURL: z.string().max(1000).optional(),
+    categories: ItemCategoriesInput.schema.array().optional(),
+    tags: ItemTagsInput.schema.array().optional(),
+  })
 
   @Field(() => String, { nullable: true })
   name?: string
@@ -162,40 +142,20 @@ export class CreateItemInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateItemInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema
-    .extend({
-      id: z.nanoid(),
-      name: z.string().max(100).optional(),
-      nameTr: TranslatedInput.schema.array().optional(),
-      desc: z.string().max(100_000).optional(),
-      descTr: TranslatedInput.schema.array().optional(),
-      imageURL: z.string().max(1000).optional(),
-      categories: ItemCategoriesInput.schema.array().optional(),
-      addCategories: ItemCategoriesInput.schema.array().optional(),
-      removeCategories: z.string().nanoid().array().optional(),
-      tags: ItemTagsInput.schema.array().optional(),
-      addTags: ItemTagsInput.schema.array().optional(),
-      removeTags: z.string().nanoid().array().optional(),
-    })
-    .refine(
-      (data) => {
-        if (data.name && data.nameTr) return false
-        if (!data.name && !data.nameTr) return false
-        return true
-      },
-      {
-        error: 'Either name or nameTr must be provided, but not both.',
-      },
-    )
-    .refine(
-      (data) => {
-        if (data.desc && data.descTr) return false
-        return true
-      },
-      {
-        error: 'Either desc or descTr may be provided, but not both.',
-      },
-    )
+  static schema = ChangeInputWithLang.schema.extend({
+    id: z.nanoid(),
+    name: z.string().max(100).optional(),
+    nameTr: TranslatedInput.schema.array().optional(),
+    desc: z.string().max(100_000).optional(),
+    descTr: TranslatedInput.schema.array().optional(),
+    imageURL: z.string().max(1000).optional(),
+    categories: ItemCategoriesInput.schema.array().optional(),
+    addCategories: ItemCategoriesInput.schema.array().optional(),
+    removeCategories: z.nanoid().array().optional(),
+    tags: ItemTagsInput.schema.array().optional(),
+    addTags: ItemTagsInput.schema.array().optional(),
+    removeTags: z.nanoid().array().optional(),
+  })
 
   @Field(() => ID)
   id!: string

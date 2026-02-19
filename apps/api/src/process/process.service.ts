@@ -58,7 +58,7 @@ export class ProcessService {
     const process = new Process()
     if (!isUsingChange(input)) {
       await this.setFields(process, input)
-      await this.em.persistAndFlush(process)
+      await this.em.persist(process).flush()
       return {
         process,
         change: null,
@@ -67,7 +67,7 @@ export class ProcessService {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(process, input, change)
     await this.editService.createEntityEdit(change, process)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return {
       process,
@@ -89,7 +89,7 @@ export class ProcessService {
     }
     if (!change) {
       await this.setFields(process, input)
-      await this.em.persistAndFlush(process)
+      await this.em.persist(process).flush()
       return {
         process,
         change: null,
@@ -98,7 +98,7 @@ export class ProcessService {
     await this.editService.beginUpdateEntityEdit(change, process)
     await this.setFields(process, input, change)
     await this.editService.updateEntityEdit(change, process)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return {
       process,

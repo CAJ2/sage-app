@@ -75,11 +75,11 @@ export function translate(params: TransformFnParams): string | undefined {
     return value
   }
   // Set Tr property to full translation object
-  obj[params.key + 'Tr'] = _.map(value, (text, lang) => {
+  obj[params.key + 'Tr'] = _.map(value, (text, key) => {
     return {
-      lang,
+      lang: key,
       text,
-      auto: lang.endsWith(';a'),
+      auto: typeof key === 'string' && key.endsWith(';a'),
     }
   })
   const field: TranslatedField = value

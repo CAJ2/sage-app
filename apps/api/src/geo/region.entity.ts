@@ -13,6 +13,7 @@ import type { Ref } from '@mikro-orm/core'
 import _ from 'lodash'
 
 import type { TranslatedField } from '@src/common/i18n'
+import { IDCreatedUpdated } from '@src/db/base.entity'
 import { MultiPolygon, MultiPolygonType } from '@src/db/custom.types'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
@@ -21,16 +22,7 @@ import { User } from '@src/users/users.entity'
 
 @Entity({ tableName: 'regions', schema: 'public' })
 @Index({ properties: ['geo'], type: 'gist' })
-export class Region extends BaseEntity {
-  @PrimaryKey()
-  id!: string
-
-  @Property({ defaultRaw: 'current_timestamp()' })
-  created_at = new Date()
-
-  @Property({ defaultRaw: 'current_timestamp()', onUpdate: () => new Date() })
-  updated_at = new Date()
-
+export class Region extends IDCreatedUpdated {
   @Property({ type: 'json' })
   name!: TranslatedField
 
@@ -44,7 +36,7 @@ export class Region extends BaseEntity {
   placetype!: string
 
   @Property({ type: 'int4' })
-  admin_level?: number
+  adminLevel?: number
 
   @OneToMany({ mappedBy: 'region' })
   variants = new Collection<Variant>(this)
@@ -60,7 +52,7 @@ export class Region extends BaseEntity {
 
   hierarchyIDs(): string[] {
     const hierarchy: string[] = [this.id]
-    const adminLevel = this.admin_level || 11
+    const adminLevel = this.adminLevel || 11
     if (this.properties && this.properties['hierarchy']) {
       const hierarchyData: Record<string, string | number>[] = this.properties['hierarchy']
       hierarchy.push(

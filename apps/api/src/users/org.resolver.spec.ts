@@ -3,10 +3,15 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { OrgSeeder } from '@src/db/seeds/OrgSeeder'
+import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
+import { TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
+import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 
@@ -29,8 +34,16 @@ describe('OrgResolver (integration)', () => {
 
     const orm = module.get<MikroORM>(MikroORM)
 
-    await clearDatabase(orm, 'public', ['users', 'orgs'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, OrgSeeder)
+    await clearDatabase(orm, 'public', ['users'])
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      OrgSeeder,
+      TestProcessSeeder,
+      TestTagSeeder,
+      TestVariantSeeder,
+    )
 
     await gql.signIn('admin', 'password')
 
@@ -58,7 +71,8 @@ describe('OrgResolver (integration)', () => {
       `),
       { id: orgID },
     )
-    expect(res.data?.org).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.org).toBeDefined()
     expect(res.data?.org?.id).toBe(orgID)
   })
 
@@ -84,8 +98,12 @@ describe('OrgResolver (integration)', () => {
       `),
       { id: orgID, first: 10 },
     )
-    expect(res.data?.org?.users).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.org?.users).toBeDefined()
     expect(Array.isArray(res.data?.org?.users.nodes)).toBe(true)
+    expect(res.data?.org?.users.totalCount).toBeGreaterThanOrEqual(0)
+    expect(res.data?.org?.users.pageInfo?.hasNextPage).toBeDefined()
+    expect(res.data?.org?.users.pageInfo?.hasPreviousPage).toBeDefined()
   })
 
   test('should create an org', async () => {
@@ -108,7 +126,8 @@ describe('OrgResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createOrg?.org).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.createOrg?.org).toBeDefined()
     expect(res.data?.createOrg?.org?.name).toBe('Test Organization')
     expect(res.data?.createOrg?.org?.slug).toBe('test-org')
   })
@@ -132,6 +151,7 @@ describe('OrgResolver (integration)', () => {
         },
       },
     )
+    expect(res.errors).toBeUndefined()
     expect(res.data?.updateOrg?.org?.id).toBe(orgID)
     expect(res.data?.updateOrg?.org?.name).toBe('Updated Org Name')
   })
@@ -147,7 +167,174 @@ describe('OrgResolver (integration)', () => {
       `),
       { id: 'non-existent-id' },
     )
-    expect(res.errors).toBeTruthy()
+    expect(res.errors).toBeDefined()
+    expect(res.errors).toHaveLength(1)
     expect(res.errors?.[0].message).toContain('Org not found')
+  })
+
+  // Comprehensive Create Tests
+  describe('CreateOrg comprehensive field tests', () => {
+    test('should create org with all text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateOrgAllFields($input: CreateOrgInput!) {
+            createOrg(input: $input) {
+              org {
+                id
+                name
+                slug
+                desc
+                avatarURL
+                websiteURL
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Comprehensive Test Org',
+            slug: 'comp-test-org',
+            desc: 'Detailed org description',
+            avatarURL: 'https://example.com/avatar.jpg',
+            websiteURL: 'https://comptest.org',
+            lang: 'en',
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createOrg?.org).toBeDefined()
+      expect(res.data?.createOrg?.org?.name).toBe('Comprehensive Test Org')
+      expect(res.data?.createOrg?.org?.slug).toBe('comp-test-org')
+      expect(res.data?.createOrg?.org?.desc).toBe('Detailed org description')
+      expect(res.data?.createOrg?.org?.avatarURL).toBe('https://example.com/avatar.jpg')
+      expect(res.data?.createOrg?.org?.websiteURL).toBe('https://comptest.org')
+    })
+
+    test('should create org with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateOrgWithChange($input: CreateOrgInput!) {
+            createOrg(input: $input) {
+              org {
+                id
+                name
+              }
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Org with Change',
+            slug: 'org-with-change',
+            change: {
+              title: 'Add new org',
+              status: ChangeStatus.Draft,
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createOrg?.org).toBeDefined()
+      expect(res.data?.createOrg?.org?.name).toBe('Org with Change')
+      expect(res.data?.createOrg?.change).toBeDefined()
+      expect(res.data?.createOrg?.change?.status).toBe('DRAFT')
+    })
+  })
+
+  // Comprehensive Update Tests
+  describe('UpdateOrg comprehensive field tests', () => {
+    let testOrgID: string
+
+    beforeAll(async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateOrgForUpdate($input: CreateOrgInput!) {
+            createOrg(input: $input) {
+              org {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Org for Updates',
+            slug: 'org-for-updates',
+          },
+        },
+      )
+      if (res.data?.createOrg?.org?.id) {
+        testOrgID = res.data?.createOrg?.org?.id
+      } else {
+        throw new Error('Failed to create org for update tests')
+      }
+    })
+
+    test('should update org text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateOrgText($input: UpdateOrgInput!) {
+            updateOrg(input: $input) {
+              org {
+                id
+                name
+                desc
+                websiteURL
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testOrgID,
+            name: 'Updated Org Name',
+            desc: 'Updated Description',
+            websiteURL: 'https://updated.org',
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateOrg?.org?.id).toBe(testOrgID)
+      expect(res.data?.updateOrg?.org?.name).toBe('Updated Org Name')
+      expect(res.data?.updateOrg?.org?.desc).toBe('Updated Description')
+      expect(res.data?.updateOrg?.org?.websiteURL).toBe('https://updated.org')
+    })
+
+    test('should update org with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateOrgWithChange($input: UpdateOrgInput!) {
+            updateOrg(input: $input) {
+              org {
+                id
+              }
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testOrgID,
+            name: 'Updated via Change',
+            change: {
+              title: 'Update org',
+              status: ChangeStatus.Proposed,
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateOrg?.org).toBeDefined()
+      expect(res.data?.updateOrg?.org?.id).toBe(testOrgID)
+      expect(res.data?.updateOrg?.change).toBeDefined()
+      expect(res.data?.updateOrg?.change?.status).toBe('PROPOSED')
+    })
   })
 })

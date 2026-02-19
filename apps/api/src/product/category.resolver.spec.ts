@@ -3,10 +3,15 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
+import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
+import { TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
+import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 
@@ -30,7 +35,15 @@ describe('CategoryResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestCategorySeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      TestCategorySeeder,
+      TestProcessSeeder,
+      TestTagSeeder,
+      TestVariantSeeder,
+    )
 
     await gql.signIn('admin', 'password')
 
@@ -60,8 +73,9 @@ describe('CategoryResolver (integration)', () => {
       `),
       { first: 10 },
     )
-    expect(res.data?.categories.nodes?.length).toBeGreaterThan(0)
-    expect(res.data?.categories.totalCount).toBeGreaterThan(0)
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.categories.nodes).toHaveLength(6)
+    expect(res.data?.categories.totalCount).toBe(6)
   })
 
   test('should query a single category', async () => {
@@ -76,7 +90,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: packagingID },
     )
-    expect(res.data?.category).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category).toBeDefined()
     expect(res.data?.category?.id).toBe(packagingID)
   })
 
@@ -91,7 +106,8 @@ describe('CategoryResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.categoryRoot).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.categoryRoot).toBeDefined()
     expect(res.data?.categoryRoot?.id).toBe(CATEGORY_ROOT)
   })
 
@@ -112,9 +128,10 @@ describe('CategoryResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.categorySchema).toBeTruthy()
-    expect(res.data?.categorySchema?.create).toBeTruthy()
-    expect(res.data?.categorySchema?.update).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.categorySchema).toBeDefined()
+    expect(res.data?.categorySchema?.create).toBeDefined()
+    expect(res.data?.categorySchema?.update).toBeDefined()
   })
 
   test('should query category parents with pagination', async () => {
@@ -135,7 +152,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: packagingID, first: 10 },
     )
-    expect(res.data?.category?.parents).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category?.parents).toBeDefined()
     expect(Array.isArray(res.data?.category?.parents.nodes)).toBe(true)
   })
 
@@ -157,7 +175,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: CATEGORY_ROOT, first: 10 },
     )
-    expect(res.data?.category?.children).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category?.children).toBeDefined()
     expect(Array.isArray(res.data?.category?.children.nodes)).toBe(true)
   })
 
@@ -179,7 +198,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: packagingID, first: 10 },
     )
-    expect(res.data?.category?.items).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category?.items).toBeDefined()
     expect(Array.isArray(res.data?.category?.items.nodes)).toBe(true)
   })
 
@@ -202,7 +222,9 @@ describe('CategoryResolver (integration)', () => {
         },
       },
     )
+    expect(res.errors).toBeUndefined()
     expect(res.data?.updateCategory?.category?.id).toBe(packagingID)
+    expect(res.data?.updateCategory?.category?.name).toBe('Updated Category Name')
   })
 
   test('should return error for non-existent category', async () => {
@@ -218,5 +240,203 @@ describe('CategoryResolver (integration)', () => {
     )
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Category not found')
+  })
+
+  // Comprehensive Create Tests
+  describe('CreateCategory comprehensive field tests', () => {
+    test('should create category with all text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryAllText($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                name
+                desc
+                descShort
+                imageURL
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'New Test Category',
+            desc: 'Detailed category description',
+            descShort: 'Short desc',
+            imageURL: 'https://example.com/category.jpg',
+            lang: 'en',
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createCategory?.category).toBeDefined()
+      expect(res.data?.createCategory?.category?.name).toBe('New Test Category')
+      expect(res.data?.createCategory?.category?.desc).toBe('Detailed category description')
+      expect(res.data?.createCategory?.category?.descShort).toBe('Short desc')
+      expect(res.data?.createCategory?.category?.imageURL).toBe('https://example.com/category.jpg')
+    })
+
+    test('should create category with translated fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryTranslated($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                name
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            nameTr: [
+              { lang: 'en', text: 'English Category' },
+              { lang: 'sv', text: 'Svenska Kategori' },
+            ],
+            descTr: [
+              { lang: 'en', text: 'English Description' },
+              { lang: 'sv', text: 'Svenska Beskrivning' },
+            ],
+            descShortTr: [
+              { lang: 'en', text: 'Short' },
+              { lang: 'sv', text: 'Kort' },
+            ],
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createCategory?.category).toBeDefined()
+    })
+
+    test('should create category with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryWithChange($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                name
+              }
+              change {
+                id
+                title
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Category with Change',
+            change: {
+              title: 'Add new category',
+              status: ChangeStatus.Draft,
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createCategory?.category).toBeDefined()
+      expect(res.data?.createCategory?.category?.name).toBe('Category with Change')
+      expect(res.data?.createCategory?.change).toBeDefined()
+      expect(res.data?.createCategory?.change?.title).toBe('Add new category')
+      expect(res.data?.createCategory?.change?.status).toBe('DRAFT')
+    })
+  })
+
+  // Comprehensive Update Tests
+  describe('UpdateCategory comprehensive field tests', () => {
+    let testCategoryID: string
+
+    beforeAll(async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryForUpdate($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Category for Updates',
+          },
+        },
+      )
+      if (res.data?.createCategory?.category?.id) {
+        testCategoryID = res.data?.createCategory?.category?.id
+      } else {
+        throw new Error('Failed to create category for update tests')
+      }
+    })
+
+    test('should update category text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateCategoryText($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                name
+                desc
+                descShort
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testCategoryID,
+            name: 'Updated Category Name',
+            desc: 'Updated Description',
+            descShort: 'Updated Short',
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateCategory?.category?.id).toBe(testCategoryID)
+      expect(res.data?.updateCategory?.category?.name).toBe('Updated Category Name')
+      expect(res.data?.updateCategory?.category?.desc).toBe('Updated Description')
+      expect(res.data?.updateCategory?.category?.descShort).toBe('Updated Short')
+    })
+
+    test('should update category with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateCategoryWithChange($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                name
+              }
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testCategoryID,
+            name: 'Updated via Change',
+            change: {
+              title: 'Update category test',
+              status: ChangeStatus.Proposed,
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateCategory?.category).toBeDefined()
+      expect(res.data?.updateCategory?.category?.id).toBe(testCategoryID)
+      expect(res.data?.updateCategory?.category?.name).toBe('Updated via Change')
+      expect(res.data?.updateCategory?.change).toBeDefined()
+      expect(res.data?.updateCategory?.change?.status).toBe('PROPOSED')
+    })
   })
 })

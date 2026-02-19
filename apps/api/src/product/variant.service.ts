@@ -147,13 +147,13 @@ export class VariantService {
     const variant = new Variant()
     if (!isUsingChange(input)) {
       await this.setFields(variant, input)
-      await this.em.persistAndFlush(variant)
+      await this.em.persist(variant).flush()
       return { variant }
     }
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(variant, input, change)
     await this.editService.createEntityEdit(change, variant)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { variant, change }
   }
@@ -166,19 +166,20 @@ export class VariantService {
       {
         id: input.id,
       },
+      { populate: ['items', 'components', 'tags', 'orgs'] },
     )
     if (!variant) {
       throw new Error('Variant not found')
     }
     if (!change) {
       await this.setFields(variant, input)
-      await this.em.persistAndFlush(variant)
+      await this.em.persist(variant).flush()
       return { variant }
     }
     await this.editService.beginUpdateEntityEdit(change, variant)
     await this.setFields(variant, input, change)
     await this.editService.updateEntityEdit(change, variant)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { variant, change }
   }

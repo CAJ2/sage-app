@@ -1,4 +1,4 @@
-import { BaseEntity, EntityManager, ref, rel } from '@mikro-orm/postgresql'
+import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
 import type {
   Collection,
   EntityDTO,
@@ -107,7 +107,7 @@ export class EditService {
       }
     }
 
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     return change
   }
 
@@ -135,7 +135,7 @@ export class EditService {
       }
     }
 
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     return change
   }
 
@@ -438,7 +438,11 @@ export class EditService {
               .join(', ')}`,
           )
         }
-        collection.remove(toRemove.map((id) => rel(pivotMeta.class, { [relField]: id } as any)))
+        // Find the actual pivot entities to remove
+        const pivotItems = collection.getItems().filter((item: any) => {
+          return toRemove.includes(item[relField]?.id || item[relField])
+        })
+        collection.remove(pivotItems)
       } else {
         const foundItem = await this.em.findOne(relEntity, { id: toRemove } as any, {
           populate: false,
@@ -446,7 +450,14 @@ export class EditService {
         if (!foundItem) {
           throw NotFoundErr(`No ${relEntity} found for ID: ${toRemove}`)
         }
-        collection.remove(rel(pivotMeta.class, { [collField]: foundItem.id } as any))
+        // Find the actual pivot entity to remove
+        const pivotItem = collection.getItems().find((item: any) => {
+          const itemRelId = item[relField]?.id || item[relField]
+          return itemRelId === toRemove
+        })
+        if (pivotItem) {
+          collection.remove(pivotItem)
+        }
       }
     }
     return collection
@@ -478,18 +489,18 @@ export class EditService {
     return entity.toReference() as unknown as { id: string } & Reference<Loaded<T>>
   }
 
-  async findOneWithChangeInput<T extends BaseEntity>(
+  async findOneWithChangeInput<T extends BaseEntity, H extends string>(
     input: IChangeInputWithLang,
     userID: string,
     model: EntityName<T>,
     where: FilterQuery<T> & { id: string },
-    options?: FindOneOptions<T, never, '*', never>,
+    options?: FindOneOptions<T, H, '*', never>,
   ): Promise<{ entity: Loaded<T, never, '*', never>; change?: Change }> {
     if (!input.changeID && !input.change) {
       if (!this.authUser.admin()) {
         throw BadRequestErr('Admin privileges are required to directly edit')
       }
-      const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
+      const entity = await this.em.findOne<T, H>(model, where as FilterQuery<T>, options)
       return { entity: entity as Loaded<T> }
     }
     const change = await this.findOneOrCreate(input.changeID, input.change, userID)
@@ -520,7 +531,7 @@ export class EditService {
     if (!options) {
       options = { disableIdentityMap: isUsingChange(input) }
     }
-    const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
+    const entity = await this.em.findOne<T, H>(model, where as FilterQuery<T>, options)
     if (!entity) {
       throw NotFoundErr(`${meta.name} with ID "${where.id}" not found`)
     }
@@ -557,7 +568,7 @@ export class EditService {
       } else if (edit.changes) {
         edit.changes = undefined // Turn the edit into a delete
       }
-      await this.em.persistAndFlush(change)
+      await this.em.persist(change).flush()
       return
     }
     // If not, check if it exists in the database
@@ -572,7 +583,7 @@ export class EditService {
     newEdit.userID = userID
     newEdit.original = this.entityToChangePOJO(meta.name, entity as BaseEntity & { id: string })
     change.edits.add(newEdit)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     return { id: input.id }
   }
 
@@ -679,7 +690,7 @@ export class EditService {
     } catch (error) {
       await this.em.rollback()
       change.status = ChangeStatus.REJECTED
-      await this.em.persistAndFlush(change)
+      await this.em.persist(change).flush()
       throw error
     }
   }
