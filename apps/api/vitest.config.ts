@@ -15,6 +15,7 @@ export default defineConfig({
     globals: true,
     // TODO(CAJ2): Only disable for integration (database) tests, or find a way to use parallel databases
     fileParallelism: false,
+    globalSetup: 'test/setup.ts',
     deps: {
       interopDefault: true,
     },
