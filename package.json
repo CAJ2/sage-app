@@ -1,37 +1,33 @@
 {
   "name": "@sageleaf/app",
   "version": "0.0.0",
+  "private": true,
   "license": "AGPL-3.0",
+  "type": "module",
   "scripts": {
     "prepare": "husky"
   },
-  "private": true,
-  "type": "module",
   "devDependencies": {
     "@nx/js": "22.4.5",
     "@nx/vitest": "^22.4.5",
     "@swc-node/register": "~1.9.2",
     "@swc/core": "~1.5.29",
     "@swc/helpers": "~0.5.15",
-    "eslint": "^9.24.0",
-    "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-oxlint": "^1.46.0",
-    "eslint-plugin-prettier": "^5.2.6",
-    "eslint-plugin-unused-imports": "^4.1.4",
-    "eslint-plugin-vue": "^9.33.0",
+    "@vue/language-server": "^3.2.4",
+    "eslint": "^9.27.0",
+    "eslint-plugin-oxlint": "^1.48.0",
     "globals": "^16.0.0",
     "husky": "^9.1.7",
     "neostandard": "^0.12.1",
     "nx": "22.4.5",
-    "oxfmt": "^0.28.0",
-    "oxlint": "^1.47.0",
-    "prettier": "^3.5.3",
+    "oxfmt": "^0.33.0",
+    "oxlint": "^1.48.0",
     "tslib": "^2.8.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.29.1",
     "vitest": "^4.0.18"
   },
+  "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a",
   "pnpm": {
     "overrides": {
       "graphql": "16.11.0"
@@ -51,6 +47,5 @@
     "patchedDependencies": {
       "graphql@16.11.0": "patches/graphql@16.11.0.patch"
     }
-  },
-  "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a"
+  }
 }
