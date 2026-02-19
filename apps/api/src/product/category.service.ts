@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
-import { DeleteInput } from '@src/changes/change-ext.model'
+import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
@@ -123,10 +123,15 @@ export class CategoryService {
 
   async create(input: CreateCategoryInput, userID: string) {
     const category = new Category()
+    if (!isUsingChange(input)) {
+      await this.setFields(category, input)
+      await this.em.persist(category).flush()
+      return { category }
+    }
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(category, input, change)
     await this.editService.createEntityEdit(change, category)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return {
       change,
@@ -148,7 +153,7 @@ export class CategoryService {
     }
     if (!change) {
       await this.setFields(category, input)
-      await this.em.persistAndFlush(category)
+      await this.em.persist(category).flush()
       return {
         category,
         change: null,
@@ -157,7 +162,7 @@ export class CategoryService {
     await this.editService.beginUpdateEntityEdit(change, category)
     await this.setFields(category, input, change)
     await this.editService.updateEntityEdit(change, category)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return {
       change,

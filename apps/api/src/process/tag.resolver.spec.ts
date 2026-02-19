@@ -143,4 +143,104 @@ describe('TagResolver (integration)', () => {
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Tag not found')
   })
+
+  // Comprehensive Create Tests
+  describe('CreateTagDefinition comprehensive field tests', () => {
+    test('should create tag with all fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateTagAllFields($input: CreateTagDefinitionInput!) {
+            createTagDefinition(input: $input) {
+              tag {
+                id
+                name
+                desc
+                type
+                bgColor
+                image
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Comprehensive Tag',
+            desc: 'Detailed tag description',
+            type: TagType.Component,
+            bgColor: '#FF5733',
+            image: 'https://example.com/tag.png',
+            metaTemplate: {
+              schema: {
+                type: 'object',
+                properties: {
+                  score: { type: 'number' },
+                  level: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+      )
+      expect(res.data?.createTagDefinition?.tag).toBeTruthy()
+      expect(res.data?.createTagDefinition?.tag?.name).toBe('Comprehensive Tag')
+      expect(res.data?.createTagDefinition?.tag?.desc).toBe('Detailed tag description')
+      expect(res.data?.createTagDefinition?.tag?.bgColor).toBe('#FF5733')
+    })
+
+    test('should create tag for each TagType', async () => {
+      const types = [TagType.Place, TagType.Variant, TagType.Component]
+      for (const type of types) {
+        const res = await gql.send(
+          graphql(`
+            mutation CreateTagWithType($input: CreateTagDefinitionInput!) {
+              createTagDefinition(input: $input) {
+                tag {
+                  id
+                  type
+                }
+              }
+            }
+          `),
+          {
+            input: {
+              name: `Tag for ${type}`,
+              type,
+            },
+          },
+        )
+        expect(res.data?.createTagDefinition?.tag?.type).toBe(type)
+      }
+    })
+  })
+
+  // Comprehensive Update Tests
+  describe('UpdateTagDefinition comprehensive field tests', () => {
+    test('should update tag fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateTagAllFields($input: UpdateTagDefinitionInput!) {
+            updateTagDefinition(input: $input) {
+              tag {
+                id
+                name
+                desc
+                bgColor
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: tagID,
+            name: 'Updated Tag Name',
+            desc: 'Updated description',
+            bgColor: '#00FF00',
+          },
+        },
+      )
+      expect(res.data?.updateTagDefinition?.tag?.name).toBe('Updated Tag Name')
+      expect(res.data?.updateTagDefinition?.tag?.desc).toBe('Updated description')
+      expect(res.data?.updateTagDefinition?.tag?.bgColor).toBe('#00FF00')
+    })
+  })
 })

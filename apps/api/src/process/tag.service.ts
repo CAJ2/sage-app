@@ -37,7 +37,7 @@ export class TagService {
   async create(input: CreateTagDefinitionInput) {
     const tag = new Tag()
     await this.setFields(tag, input)
-    await this.em.persistAndFlush(tag)
+    await this.em.persist(tag).flush()
     return tag
   }
 
@@ -47,7 +47,7 @@ export class TagService {
       throw new Error(`Tag with ID "${input.id}" not found`)
     }
     await this.setFields(tag, input)
-    await this.em.persistAndFlush(tag)
+    await this.em.persist(tag).flush()
     return tag
   }
 

@@ -86,6 +86,11 @@ export class GraphQLTestClient {
       query: print(operation),
       variables: variables ?? undefined,
     })
+    if (res.body.errors) {
+      /* oxlint-disable */
+      console.log('GraphQL Errors:')
+      console.dir(res.body.errors, { depth: 4 })
+    }
     return res.body
   }
 }

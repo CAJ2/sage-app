@@ -44,13 +44,13 @@ export class OrgService {
     const org = new Org()
     if (!isUsingChange(input)) {
       await this.setFields(org, input)
-      await this.em.persistAndFlush(org)
+      await this.em.persist(org).flush()
       return { org }
     }
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(org, input, change)
     await this.editService.createEntityEdit(change, org)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { org, change }
   }
@@ -69,13 +69,13 @@ export class OrgService {
     }
     if (!change) {
       await this.setFields(org, input)
-      await this.em.persistAndFlush(org)
+      await this.em.persist(org).flush()
       return { org }
     }
     await this.editService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
     await this.editService.updateEntityEdit(change, org)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { org, change }
   }

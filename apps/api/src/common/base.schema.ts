@@ -25,7 +25,7 @@ export const zToSchema = (schema: core.$ZodType): core.JSONSchema.BaseSchema => 
 }
 
 export const ImageOrIconSchema = z
-  .url({ protocol: /^(https|icon):\/\// })
+  .url({ protocol: /^(https|icon)/ })
   .optional()
   .default('')
 export const RelMetaSchema = z

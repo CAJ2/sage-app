@@ -79,8 +79,9 @@ export class ComponentService {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
     return component.componentTags.getItems().map((tag) => {
+      const tagObj = tag.tag.toObject()
       return {
-        ...tag.tag,
+        ...tagObj,
         meta: tag.meta,
       }
     })
@@ -100,7 +101,7 @@ export class ComponentService {
     const component = new Component()
     if (!isUsingChange(input)) {
       await this.setFields(component, input)
-      await this.em.persistAndFlush(component)
+      await this.em.persist(component).flush()
       return {
         component,
         change: null,
@@ -109,7 +110,7 @@ export class ComponentService {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(component, input, change)
     await this.editService.createEntityEdit(change, component)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return {
       component,
@@ -125,13 +126,14 @@ export class ComponentService {
       {
         id: input.id,
       },
+      { populate: ['materials', 'tags', 'componentTags'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
     if (!change) {
       await this.setFields(component, input)
-      await this.em.persistAndFlush(component)
+      await this.em.persist(component).flush()
       return {
         component,
         change: null,
@@ -140,7 +142,7 @@ export class ComponentService {
     await this.editService.beginUpdateEntityEdit(change, component)
     await this.setFields(component, input, change)
     await this.editService.updateEntityEdit(change, component)
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return {
       component,

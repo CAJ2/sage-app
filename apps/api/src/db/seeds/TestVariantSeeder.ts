@@ -41,7 +41,7 @@ export class TestVariantSeeder extends Seeder {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
-      await em.persistAndFlush(user)
+      await em.persist(user).flush()
     }
 
     for (const id of SOURCE_IDS) {
@@ -69,7 +69,7 @@ export class TestVariantSeeder extends Seeder {
       source: [{ id: SOURCE_IDS[0] }],
     })
     try {
-      await em.persistAndFlush(item1)
+      await em.persist(item1).flush()
     } catch (error) {
       throw new Error(`Failed to persist item1: ${error}`)
     }
@@ -144,7 +144,7 @@ export class TestVariantSeeder extends Seeder {
         em.persist(component)
         variant.variantComponents.add(component)
       }
-      await em.persistAndFlush(variant)
+      await em.persist(variant).flush()
     }
   }
 }

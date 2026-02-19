@@ -154,7 +154,7 @@ export class ChangeService {
       }
     }
 
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     return change
   }
 
@@ -183,13 +183,13 @@ export class ChangeService {
       }
     }
 
-    await this.em.persistAndFlush(change)
+    await this.em.persist(change).flush()
     return change
   }
 
   async remove(id: string) {
     const change = await this.findOne(id)
-    await this.em.removeAndFlush(change)
+    await this.em.remove(change).flush()
   }
 
   async discardEdit(changeID: string, editID: string) {

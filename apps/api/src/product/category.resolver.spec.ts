@@ -7,6 +7,10 @@ import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
+import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
+import { TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
+import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 
@@ -30,7 +34,15 @@ describe('CategoryResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestCategorySeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      TestCategorySeeder,
+      TestProcessSeeder,
+      TestTagSeeder,
+      TestVariantSeeder,
+    )
 
     await gql.signIn('admin', 'password')
 
@@ -218,5 +230,186 @@ describe('CategoryResolver (integration)', () => {
     )
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Category not found')
+  })
+
+  // Comprehensive Create Tests
+  describe('CreateCategory comprehensive field tests', () => {
+    test('should create category with all text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryAllText($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                name
+                desc
+                descShort
+                imageURL
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'New Test Category',
+            desc: 'Detailed category description',
+            descShort: 'Short desc',
+            imageURL: 'https://example.com/category.jpg',
+            lang: 'en',
+          },
+        },
+      )
+      expect(res.data?.createCategory?.category).toBeTruthy()
+      expect(res.data?.createCategory?.category?.name).toBe('New Test Category')
+      expect(res.data?.createCategory?.category?.desc).toBe('Detailed category description')
+      expect(res.data?.createCategory?.category?.descShort).toBe('Short desc')
+    })
+
+    test('should create category with translated fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryTranslated($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                name
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            nameTr: [
+              { lang: 'en', text: 'English Category' },
+              { lang: 'sv', text: 'Svenska Kategori' },
+            ],
+            descTr: [
+              { lang: 'en', text: 'English Description' },
+              { lang: 'sv', text: 'Svenska Beskrivning' },
+            ],
+            descShortTr: [
+              { lang: 'en', text: 'Short' },
+              { lang: 'sv', text: 'Kort' },
+            ],
+          },
+        },
+      )
+      expect(res.data?.createCategory?.category).toBeTruthy()
+    })
+
+    test('should create category with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryWithChange($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                name
+              }
+              change {
+                id
+                title
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Category with Change',
+            change: {
+              title: 'Add new category',
+              status: 'DRAFT',
+            },
+          },
+        },
+      )
+      expect(res.data?.createCategory?.category).toBeTruthy()
+      expect(res.data?.createCategory?.change).toBeTruthy()
+      expect(res.data?.createCategory?.change?.status).toBe('DRAFT')
+    })
+  })
+
+  // Comprehensive Update Tests
+  describe('UpdateCategory comprehensive field tests', () => {
+    let testCategoryID: string
+
+    beforeAll(async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCategoryForUpdate($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Category for Updates',
+          },
+        },
+      )
+      testCategoryID = res.data?.createCategory?.category?.id
+    })
+
+    test('should update category text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateCategoryText($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                name
+                desc
+                descShort
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testCategoryID,
+            name: 'Updated Category Name',
+            desc: 'Updated Description',
+            descShort: 'Updated Short',
+          },
+        },
+      )
+      expect(res.data?.updateCategory?.category?.name).toBe('Updated Category Name')
+      expect(res.data?.updateCategory?.category?.desc).toBe('Updated Description')
+    })
+
+    test('should update category with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateCategoryWithChange($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                name
+              }
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testCategoryID,
+            name: 'Updated via Change',
+            change: {
+              title: 'Update category test',
+              status: 'PROPOSED',
+            },
+          },
+        },
+      )
+      expect(res.data?.updateCategory?.category).toBeTruthy()
+      expect(res.data?.updateCategory?.change).toBeTruthy()
+    })
   })
 })

@@ -35,27 +35,27 @@ export class SourceService {
     const source = new Source()
     source.user = ref(User, userID)
     await this.setFields(source, input)
-    await this.em.persistAndFlush(source)
+    await this.em.persist(source).flush()
     return source
   }
 
   async update(input: UpdateSourceInput) {
     const source = await this.findOneByID(input.id)
     await this.setFields(source, input)
-    await this.em.persistAndFlush(source)
+    await this.em.persist(source).flush()
     return source
   }
 
   async markProcessed(id: string) {
     const source = await this.findOneByID(id)
     source.processedAt = new Date()
-    await this.em.persistAndFlush(source)
+    await this.em.persist(source).flush()
     return source
   }
 
   async remove(id: string) {
     const source = await this.findOneByID(id)
-    await this.em.removeAndFlush(source)
+    await this.em.remove(source).flush()
     return true
   }
 

@@ -39,7 +39,7 @@ export class UsersService {
     if (existing) {
       throw BadRequestErr('User already exists')
     }
-    await this.em.persistAndFlush(user)
+    await this.em.persist(user).flush()
     return user
   }
 

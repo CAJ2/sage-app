@@ -213,4 +213,90 @@ describe('SourceResolver (integration)', () => {
     )
     expect(res.data?.source).toBeNull()
   })
+
+  // Comprehensive Create Tests
+  describe('CreateSource comprehensive field tests', () => {
+    test('should create source with all fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateSourceAllFields($input: CreateSourceInput!) {
+            createSource(input: $input) {
+              source {
+                id
+                type
+                location
+                contentURL
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            type: SourceType.Url,
+            location: 'https://recycling-guide.com/page1',
+            contentURL: 'https://cdn.example.com/content.json',
+            content: { title: 'Recycling Guide', pages: 10 },
+            metadata: { author: 'Test Author', date: '2024-01-01' },
+          },
+        },
+      )
+      expect(res.data?.createSource?.source).toBeTruthy()
+      expect(res.data?.createSource?.source?.type).toBe(SourceType.Url)
+      expect(res.data?.createSource?.source?.location).toBe('https://recycling-guide.com/page1')
+    })
+
+    test('should create source for each SourceType', async () => {
+      const types = [SourceType.File, SourceType.Image, SourceType.Url, SourceType.Pdf]
+      for (const type of types) {
+        const res = await gql.send(
+          graphql(`
+            mutation CreateSourceWithType($input: CreateSourceInput!) {
+              createSource(input: $input) {
+                source {
+                  id
+                  type
+                }
+              }
+            }
+          `),
+          {
+            input: {
+              type,
+              location: `https://example.com/${type.toLowerCase()}/test`,
+            },
+          },
+        )
+        expect(res.data?.createSource?.source?.type).toBe(type)
+      }
+    })
+  })
+
+  // Comprehensive Update Tests
+  describe('UpdateSource comprehensive field tests', () => {
+    test('should update source fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateSourceAllFields($input: UpdateSourceInput!) {
+            updateSource(input: $input) {
+              source {
+                id
+                location
+                contentURL
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            location: 'https://updated-location.com',
+            contentURL: 'https://updated-content.com/data.json',
+            content: { updated: true },
+            metadata: { updatedBy: 'Test User' },
+          },
+        },
+      )
+      expect(res.data?.updateSource?.source?.location).toBe('https://updated-location.com')
+    })
+  })
 })

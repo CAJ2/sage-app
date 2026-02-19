@@ -3,10 +3,13 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { REGION_IDS, TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
+import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { COMPONENT_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
@@ -29,7 +32,14 @@ describe('ComponentResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      TestProcessSeeder,
+      TestTagSeeder,
+      TestVariantSeeder,
+    )
 
     await gql.signIn('admin', 'password')
 
@@ -204,5 +214,332 @@ describe('ComponentResolver (integration)', () => {
     )
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Component not found')
+  })
+
+  // Comprehensive Create Tests
+  describe('CreateComponent comprehensive field tests', () => {
+    test('should create component with all text fields and primary material', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentAllFields($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+                name
+                desc
+                imageURL
+                primaryMaterial {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Comprehensive Test Component',
+            desc: 'Detailed component description',
+            imageURL: 'https://example.com/component.jpg',
+            lang: 'en',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+          },
+        },
+      )
+      expect(res.data?.createComponent?.component).toBeTruthy()
+      expect(res.data?.createComponent?.component?.name).toBe('Comprehensive Test Component')
+      expect(res.data?.createComponent?.component?.primaryMaterial?.id).toBe(MATERIAL_IDS[0])
+    })
+
+    test('should create component with translated fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentTranslated($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+                name
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            nameTr: [
+              { lang: 'en', text: 'English Component' },
+              { lang: 'sv', text: 'Svenska Komponent' },
+            ],
+            descTr: [
+              { lang: 'en', text: 'English Comp Description' },
+              { lang: 'sv', text: 'Svenska Beskrivning' },
+            ],
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+          },
+        },
+      )
+      expect(res.data?.createComponent?.component).toBeTruthy()
+    })
+
+    test('should create component with materials and physical data', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentWithMaterials($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+                name
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Component with Materials',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+            materials: [
+              { id: MATERIAL_IDS[0], materialFraction: 0.7 },
+              { id: MATERIAL_IDS[1], materialFraction: 0.3 },
+            ],
+            physical: { weight: 100, unit: 'g' },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createComponent?.component).toBeTruthy()
+    })
+
+    test('should create component with tags', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentWithTags($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+                tags {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Component with Tags',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+            tags: [
+              { id: TAG_IDS[0], meta: { score: 95 } },
+              { id: TAG_IDS[3], meta: { level: 'low' } },
+            ],
+          },
+        },
+      )
+      expect(res.data?.createComponent?.component?.tags?.length).toBeGreaterThanOrEqual(2)
+    })
+
+    test('should create component with region', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentWithRegion($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+                region {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Component with Region',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+            region: { id: REGION_IDS[0] },
+          },
+        },
+      )
+      expect(res.data?.createComponent?.component?.region?.id).toBe(REGION_IDS[0])
+    })
+
+    test('should create component with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentWithChange($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+              }
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Component with Change',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+            change: {
+              title: 'Add new component',
+              status: ChangeStatus.Draft,
+            },
+          },
+        },
+      )
+      expect(res.data?.createComponent?.component).toBeTruthy()
+      expect(res.data?.createComponent?.change).toBeTruthy()
+      expect(res.data?.createComponent?.change?.status).toBe('DRAFT')
+    })
+  })
+
+  // Comprehensive Update Tests
+  describe('UpdateComponent comprehensive field tests', () => {
+    let testComponentID: string
+
+    beforeAll(async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateComponentForUpdate($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Component for Updates',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+          },
+        },
+      )
+      if (res.data?.createComponent?.component?.id) {
+        testComponentID = res.data?.createComponent?.component?.id
+      } else {
+        throw new Error('Failed to create component for update tests')
+      }
+    })
+
+    test('should update component text fields', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateComponentText($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                name
+                desc
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            name: 'Updated Component Name',
+            desc: 'Updated Description',
+          },
+        },
+      )
+      expect(res.data?.updateComponent?.component?.name).toBe('Updated Component Name')
+    })
+
+    test('should update component materials', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateComponentMaterials($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                name
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            materials: [{ id: MATERIAL_IDS[1], materialFraction: 0.5 }],
+          },
+        },
+      )
+      expect(res.data?.updateComponent?.component).toBeTruthy()
+    })
+
+    test('should add and remove tags', async () => {
+      // Add tags
+      const addRes = await gql.send(
+        graphql(`
+          mutation UpdateComponentAddTags($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                tags {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            addTags: [{ id: TAG_IDS[0], meta: { score: 80 } }],
+          },
+        },
+      )
+      expect(addRes.data?.updateComponent?.component?.tags?.length).toBeGreaterThanOrEqual(1)
+
+      // Remove tags
+      const removeRes = await gql.send(
+        graphql(`
+          mutation UpdateComponentRemoveTags($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            removeTags: [TAG_IDS[0]],
+          },
+        },
+      )
+      expect(removeRes.data?.updateComponent?.component).toBeTruthy()
+    })
+
+    test('should update component with change tracking', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateComponentWithChange($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+              }
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            name: 'Updated via Change',
+            change: {
+              title: 'Update component',
+              status: ChangeStatus.Proposed,
+            },
+          },
+        },
+      )
+      expect(res.data?.updateComponent?.component).toBeTruthy()
+      expect(res.data?.updateComponent?.change).toBeTruthy()
+    })
   })
 })
