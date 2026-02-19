@@ -166,7 +166,7 @@ export class VariantService {
       {
         id: input.id,
       },
-      { populate: ['items', 'components', 'tags'] },
+      { populate: ['items', 'components', 'tags', 'orgs'] },
     )
     if (!variant) {
       throw new Error('Variant not found')

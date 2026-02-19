@@ -87,7 +87,7 @@ describe('ItemResolver (integration)', () => {
       `),
       { id: itemID },
     )
-    expect(res.data?.item).toBeTruthy()
+    expect(res.data?.item).toBeDefined()
     expect(res.data?.item?.id).toBe(itemID)
   })
 
@@ -108,9 +108,9 @@ describe('ItemResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.itemSchema).toBeTruthy()
-    expect(res.data?.itemSchema?.create).toBeTruthy()
-    expect(res.data?.itemSchema?.update).toBeTruthy()
+    expect(res.data?.itemSchema).toBeDefined()
+    expect(res.data?.itemSchema?.create).toBeDefined()
+    expect(res.data?.itemSchema?.update).toBeDefined()
   })
 
   test('should query item categories with pagination', async () => {
@@ -131,7 +131,7 @@ describe('ItemResolver (integration)', () => {
       `),
       { id: itemID, first: 10 },
     )
-    expect(res.data?.item?.categories).toBeTruthy()
+    expect(res.data?.item?.categories).toBeDefined()
     expect(Array.isArray(res.data?.item?.categories.nodes)).toBe(true)
   })
 
@@ -153,7 +153,7 @@ describe('ItemResolver (integration)', () => {
       `),
       { id: itemID, first: 10 },
     )
-    expect(res.data?.item?.tags).toBeTruthy()
+    expect(res.data?.item?.tags).toBeDefined()
     expect(Array.isArray(res.data?.item?.tags.nodes)).toBe(true)
   })
 
@@ -175,7 +175,7 @@ describe('ItemResolver (integration)', () => {
       `),
       { id: itemID, first: 10 },
     )
-    expect(res.data?.item?.variants).toBeTruthy()
+    expect(res.data?.item?.variants).toBeDefined()
     expect(Array.isArray(res.data?.item?.variants.nodes)).toBe(true)
   })
 
@@ -197,7 +197,7 @@ describe('ItemResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createItem?.item).toBeTruthy()
+    expect(res.data?.createItem?.item).toBeDefined()
     expect(res.data?.createItem?.item?.name).toBe('Test Item')
   })
 
@@ -234,7 +234,7 @@ describe('ItemResolver (integration)', () => {
       `),
       { id: 'non-existent-id' },
     )
-    expect(res.errors).toBeTruthy()
+    expect(res.errors).toBeDefined()
     expect(res.errors?.[0].message).toContain('Item not found')
   })
 
@@ -263,7 +263,8 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createItem?.item).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createItem?.item).toBeDefined()
       expect(res.data?.createItem?.item?.name).toBe('Comprehensive Test Item')
       expect(res.data?.createItem?.item?.desc).toBe('Detailed item description')
       expect(res.data?.createItem?.item?.imageURL).toBe('https://example.com/item.jpg')
@@ -295,9 +296,10 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createItem?.item).toBeTruthy()
-      // Name and desc will be set from translations
-      expect(res.data?.createItem?.item?.name).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createItem?.item).toBeDefined()
+      expect(res.data?.createItem?.item?.name).toBe('English Item Name')
+      expect(res.data?.createItem?.item?.desc).toBe('English Item Description')
     })
 
     test('should create item with categories relationship', async () => {
@@ -326,8 +328,16 @@ describe('ItemResolver (integration)', () => {
         },
       )
       expect(res.errors).toBeUndefined()
-      expect(res.data?.createItem?.item).toBeTruthy()
-      // Categories are created but not populated in response
+      expect(res.data?.createItem?.item).toBeDefined()
+      expect(res.data?.createItem?.item?.name).toBe('Item with Categories')
+      expect(res.data?.createItem?.item?.categories?.totalCount).toBe(2)
+      expect(res.data?.createItem?.item?.categories?.nodes).toHaveLength(2)
+      expect(res.data?.createItem?.item?.categories?.nodes?.map((n) => n.id)).toContain(
+        CATEGORY_IDS[0],
+      )
+      expect(res.data?.createItem?.item?.categories?.nodes?.map((n) => n.id)).toContain(
+        CATEGORY_IDS[1],
+      )
     })
 
     test('should create item with tags including metadata', async () => {
@@ -358,8 +368,12 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createItem?.item).toBeTruthy()
-      // Tags are created but not populated in response
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createItem?.item).toBeDefined()
+      expect(res.data?.createItem?.item?.name).toBe('Item with Tags')
+      expect(res.data?.createItem?.item?.tags?.totalCount).toBe(1)
+      expect(res.data?.createItem?.item?.tags?.nodes).toHaveLength(1)
+      expect(res.data?.createItem?.item?.tags?.nodes?.map((n) => n.id)).toContain(TAG_IDS[0])
     })
 
     test('should create item with change tracking (change input)', async () => {
@@ -390,8 +404,11 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createItem?.item).toBeTruthy()
-      expect(res.data?.createItem?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createItem?.item).toBeDefined()
+      expect(res.data?.createItem?.item?.name).toBe('Item with Change')
+      expect(res.data?.createItem?.change).toBeDefined()
+      expect(res.data?.createItem?.change?.title).toBe('Add new item via change')
       expect(res.data?.createItem?.change?.status).toBe('DRAFT')
     })
 
@@ -426,8 +443,13 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createItem?.item).toBeTruthy()
-      // Categories and tags are created but not populated in response
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createItem?.item).toBeDefined()
+      expect(res.data?.createItem?.item?.name).toBe('Complete Item')
+      expect(res.data?.createItem?.item?.desc).toBe('All fields test')
+      expect(res.data?.createItem?.item?.imageURL).toBe('https://example.com/complete-item.jpg')
+      expect(res.data?.createItem?.item?.categories?.totalCount).toBe(1)
+      expect(res.data?.createItem?.item?.tags?.totalCount).toBe(1)
     })
   })
 
@@ -503,7 +525,8 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateItem?.item).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateItem?.item).toBeDefined()
     })
 
     test('should remove categories from item', async () => {
@@ -527,7 +550,9 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateItem?.item).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateItem?.item).toBeDefined()
+      expect(res.data?.updateItem?.item?.categories?.totalCount).toBe(1)
     })
 
     test('should add tags to existing item', async () => {
@@ -551,7 +576,9 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateItem?.item?.tags?.totalCount).toBeGreaterThanOrEqual(1)
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateItem?.item).toBeDefined()
+      expect(res.data?.updateItem?.item?.tags?.totalCount).toBe(1)
     })
 
     test('should remove tags from item', async () => {
@@ -606,8 +633,11 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateItem?.item).toBeTruthy()
-      expect(res.data?.updateItem?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateItem?.item).toBeDefined()
+      expect(res.data?.updateItem?.item?.name).toBe('Updated via Change')
+      expect(res.data?.updateItem?.change).toBeDefined()
+      expect(res.data?.updateItem?.change?.title).toBe('Update item test')
       expect(res.data?.updateItem?.change?.status).toBe('PROPOSED')
     })
   })
@@ -640,9 +670,10 @@ describe('ItemResolver (integration)', () => {
           input2: { name: 'Batch Item 2' },
         },
       )
-      expect(res.data?.item1?.item).toBeTruthy()
-      expect(res.data?.item2?.item).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.item1?.item).toBeDefined()
       expect(res.data?.item1?.item?.name).toBe('Batch Item 1')
+      expect(res.data?.item2?.item).toBeDefined()
       expect(res.data?.item2?.item?.name).toBe('Batch Item 2')
     })
   })

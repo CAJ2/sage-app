@@ -73,8 +73,9 @@ describe('CategoryResolver (integration)', () => {
       `),
       { first: 10 },
     )
-    expect(res.data?.categories.nodes?.length).toBeGreaterThan(0)
-    expect(res.data?.categories.totalCount).toBeGreaterThan(0)
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.categories.nodes).toHaveLength(6)
+    expect(res.data?.categories.totalCount).toBe(6)
   })
 
   test('should query a single category', async () => {
@@ -89,7 +90,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: packagingID },
     )
-    expect(res.data?.category).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category).toBeDefined()
     expect(res.data?.category?.id).toBe(packagingID)
   })
 
@@ -104,7 +106,8 @@ describe('CategoryResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.categoryRoot).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.categoryRoot).toBeDefined()
     expect(res.data?.categoryRoot?.id).toBe(CATEGORY_ROOT)
   })
 
@@ -125,9 +128,10 @@ describe('CategoryResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.categorySchema).toBeTruthy()
-    expect(res.data?.categorySchema?.create).toBeTruthy()
-    expect(res.data?.categorySchema?.update).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.categorySchema).toBeDefined()
+    expect(res.data?.categorySchema?.create).toBeDefined()
+    expect(res.data?.categorySchema?.update).toBeDefined()
   })
 
   test('should query category parents with pagination', async () => {
@@ -148,7 +152,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: packagingID, first: 10 },
     )
-    expect(res.data?.category?.parents).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category?.parents).toBeDefined()
     expect(Array.isArray(res.data?.category?.parents.nodes)).toBe(true)
   })
 
@@ -170,7 +175,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: CATEGORY_ROOT, first: 10 },
     )
-    expect(res.data?.category?.children).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category?.children).toBeDefined()
     expect(Array.isArray(res.data?.category?.children.nodes)).toBe(true)
   })
 
@@ -192,7 +198,8 @@ describe('CategoryResolver (integration)', () => {
       `),
       { id: packagingID, first: 10 },
     )
-    expect(res.data?.category?.items).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.category?.items).toBeDefined()
     expect(Array.isArray(res.data?.category?.items.nodes)).toBe(true)
   })
 
@@ -215,7 +222,9 @@ describe('CategoryResolver (integration)', () => {
         },
       },
     )
+    expect(res.errors).toBeUndefined()
     expect(res.data?.updateCategory?.category?.id).toBe(packagingID)
+    expect(res.data?.updateCategory?.category?.name).toBe('Updated Category Name')
   })
 
   test('should return error for non-existent category', async () => {
@@ -260,10 +269,12 @@ describe('CategoryResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createCategory?.category).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createCategory?.category).toBeDefined()
       expect(res.data?.createCategory?.category?.name).toBe('New Test Category')
       expect(res.data?.createCategory?.category?.desc).toBe('Detailed category description')
       expect(res.data?.createCategory?.category?.descShort).toBe('Short desc')
+      expect(res.data?.createCategory?.category?.imageURL).toBe('https://example.com/category.jpg')
     })
 
     test('should create category with translated fields', async () => {
@@ -295,7 +306,8 @@ describe('CategoryResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createCategory?.category).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createCategory?.category).toBeDefined()
     })
 
     test('should create category with change tracking', async () => {
@@ -325,8 +337,11 @@ describe('CategoryResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createCategory?.category).toBeTruthy()
-      expect(res.data?.createCategory?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createCategory?.category).toBeDefined()
+      expect(res.data?.createCategory?.category?.name).toBe('Category with Change')
+      expect(res.data?.createCategory?.change).toBeDefined()
+      expect(res.data?.createCategory?.change?.title).toBe('Add new category')
       expect(res.data?.createCategory?.change?.status).toBe('DRAFT')
     })
   })
@@ -382,8 +397,11 @@ describe('CategoryResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateCategory?.category?.id).toBe(testCategoryID)
       expect(res.data?.updateCategory?.category?.name).toBe('Updated Category Name')
       expect(res.data?.updateCategory?.category?.desc).toBe('Updated Description')
+      expect(res.data?.updateCategory?.category?.descShort).toBe('Updated Short')
     })
 
     test('should update category with change tracking', async () => {
@@ -413,8 +431,12 @@ describe('CategoryResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateCategory?.category).toBeTruthy()
-      expect(res.data?.updateCategory?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateCategory?.category).toBeDefined()
+      expect(res.data?.updateCategory?.category?.id).toBe(testCategoryID)
+      expect(res.data?.updateCategory?.category?.name).toBe('Updated via Change')
+      expect(res.data?.updateCategory?.change).toBeDefined()
+      expect(res.data?.updateCategory?.change?.status).toBe('PROPOSED')
     })
   })
 })

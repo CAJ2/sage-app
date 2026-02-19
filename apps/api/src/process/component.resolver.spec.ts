@@ -69,6 +69,8 @@ describe('ComponentResolver (integration)', () => {
       `),
       { first: 10 },
     )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.components.nodes).toBeDefined()
     expect(res.data?.components.nodes?.length).toBeGreaterThan(0)
     expect(res.data?.components.totalCount).toBeGreaterThan(0)
   })
@@ -85,7 +87,8 @@ describe('ComponentResolver (integration)', () => {
       `),
       { id: componentID },
     )
-    expect(res.data?.component).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.component).toBeDefined()
     expect(res.data?.component?.id).toBe(componentID)
   })
 
@@ -106,9 +109,10 @@ describe('ComponentResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.componentSchema).toBeTruthy()
-    expect(res.data?.componentSchema?.create).toBeTruthy()
-    expect(res.data?.componentSchema?.update).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.componentSchema).toBeDefined()
+    expect(res.data?.componentSchema?.create).toBeDefined()
+    expect(res.data?.componentSchema?.update).toBeDefined()
   })
 
   test('should query component material', async () => {
@@ -128,7 +132,8 @@ describe('ComponentResolver (integration)', () => {
       `),
       { id: componentID },
     )
-    expect(res.data?.component).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.component).toBeDefined()
   })
 
   test('should query component tags', async () => {
@@ -146,7 +151,8 @@ describe('ComponentResolver (integration)', () => {
       `),
       { id: componentID },
     )
-    expect(res.data?.component).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.component).toBeDefined()
     expect(Array.isArray(res.data?.component?.tags)).toBe(true)
   })
 
@@ -173,7 +179,8 @@ describe('ComponentResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createComponent?.component).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.createComponent?.component).toBeDefined()
     expect(res.data?.createComponent?.component?.name).toBe('Test Component')
   })
 
@@ -198,7 +205,10 @@ describe('ComponentResolver (integration)', () => {
         },
       },
     )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.updateComponent?.component).toBeDefined()
     expect(res.data?.updateComponent?.component?.id).toBe(componentID)
+    expect(res.data?.updateComponent?.component?.name).toBe('Updated Component Name')
   })
 
   test('should return error for non-existent component', async () => {
@@ -245,8 +255,13 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createComponent?.component).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createComponent?.component).toBeDefined()
       expect(res.data?.createComponent?.component?.name).toBe('Comprehensive Test Component')
+      expect(res.data?.createComponent?.component?.desc).toBe('Detailed component description')
+      expect(res.data?.createComponent?.component?.imageURL).toBe(
+        'https://example.com/component.jpg',
+      )
       expect(res.data?.createComponent?.component?.primaryMaterial?.id).toBe(MATERIAL_IDS[0])
     })
 
@@ -276,7 +291,8 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createComponent?.component).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createComponent?.component).toBeDefined()
     })
 
     test('should create component with materials and physical data', async () => {
@@ -304,7 +320,8 @@ describe('ComponentResolver (integration)', () => {
         },
       )
       expect(res.errors).toBeUndefined()
-      expect(res.data?.createComponent?.component).toBeTruthy()
+      expect(res.data?.createComponent?.component).toBeDefined()
+      expect(res.data?.createComponent?.component?.name).toBe('Component with Materials')
     })
 
     test('should create component with tags', async () => {
@@ -332,7 +349,15 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createComponent?.component?.tags?.length).toBeGreaterThanOrEqual(2)
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createComponent?.component).toBeDefined()
+      expect(res.data?.createComponent?.component?.tags).toHaveLength(2)
+      expect(res.data?.createComponent?.component?.tags?.map((t: any) => t.id)).toContain(
+        TAG_IDS[0],
+      )
+      expect(res.data?.createComponent?.component?.tags?.map((t: any) => t.id)).toContain(
+        TAG_IDS[3],
+      )
     })
 
     test('should create component with region', async () => {
@@ -357,6 +382,8 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createComponent?.component).toBeDefined()
       expect(res.data?.createComponent?.component?.region?.id).toBe(REGION_IDS[0])
     })
 
@@ -386,8 +413,9 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createComponent?.component).toBeTruthy()
-      expect(res.data?.createComponent?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createComponent?.component).toBeDefined()
+      expect(res.data?.createComponent?.change).toBeDefined()
       expect(res.data?.createComponent?.change?.status).toBe('DRAFT')
     })
   })
@@ -442,7 +470,11 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateComponent?.component).toBeDefined()
+      expect(res.data?.updateComponent?.component?.id).toBe(testComponentID)
       expect(res.data?.updateComponent?.component?.name).toBe('Updated Component Name')
+      expect(res.data?.updateComponent?.component?.desc).toBe('Updated Description')
     })
 
     test('should update component materials', async () => {
@@ -464,7 +496,9 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateComponent?.component).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateComponent?.component).toBeDefined()
+      expect(res.data?.updateComponent?.component?.id).toBe(testComponentID)
     })
 
     test('should add and remove tags', async () => {
@@ -489,7 +523,12 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(addRes.data?.updateComponent?.component?.tags?.length).toBeGreaterThanOrEqual(1)
+      expect(addRes.errors).toBeUndefined()
+      expect(addRes.data?.updateComponent?.component).toBeDefined()
+      expect(addRes.data?.updateComponent?.component?.tags).toHaveLength(1)
+      expect(addRes.data?.updateComponent?.component?.tags?.map((t: any) => t.id)).toContain(
+        TAG_IDS[0],
+      )
 
       // Remove tags
       const removeRes = await gql.send(
@@ -509,7 +548,9 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(removeRes.data?.updateComponent?.component).toBeTruthy()
+      expect(removeRes.errors).toBeUndefined()
+      expect(removeRes.data?.updateComponent?.component).toBeDefined()
+      expect(removeRes.data?.updateComponent?.component?.id).toBe(testComponentID)
     })
 
     test('should update component with change tracking', async () => {
@@ -538,8 +579,11 @@ describe('ComponentResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateComponent?.component).toBeTruthy()
-      expect(res.data?.updateComponent?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateComponent?.component).toBeDefined()
+      expect(res.data?.updateComponent?.component?.id).toBe(testComponentID)
+      expect(res.data?.updateComponent?.change).toBeDefined()
+      expect(res.data?.updateComponent?.change?.status).toBe('PROPOSED')
     })
   })
 })

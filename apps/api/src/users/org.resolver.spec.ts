@@ -71,7 +71,8 @@ describe('OrgResolver (integration)', () => {
       `),
       { id: orgID },
     )
-    expect(res.data?.org).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.org).toBeDefined()
     expect(res.data?.org?.id).toBe(orgID)
   })
 
@@ -97,8 +98,12 @@ describe('OrgResolver (integration)', () => {
       `),
       { id: orgID, first: 10 },
     )
-    expect(res.data?.org?.users).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.org?.users).toBeDefined()
     expect(Array.isArray(res.data?.org?.users.nodes)).toBe(true)
+    expect(res.data?.org?.users.totalCount).toBeGreaterThanOrEqual(0)
+    expect(res.data?.org?.users.pageInfo?.hasNextPage).toBeDefined()
+    expect(res.data?.org?.users.pageInfo?.hasPreviousPage).toBeDefined()
   })
 
   test('should create an org', async () => {
@@ -121,7 +126,8 @@ describe('OrgResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createOrg?.org).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.createOrg?.org).toBeDefined()
     expect(res.data?.createOrg?.org?.name).toBe('Test Organization')
     expect(res.data?.createOrg?.org?.slug).toBe('test-org')
   })
@@ -145,6 +151,7 @@ describe('OrgResolver (integration)', () => {
         },
       },
     )
+    expect(res.errors).toBeUndefined()
     expect(res.data?.updateOrg?.org?.id).toBe(orgID)
     expect(res.data?.updateOrg?.org?.name).toBe('Updated Org Name')
   })
@@ -160,7 +167,8 @@ describe('OrgResolver (integration)', () => {
       `),
       { id: 'non-existent-id' },
     )
-    expect(res.errors).toBeTruthy()
+    expect(res.errors).toBeDefined()
+    expect(res.errors).toHaveLength(1)
     expect(res.errors?.[0].message).toContain('Org not found')
   })
 
@@ -193,7 +201,8 @@ describe('OrgResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createOrg?.org).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createOrg?.org).toBeDefined()
       expect(res.data?.createOrg?.org?.name).toBe('Comprehensive Test Org')
       expect(res.data?.createOrg?.org?.slug).toBe('comp-test-org')
       expect(res.data?.createOrg?.org?.desc).toBe('Detailed org description')
@@ -228,8 +237,10 @@ describe('OrgResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createOrg?.org).toBeTruthy()
-      expect(res.data?.createOrg?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createOrg?.org).toBeDefined()
+      expect(res.data?.createOrg?.org?.name).toBe('Org with Change')
+      expect(res.data?.createOrg?.change).toBeDefined()
       expect(res.data?.createOrg?.change?.status).toBe('DRAFT')
     })
   })
@@ -286,6 +297,8 @@ describe('OrgResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateOrg?.org?.id).toBe(testOrgID)
       expect(res.data?.updateOrg?.org?.name).toBe('Updated Org Name')
       expect(res.data?.updateOrg?.org?.desc).toBe('Updated Description')
       expect(res.data?.updateOrg?.org?.websiteURL).toBe('https://updated.org')
@@ -317,8 +330,11 @@ describe('OrgResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateOrg?.org).toBeTruthy()
-      expect(res.data?.updateOrg?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateOrg?.org).toBeDefined()
+      expect(res.data?.updateOrg?.org?.id).toBe(testOrgID)
+      expect(res.data?.updateOrg?.change).toBeDefined()
+      expect(res.data?.updateOrg?.change?.status).toBe('PROPOSED')
     })
   })
 })

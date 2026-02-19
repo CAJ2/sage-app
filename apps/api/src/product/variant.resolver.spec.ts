@@ -90,7 +90,7 @@ describe('VariantResolver (integration)', () => {
       `),
       { id: variantID },
     )
-    expect(res.data?.variant).toBeTruthy()
+    expect(res.data?.variant).toBeDefined()
     expect(res.data?.variant?.id).toBe(variantID)
   })
 
@@ -111,9 +111,9 @@ describe('VariantResolver (integration)', () => {
         }
       `),
     )
-    expect(res.data?.variantSchema).toBeTruthy()
-    expect(res.data?.variantSchema?.create).toBeTruthy()
-    expect(res.data?.variantSchema?.update).toBeTruthy()
+    expect(res.data?.variantSchema).toBeDefined()
+    expect(res.data?.variantSchema?.create).toBeDefined()
+    expect(res.data?.variantSchema?.update).toBeDefined()
   })
 
   test('should query variant items with pagination', async () => {
@@ -134,7 +134,7 @@ describe('VariantResolver (integration)', () => {
       `),
       { id: variantID, first: 10 },
     )
-    expect(res.data?.variant?.items).toBeTruthy()
+    expect(res.data?.variant?.items).toBeDefined()
     expect(Array.isArray(res.data?.variant?.items.nodes)).toBe(true)
   })
 
@@ -158,7 +158,7 @@ describe('VariantResolver (integration)', () => {
       `),
       { id: variantID, first: 10 },
     )
-    expect(res.data?.variant?.orgs).toBeTruthy()
+    expect(res.data?.variant?.orgs).toBeDefined()
     expect(Array.isArray(res.data?.variant?.orgs.nodes)).toBe(true)
   })
 
@@ -180,7 +180,7 @@ describe('VariantResolver (integration)', () => {
       `),
       { id: variantID, first: 10 },
     )
-    expect(res.data?.variant?.tags).toBeTruthy()
+    expect(res.data?.variant?.tags).toBeDefined()
     expect(Array.isArray(res.data?.variant?.tags.nodes)).toBe(true)
   })
 
@@ -204,7 +204,7 @@ describe('VariantResolver (integration)', () => {
       `),
       { id: variantID, first: 10 },
     )
-    expect(res.data?.variant?.components).toBeTruthy()
+    expect(res.data?.variant?.components).toBeDefined()
     expect(Array.isArray(res.data?.variant?.components.nodes)).toBe(true)
   })
 
@@ -226,7 +226,7 @@ describe('VariantResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createVariant?.variant).toBeTruthy()
+    expect(res.data?.createVariant?.variant).toBeDefined()
     expect(res.data?.createVariant?.variant?.name).toBe('Test Variant')
   })
 
@@ -263,7 +263,7 @@ describe('VariantResolver (integration)', () => {
       `),
       { id: 'non-existent-id' },
     )
-    expect(res.errors).toBeTruthy()
+    expect(res.errors).toBeDefined()
     expect(res.errors?.[0].message).toContain('Variant not found')
   })
 
@@ -293,10 +293,10 @@ describe('VariantResolver (integration)', () => {
         },
       )
       expect(res.errors).toBeUndefined()
-      expect(res.data?.createVariant?.variant).toBeTruthy()
+      expect(res.data?.createVariant?.variant).toBeDefined()
       expect(res.data?.createVariant?.variant?.name).toBe('Comprehensive Test Variant')
       expect(res.data?.createVariant?.variant?.desc).toBe('This is a detailed description')
-      // imageURL is set but defaults to empty string in schema
+      expect(res.data?.createVariant?.variant?.imageURL).toBeNull()
     })
 
     test('should create variant with translated fields (nameTr, descTr)', async () => {
@@ -325,9 +325,10 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createVariant?.variant).toBeTruthy()
-      // Name and desc will be set from translations
-      expect(res.data?.createVariant?.variant?.name).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('English Name')
+      expect(res.data?.createVariant?.variant?.desc).toBe('English Description')
     })
 
     test('should create variant with items relationship', async () => {
@@ -355,7 +356,17 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Variant with Items')
       expect(res.data?.createVariant?.variant?.items?.totalCount).toBe(2)
+      expect(res.data?.createVariant?.variant?.items?.nodes).toHaveLength(2)
+      expect(res.data?.createVariant?.variant?.items?.nodes?.map((n) => n.id)).toContain(
+        ITEM_IDS[0],
+      )
+      expect(res.data?.createVariant?.variant?.items?.nodes?.map((n) => n.id)).toContain(
+        ITEM_IDS[1],
+      )
     })
 
     test('should create variant with components relationship', async () => {
@@ -385,7 +396,17 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Variant with Components')
       expect(res.data?.createVariant?.variant?.components?.totalCount).toBe(2)
+      expect(res.data?.createVariant?.variant?.components?.nodes).toHaveLength(2)
+      expect(
+        res.data?.createVariant?.variant?.components?.nodes?.map((n) => n.component.id),
+      ).toContain(COMPONENT_IDS[0])
+      expect(
+        res.data?.createVariant?.variant?.components?.nodes?.map((n) => n.component.id),
+      ).toContain(COMPONENT_IDS[1])
     })
 
     test('should create variant with region relationship', async () => {
@@ -407,8 +428,9 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createVariant?.variant).toBeTruthy()
-      // Region is stored but not exposed in output type
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Variant with Region')
     })
 
     test('should create variant with orgs pivot relationship', async () => {
@@ -438,7 +460,17 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Variant with Orgs')
       expect(res.data?.createVariant?.variant?.orgs?.totalCount).toBe(2)
+      expect(res.data?.createVariant?.variant?.orgs?.nodes).toHaveLength(2)
+      expect(res.data?.createVariant?.variant?.orgs?.nodes?.map((n) => n.org.id)).toContain(
+        ORG_IDS[0],
+      )
+      expect(res.data?.createVariant?.variant?.orgs?.nodes?.map((n) => n.org.id)).toContain(
+        ORG_IDS[1],
+      )
     })
 
     test('should create variant with tags including metadata', async () => {
@@ -469,7 +501,13 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Variant with Tags')
       expect(res.data?.createVariant?.variant?.tags?.totalCount).toBe(2)
+      expect(res.data?.createVariant?.variant?.tags?.nodes).toHaveLength(2)
+      expect(res.data?.createVariant?.variant?.tags?.nodes?.map((n) => n.id)).toContain(TAG_IDS[2])
+      expect(res.data?.createVariant?.variant?.tags?.nodes?.map((n) => n.id)).toContain(TAG_IDS[0])
     })
 
     test('should create variant with change tracking (change input)', async () => {
@@ -500,8 +538,11 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createVariant?.variant).toBeTruthy()
-      expect(res.data?.createVariant?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Variant with Change')
+      expect(res.data?.createVariant?.change).toBeDefined()
+      expect(res.data?.createVariant?.change?.title).toBe('Add new variant via change')
       expect(res.data?.createVariant?.change?.status).toBe('DRAFT')
     })
 
@@ -545,7 +586,11 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createVariant?.variant).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createVariant?.variant).toBeDefined()
+      expect(res.data?.createVariant?.variant?.name).toBe('Complete Variant')
+      expect(res.data?.createVariant?.variant?.desc).toBe('All fields test')
+      expect(res.data?.createVariant?.variant?.imageURL).toBeNull()
       expect(res.data?.createVariant?.variant?.items?.totalCount).toBe(1)
       expect(res.data?.createVariant?.variant?.components?.totalCount).toBe(1)
       expect(res.data?.createVariant?.variant?.orgs?.totalCount).toBe(1)
@@ -615,6 +660,9 @@ describe('VariantResolver (integration)', () => {
               variant {
                 id
                 items {
+                  nodes {
+                    id
+                  }
                   totalCount
                 }
               }
@@ -628,7 +676,15 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateVariant?.variant?.items?.totalCount).toBeGreaterThanOrEqual(2)
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateVariant?.variant).toBeDefined()
+      expect(res.data?.updateVariant?.variant?.items?.totalCount).toBe(2)
+      expect(res.data?.updateVariant?.variant?.items?.nodes?.map((n) => n.id)).toContain(
+        ITEM_IDS[0],
+      )
+      expect(res.data?.updateVariant?.variant?.items?.nodes?.map((n) => n.id)).toContain(
+        ITEM_IDS[1],
+      )
     })
 
     test('should remove items from variant', async () => {
@@ -639,6 +695,9 @@ describe('VariantResolver (integration)', () => {
               variant {
                 id
                 items {
+                  nodes {
+                    id
+                  }
                   totalCount
                 }
               }
@@ -653,7 +712,14 @@ describe('VariantResolver (integration)', () => {
         },
       )
       expect(res.errors).toBeUndefined()
-      expect(res.data?.updateVariant?.variant).toBeTruthy()
+      expect(res.data?.updateVariant?.variant).toBeDefined()
+      expect(res.data?.updateVariant?.variant?.items?.totalCount).toBe(1)
+      expect(res.data?.updateVariant?.variant?.items?.nodes?.map((n) => n.id)).not.toContain(
+        ITEM_IDS[0],
+      )
+      expect(res.data?.updateVariant?.variant?.items?.nodes?.map((n) => n.id)).toContain(
+        ITEM_IDS[1],
+      )
     })
 
     test('should add components to existing variant', async () => {
@@ -664,6 +730,11 @@ describe('VariantResolver (integration)', () => {
               variant {
                 id
                 components {
+                  nodes {
+                    component {
+                      id
+                    }
+                  }
                   totalCount
                 }
               }
@@ -677,7 +748,12 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateVariant?.variant?.components?.totalCount).toBeGreaterThanOrEqual(1)
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateVariant?.variant).toBeDefined()
+      expect(res.data?.updateVariant?.variant?.components?.totalCount).toBe(1)
+      expect(
+        res.data?.updateVariant?.variant?.components?.nodes?.map((n) => n.component.id),
+      ).toContain(COMPONENT_IDS[0])
     })
 
     test('should remove components from variant', async () => {
@@ -688,6 +764,11 @@ describe('VariantResolver (integration)', () => {
               variant {
                 id
                 components {
+                  nodes {
+                    component {
+                      id
+                    }
+                  }
                   totalCount
                 }
               }
@@ -701,7 +782,10 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateVariant?.variant).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateVariant?.variant).toBeDefined()
+      expect(res.data?.updateVariant?.variant?.components?.totalCount).toBe(0)
+      expect(res.data?.updateVariant?.variant?.components?.nodes).toHaveLength(0)
     })
 
     test('should update variant with change tracking', async () => {
@@ -732,14 +816,17 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.updateVariant?.variant).toBeTruthy()
-      expect(res.data?.updateVariant?.change).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateVariant?.variant).toBeDefined()
+      expect(res.data?.updateVariant?.variant?.name).toBe('Updated via Change')
+      expect(res.data?.updateVariant?.change).toBeDefined()
+      expect(res.data?.updateVariant?.change?.title).toBe('Update variant test')
       expect(res.data?.updateVariant?.change?.status).toBe('DRAFT')
     })
 
     test.skip('should add and remove tags', async () => {
-      // NOTE: This test is skipped because tag IDs use a custom format
-      // that doesn't match the nanoid validation in the schema
+      // NOTE: Skipped - requires special database state and collection initialization
+      // Tags collection may not exist for this test variant
       // First add tags
       const addRes = await gql.send(
         graphql(`
@@ -761,6 +848,7 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
+      expect(addRes.errors).toBeUndefined()
       expect(addRes.data?.updateVariant?.variant?.tags?.totalCount).toBeGreaterThanOrEqual(1)
 
       // Then remove tags
@@ -784,12 +872,13 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(removeRes.data?.updateVariant?.variant).toBeTruthy()
+      expect(removeRes.errors).toBeUndefined()
+      expect(removeRes.data?.updateVariant?.variant).toBeDefined()
     })
 
     test.skip('should add and remove orgs', async () => {
-      // NOTE: This test is skipped because org IDs use a custom format
-      // that doesn't match the nanoid validation in the schema
+      // NOTE: Skipped - requires special database state and collection initialization
+      // Orgs collection may not exist for this test variant
       // First add orgs
       const addRes = await gql.send(
         graphql(`
@@ -811,6 +900,7 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
+      expect(addRes.errors).toBeUndefined()
       expect(addRes.data?.updateVariant?.variant?.orgs?.totalCount).toBeGreaterThanOrEqual(1)
 
       // Then remove orgs
@@ -834,7 +924,8 @@ describe('VariantResolver (integration)', () => {
           },
         },
       )
-      expect(removeRes.data?.updateVariant?.variant).toBeTruthy()
+      expect(removeRes.errors).toBeUndefined()
+      expect(removeRes.data?.updateVariant?.variant).toBeDefined()
     })
   })
 
@@ -866,9 +957,10 @@ describe('VariantResolver (integration)', () => {
           input2: { name: 'Batch Variant 2' },
         },
       )
-      expect(res.data?.variant1?.variant).toBeTruthy()
-      expect(res.data?.variant2?.variant).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.variant1?.variant).toBeDefined()
       expect(res.data?.variant1?.variant?.name).toBe('Batch Variant 1')
+      expect(res.data?.variant2?.variant).toBeDefined()
       expect(res.data?.variant2?.variant?.name).toBe('Batch Variant 2')
     })
   })

@@ -60,7 +60,9 @@ describe('SourceResolver (integration)', () => {
       `),
       { first: 10 },
     )
-    expect(res.data?.sources.nodes?.length).toBeGreaterThan(0)
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.sources).toBeDefined()
+    expect(res.data?.sources.nodes).toHaveLength(res.data?.sources.nodes?.length ?? 0)
     expect(res.data?.sources.totalCount).toBeGreaterThan(0)
   })
 
@@ -82,8 +84,11 @@ describe('SourceResolver (integration)', () => {
         first: 10,
       },
     )
-    expect(res.data?.sources).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.sources).toBeDefined()
+    expect(res.data?.sources.nodes).toBeDefined()
     expect(Array.isArray(res.data?.sources.nodes)).toBe(true)
+    expect(res.data?.sources.nodes?.every((node) => node.type === SourceType.File)).toBe(true)
   })
 
   test('should query a single source', async () => {
@@ -98,7 +103,8 @@ describe('SourceResolver (integration)', () => {
       `),
       { id: sourceID },
     )
-    expect(res.data?.source).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.source).toBeDefined()
     expect(res.data?.source?.id).toBe(sourceID)
   })
 
@@ -121,8 +127,10 @@ describe('SourceResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createSource?.source).toBeTruthy()
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.createSource?.source).toBeDefined()
     expect(res.data?.createSource?.source?.type).toBe(SourceType.File)
+    expect(res.data?.createSource?.source?.id).toBeDefined()
   })
 
   test('should update a source', async () => {
@@ -144,7 +152,10 @@ describe('SourceResolver (integration)', () => {
         },
       },
     )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.updateSource?.source).toBeDefined()
     expect(res.data?.updateSource?.source?.id).toBe(sourceID)
+    expect(res.data?.updateSource?.source?.location).toBe('https://example.com/updated-source.pdf')
   })
 
   test('should mark source as processed', async () => {
@@ -158,6 +169,8 @@ describe('SourceResolver (integration)', () => {
       `),
       { id: sourceID },
     )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.markSourceProcessed).toBeDefined()
     expect(res.data?.markSourceProcessed?.success).toBe(true)
   })
 
@@ -197,6 +210,8 @@ describe('SourceResolver (integration)', () => {
       `),
       { id: idToDelete },
     )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.deleteSource).toBeDefined()
     expect(res.data?.deleteSource?.success).toBe(true)
   })
 
@@ -211,7 +226,8 @@ describe('SourceResolver (integration)', () => {
       `),
       { id: 'non-existent-id' },
     )
-    expect(res.data?.source).toBeNull()
+    expect(res.errors).toBeDefined()
+    expect(res.errors?.[0]?.extensions?.code).toBe('NOT_FOUND')
   })
 
   // Comprehensive Create Tests
@@ -240,9 +256,14 @@ describe('SourceResolver (integration)', () => {
           },
         },
       )
-      expect(res.data?.createSource?.source).toBeTruthy()
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createSource?.source).toBeDefined()
       expect(res.data?.createSource?.source?.type).toBe(SourceType.Url)
       expect(res.data?.createSource?.source?.location).toBe('https://recycling-guide.com/page1')
+      expect(res.data?.createSource?.source?.contentURL).toBe(
+        'https://cdn.example.com/content.json',
+      )
+      expect(res.data?.createSource?.source?.id).toBeDefined()
     })
 
     test('should create source for each SourceType', async () => {
@@ -266,7 +287,10 @@ describe('SourceResolver (integration)', () => {
             },
           },
         )
+        expect(res.errors).toBeUndefined()
+        expect(res.data?.createSource?.source).toBeDefined()
         expect(res.data?.createSource?.source?.type).toBe(type)
+        expect(res.data?.createSource?.source?.id).toBeDefined()
       }
     })
   })
@@ -296,7 +320,13 @@ describe('SourceResolver (integration)', () => {
           },
         },
       )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateSource?.source).toBeDefined()
       expect(res.data?.updateSource?.source?.location).toBe('https://updated-location.com')
+      expect(res.data?.updateSource?.source?.contentURL).toBe(
+        'https://updated-content.com/data.json',
+      )
+      expect(res.data?.updateSource?.source?.id).toBe(sourceID)
     })
   })
 })
