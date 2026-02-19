@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -384,7 +385,7 @@ describe('ItemResolver (integration)', () => {
             change: {
               title: 'Add new item via change',
               description: 'Testing change-based creation',
-              status: 'DRAFT',
+              status: ChangeStatus.Draft,
             },
           },
         },
@@ -452,6 +453,9 @@ describe('ItemResolver (integration)', () => {
           },
         },
       )
+      if (!res.data?.createItem?.item?.id) {
+        throw new Error('Failed to create item for update tests')
+      }
       testItemID = res.data?.createItem?.item?.id
     })
 
@@ -597,7 +601,7 @@ describe('ItemResolver (integration)', () => {
             name: 'Updated via Change',
             change: {
               title: 'Update item test',
-              status: 'PROPOSED',
+              status: ChangeStatus.Proposed,
             },
           },
         },

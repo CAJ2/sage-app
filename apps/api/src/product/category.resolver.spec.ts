@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -319,7 +320,7 @@ describe('CategoryResolver (integration)', () => {
             name: 'Category with Change',
             change: {
               title: 'Add new category',
-              status: 'DRAFT',
+              status: ChangeStatus.Draft,
             },
           },
         },
@@ -351,7 +352,11 @@ describe('CategoryResolver (integration)', () => {
           },
         },
       )
-      testCategoryID = res.data?.createCategory?.category?.id
+      if (res.data?.createCategory?.category?.id) {
+        testCategoryID = res.data?.createCategory?.category?.id
+      } else {
+        throw new Error('Failed to create category for update tests')
+      }
     })
 
     test('should update category text fields', async () => {
@@ -403,7 +408,7 @@ describe('CategoryResolver (integration)', () => {
             name: 'Updated via Change',
             change: {
               title: 'Update category test',
-              status: 'PROPOSED',
+              status: ChangeStatus.Proposed,
             },
           },
         },
