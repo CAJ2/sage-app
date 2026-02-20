@@ -23,10 +23,10 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  css: ['@/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
+  css: ['~/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
 
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss() as any],
     optimizeDeps: {
       include: ['graphql'],
     },
@@ -42,7 +42,6 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: 'en',
-    lazy: true,
     locales: [
       { code: 'en', iso: 'en-US', name: 'English', file: 'en.json' },
       { code: 'sv', iso: 'sv-SE', name: 'Svenska', file: 'sv.json' },
@@ -51,12 +50,6 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n_set',
       redirectOn: 'root',
-    },
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
-    experimental: {
-      autoImportTranslationFunctions: true,
     },
   },
 
@@ -76,5 +69,5 @@ export default defineNuxtConfig({
     classSuffix: '',
   },
 
-  compatibilityDate: '2025-02-12',
+  compatibilityDate: '2026-02-12',
 })
