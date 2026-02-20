@@ -1,12 +1,14 @@
-import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'node:url'
 
-import dotenv from 'dotenv-flow';
+import type { ConfigOptions } from '@nuxt/test-utils/playwright'
+import { defineConfig, devices } from '@playwright/test'
+import dotenv from 'dotenv-flow'
 dotenv.config()
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+export default defineConfig<ConfigOptions>({
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -25,6 +27,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    nuxt: {
+      rootDir: fileURLToPath(new URL('../../apps/frontend', import.meta.url)),
+    },
   },
 
   /* Configure projects for major browsers */
@@ -61,4 +67,4 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
   },
-});
+})

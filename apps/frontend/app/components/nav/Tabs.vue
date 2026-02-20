@@ -49,6 +49,7 @@
       >
         <Button
           class="h-16 w-16 rounded-full border-0 p-0 shadow-[0_0px_10px_rgba(0,0,0,0.25)] shadow-neutral-500 dark:shadow-neutral-900"
+          aria-label="Search"
         >
           <svg
             class="h-6! w-6!"

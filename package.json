@@ -13,6 +13,7 @@
     "@swc-node/register": "~1.9.2",
     "@swc/core": "~1.5.29",
     "@swc/helpers": "~0.5.15",
+    "@types/node": "=22.14.0",
     "@vue/language-server": "^3.2.4",
     "eslint": "^10.0.0",
     "eslint-plugin-oxlint": "^1.48.0",
