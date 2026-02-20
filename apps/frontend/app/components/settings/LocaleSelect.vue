@@ -21,7 +21,7 @@ const emits = defineEmits<{
     <DrawerHeader>
       <DrawerTitle>{{ t('settings.language.select_title') }}</DrawerTitle>
     </DrawerHeader>
-    <div class="min-h-[400px] p-4 pb-0">
+    <div class="min-h-100 p-4 pb-0">
       <ul class="divide-y">
         <li
           v-for="locale in locales"

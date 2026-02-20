@@ -14,26 +14,26 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
       plugins,
     )
 
-    function scrollPrev() {
-      emblaApi.value?.scrollPrev()
+    function goToPrev() {
+      emblaApi.value?.goToPrev()
     }
-    function scrollNext() {
-      emblaApi.value?.scrollNext()
+    function goToNext() {
+      emblaApi.value?.goToNext()
     }
 
-    const canScrollNext = ref(false)
-    const canScrollPrev = ref(false)
+    const canGoToNext = ref(false)
+    const canGoToPrev = ref(false)
 
     function onSelect(api: CarouselApi) {
-      canScrollNext.value = api?.canScrollNext() || false
-      canScrollPrev.value = api?.canScrollPrev() || false
+      canGoToNext.value = api?.canGoToNext() || false
+      canGoToPrev.value = api?.canGoToPrev() || false
     }
 
     onMounted(() => {
       if (!emblaApi.value) return
 
-      emblaApi.value?.on('init', onSelect)
-      emblaApi.value?.on('reInit', onSelect)
+      emblaApi.value?.on('slidesinview', onSelect)
+      emblaApi.value?.on('reinit', onSelect)
       emblaApi.value?.on('select', onSelect)
 
       emits('init-api', emblaApi.value)
@@ -42,10 +42,10 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
     return {
       carouselRef: emblaNode,
       carouselApi: emblaApi,
-      canScrollPrev,
-      canScrollNext,
-      scrollPrev,
-      scrollNext,
+      canGoToPrev,
+      canGoToNext,
+      goToPrev,
+      goToNext,
       orientation,
     }
   },

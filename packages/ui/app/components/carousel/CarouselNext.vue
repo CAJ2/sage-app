@@ -6,12 +6,12 @@ import { useCarousel } from './useCarousel'
 
 const props = defineProps<WithClassAsProps>()
 
-const { orientation, canScrollNext, scrollNext } = useCarousel()
+const { orientation, canGoToNext, goToNext } = useCarousel()
 </script>
 
 <template>
   <Button
-    :disabled="!canScrollNext"
+    :disabled="!canGoToNext"
     :class="
       cn(
         'absolute h-8 w-8 touch-manipulation rounded-full p-0',
@@ -22,7 +22,7 @@ const { orientation, canScrollNext, scrollNext } = useCarousel()
       )
     "
     variant="outline"
-    @click="scrollNext"
+    @click="goToNext"
   >
     <slot>
       <ArrowRight class="h-4 w-4 text-current" />

@@ -9,24 +9,17 @@ const props = withDefaults(defineProps<CarouselProps & WithClassAsProps>(), {
 
 const emits = defineEmits<CarouselEmits>()
 
-const {
-  canScrollNext,
-  canScrollPrev,
-  carouselApi,
-  carouselRef,
-  orientation,
-  scrollNext,
-  scrollPrev,
-} = useProvideCarousel(props, emits)
+const { canGoToNext, canGoToPrev, carouselApi, carouselRef, orientation, goToNext, goToPrev } =
+  useProvideCarousel(props, emits)
 
 defineExpose({
-  canScrollNext,
-  canScrollPrev,
+  canGoToNext,
+  canGoToPrev,
   carouselApi,
   carouselRef,
   orientation,
-  scrollNext,
-  scrollPrev,
+  goToNext,
+  goToPrev,
 })
 
 function onKeyDown(event: KeyboardEvent) {
@@ -35,14 +28,14 @@ function onKeyDown(event: KeyboardEvent) {
 
   if (event.key === prevKey) {
     event.preventDefault()
-    scrollPrev()
+    goToPrev()
 
     return
   }
 
   if (event.key === nextKey) {
     event.preventDefault()
-    scrollNext()
+    goToNext()
   }
 }
 </script>
@@ -56,13 +49,13 @@ function onKeyDown(event: KeyboardEvent) {
     @keydown="onKeyDown"
   >
     <slot
-      :can-scroll-next
-      :can-scroll-prev
+      :can-go-to-next
+      :can-go-to-prev
       :carousel-api
       :carousel-ref
       :orientation
-      :scroll-next
-      :scroll-prev
+      :go-to-next
+      :go-to-prev
     />
   </div>
 </template>

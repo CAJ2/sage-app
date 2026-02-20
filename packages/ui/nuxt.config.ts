@@ -23,7 +23,7 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  css: ['@/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
+  css: ['~/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
 
   vite: {
     plugins: [tailwindcss() as any],

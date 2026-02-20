@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    ['reka-ui/nuxt', { components: false }],
+    'reka-ui/nuxt',
   ],
 
   app: {
@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  css: ['@/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
+  css: ['~/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
 
   vite: {
     plugins: [tailwindcss() as any],

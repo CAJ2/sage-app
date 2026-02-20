@@ -140,16 +140,16 @@
               <h2 class="px-2">Dark Mode</h2>
             </div>
             <div class="mx-2 flex-none">
-              <RekaSwitchRoot
+              <SwitchRoot
                 id="dark-mode"
                 v-model="isDark"
                 class="relative flex h-[24px] w-[40px] rounded-full border border-stone-300 shadow-sm transition-[background] focus-within:border-stone-800 focus-within:shadow-[0_0_0_1px] focus-within:shadow-stone-800 focus-within:outline-none data-[state=checked]:border-stone-700 data-[state=checked]:bg-stone-800 data-[state=unchecked]:bg-stone-300 dark:border-stone-700 dark:data-[state=checked]:bg-stone-700 dark:data-[state=unchecked]:bg-stone-800"
                 @click="toggleDark()"
               >
-                <RekaSwitchThumb
+                <SwitchThumb
                   class="my-auto flex h-4 w-4 translate-x-0.5 items-center justify-center rounded-full bg-white text-xs shadow-xl transition-transform will-change-transform data-[state=checked]:translate-x-full"
                 />
-              </RekaSwitchRoot>
+              </SwitchRoot>
             </div>
           </li>
         </ul>
@@ -162,6 +162,7 @@
 import { useAuthClient } from '~/utils'
 import { useDark, useToggle } from '@vueuse/core'
 import { DrawerTrigger } from 'vaul-vue'
+import { SwitchRoot, SwitchThumb } from 'reka-ui'
 
 const { locale, locales, setLocale } = useI18n()
 const isDark = useDark({

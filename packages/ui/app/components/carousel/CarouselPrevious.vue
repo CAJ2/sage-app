@@ -6,12 +6,12 @@ import { useCarousel } from './useCarousel'
 
 const props = defineProps<WithClassAsProps>()
 
-const { orientation, canScrollPrev, scrollPrev } = useCarousel()
+const { orientation, canGoToPrev, goToPrev } = useCarousel()
 </script>
 
 <template>
   <Button
-    :disabled="!canScrollPrev"
+    :disabled="!canGoToPrev"
     :class="
       cn(
         'absolute h-8 w-8 touch-manipulation rounded-full p-0',
@@ -22,7 +22,7 @@ const { orientation, canScrollPrev, scrollPrev } = useCarousel()
       )
     "
     variant="outline"
-    @click="scrollPrev"
+    @click="goToPrev"
   >
     <slot>
       <ArrowLeft class="h-4 w-4 text-current" />
