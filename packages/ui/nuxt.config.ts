@@ -27,6 +27,9 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['graphql'],
+    },
   },
 
   vue: {
