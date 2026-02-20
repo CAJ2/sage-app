@@ -1,7 +1,7 @@
 import oxlint from 'eslint-plugin-oxlint'
 import globals from 'globals'
 
-import withNuxt from '.nuxt/eslint.config.mjs'
+import withNuxt from './.nuxt/eslint.config.mjs'
 
 const baseConfig = [
   {

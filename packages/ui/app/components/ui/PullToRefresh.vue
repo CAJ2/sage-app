@@ -107,12 +107,12 @@ const topOffset = computed(() => clamp(touchDiff.value, 0, props.pullDownThresho
 function onTouchstart(e: TouchEvent | MouseEvent) {
   if (refreshing.value || props.disabled) return
   touching.value = true
-  touchstartY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
+  touchstartY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0]!.clientY
 }
 function onTouchmove(e: TouchEvent | MouseEvent) {
   if (refreshing.value || !touching.value || props.disabled) return
-  const touchY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY
-  if (scrollParents.length > 0 && !scrollParents[0].scrollTop) {
+  const touchY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0]!.clientY
+  if (scrollParents.length > 0 && !scrollParents[0]!.scrollTop) {
     touchDiff.value = touchY - touchstartY
   }
 }

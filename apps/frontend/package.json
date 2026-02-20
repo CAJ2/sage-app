@@ -17,7 +17,6 @@
     "lint:ci": "pnpm exec oxlint --deny-warnings && pnpm exec eslint . --max-warnings 0",
     "fmt": "pnpm exec oxfmt",
     "fmt:ci": "pnpm exec oxfmt --check",
-    "codegen": "graphql-codegen --config codegen.ts",
     "android:dev": "pnpm tauri android dev",
     "android:build": "pnpm tauri android build --target aarch64 --target armv7",
     "android:run": "pnpm tauri android run",

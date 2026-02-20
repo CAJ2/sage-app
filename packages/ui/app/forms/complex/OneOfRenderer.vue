@@ -35,8 +35,8 @@
 
     <dispatch-renderer
       v-if="selectedIndex !== undefined && selectedIndex !== null"
-      :schema="indexedOneOfRenderInfos[selectedIndex].schema"
-      :uischema="indexedOneOfRenderInfos[selectedIndex].uischema"
+      :schema="indexedOneOfRenderInfos[selectedIndex]!.schema"
+      :uischema="indexedOneOfRenderInfos[selectedIndex]!.uischema"
       :path="control.path"
       :renderers="control.renderers"
       :cells="control.cells"
@@ -186,7 +186,7 @@ const controlRenderer = defineComponent({
         this.control.path,
         this.newSelectedIndex !== undefined && this.newSelectedIndex !== null
           ? createDefaultValue(
-              this.indexedOneOfRenderInfos[this.newSelectedIndex].schema,
+              this.indexedOneOfRenderInfos[this.newSelectedIndex]!.schema,
               this.control.rootSchema,
             )
           : {},

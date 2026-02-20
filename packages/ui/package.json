@@ -11,8 +11,7 @@
     "lint": "pnpm exec oxlint --fix && pnpm exec eslint --fix",
     "lint:ci": "pnpm exec oxlint --deny-warnings && pnpm exec eslint . --max-warnings 0",
     "fmt": "pnpm exec oxfmt",
-    "fmt:ci": "pnpm exec oxfmt --check",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "fmt:ci": "pnpm exec oxfmt --check"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -92,12 +91,6 @@
       "lint:ci": {
         "dependsOn": [
           "build"
-        ]
-      },
-      "codegen": {
-        "dependsOn": [
-          "lint",
-          "fmt"
         ]
       }
     }

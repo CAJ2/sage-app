@@ -21,13 +21,13 @@
       <array-list-element
         v-if="!isRefList"
         :move-shown="!control.uischema.options || control.uischema.options.showSortButtons"
-        :move-up="moveUp ? moveUp(control.path, index) : undefined"
-        :move-up-enabled="control.enabled && index > 0"
-        :move-down="moveDown ? moveDown(control.path, index) : undefined"
-        :move-down-enabled="control.enabled && index < control.data.length - 1"
+        :move-up="moveUp ? moveUp(control.path, index as number) : undefined"
+        :move-up-enabled="control.enabled && (index as number) > 0"
+        :move-down="moveDown ? moveDown(control.path, index as number) : undefined"
+        :move-down-enabled="control.enabled && (index as number) < control.data.length - 1"
         :delete-enabled="control.enabled && !minItemsReached"
-        :delete="removeItems ? removeItems(control.path, [index]) : undefined"
-        :label="childLabelForIndex(index)"
+        :delete="removeItems ? removeItems(control.path, [index as number]) : undefined"
+        :label="childLabelForIndex(index as number)"
         :styles="styles"
       >
         <dispatch-renderer
@@ -42,8 +42,8 @@
       <array-list-ref-element
         v-if="isRefList"
         :delete-enabled="control.enabled && !minItemsReached"
-        :delete="removeItems ? removeItems(control.path, [index]) : undefined"
-        :label="childLabelForIndex(index)"
+        :delete="removeItems ? removeItems(control.path, [index as number]) : undefined"
+        :label="childLabelForIndex(index as number)"
         :styles="styles"
       >
         <dispatch-renderer

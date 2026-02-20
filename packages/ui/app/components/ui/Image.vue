@@ -46,7 +46,7 @@ const srcType = computed(() => {
 
 const iconName = computed(() => {
   if (props.src && props.src.startsWith('icon://')) {
-    return props.src.replace('icon://', '').split('?')[0]
+    return props.src.replace('icon://', '').split('?')[0] ?? ''
   }
   return props.src || ''
 })

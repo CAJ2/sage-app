@@ -1,7 +1,7 @@
 // oxlint-disable no-console
 // From https://github.com/genu/nuxt-codegen/blob/master/src/module.ts
 // and licensed under the MIT License
-import { defineNuxtModule } from '@nuxt/kit'
+import { defineNuxtModule, getLayerDirectories } from '@nuxt/kit'
 import type { Nuxt, WatchEvent } from 'nuxt/schema'
 import { basename } from 'pathe'
 
@@ -32,21 +32,11 @@ export default defineNuxtModule<ModuleOptions>({
 
     nuxt.hook('build:done', async () => {
       const { generate, loadCodegenConfig } = await import('@graphql-codegen/cli')
-      const { config } = await loadCodegenConfig({
-        configFilePath: options.configFile,
-      })
       const start = Date.now()
       console.info('NuxtCodegen: Running GraphQl Code Generator')
 
-      await generate({
-        silent: true,
-        ...config,
-      })
-
       // Run generation for any codegen.ts files from extended Nuxt layers
-      const codegenFiles = nuxt.options._layers
-        .filter((layer) => layer.cwd !== nuxt.options.srcDir)
-        .map((layer) => layer.config.srcDir)
+      const codegenFiles = getLayerDirectories().map((layer) => layer.root)
       for (const dir of codegenFiles) {
         console.info(`NuxtCodegen: Found codegen file in layer: ${dir}`)
         const { config } = await loadCodegenConfig({

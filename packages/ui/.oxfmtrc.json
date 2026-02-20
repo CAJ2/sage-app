@@ -31,8 +31,8 @@
     ]
   },
   "experimentalTailwindcss": {
-    "stylesheet": "./assets/css/main.css",
+    "stylesheet": "./app/assets/css/main.css",
     "functions": ["clsx", "cn"]
   },
-  "ignorePatterns": ["gql/**/*"]
+  "ignorePatterns": ["app/gql/**/*"]
 }

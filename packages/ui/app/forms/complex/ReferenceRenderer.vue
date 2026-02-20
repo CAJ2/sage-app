@@ -214,18 +214,18 @@ const controlRenderer = defineComponent({
       refetch,
     } = useLazyQuery(searchQuery, {
       input: searchInput.value,
-      type: filterTypes[refType],
+      type: filterTypes[refType]!,
     })
     watchDebounced(
       searchInput,
       async (newValue) => {
         if (newValue.length > 0) {
           if (searchData.value) {
-            await refetch({ input: newValue, type: filterTypes[refType] })
+            await refetch({ input: newValue, type: filterTypes[refType]! })
           } else {
             await load(searchQuery, {
               input: newValue,
-              type: filterTypes[refType],
+              type: filterTypes[refType]!,
             })
           }
         }

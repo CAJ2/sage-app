@@ -57,20 +57,20 @@ const emits = defineEmits<{
 const { result: schemaData } = useQuery(schemaQuery)
 const jsonSchema = computed(() => {
   if (modelId === 'new' && schemaData.value) {
-    const schemaKey = Object.keys(schemaData.value)[0]
+    const schemaKey = Object.keys(schemaData.value)[0]!
     return schemaData.value[schemaKey]?.create?.schema
   } else if (modelId !== 'new' && schemaData.value) {
-    const schemaKey = Object.keys(schemaData.value)[0]
+    const schemaKey = Object.keys(schemaData.value)[0]!
     return schemaData.value[schemaKey]?.update?.schema
   }
   return null
 })
 const uiSchema = computed(() => {
   if (modelId === 'new' && schemaData.value) {
-    const schemaKey = Object.keys(schemaData.value)[0]
+    const schemaKey = Object.keys(schemaData.value)[0]!
     return schemaData.value[schemaKey]?.create?.uischema
   } else if (modelId !== 'new' && schemaData.value) {
-    const schemaKey = Object.keys(schemaData.value)[0]
+    const schemaKey = Object.keys(schemaData.value)[0]!
     return schemaData.value[schemaKey]?.update?.uischema
   }
   return null
@@ -162,8 +162,8 @@ const saveForm = async () => {
           return
         }
         saveStatus.value = 'saved'
-        const data = modelResult.data as { [key: string]: never }
-        const createKey = Object.keys(data)[0]
+        const data = modelResult.data as Record<string, Record<string, unknown> | null>
+        const createKey = Object.keys(data)[0]!
         const modelReturned = data[createKey]?.[createModelKey] as {
           id: string
         } | null

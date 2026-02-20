@@ -17,7 +17,7 @@
       <DispatchRenderer
         v-if="categories[selected]"
         :schema="layout.schema"
-        :uischema="categories[selected].value.uischema"
+        :uischema="categories[selected]!.value.uischema"
         :path="layout.path"
         :enabled="layout.enabled"
         :renderers="layout.renderers"

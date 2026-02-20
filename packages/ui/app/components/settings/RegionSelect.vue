@@ -27,7 +27,7 @@
           placeholder="Search..."
           class="pl-10"
         />
-        <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
+        <span class="absolute inset-y-0 inset-s-0 flex items-center justify-center px-2">
           <font-awesome-icon
             icon="fa-solid fa-magnifying-glass"
             class="text-neutral-700"
@@ -49,7 +49,7 @@
             <div v-if="res.id" class="list-row flex flex-col gap-0 pt-2 pb-3">
               <div class="flex items-center gap-2">
                 <span
-                  class="flex size-12 items-center justify-center rounded-box border-1 border-neutral-200"
+                  class="flex size-12 items-center justify-center rounded-box border border-neutral-200"
                 >
                   <font-awesome-icon icon="fa-solid fa-globe" class="size-6 h-6! p-1" />
                 </span>
@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
+import { useRegionStore } from '~/stores/region_store'
 
 const router = useRouter()
 

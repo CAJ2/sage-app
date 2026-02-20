@@ -24,7 +24,7 @@
       <DispatchRenderer
         v-if="visibleCategories[selected]"
         :schema="layout.schema"
-        :uischema="visibleCategories[selected].value.uischema"
+        :uischema="visibleCategories[selected]!.value.uischema"
         :path="layout.path"
         :enabled="layout.enabled"
         :renderers="layout.renderers"
@@ -38,7 +38,7 @@
         :class="styles.categorization.stepperButtonBack"
         @click="selected = selected - 1"
       >
-        <button :disabled="!visibleCategories[selected - 1].value.enabled">
+        <button :disabled="!visibleCategories[selected - 1]!.value.enabled">
           {{ 'back' }}
         </button>
       </div>
@@ -48,7 +48,7 @@
         :class="styles.categorization.stepperButtonNext"
         @click="selected = selected + 1"
       >
-        <button :disabled="!visibleCategories[selected + 1].value.enabled">
+        <button :disabled="!visibleCategories[selected + 1]!.value.enabled">
           {{ 'next' }}
         </button>
       </div>
