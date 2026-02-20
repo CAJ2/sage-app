@@ -42,6 +42,9 @@ export default defineNuxtConfig({
     server: {
       strictPort: true,
     },
+    optimizeDeps: {
+      include: ['graphql'],
+    },
   },
 
   devServer: {
