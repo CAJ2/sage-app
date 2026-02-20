@@ -107,10 +107,10 @@ const placeSearch = graphql(`
 const search = useQuery(placeSearch, {
   search: searchInput.value,
   latLong: [
-    mapBounds.value ? mapBounds.value[1][1] : 0,
-    mapBounds.value ? mapBounds.value[1][0] : 0,
-    mapBounds.value ? mapBounds.value[0][1] : 0,
-    mapBounds.value ? mapBounds.value[0][0] : 0,
+    mapBounds.value?.[1]?.[1] || 0,
+    mapBounds.value?.[1]?.[0] || 0,
+    mapBounds.value?.[0]?.[1] || 0,
+    mapBounds.value?.[0]?.[0] || 0,
   ],
 })
 let markers: Pick<maplibregl.Marker, 'remove'>[] = []
@@ -157,10 +157,10 @@ const refreshSearch = (newSearch: string) => {
   search.refetch({
     search: newSearch,
     latLong: [
-      mapBounds.value[1][1],
-      mapBounds.value[1][0],
-      mapBounds.value[0][1],
-      mapBounds.value[0][0],
+      mapBounds.value[1]?.[1] || 0,
+      mapBounds.value[1]?.[0] || 0,
+      mapBounds.value[0]?.[1] || 0,
+      mapBounds.value[0]?.[0] || 0,
     ],
   })
 }
@@ -170,7 +170,12 @@ const refreshBounds = (newBounds: [number, number][] | null) => {
   }
   search.refetch({
     search: searchInput.value,
-    latLong: [newBounds[1][1], newBounds[1][0], newBounds[0][1], newBounds[0][0]],
+    latLong: [
+      newBounds[1]?.[1] || 0,
+      newBounds[1]?.[0] || 0,
+      newBounds[0]?.[1] || 0,
+      newBounds[0]?.[0] || 0,
+    ],
   })
 }
 
@@ -183,12 +188,11 @@ onMounted(() => {
   if (!mapContainer.value) {
     return
   }
-  const center: LngLatLike = regionData.value?.region?.bbox
-    ? [
-        (regionData.value.region.bbox[0] + regionData.value.region.bbox[2]) / 2,
-        (regionData.value.region.bbox[1] + regionData.value.region.bbox[3]) / 2,
-      ]
-    : [0, 0]
+  const bbox = regionData.value?.region?.bbox
+  const center: LngLatLike =
+    bbox && bbox.length === 4 && bbox[0] && bbox[1] && bbox[2] && bbox[3]
+      ? [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
+      : [0, 0]
   map.value = new Map({
     container: mapContainer.value,
     style: 'map-style-light.json',
@@ -198,17 +202,14 @@ onMounted(() => {
   })
   map.value.addControl(new NavigationControl(), 'top-right')
   map.value.addControl(new maplibregl.AttributionControl(), 'bottom-left')
-  if (
-    regionData.value?.region?.bbox &&
-    regionData.value.region.bbox[0] === regionData.value.region.bbox[2]
-  ) {
+  if (bbox && bbox[0] === bbox[2]) {
     map.value.setCenter(center)
   } else {
     map.value.fitBounds(
-      regionData.value?.region?.bbox
+      bbox && bbox.length === 4 && bbox[0] && bbox[1] && bbox[2] && bbox[3]
         ? [
-            [regionData.value.region.bbox[0], regionData.value.region.bbox[1]],
-            [regionData.value.region.bbox[2], regionData.value.region.bbox[3]],
+            [bbox[0], bbox[1]],
+            [bbox[2], bbox[3]],
           ]
         : [
             [-180, -90],

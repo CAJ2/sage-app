@@ -1,9 +1,11 @@
 <template>
   <div>
-    <NavTopbar :title="processID === 'new' ? 'New Process' : 'Edit Process'" back="true" />
+    <NavTopbar
+      :title="route.params.componentID === 'new' ? 'Create Component' : 'Edit Component'"
+      back="true"
+    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
-        <FormChangeSaveStatus :status="saveStatus" />
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -19,20 +21,17 @@
 <script setup lang="ts">
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import { graphql } from '~/gql'
-import {
-  ChangeStatus,
-  type CreateProcessInput,
-  type UpdateProcessInput,
-} from '~/gql/types.generated'
+import type { CreateComponentInput, UpdateComponentInput } from '~/gql/graphql'
+import { ChangeStatus } from '~/gql/graphql'
 
 const route = useRoute()
 const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
-const processID = route.params.process_id as string
+const componentID = route.params.componentID as string
 
-const processSchema = graphql(`
-  query ChangesProcessSchema {
-    processSchema {
+const formQuery = graphql(`
+  query ChangesComponentSchema {
+    componentSchema {
       create {
         schema
         uischema
@@ -44,9 +43,9 @@ const processSchema = graphql(`
     }
   }
 `)
-const { data: formData } = await useAsyncQuery(processSchema)
-const processEditQuery = graphql(`
-  query ChangesProcessEdit($id: ID!, $changeID: ID!) {
+const { data: formData } = await useAsyncQuery(formQuery)
+const componentEditQuery = graphql(`
+  query ChangesComponentEdit($id: ID!, $changeID: ID!) {
     change(id: $changeID) {
       status
       edits(id: $id) {
@@ -58,31 +57,31 @@ const processEditQuery = graphql(`
   }
 `)
 const jsonSchema = computed(() => {
-  if (processID === 'new') {
-    return formData.value?.processSchema?.create?.schema
+  if (route.params.componentID === 'new') {
+    return formData.value?.componentSchema?.create?.schema
   }
-  return formData.value?.processSchema?.update?.schema
+  return formData.value?.componentSchema?.update?.schema
 })
 const uiSchema = computed(() => {
-  if (processID === 'new') {
-    return formData.value?.processSchema?.create?.uischema
+  if (route.params.componentID === 'new') {
+    return formData.value?.componentSchema?.create?.uischema
   }
-  return formData.value?.processSchema?.update?.uischema
+  return formData.value?.componentSchema?.update?.uischema
 })
 
-const createData = ref<CreateProcessInput | null>(null)
-const updateData = ref<UpdateProcessInput | null>(null)
+const createData = ref<CreateComponentInput | null>(null)
+const updateData = ref<UpdateComponentInput | null>(null)
 const changeStatus = ref<ChangeStatus | null>(null)
-if (processID !== 'new') {
-  const { data } = await useAsyncQuery(processEditQuery, {
-    id: processID,
-    changeID: route.params.id as string,
+if (componentID !== 'new') {
+  const { data } = await useAsyncQuery(componentEditQuery, {
+    id: componentID,
+    changeID,
   })
   if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.change.edits.nodes[0].updateChanges,
-    ) as UpdateProcessInput
+      data.value.change.edits.nodes[0]?.updateChanges,
+    ) as UpdateComponentInput
   }
   if (data?.value?.change?.status) {
     changeStatus.value = data.value.change.status
@@ -95,39 +94,39 @@ const readOnly = computed<boolean | undefined>(() => {
   return true
 })
 
-const processCreateMutation = graphql(`
-  mutation ChangeProcessCreate($input: CreateProcessInput!) {
-    createProcess(input: $input) {
+const componentCreateMutation = graphql(`
+  mutation ChangeComponentCreate($input: CreateComponentInput!) {
+    createComponent(input: $input) {
       change {
         id
       }
-      process {
+      component {
         id
       }
     }
   }
 `)
-const processCreate = useMutation(processCreateMutation, {
+const componentCreate = useMutation(componentCreateMutation, {
   variables: {
     input: {
       changeID: changeID,
-    } as CreateProcessInput,
+    } as CreateComponentInput,
   },
 })
-const processUpdateMutation = graphql(`
-  mutation ChangeProcessUpdate($input: UpdateProcessInput!) {
-    updateProcess(input: $input) {
+const componentUpdateMutation = graphql(`
+  mutation ChangeComponentUpdate($input: UpdateComponentInput!) {
+    updateComponent(input: $input) {
       change {
         id
       }
     }
   }
 `)
-const processUpdate = useMutation(processUpdateMutation, {
+const componentUpdate = useMutation(componentUpdateMutation, {
   variables: {
     input: {
       changeID: changeID,
-      id: processID,
+      id: componentID,
       ...updateData.value,
     },
   },
@@ -140,26 +139,26 @@ const onChange = async (event: JsonFormsChangeEvent) => {
   }
   if (event.data) {
     if (event.errors && event.errors.length > 0) {
-      saveStatus.value = 'not_saved'
+      saveStatus.value = 'error'
       return
     }
     saveStatus.value = 'saving'
-    if (processID === 'new') {
+    if (componentID === 'new') {
       createData.value = event.data
-      await processCreate
+      await componentCreate
         .mutate({
           input: {
             changeID: changeID,
             ...createData.value,
-          } as CreateProcessInput,
+          } as CreateComponentInput,
         })
-        .then((process) => {
+        .then((component) => {
           saveStatus.value = 'saved'
-          // Redirect to the new process page
-          if (process?.data?.createProcess?.process?.id) {
+          // Redirect to the new component page
+          if (component?.data?.createComponent?.component?.id) {
             navigateTo(
               localeRoute(
-                `/contribute/changes/${changeID}/processes/${process?.data?.createProcess?.process?.id}`,
+                `/contribute/changes/${changeID}/components/${component?.data?.createComponent?.component?.id}`,
               ),
             )
           }
@@ -169,11 +168,11 @@ const onChange = async (event: JsonFormsChangeEvent) => {
         })
     } else {
       updateData.value = event.data
-      await processUpdate
+      await componentUpdate
         .mutate({
           input: {
             changeID: changeID,
-            id: processID,
+            id: componentID,
             ...updateData.value,
           },
         })

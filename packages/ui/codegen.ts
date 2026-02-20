@@ -6,7 +6,7 @@ const config: CodegenConfig = {
   documents: './**/*.vue',
   emitLegacyCommonJSImports: false,
   generates: {
-    'gql/': {
+    'app/gql/': {
       preset: 'client',
       plugins: [
         {
@@ -19,7 +19,7 @@ const config: CodegenConfig = {
         useTypeImports: true,
       },
     },
-    'gql/types.generated.ts': {
+    'app/gql/types.generated.ts': {
       plugins: ['typescript'],
     },
   },

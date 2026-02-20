@@ -39,10 +39,10 @@
       </CollapsibleContent>
     </Collapsible>
 
-    <Collapsible v-model:open="recyclingOpen" class="space-y-2 border-b-1 border-neutral-700 pb-2">
+    <Collapsible v-model:open="recyclingOpen" class="space-y-2 border-b border-neutral-700 pb-2">
       <CollapsibleTrigger as-child>
         <div
-          class="mb-0 flex items-center justify-between space-x-4 border-t-1 border-b-0 border-neutral-700 p-3"
+          class="mb-0 flex items-center justify-between space-x-4 border-t border-b-0 border-neutral-700 p-3"
         >
           <h4 class="text-md font-semibold">Recycle</h4>
           <Button variant="ghost" size="sm" class="w-9 p-0">
@@ -225,7 +225,7 @@ const {
   load: loadRecycling,
   loading: loadingRecycling,
 } = useLazyQuery(variantRecycling, {
-  id: typeof route.params.id === 'string' ? route.params.id : route.params.id[0],
+  id: typeof route.params.id === 'string' ? route.params.id : route.params.id?.[0] || '',
   region: useRegionStore().selectedRegion,
 })
 watch(

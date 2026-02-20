@@ -1,11 +1,9 @@
 <template>
   <div>
-    <NavTopbar
-      :title="route.params.componentID === 'new' ? 'Create Component' : 'Edit Component'"
-      back="true"
-    />
+    <NavTopbar :title="categoryID === 'new' ? 'New Category' : 'Edit Category'" back="true" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
+        <FormChangeSaveStatus v-if="!readOnly" :status="saveStatus" />
         <FormJsonSchema
           :schema="jsonSchema"
           :uischema="uiSchema"
@@ -21,17 +19,21 @@
 <script setup lang="ts">
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import { graphql } from '~/gql'
-import type { CreateComponentInput, UpdateComponentInput } from '~/gql/graphql'
-import { ChangeStatus } from '~/gql/graphql'
+import {
+  ChangeStatus,
+  type CreateCategoryInput,
+  type UpdateCategoryInput,
+} from '~/gql/types.generated'
 
 const route = useRoute()
 const localeRoute = useLocaleRoute()
+const posthog = usePostHog()
 const changeID = route.params.id as string
-const componentID = route.params.componentID as string
+const categoryID = route.params.category_id as string
 
-const formQuery = graphql(`
-  query ChangesComponentSchema {
-    componentSchema {
+const categorySchema = graphql(`
+  query ChangesCategorySchema {
+    categorySchema {
       create {
         schema
         uischema
@@ -43,9 +45,9 @@ const formQuery = graphql(`
     }
   }
 `)
-const { data: formData } = await useAsyncQuery(formQuery)
-const componentEditQuery = graphql(`
-  query ChangesComponentEdit($id: ID!, $changeID: ID!) {
+const { data: formData } = await useAsyncQuery(categorySchema)
+const categoryEditQuery = graphql(`
+  query ChangesCategoryEdit($id: ID!, $changeID: ID!) {
     change(id: $changeID) {
       status
       edits(id: $id) {
@@ -57,31 +59,31 @@ const componentEditQuery = graphql(`
   }
 `)
 const jsonSchema = computed(() => {
-  if (route.params.componentID === 'new') {
-    return formData.value?.componentSchema?.create?.schema
+  if (categoryID === 'new') {
+    return formData.value?.categorySchema?.create?.schema
   }
-  return formData.value?.componentSchema?.update?.schema
+  return formData.value?.categorySchema?.update?.schema
 })
 const uiSchema = computed(() => {
-  if (route.params.componentID === 'new') {
-    return formData.value?.componentSchema?.create?.uischema
+  if (categoryID === 'new') {
+    return formData.value?.categorySchema?.create?.uischema
   }
-  return formData.value?.componentSchema?.update?.uischema
+  return formData.value?.categorySchema?.update?.uischema
 })
 
-const createData = ref<CreateComponentInput | null>(null)
-const updateData = ref<UpdateComponentInput | null>(null)
+const createData = ref<CreateCategoryInput | null>(null)
+const updateData = ref<UpdateCategoryInput | null>(null)
 const changeStatus = ref<ChangeStatus | null>(null)
-if (componentID !== 'new') {
-  const { data } = await useAsyncQuery(componentEditQuery, {
-    id: componentID,
+if (categoryID !== 'new') {
+  const { data } = await useAsyncQuery(categoryEditQuery, {
+    id: categoryID,
     changeID,
   })
   if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.change.edits.nodes[0].updateChanges,
-    ) as UpdateComponentInput
+      data.value.change.edits.nodes[0]?.updateChanges,
+    ) as UpdateCategoryInput
   }
   if (data?.value?.change?.status) {
     changeStatus.value = data.value.change.status
@@ -94,39 +96,39 @@ const readOnly = computed<boolean | undefined>(() => {
   return true
 })
 
-const componentCreateMutation = graphql(`
-  mutation ChangeComponentCreate($input: CreateComponentInput!) {
-    createComponent(input: $input) {
+const categoryCreateMutation = graphql(`
+  mutation ChangeCategoryCreate($input: CreateCategoryInput!) {
+    createCategory(input: $input) {
       change {
         id
       }
-      component {
+      category {
         id
       }
     }
   }
 `)
-const componentCreate = useMutation(componentCreateMutation, {
+const categoryCreate = useMutation(categoryCreateMutation, {
   variables: {
     input: {
       changeID: changeID,
-    } as CreateComponentInput,
+    } as CreateCategoryInput,
   },
 })
-const componentUpdateMutation = graphql(`
-  mutation ChangeComponentUpdate($input: UpdateComponentInput!) {
-    updateComponent(input: $input) {
+const categoryUpdateMutation = graphql(`
+  mutation ChangeCategoryUpdate($input: UpdateCategoryInput!) {
+    updateCategory(input: $input) {
       change {
         id
       }
     }
   }
 `)
-const componentUpdate = useMutation(componentUpdateMutation, {
+const categoryUpdate = useMutation(categoryUpdateMutation, {
   variables: {
     input: {
       changeID: changeID,
-      id: componentID,
+      id: categoryID,
       ...updateData.value,
     },
   },
@@ -143,43 +145,55 @@ const onChange = async (event: JsonFormsChangeEvent) => {
       return
     }
     saveStatus.value = 'saving'
-    if (componentID === 'new') {
+    if (categoryID === 'new') {
       createData.value = event.data
-      await componentCreate
+      await categoryCreate
         .mutate({
           input: {
             changeID: changeID,
             ...createData.value,
-          } as CreateComponentInput,
+          } as CreateCategoryInput,
         })
-        .then((component) => {
+        .then((category) => {
           saveStatus.value = 'saved'
-          // Redirect to the new component page
-          if (component?.data?.createComponent?.component?.id) {
+          // Redirect to the new category page
+          if (category?.data?.createCategory?.category?.id) {
             navigateTo(
               localeRoute(
-                `/contribute/changes/${changeID}/components/${component?.data?.createComponent?.component?.id}`,
+                `/contribute/changes/${changeID}/categories/${category?.data?.createCategory?.category?.id}`,
               ),
             )
           }
         })
-        .catch(() => {
+        .catch((error) => {
+          posthog?.captureException(error, {
+            tags: {
+              feature: 'categories',
+              action: 'create',
+            },
+          })
           saveStatus.value = 'error'
         })
     } else {
       updateData.value = event.data
-      await componentUpdate
+      await categoryUpdate
         .mutate({
           input: {
             changeID: changeID,
-            id: componentID,
+            id: categoryID,
             ...updateData.value,
           },
         })
         .then(() => {
           saveStatus.value = 'saved'
         })
-        .catch(() => {
+        .catch((error) => {
+          posthog?.captureException(error, {
+            tags: {
+              feature: 'categories',
+              action: 'update',
+            },
+          })
           saveStatus.value = 'error'
         })
     }
