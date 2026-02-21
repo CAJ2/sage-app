@@ -25,7 +25,10 @@
         "cache": true,
         "inputs": [
           "{projectRoot}/**/*",
-          "^default"
+          "^default",
+          {
+            "env": "TEST_DEVICES"
+          }
         ],
         "outputs": [
           "{projectRoot}/playwright-report",
@@ -51,7 +54,10 @@
         "cache": true,
         "inputs": [
           "{projectRoot}/**/*",
-          "^default"
+          "^default",
+          {
+            "env": "TEST_DEVICES"
+          }
         ],
         "outputs": [
           "{projectRoot}/playwright-report",
