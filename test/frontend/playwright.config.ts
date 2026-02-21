@@ -22,7 +22,6 @@ const devicesToTest = [
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-console.log(fileURLToPath(new URL('../../apps/frontend', import.meta.url)))
 export default defineConfig<ConfigOptions>({
   testDir: './tests',
   /* Run tests in files in parallel */
