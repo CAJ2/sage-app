@@ -64,7 +64,7 @@ if (dotenv) {
         path: path.join(__dirname, '/i18n/'),
         watch: !isProd(),
       },
-      typesOutputPath: path.join(__dirname, '../src/i18n/i18n.generated.ts'),
+      typesOutputPath: isProd() ? undefined : path.join(__dirname, '../src/i18n/i18n.generated.ts'),
       resolvers: [
         new QueryResolver(['lang', 'locale']),
         new HeaderResolver(['x-lang', 'x-locale']),
