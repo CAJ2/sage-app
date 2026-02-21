@@ -12,7 +12,8 @@
     "@nuxt/test-utils": "^4.0.0",
     "@playwright/test": "^1.58.2",
     "@types/node": "=25.3.0",
-    "dotenv-flow": "^4.1.0"
+    "dotenv-flow": "^4.1.0",
+    "std-env": "4.0.0-rc.1"
   },
   "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a"
 }

@@ -44,6 +44,7 @@ export default defineNuxtConfig({
     },
     optimizeDeps: {
       include: ['graphql'],
+      noDiscovery: process.env.NODE_ENV === 'test' ? true : false,
     },
   },
 
