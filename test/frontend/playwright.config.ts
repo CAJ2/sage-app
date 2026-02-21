@@ -8,11 +8,6 @@ if (dotenv) {
   dotenv.config()
 }
 
-const DEVICES =
-  (process.env.TEST_DEVICES && process.env.TEST_DEVICES.split(',')) || isCI
-    ? 'desktop,mobile'
-    : 'pixel'
-
 // Set TEST_DEVICES env var to a comma-separate list of device names
 // Defaults:
 //   Local: test Pixel 5 only for faster feedback

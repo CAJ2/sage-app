@@ -111,6 +111,7 @@ jobs:
           NODE_ENV: test
           TEST_DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
 
+      - run: pnpm exec playwright install --with-deps
       - run: pnpm exec nx affected -t e2e:ci
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
@@ -145,6 +146,7 @@ jobs:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test
 
+      - run: pnpm exec playwright install --with-deps
       - run: pnpm exec nx affected -t e2e:ci
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
