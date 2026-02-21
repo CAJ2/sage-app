@@ -2,7 +2,6 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { betterAuth } from 'better-auth'
 import { admin, organization, username } from 'better-auth/plugins'
 import { KyselyKnexDialect, PGColdDialect } from 'kysely-knex'
-import { nanoid } from 'nanoid'
 
 import { isProd } from '@src/common/common.utils'
 
@@ -158,14 +157,14 @@ export const configureAuth = (orm: MikroORM) => {
           'https://dev.sageleaf.app',
           'https://science.sageleaf.app',
           'https://science.dev.sageleaf.app',
+          'http://localhost:*',
+          'http://127.0.0.1:*',
           'https://tauri.localhost',
           'http://tauri.localhost',
         ]
       : [
-          'http://localhost:3000',
-          'http://127.0.0.1:3000',
-          'http://localhost:3001',
-          'http://127.0.0.1:3001',
+          'http://localhost:*',
+          'http://127.0.0.1:*',
           'https://tauri.localhost',
           'http://tauri.localhost',
         ],
@@ -181,7 +180,6 @@ export const configureAuth = (orm: MikroORM) => {
         sameSite: 'none',
         partitioned: true,
       },
-      generateId: () => nanoid(),
     },
     hooks: {},
   })
