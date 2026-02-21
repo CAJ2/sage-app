@@ -3,7 +3,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS build
-RUN corepack enable && corepack install --global pnpm@10.12.1
+RUN corepack enable && corepack install --global pnpm@10.30.0
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN pnpm add -g nx@latest
 COPY package.json pnpm-*.yaml nx.json /usr/src/app/
@@ -32,6 +32,7 @@ FROM build AS frontend-build
 COPY apps/frontend /usr/src/app/apps/frontend
 COPY packages/ui /usr/src/app/packages/ui/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
+RUN pnpm --filter=@sageleaf/frontend exec nuxi prepare
 RUN nx run-many -p frontend -t build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...frontend --prod /prod/frontend
 
@@ -46,6 +47,7 @@ FROM build AS science-build
 COPY apps/science /usr/src/app/apps/science
 COPY packages/ui /usr/src/app/packages/ui/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
+RUN pnpm --filter=@sageleaf/science exec nuxi prepare
 RUN nx run-many -p science -t build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...science --prod /prod/science
 
