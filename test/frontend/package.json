@@ -5,15 +5,62 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "e2e": "pnpm exec playwright test",
-    "e2e:ui": "pnpm exec playwright test --ui"
+    "e2e": "pnpm exec playwright test || pnpm run reset",
+    "e2e:ui": "pnpm exec playwright test --ui || pnpm run reset",
+    "e2e:ci": "pnpm exec playwright test",
+    "reset": "lsof -ti:3000 | xargs kill || true"
   },
   "devDependencies": {
     "@nuxt/test-utils": "^4.0.0",
     "@playwright/test": "^1.58.2",
+    "@sageleaf/frontend": "workspace:^0.1.0",
     "@types/node": "=25.3.0",
     "dotenv-flow": "^4.1.0",
     "std-env": "4.0.0-rc.1"
   },
-  "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a"
+  "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a",
+  "nx": {
+    "targets": {
+      "e2e": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/**/*",
+          "^default"
+        ],
+        "outputs": [
+          "{projectRoot}/playwright-report",
+          "{projectRoot}/blob-report"
+        ],
+        "dependsOn": [
+          "^preview",
+          "reset"
+        ]
+      },
+      "e2e:ui": {
+        "cache": false,
+        "inputs": [
+          "{projectRoot}/**/*",
+          "^default"
+        ],
+        "dependsOn": [
+          "^dev",
+          "reset"
+        ]
+      },
+      "e2e:ci": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/**/*",
+          "^default"
+        ],
+        "outputs": [
+          "{projectRoot}/playwright-report",
+          "{projectRoot}/blob-report"
+        ],
+        "dependsOn": [
+          "^build"
+        ]
+      }
+    }
+  }
 }

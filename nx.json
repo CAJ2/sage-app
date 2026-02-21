@@ -1,10 +1,7 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
@@ -13,70 +10,35 @@
       "!{projectRoot}/test/test-setup.[jt]s",
       "!{projectRoot}/eslint.config.js"
     ],
-    "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/*.yml"
-    ]
+    "sharedGlobals": []
   },
   "targetDefaults": {
     "build": {
       "cache": true,
-      "inputs": [
-        "production",
-        "^production"
-      ],
+      "inputs": ["production", "^production"],
       "outputs": [
         "{projectRoot}/dist",
         "{projectRoot}/temp",
         "{projectRoot}/.nuxt",
         "{projectRoot}/.output"
       ],
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "lint": {
       "cache": true,
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "dependsOn": [
-        "^build"
-      ]
+      "inputs": ["default", "^production"],
+      "dependsOn": ["^build"]
     },
     "lint:ci": {
       "cache": false,
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "dependsOn": [
-        "^build"
-      ]
+      "inputs": ["default", "^production"],
+      "dependsOn": ["^build"]
     },
     "test": {
       "cache": true,
-      "inputs": [
-        "default",
-        "^default",
-        "{workspaceRoot}/vitest.config.ts"
-      ],
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}",
-        "{projectRoot}/coverage"
-      ],
+      "inputs": ["default", "^default", "{workspaceRoot}/vitest.config.ts"],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}", "{projectRoot}/coverage"],
       "executor": "@nx/vitest:vitest"
-    },
-    "generate": {
-      "cache": true,
-      "inputs": [
-        "default",
-        "^default"
-      ],
-      "outputs": [
-        "{projectRoot}/temp",
-        "{projectRoot}/test/gql"
-      ]
     }
   },
   "nxCloudId": "67acadc6cdcfda5eba4a88e1",
@@ -95,6 +57,13 @@
       "options": {
         "testTargetName": "test",
         "testMode": "watch"
+      }
+    },
+    {
+      "plugin": "@nx/playwright/plugin",
+      "options": {
+        "targetName": "e2e",
+        "ciTargetName": false
       }
     }
   ]

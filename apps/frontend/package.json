@@ -101,6 +101,15 @@
   "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a",
   "nx": {
     "targets": {
+      "dev": {
+        "continuous": true
+      },
+      "preview": {
+        "continuous": true,
+        "dependsOn": [
+          "build"
+        ]
+      },
       "lint": {
         "dependsOn": [
           "build"

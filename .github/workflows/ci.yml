@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   nx-affected:
-    name: "Calculate affected projects"
+    name: 'Calculate affected projects'
     runs-on: ubuntu-latest
     outputs:
       affected: ${{ steps.affected.outputs.affected }}
@@ -29,18 +29,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
-      - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      - name: "Calculate affected projects"
+      - name: 'Calculate affected projects'
         id: affected
         run: |
-          echo "affected=$(pnpm exec nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
+          echo "affected=$(pnpm dlx nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
 
   test:
-    name: "Build & Test API + Frontend"
+    name: 'Build & Test API + Frontend'
     runs-on: ubuntu-latest
     if: ${{ contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: nx-affected
@@ -49,7 +48,7 @@ jobs:
       crdb:
         image: cockroachdb/cockroach
         env:
-          COCKROACH_ARGS: "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost"
+          COCKROACH_ARGS: 'start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost'
         ports:
           - 26257:26257
         options: >-
@@ -65,7 +64,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
@@ -80,22 +79,27 @@ jobs:
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
-          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
 
       # Run migrations
       - run: pnpm --filter api exec mikro-orm migration:up
         env:
-          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
 
       # Run tests
-      - run: pnpm exec nx affected -t gen test
+      - run: pnpm exec nx affected -t test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           NODE_ENV: test
-          TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          TEST_DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
+
+      - run: pnpm exec nx affected -t e2e:ci
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
+          NODE_ENV: test
 
   test-frontend:
-    name: "Build & Test Frontend"
+    name: 'Build & Test Frontend'
     runs-on: ubuntu-latest
     if: ${{ !contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: nx-affected
@@ -111,7 +115,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
@@ -128,13 +132,18 @@ jobs:
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
 
       # Run tests
-      - run: pnpm exec nx affected -t gen test
+      - run: pnpm exec nx affected -t test
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
+          NODE_ENV: test
+
+      - run: pnpm exec nx affected -t e2e:ci
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           NODE_ENV: test
 
   build-image-api:
-    name: "Build API images"
+    name: 'Build API images'
     uses: ./.github/workflows/oci-build-image.yml
     if: ${{ contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: [nx-affected, test]
@@ -149,7 +158,7 @@ jobs:
       target: api
 
   build-image-frontend:
-    name: "Build frontend images"
+    name: 'Build frontend images'
     uses: ./.github/workflows/oci-build-image.yml
     if: ${{ !failure() && !cancelled() && contains(needs.nx-affected.outputs.affected, '@sageleaf/frontend') }}
     needs: [nx-affected, test, test-frontend]
@@ -164,7 +173,7 @@ jobs:
       target: frontend
 
   build-image-science:
-    name: "Build science images"
+    name: 'Build science images'
     uses: ./.github/workflows/oci-build-image.yml
     if: ${{ !failure() && !cancelled() && contains(needs.nx-affected.outputs.affected, '@sageleaf/science') }}
     needs: [nx-affected, test, test-frontend]

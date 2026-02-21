@@ -4,7 +4,9 @@ import type { ConfigOptions } from '@nuxt/test-utils/playwright'
 import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv-flow'
 import { isCI } from 'std-env'
-dotenv.config()
+if (dotenv) {
+  dotenv.config()
+}
 
 const devicesToTest = [
   'Desktop Chrome',
@@ -12,8 +14,8 @@ const devicesToTest = [
   // 'Desktop Firefox',
   // 'Desktop Safari',
   // Test against mobile viewports.
-  // 'Pixel 5',
-  // 'iPhone 12',
+  'Pixel 5',
+  'iPhone 12',
   // Test against branded browsers.
   // { ...devices['Desktop Edge'], channel: 'msedge' },
   // { ...devices['Desktop Chrome'], channel: 'chrome' },
@@ -31,11 +33,14 @@ export default defineConfig<ConfigOptions>({
   /* Retry on CI only */
   retries: isCI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: isCI ? 1 : 2,
+  workers: isCI ? 1 : undefined,
   /* Allow enough time for Nuxt builds in parallel workers */
   timeout: 120000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['html', { outputFolder: 'playwright-report' }],
+    ...(isCI ? [['blob', { outputDir: 'blob-report' }] as const] : []),
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
@@ -48,6 +53,8 @@ export default defineConfig<ConfigOptions>({
           typeCheck: false,
         },
       },
+      /* Allow using an existing Nuxt server for faster test runs */
+      host: !isCI ? 'http://localhost:3000' : undefined,
     },
   },
   projects: devicesToTest.map((p) => (typeof p === 'string' ? { name: p, use: devices[p] } : p)),
