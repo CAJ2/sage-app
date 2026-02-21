@@ -53,6 +53,7 @@
     "clsx": "^2.1.1",
     "core-js": "^3.42.0",
     "embla-carousel-vue": "^9.0.0-rc01",
+    "entities": "^7.0.1",
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6",
     "iconify-icon": "^3.0.0",
