@@ -29,12 +29,13 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
+      - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
       - name: 'Calculate affected projects'
         id: affected
         run: |
-          echo "affected=$(pnpm dlx nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
+          echo "affected=$(pnpm exec nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
 
   build:
     name: 'Build & Lint'
