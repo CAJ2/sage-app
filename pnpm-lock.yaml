@@ -368,6 +368,9 @@ importers:
       embla-carousel-vue:
         specifier: ^9.0.0-rc01
         version: 9.0.0-rc01(vue@3.5.28(typescript@5.9.3))
+      entities:
+        specifier: ^7.0.1
+        version: 7.0.1
       graphql:
         specifier: 16.11.0
         version: 16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)
@@ -582,6 +585,9 @@ importers:
       embla-carousel-vue:
         specifier: ^9.0.0-rc01
         version: 9.0.0-rc01(vue@3.5.28(typescript@5.9.3))
+      entities:
+        specifier: ^7.0.1
+        version: 7.0.1
       graphql:
         specifier: 16.11.0
         version: 16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8)

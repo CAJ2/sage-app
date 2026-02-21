@@ -1,10 +1,9 @@
-FROM node:22-slim AS base
+FROM node:25-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS build
-RUN corepack enable && corepack install --global pnpm@10.30.0
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN npm install -g pnpm@latest-10
 RUN pnpm add -g nx@latest
 COPY package.json pnpm-*.yaml nx.json /usr/src/app/
 COPY patches /usr/src/app/patches/
