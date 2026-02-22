@@ -35,26 +35,37 @@ export type CategoriesPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** A hierarchical category for classifying product items */
 export type Category = Named & {
   __typename?: 'Category';
+  /** All ancestor categories up the hierarchy tree */
   ancestors: CategoriesPage;
+  /** Direct child categories in the hierarchy */
   children: CategoriesPage;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  /** A short summary description */
   descShort?: Maybe<Scalars['String']['output']>;
+  /** Translated versions of the short description */
   descShortTr?: Maybe<Array<TranslatedOutput>>;
+  /** Translated versions of the description */
   descTr?: Maybe<Array<TranslatedOutput>>;
+  /** All descendant categories down the hierarchy tree */
   descendants: CategoriesPage;
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
+  /** Items classified under this category */
   items: ItemsPage;
   name: Scalars['String']['output'];
+  /** Translated versions of the name */
   nameTr?: Maybe<Array<TranslatedOutput>>;
+  /** Direct parent categories in the hierarchy */
   parents: CategoriesPage;
   updatedAt: Scalars['DateTime']['output'];
 };
 
 
+/** A hierarchical category for classifying product items */
 export type CategoryAncestorsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -63,6 +74,7 @@ export type CategoryAncestorsArgs = {
 };
 
 
+/** A hierarchical category for classifying product items */
 export type CategoryChildrenArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -71,6 +83,7 @@ export type CategoryChildrenArgs = {
 };
 
 
+/** A hierarchical category for classifying product items */
 export type CategoryDescendantsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -79,6 +92,7 @@ export type CategoryDescendantsArgs = {
 };
 
 
+/** A hierarchical category for classifying product items */
 export type CategoryItemsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -87,6 +101,7 @@ export type CategoryItemsArgs = {
 };
 
 
+/** A hierarchical category for classifying product items */
 export type CategoryParentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -100,20 +115,25 @@ export type CategoryEdge = {
   node: Category;
 };
 
+/** A proposed or merged set of edits to one or more data models */
 export type Change = {
   __typename?: 'Change';
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
+  /** The individual entity edits included in this change */
   edits: ChangeEditsPage;
   id: Scalars['ID']['output'];
+  /** Source references supporting this change */
   sources: SourcesPage;
   status: ChangeStatus;
   title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
+  /** The user who created this change */
   user: User;
 };
 
 
+/** A proposed or merged set of edits to one or more data models */
 export type ChangeEditsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -124,6 +144,7 @@ export type ChangeEditsArgs = {
 };
 
 
+/** A proposed or merged set of edits to one or more data models */
 export type ChangeSourcesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -162,30 +183,39 @@ export type ChangesPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** A physical component of a product variant, made of one or more materials */
 export type Component = Named & {
   __typename?: 'Component';
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  /** Audit history of changes to this component */
   history: Array<ComponentHistory>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
+  /** All materials in this component with their fractions */
   materials: Array<ComponentMaterial>;
   name?: Maybe<Scalars['String']['output']>;
+  /** The primary material this component is made of */
   primaryMaterial: Material;
+  /** Available recycling options for this component by stream */
   recycle?: Maybe<Array<ComponentRecycle>>;
+  /** Aggregated recyclability score for this component */
   recycleScore?: Maybe<StreamScore>;
+  /** The geographic region this component's recycling data applies to */
   region?: Maybe<Region>;
   tags: Array<Tag>;
   updatedAt: Scalars['DateTime']['output'];
 };
 
 
+/** A physical component of a product variant, made of one or more materials */
 export type ComponentRecycleArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
+/** A physical component of a product variant, made of one or more materials */
 export type ComponentRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -204,17 +234,21 @@ export type ComponentHistory = {
   original?: Maybe<Scalars['String']['output']>;
 };
 
+/** The fraction of a specific material within a component */
 export type ComponentMaterial = {
   __typename?: 'ComponentMaterial';
   material: Material;
+  /** Fraction of this material in the component (0–1) */
   materialFraction?: Maybe<Scalars['Float']['output']>;
 };
 
 export type ComponentMaterialInput = {
   id: Scalars['ID']['input'];
+  /** Fraction of this material in the component (0–1) */
   materialFraction?: InputMaybe<Scalars['Float']['input']>;
 };
 
+/** A recycling option for a component in a specific recycling stream */
 export type ComponentRecycle = {
   __typename?: 'ComponentRecycle';
   context?: Maybe<StreamContext>;
@@ -238,13 +272,20 @@ export type ComponentsPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** A collection container for a recycling stream (e.g. a bin or bag) */
 export type Container = {
   __typename?: 'Container';
+  /** Access method for the container (e.g. CURBSIDE, DROP_OFF) */
   access?: Maybe<Scalars['String']['output']>;
+  /** Typical color of the container */
   color?: Maybe<Scalars['String']['output']>;
+  /** URL of an image of the container */
   image?: Maybe<Scalars['String']['output']>;
+  /** Coordinates for the item entry point on the container image */
   imageEntryPoint?: Maybe<ContainerImageEntryPoint>;
+  /** Physical dimensions of the container */
   shape?: Maybe<ContainerShape>;
+  /** Container type (e.g. BIN, BAG, BOX) */
   type: Scalars['String']['output'];
 };
 
@@ -263,18 +304,24 @@ export type ContainerShape = {
 };
 
 export type CreateCategoryInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descShort?: InputMaybe<Scalars['String']['input']>;
   descShortTr?: InputMaybe<Array<TranslatedInput>>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   imageURL?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nameTr?: InputMaybe<Array<TranslatedInput>>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
@@ -297,13 +344,18 @@ export type CreateChangeOutput = {
 };
 
 export type CreateComponentInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   imageURL?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   materials?: InputMaybe<Array<ComponentMaterialInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -311,6 +363,7 @@ export type CreateComponentInput = {
   physical?: InputMaybe<Scalars['JSONObject']['input']>;
   primaryMaterial?: InputMaybe<ComponentMaterialInput>;
   region?: InputMaybe<ComponentRegionInput>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<ComponentTagsInput>>;
   visual?: InputMaybe<Scalars['JSONObject']['input']>;
@@ -323,17 +376,23 @@ export type CreateComponentOutput = {
 };
 
 export type CreateItemInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
   categories?: InputMaybe<Array<ItemCategoriesInput>>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   imageURL?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nameTr?: InputMaybe<Array<TranslatedInput>>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<ItemTagsInput>>;
 };
@@ -345,14 +404,20 @@ export type CreateItemOutput = {
 };
 
 export type CreateOrgInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
   avatarURL?: InputMaybe<Scalars['String']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   slug: Scalars['String']['input'];
   websiteURL?: InputMaybe<Scalars['String']['input']>;
@@ -365,15 +430,20 @@ export type CreateOrgOutput = {
 };
 
 export type CreateProcessInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   efficiency?: InputMaybe<Scalars['JSONObject']['input']>;
   instructions?: InputMaybe<Scalars['JSONObject']['input']>;
   intent: Scalars['String']['input'];
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   material?: InputMaybe<ProcessMaterialInput>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -381,6 +451,7 @@ export type CreateProcessInput = {
   org?: InputMaybe<ProcessOrgInput>;
   place?: InputMaybe<ProcessPlaceInput>;
   region?: InputMaybe<ProcessRegionInput>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   rules?: InputMaybe<Scalars['JSONObject']['input']>;
   variant?: InputMaybe<ProcessVariantInput>;
@@ -420,22 +491,29 @@ export type CreateTagDefinitionOutput = {
 };
 
 export type CreateVariantInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
+  /** Manufacturer or product code for this variant */
   code?: InputMaybe<Scalars['String']['input']>;
   components?: InputMaybe<Array<VariantComponentsInput>>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   imageURL?: InputMaybe<Scalars['String']['input']>;
   items?: InputMaybe<Array<VariantItemsInput>>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nameTr?: InputMaybe<Array<TranslatedInput>>;
   orgs?: InputMaybe<Array<VariantOrgsInput>>;
   region?: InputMaybe<VariantRegionsInput>;
   regions?: InputMaybe<Array<VariantRegionsInput>>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<VariantTagsInput>>;
 };
@@ -485,13 +563,19 @@ export type DiscardEditOutput = {
   success?: Maybe<Scalars['Boolean']['output']>;
 };
 
+/** A tracked edit to a single entity within a change */
 export type Edit = {
   __typename?: 'Edit';
+  /** The proposed state of the entity after this edit */
   changes?: Maybe<EditModel>;
+  /** Raw field values for creating a new entity */
   createChanges?: Maybe<Scalars['JSONObject']['output']>;
+  /** The type name of the entity being edited (e.g. Item, Component) */
   entityName: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
+  /** The state of the entity before this edit */
   original?: Maybe<EditModel>;
+  /** Raw field values for updating an existing entity */
   updateChanges?: Maybe<Scalars['JSONObject']['output']>;
 };
 
@@ -515,8 +599,10 @@ export enum EditModelType {
   Variant = 'Variant'
 }
 
+/** A product or consumable item that can be categorized and have multiple variants */
 export type Item = Named & {
   __typename?: 'Item';
+  /** Categories this item belongs to */
   categories: CategoriesPage;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
@@ -524,12 +610,15 @@ export type Item = Named & {
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** Metadata tags applied to this item */
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
+  /** Product variants of this item (e.g. specific SKUs or models) */
   variants: VariantsPage;
 };
 
 
+/** A product or consumable item that can be categorized and have multiple variants */
 export type ItemCategoriesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -538,6 +627,7 @@ export type ItemCategoriesArgs = {
 };
 
 
+/** A product or consumable item that can be categorized and have multiple variants */
 export type ItemTagsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -546,6 +636,7 @@ export type ItemTagsArgs = {
 };
 
 
+/** A product or consumable item that can be categorized and have multiple variants */
 export type ItemVariantsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -581,25 +672,36 @@ export type MarkSourceProcessedOutput = {
   success?: Maybe<Scalars['Boolean']['output']>;
 };
 
+/** A raw or processed material that physical components are composed of */
 export type Material = Named & {
   __typename?: 'Material';
+  /** All ancestor materials up the hierarchy */
   ancestors: MaterialsPage;
+  /** Direct child materials in the hierarchy */
   children: MaterialsPage;
+  /** All components that include this material */
   components: ComponentsPage;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  /** All descendant materials down the hierarchy */
   descendants: MaterialsPage;
   id: Scalars['ID']['output'];
   name?: Maybe<Scalars['String']['output']>;
+  /** Direct parent materials in the hierarchy */
   parents: MaterialsPage;
+  /** Components that primarily use this material */
   primaryComponents: ComponentsPage;
+  /** Recycling or disposal processes for this material */
   processes: ProcessPage;
+  /** The physical form or shape of the material (e.g. film, rigid, fibre) */
   shape?: Maybe<Scalars['String']['output']>;
+  /** If true, this is an internal technical classification not shown to end-users */
   technical: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialAncestorsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -608,6 +710,7 @@ export type MaterialAncestorsArgs = {
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialChildrenArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -616,6 +719,7 @@ export type MaterialChildrenArgs = {
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialComponentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -624,6 +728,7 @@ export type MaterialComponentsArgs = {
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialDescendantsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -632,6 +737,7 @@ export type MaterialDescendantsArgs = {
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialParentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -640,6 +746,7 @@ export type MaterialParentsArgs = {
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialPrimaryComponentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -648,6 +755,7 @@ export type MaterialPrimaryComponentsArgs = {
 };
 
 
+/** A raw or processed material that physical components are composed of */
 export type MaterialProcessesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -869,6 +977,7 @@ export type Named = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+/** An organization or company on the platform */
 export type Org = Named & {
   __typename?: 'Org';
   avatarURL?: Maybe<Scalars['String']['output']>;
@@ -877,13 +986,17 @@ export type Org = Named & {
   /** The ID of the model */
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  /** URL-friendly unique identifier for this organization */
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
+  /** Users that are members of this organization */
   users: UserPage;
+  /** URL of the organization's website */
   websiteURL?: Maybe<Scalars['String']['output']>;
 };
 
 
+/** An organization or company on the platform */
 export type OrgUsersArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -905,19 +1018,25 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']['output']>;
 };
 
+/** A specific physical location, such as a business or recycling facility */
 export type Place = Named & {
   __typename?: 'Place';
+  /** Structured postal address of this place */
   address?: Maybe<PlaceAddress>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  /** Geographic coordinates of this place */
   location?: Maybe<PlaceLocation>;
   name?: Maybe<Scalars['String']['output']>;
+  /** The organization associated with this place */
   org?: Maybe<Org>;
+  /** Metadata tags applied to this place */
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
 };
 
+/** A structured postal address */
 export type PlaceAddress = {
   __typename?: 'PlaceAddress';
   city?: Maybe<Scalars['String']['output']>;
@@ -934,6 +1053,7 @@ export type PlaceEdge = {
   node: Place;
 };
 
+/** Geographic coordinates (latitude and longitude) for a place */
 export type PlaceLocation = {
   __typename?: 'PlaceLocation';
   latitude: Scalars['Float']['output'];
@@ -948,21 +1068,30 @@ export type PlacesPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** A recycling, reuse, or disposal process for a product variant or material */
 export type Process = Named & {
   __typename?: 'Process';
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  /** Efficiency metrics for this process */
   efficiency?: Maybe<ProcessEfficiency>;
+  /** Audit history of changes to this process */
   history: Array<ProcessHistory>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
+  /** The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR) */
   intent: Scalars['String']['output'];
+  /** The material this process handles */
   material?: Maybe<Material>;
   name?: Maybe<Scalars['String']['output']>;
+  /** The organization that offers or operates this process */
   org?: Maybe<Org>;
+  /** The physical location where this process is carried out */
   place?: Maybe<Place>;
+  /** The geographic region where this process is available */
   region?: Maybe<Region>;
   updatedAt: Scalars['DateTime']['output'];
+  /** The product variant this process applies to */
   variant?: Maybe<Variant>;
 };
 
@@ -972,10 +1101,14 @@ export type ProcessEdge = {
   node: Process;
 };
 
+/** Efficiency metrics for a recycling or recovery process */
 export type ProcessEfficiency = {
   __typename?: 'ProcessEfficiency';
+  /** Recycling or recovery efficiency ratio (0–1) */
   efficiency?: Maybe<Scalars['Float']['output']>;
+  /** Material equivalency ratio for this process */
   equivalency?: Maybe<Scalars['Float']['output']>;
+  /** Value recovery ratio relative to virgin material */
   valueRatio?: Maybe<Scalars['Float']['output']>;
 };
 
@@ -1237,22 +1370,30 @@ export type QueryVariantsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** A recycling collection stream in a region, with score and container information */
 export type RecyclingStream = {
   __typename?: 'RecyclingStream';
+  /** The collection container used in this stream */
   container?: Maybe<Container>;
   desc?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** Aggregated recyclability score for this stream */
   score?: Maybe<StreamScore>;
+  /** Per-material recyclability scores within this stream */
   scores?: Maybe<Array<StreamScore>>;
 };
 
+/** A geographic region based on the Who's On First dataset */
 export type Region = {
   __typename?: 'Region';
+  /** Bounding box as [minLon, minLat, maxLon, maxLat] */
   bbox?: Maybe<Array<Scalars['Float']['output']>>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  /** Minimum map zoom level at which this region should be displayed */
   minZoom?: Maybe<Scalars['Float']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** The type of geographic entity (e.g. country, region, locality) */
   placetype: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -1299,15 +1440,20 @@ export enum SearchType {
   Variant = 'VARIANT'
 }
 
+/** A reference source used to support data changes, such as a URL, PDF, or image */
 export type Source = {
   __typename?: 'Source';
   changes: ChangesPage;
+  /** Extracted or structured content from the source */
   content?: Maybe<Scalars['JSONObject']['output']>;
   contentURL?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  /** Reference location or citation string (e.g. page number, URL fragment) */
   location?: Maybe<Scalars['String']['output']>;
+  /** Additional metadata about the source (e.g. author, publication date) */
   metadata?: Maybe<Scalars['JSONObject']['output']>;
+  /** Timestamp when this source was processed and ingested */
   processedAt?: Maybe<Scalars['DateTime']['output']>;
   type: SourceType;
   updatedAt: Scalars['DateTime']['output'];
@@ -1345,24 +1491,36 @@ export type SourcesPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** Additional context about a recycling recommendation for a component */
 export type StreamContext = {
   __typename?: 'StreamContext';
   desc?: Maybe<Scalars['String']['output']>;
+  /** Identifier key for this context entry */
   key: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
+  /** Type of contextual information */
   type?: Maybe<Scalars['String']['output']>;
+  /** Value of this context entry */
   value?: Maybe<Scalars['String']['output']>;
 };
 
+/** A recyclability score for a component or variant in a recycling stream */
 export type StreamScore = {
   __typename?: 'StreamScore';
+  /** Quality rating for the underlying recycling data */
   dataQuality?: Maybe<StreamScoreRating>;
+  /** Formatted display label for the data quality rating */
   dataQualityF?: Maybe<Scalars['String']['output']>;
+  /** Maximum possible score for this stream */
   maxScore?: Maybe<Scalars['Float']['output']>;
+  /** Minimum possible score for this stream */
   minScore?: Maybe<Scalars['Float']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** Qualitative rating for this score */
   rating?: Maybe<StreamScoreRating>;
+  /** Formatted display label for the rating */
   ratingF?: Maybe<Scalars['String']['output']>;
+  /** Numerical recyclability score */
   score?: Maybe<Scalars['Float']['output']>;
 };
 
@@ -1376,31 +1534,42 @@ export enum StreamScoreRating {
   VeryGood = 'VERY_GOOD'
 }
 
+/** A tag instance applied to a model, with optional instance-specific metadata */
 export type Tag = Named & {
   __typename?: 'Tag';
+  /** Hex color code for the tag background (e.g. #FF5733) */
   bgColor?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
+  /** Icon or image URL for this tag */
   image?: Maybe<Scalars['String']['output']>;
+  /** Instance metadata conforming to the tag definition's metaTemplate */
   meta?: Maybe<Scalars['JSONObject']['output']>;
+  /** JSON schema template for tag instance metadata */
   metaTemplate?: Maybe<Scalars['JSONObject']['output']>;
   name: Scalars['String']['output'];
+  /** The type of model this tag can be applied to */
   type: TagType;
   updatedAt: Scalars['DateTime']['output'];
 };
 
+/** A reusable tag definition for classifying models with custom metadata */
 export type TagDefinition = Named & {
   __typename?: 'TagDefinition';
+  /** Hex color code for the tag background (e.g. #FF5733) */
   bgColor?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
+  /** Icon or image URL for this tag */
   image?: Maybe<Scalars['String']['output']>;
+  /** JSON schema template for tag instance metadata */
   metaTemplate?: Maybe<Scalars['JSONObject']['output']>;
   name: Scalars['String']['output'];
+  /** The type of model this tag can be applied to */
   type: TagType;
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -1435,23 +1604,33 @@ export enum TagType {
   Variant = 'VARIANT'
 }
 
+/** A translated text value for a specific language */
 export type TranslatedInput = {
+  /** Whether this translation was generated automatically */
   auto?: Scalars['Boolean']['input'];
+  /** BCP 47 language code (e.g. "en", "fr-CA") */
   lang: Scalars['String']['input'];
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** A translated text value for a specific language */
 export type TranslatedOutput = {
   __typename?: 'TranslatedOutput';
+  /** Whether this translation was generated automatically */
   auto: Scalars['Boolean']['output'];
+  /** BCP 47 language code (e.g. "en", "fr-CA") */
   lang: Scalars['String']['output'];
   text?: Maybe<Scalars['String']['output']>;
 };
 
 export type UpdateCategoryInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descShort?: InputMaybe<Scalars['String']['input']>;
@@ -1459,9 +1638,11 @@ export type UpdateCategoryInput = {
   descTr?: InputMaybe<Array<TranslatedInput>>;
   id: Scalars['ID']['input'];
   imageURL?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nameTr?: InputMaybe<Array<TranslatedInput>>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
@@ -1485,15 +1666,20 @@ export type UpdateChangeOutput = {
 };
 
 export type UpdateComponentInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
   addTags?: InputMaybe<Array<ComponentTagsInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   id: Scalars['ID']['input'];
   imageURL?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   materials?: InputMaybe<Array<ComponentMaterialInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -1501,6 +1687,7 @@ export type UpdateComponentInput = {
   physical?: InputMaybe<Scalars['JSONObject']['input']>;
   primaryMaterial?: InputMaybe<ComponentMaterialInput>;
   region?: InputMaybe<ComponentRegionInput>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeTags?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<ComponentTagsInput>>;
@@ -1515,20 +1702,26 @@ export type UpdateComponentOutput = {
 
 export type UpdateItemInput = {
   addCategories?: InputMaybe<Array<ItemCategoriesInput>>;
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
   addTags?: InputMaybe<Array<ItemTagsInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
   categories?: InputMaybe<Array<ItemCategoriesInput>>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
   id: Scalars['ID']['input'];
   imageURL?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nameTr?: InputMaybe<Array<TranslatedInput>>;
   removeCategories?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeTags?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<ItemTagsInput>>;
@@ -1541,15 +1734,21 @@ export type UpdateItemOutput = {
 };
 
 export type UpdateOrgInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
   avatarURL?: InputMaybe<Scalars['String']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   websiteURL?: InputMaybe<Scalars['String']['input']>;
@@ -1562,9 +1761,13 @@ export type UpdateOrgOutput = {
 };
 
 export type UpdateProcessInput = {
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   desc?: InputMaybe<Scalars['String']['input']>;
   descTr?: InputMaybe<Array<TranslatedInput>>;
@@ -1572,6 +1775,7 @@ export type UpdateProcessInput = {
   id: Scalars['ID']['input'];
   instructions?: InputMaybe<Scalars['JSONObject']['input']>;
   intent?: InputMaybe<Scalars['String']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   material?: InputMaybe<ProcessMaterialInput>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -1579,6 +1783,7 @@ export type UpdateProcessInput = {
   org?: InputMaybe<ProcessOrgInput>;
   place?: InputMaybe<ProcessPlaceInput>;
   region?: InputMaybe<ProcessRegionInput>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   rules?: InputMaybe<Scalars['JSONObject']['input']>;
   variant?: InputMaybe<ProcessVariantInput>;
@@ -1624,10 +1829,14 @@ export type UpdateVariantInput = {
   addItems?: InputMaybe<Array<VariantItemsInput>>;
   addOrgs?: InputMaybe<Array<VariantOrgsInput>>;
   addRegions?: InputMaybe<Array<VariantRegionsInput>>;
+  /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
   addTags?: InputMaybe<Array<VariantTagsInput>>;
+  /** If true, immediately apply (merge) the change after creation */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
   change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
   changeID?: InputMaybe<Scalars['ID']['input']>;
   code?: InputMaybe<Scalars['String']['input']>;
   components?: InputMaybe<Array<VariantComponentsInput>>;
@@ -1636,6 +1845,7 @@ export type UpdateVariantInput = {
   id: Scalars['ID']['input'];
   imageURL?: InputMaybe<Scalars['String']['input']>;
   items?: InputMaybe<Array<VariantItemsInput>>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
   lang?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nameTr?: InputMaybe<Array<TranslatedInput>>;
@@ -1645,6 +1855,7 @@ export type UpdateVariantInput = {
   removeItems?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeOrgs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeRegions?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeTags?: InputMaybe<Array<Scalars['ID']['input']>>;
   tags?: InputMaybe<Array<VariantTagsInput>>;
@@ -1656,6 +1867,7 @@ export type UpdateVariantOutput = {
   variant?: Maybe<Variant>;
 };
 
+/** A registered user of the platform */
 export type User = {
   __typename?: 'User';
   avatarURL?: Maybe<Scalars['String']['output']>;
@@ -1665,13 +1877,16 @@ export type User = {
   id: Scalars['ID']['output'];
   lang?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** Organizations this user belongs to */
   orgs: UserOrgsPage;
+  /** Extended profile information for this user */
   profile?: Maybe<UserProfile>;
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
 };
 
 
+/** A registered user of the platform */
 export type UserOrgsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -1685,9 +1900,11 @@ export type UserEdge = {
   node: User;
 };
 
+/** Membership of a user in an organization */
 export type UserOrg = {
   __typename?: 'UserOrg';
   org: Org;
+  /** The user's role within the organization */
   role?: Maybe<Scalars['String']['output']>;
 };
 
@@ -1718,23 +1935,30 @@ export type UserProfile = {
   bio?: Maybe<Scalars['String']['output']>;
 };
 
+/** A specific variant or SKU of a product item, composed of physical components */
 export type Variant = Named & {
   __typename?: 'Variant';
+  /** Physical components that make up this variant */
   components: VariantComponentsPage;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
+  /** Product items this variant belongs to */
   items: ItemsPage;
   name?: Maybe<Scalars['String']['output']>;
+  /** Organizations associated with this variant (e.g. manufacturer, importer) */
   orgs: VariantOrgsPage;
+  /** Aggregated recyclability score for this variant */
   recycleScore?: Maybe<StreamScore>;
+  /** Metadata tags applied to this variant */
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
 };
 
 
+/** A specific variant or SKU of a product item, composed of physical components */
 export type VariantComponentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -1743,6 +1967,7 @@ export type VariantComponentsArgs = {
 };
 
 
+/** A specific variant or SKU of a product item, composed of physical components */
 export type VariantItemsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -1751,6 +1976,7 @@ export type VariantItemsArgs = {
 };
 
 
+/** A specific variant or SKU of a product item, composed of physical components */
 export type VariantOrgsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -1759,11 +1985,13 @@ export type VariantOrgsArgs = {
 };
 
 
+/** A specific variant or SKU of a product item, composed of physical components */
 export type VariantRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
+/** A specific variant or SKU of a product item, composed of physical components */
 export type VariantTagsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -1771,10 +1999,13 @@ export type VariantTagsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** A physical component within a variant, with its quantity */
 export type VariantComponent = {
   __typename?: 'VariantComponent';
   component: Component;
+  /** Quantity of this component in the variant */
   quantity?: Maybe<Scalars['Float']['output']>;
+  /** Unit of measurement for the component quantity */
   unit?: Maybe<Scalars['String']['output']>;
 };
 
@@ -1786,7 +2017,9 @@ export type VariantComponentEdge = {
 
 export type VariantComponentsInput = {
   id: Scalars['ID']['input'];
+  /** Quantity of this component in the variant */
   quantity?: InputMaybe<Scalars['Float']['input']>;
+  /** Unit of measurement for the component quantity */
   unit?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1808,9 +2041,11 @@ export type VariantItemsInput = {
   id: Scalars['ID']['input'];
 };
 
+/** An organization associated with a variant and its role (e.g. manufacturer, importer) */
 export type VariantOrg = {
   __typename?: 'VariantOrg';
   org: Org;
+  /** The organization's role for this variant (e.g. manufacturer, importer) */
   role?: Maybe<Scalars['String']['output']>;
 };
 

@@ -24,6 +24,7 @@ import { ItemsPage } from './item.model'
 
 @ObjectType({
   implements: () => [Named],
+  description: 'A hierarchical category for classifying product items',
 })
 export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @Field(() => ID)
@@ -34,42 +35,51 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @MaxLength(1024)
   name!: string
 
-  @Field(() => [TranslatedOutput], { nullable: true })
+  @Field(() => [TranslatedOutput], {
+    nullable: true,
+    description: 'Translated versions of the name',
+  })
   nameTr?: TranslatedOutput[]
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'A short summary description' })
   @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   descShort?: string
 
-  @Field(() => [TranslatedOutput], { nullable: true })
+  @Field(() => [TranslatedOutput], {
+    nullable: true,
+    description: 'Translated versions of the short description',
+  })
   descShortTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
   desc?: string
 
-  @Field(() => [TranslatedOutput], { nullable: true })
+  @Field(() => [TranslatedOutput], {
+    nullable: true,
+    description: 'Translated versions of the description',
+  })
   descTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @IsOptional()
   imageURL?: string
 
-  @Field(() => CategoriesPage)
+  @Field(() => CategoriesPage, { description: 'Direct parent categories in the hierarchy' })
   parents!: CategoriesPage & {}
 
-  @Field(() => CategoriesPage)
+  @Field(() => CategoriesPage, { description: 'Direct child categories in the hierarchy' })
   children!: CategoriesPage & {}
 
-  @Field(() => CategoriesPage)
+  @Field(() => CategoriesPage, { description: 'All ancestor categories up the hierarchy tree' })
   ancestors!: CategoriesPage & {}
 
-  @Field(() => CategoriesPage)
+  @Field(() => CategoriesPage, { description: 'All descendant categories down the hierarchy tree' })
   descendants!: CategoriesPage & {}
 
-  @Field(() => ItemsPage)
+  @Field(() => ItemsPage, { description: 'Items classified under this category' })
   items!: ItemsPage & {}
 }
 registerModel('Category', Category)

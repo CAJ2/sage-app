@@ -21,6 +21,7 @@ import { VariantsPage } from './variant.model'
 
 @ObjectType({
   implements: () => [Named],
+  description: 'A product or consumable item that can be categorized and have multiple variants',
 })
 export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   @Field(() => String, { nullable: true })
@@ -37,13 +38,15 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   @IsOptional()
   imageURL?: string
 
-  @Field(() => CategoriesPage)
+  @Field(() => CategoriesPage, { description: 'Categories this item belongs to' })
   categories!: CategoriesPage
 
-  @Field(() => TagPage)
+  @Field(() => TagPage, { description: 'Metadata tags applied to this item' })
   tags!: TagPage
 
-  @Field(() => VariantsPage)
+  @Field(() => VariantsPage, {
+    description: 'Product variants of this item (e.g. specific SKUs or models)',
+  })
   variants!: VariantsPage & {}
 
   transform(entity: ItemEntity) {

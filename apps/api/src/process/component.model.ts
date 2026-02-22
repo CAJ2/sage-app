@@ -26,16 +26,19 @@ import { Material } from './material.model'
 import { RecyclingStream, StreamContext, StreamScore } from './stream.model'
 import { Tag } from './tag.model'
 
-@ObjectType()
+@ObjectType({ description: 'The fraction of a specific material within a component' })
 export class ComponentMaterial {
   @Field(() => Material)
   material!: Material & {}
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float, {
+    nullable: true,
+    description: 'Fraction of this material in the component (0–1)',
+  })
   materialFraction?: number
 }
 
-@ObjectType()
+@ObjectType({ description: 'A recycling option for a component in a specific recycling stream' })
 export class ComponentRecycle {
   @Field(() => RecyclingStream, { nullable: true })
   stream?: RecyclingStream & {}
@@ -46,6 +49,7 @@ export class ComponentRecycle {
 
 @ObjectType({
   implements: () => [Named],
+  description: 'A physical component of a product variant, made of one or more materials',
 })
 export class Component extends IDCreatedUpdated<ComponentEntity> implements Named {
   @Field(() => String, { nullable: true })
@@ -61,25 +65,36 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
   @Transform(({ value }) => value.image)
   imageURL?: string
 
-  @Field(() => Material)
+  @Field(() => Material, { description: 'The primary material this component is made of' })
   primaryMaterial!: Material & {}
 
-  @Field(() => [ComponentMaterial])
+  @Field(() => [ComponentMaterial], {
+    description: 'All materials in this component with their fractions',
+  })
   materials: ComponentMaterial[] = []
 
   @Field(() => [Tag])
   tags!: Tag[]
 
-  @Field(() => Region, { nullable: true })
+  @Field(() => Region, {
+    nullable: true,
+    description: "The geographic region this component's recycling data applies to",
+  })
   region?: Region & {}
 
-  @Field(() => [ComponentRecycle], { nullable: true })
+  @Field(() => [ComponentRecycle], {
+    nullable: true,
+    description: 'Available recycling options for this component by stream',
+  })
   recycle?: ComponentRecycle[]
 
-  @Field(() => StreamScore, { nullable: true })
+  @Field(() => StreamScore, {
+    nullable: true,
+    description: 'Aggregated recyclability score for this component',
+  })
   recycleScore?: StreamScore
 
-  @Field(() => [ComponentHistory])
+  @Field(() => [ComponentHistory], { description: 'Audit history of changes to this component' })
   history: ComponentHistory[] = []
 
   transform(entity: ComponentEntity) {
@@ -137,7 +152,10 @@ export class ComponentMaterialInput {
   @Field(() => ID)
   id!: string
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float, {
+    nullable: true,
+    description: 'Fraction of this material in the component (0–1)',
+  })
   materialFraction?: number
 }
 

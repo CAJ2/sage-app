@@ -12,26 +12,40 @@ import { User } from '@src/users/users.model'
 import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from './change.entity'
 import { EditModel, EditModelType } from './change.enum'
 
-@ObjectType()
+@ObjectType({ description: 'A tracked edit to a single entity within a change' })
 export class Edit extends BaseModel<ChangeEdits> {
-  @Field(() => String)
+  @Field(() => String, {
+    description: 'The type name of the entity being edited (e.g. Item, Component)',
+  })
   entityName!: string
 
   @Field(() => ID, { nullable: true })
   id?: string
 
-  @Field(() => EditModel, { nullable: true })
+  @Field(() => EditModel, {
+    nullable: true,
+    description: 'The state of the entity before this edit',
+  })
   @Transform(transformUnion('entityName'))
   original?: typeof EditModel
 
-  @Field(() => EditModel, { nullable: true })
+  @Field(() => EditModel, {
+    nullable: true,
+    description: 'The proposed state of the entity after this edit',
+  })
   @Transform(transformUnion('entityName'))
   changes?: typeof EditModel
 
-  @Field(() => JSONObjectResolver, { nullable: true })
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
+    description: 'Raw field values for creating a new entity',
+  })
   createChanges?: Record<string, any>
 
-  @Field(() => JSONObjectResolver, { nullable: true })
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
+    description: 'Raw field values for updating an existing entity',
+  })
   updateChanges?: Record<string, any>
 
   transform(entity: ChangeEdits) {
@@ -65,7 +79,7 @@ export class DirectEdit {
 @ObjectType()
 export class ChangeEditsPage extends Paginated(Edit) {}
 
-@ObjectType()
+@ObjectType({ description: 'A proposed or merged set of edits to one or more data models' })
 export class Change extends IDCreatedUpdated<ChangeEntity> {
   @Field(() => String, { nullable: true })
   title?: string
@@ -76,13 +90,15 @@ export class Change extends IDCreatedUpdated<ChangeEntity> {
   @Field(() => ChangeStatus)
   status!: ChangeStatus & {}
 
-  @Field(() => User)
+  @Field(() => User, { description: 'The user who created this change' })
   user!: User & {}
 
-  @Field(() => ChangeEditsPage)
+  @Field(() => ChangeEditsPage, {
+    description: 'The individual entity edits included in this change',
+  })
   edits!: ChangeEditsPage
 
-  @Field(() => SourcesPage)
+  @Field(() => SourcesPage, { description: 'Source references supporting this change' })
   sources!: SourcesPage & {}
 }
 
