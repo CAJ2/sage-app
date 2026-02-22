@@ -1,0 +1,62 @@
+import { fileURLToPath } from 'node:url'
+
+import type { ConfigOptions } from '@nuxt/test-utils/playwright'
+import { defineConfig, devices } from '@playwright/test'
+import dotenv from 'dotenv-flow'
+import { isCI } from 'std-env'
+if (dotenv) {
+  dotenv.config()
+}
+
+// Set TEST_DEVICES env var to a comma-separate list of device names
+// Defaults:
+//   Local: test Pixel 5 only for faster feedback
+//   CI: test Desktop Chrome, Pixel 5 and iPhone 12 to cover a range of form factors and browsers
+const devicesToTest =
+  (process.env.TEST_DEVICES && process.env.TEST_DEVICES.split(',')) ||
+  ((isCI ? ['Desktop Chrome', 'Pixel 5', 'iPhone 12'] : ['Pixel 5']) satisfies Array<
+    string | (typeof devices)[string]
+  >)
+
+const rootDir = fileURLToPath(new URL('../../apps/frontend', import.meta.url))
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+export default defineConfig<ConfigOptions>({
+  testDir: './tests',
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!isCI,
+  /* Retry on CI only */
+  retries: isCI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: isCI ? 1 : undefined,
+  /* Allow enough time for Nuxt builds in parallel workers */
+  timeout: 120000,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: [
+    ['html', { outputFolder: 'playwright-report' }],
+    ...(isCI ? [['blob', { outputDir: 'blob-report' }] as const] : []),
+  ],
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: 'on-first-retry',
+    /* Nuxt configuration options */
+    nuxt: {
+      rootDir,
+      nuxtConfig: {
+        typescript: {
+          typeCheck: false,
+        },
+        ...(isCI ? { nitro: { output: { dir: rootDir + '/.output' } } } : {}),
+      },
+      build: !isCI,
+      /* Allow using an existing Nuxt server for faster test runs */
+      host: !isCI ? 'http://localhost:3000' : undefined,
+    },
+  },
+  projects: devicesToTest.map((p) => (typeof p === 'string' ? { name: p, use: devices[p] } : p)),
+})

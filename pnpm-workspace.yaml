@@ -3,5 +3,6 @@ packages:
   - apps/api
   - apps/frontend
   - apps/science
+  - test/frontend
 syncInjectedDepsAfterScripts:
   - build

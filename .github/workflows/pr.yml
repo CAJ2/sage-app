@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   nx-affected:
-    name: "Calculate affected projects"
+    name: 'Calculate affected projects'
     runs-on: ubuntu-latest
     outputs:
       affected: ${{ steps.affected.outputs.affected }}
@@ -27,18 +27,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      - name: "Calculate affected projects"
+      - name: 'Calculate affected projects'
         id: affected
         run: |
           echo "affected=$(pnpm exec nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
 
   build:
-    name: "Build & Lint"
+    name: 'Build & Lint'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
@@ -66,10 +66,10 @@ jobs:
       - run: pnpm exec nx affected -t build
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
-          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
 
   test:
-    name: "Test API + Frontend"
+    name: 'Test API + Frontend'
     runs-on: ubuntu-latest
     if: ${{ contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: nx-affected
@@ -78,7 +78,7 @@ jobs:
       crdb:
         image: cockroachdb/cockroach
         env:
-          COCKROACH_ARGS: "start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost"
+          COCKROACH_ARGS: 'start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost'
         ports:
           - 26257:26257
         options: >-
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
@@ -102,17 +102,24 @@ jobs:
       # Run migrations
       - run: pnpm --filter api exec mikro-orm migration:up
         env:
-          DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
 
       # Run tests
-      - run: pnpm exec nx affected -t gen test
+      - run: pnpm exec nx affected -t test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test
-          TEST_DATABASE_URL: "cockroachdb://root@localhost:26257/defaultdb?sslmode=disable"
+          TEST_DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
+
+      - run: pnpm --filter=@sageleaf/e2e-frontend exec playwright install --with-deps
+      - run: pnpm exec nx affected -t e2e:ci
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NODE_ENV: test
+          TEST_DEVICES: 'Pixel 5'
 
   test-frontend:
-    name: "Test Frontend"
+    name: 'Test Frontend'
     runs-on: ubuntu-latest
     if: ${{ !contains(needs.nx-affected.outputs.affected, '@sageleaf/api') }}
     needs: nx-affected
@@ -128,13 +135,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
       # Run tests
-      - run: pnpm exec nx affected -t gen test
+      - run: pnpm exec nx affected -t test
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test
+
+      - run: pnpm --filter=@sageleaf/e2e-frontend exec playwright install --with-deps
+      - run: pnpm exec nx affected -t e2e:ci
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NODE_ENV: test
+          TEST_DEVICES: 'Pixel 5'
