@@ -25,13 +25,21 @@ export class Region extends CreatedUpdated<RegionEntity> {
   @Transform(translate)
   name?: string
 
-  @Field(() => String, { description: 'The type of geographic entity (e.g. country, region, locality)' })
+  @Field(() => String, {
+    description: 'The type of geographic entity (e.g. country, region, locality)',
+  })
   placetype!: string
 
-  @Field(() => [Number], { nullable: true, description: 'Bounding box as [minLon, minLat, maxLon, maxLat]' })
+  @Field(() => [Number], {
+    nullable: true,
+    description: 'Bounding box as [minLon, minLat, maxLon, maxLat]',
+  })
   bbox?: number[]
 
-  @Field(() => Number, { nullable: true, description: 'Minimum map zoom level at which this region should be displayed' })
+  @Field(() => Number, {
+    nullable: true,
+    description: 'Minimum map zoom level at which this region should be displayed',
+  })
   minZoom?: number
 
   transform(entity: RegionEntity) {

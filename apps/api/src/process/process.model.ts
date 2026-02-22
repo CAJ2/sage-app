@@ -29,13 +29,22 @@ import {
 
 @ObjectType({ description: 'Efficiency metrics for a recycling or recovery process' })
 export class ProcessEfficiency {
-  @Field(() => Number, { nullable: true, description: 'Recycling or recovery efficiency ratio (0–1)' })
+  @Field(() => Number, {
+    nullable: true,
+    description: 'Recycling or recovery efficiency ratio (0–1)',
+  })
   efficiency?: number
 
-  @Field(() => Number, { nullable: true, description: 'Material equivalency ratio for this process' })
+  @Field(() => Number, {
+    nullable: true,
+    description: 'Material equivalency ratio for this process',
+  })
   equivalency?: number
 
-  @Field(() => Number, { nullable: true, description: 'Value recovery ratio relative to virgin material' })
+  @Field(() => Number, {
+    nullable: true,
+    description: 'Value recovery ratio relative to virgin material',
+  })
   valueRatio?: number
 }
 
@@ -44,7 +53,9 @@ export class ProcessEfficiency {
   description: 'A recycling, reuse, or disposal process for a product variant or material',
 })
 export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
-  @Field(() => String, { description: 'The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR)' })
+  @Field(() => String, {
+    description: 'The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR)',
+  })
   intent!: ProcessIntent
 
   @Field(() => String, { nullable: true })
@@ -55,22 +66,37 @@ export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
   @Transform(translate)
   desc?: string
 
-  @Field(() => ProcessEfficiency, { nullable: true, description: 'Efficiency metrics for this process' })
+  @Field(() => ProcessEfficiency, {
+    nullable: true,
+    description: 'Efficiency metrics for this process',
+  })
   efficiency?: ProcessEfficiency
 
   @Field(() => Material, { nullable: true, description: 'The material this process handles' })
   material?: Material & {}
 
-  @Field(() => Variant, { nullable: true, description: 'The product variant this process applies to' })
+  @Field(() => Variant, {
+    nullable: true,
+    description: 'The product variant this process applies to',
+  })
   variant?: Variant & {}
 
-  @Field(() => Org, { nullable: true, description: 'The organization that offers or operates this process' })
+  @Field(() => Org, {
+    nullable: true,
+    description: 'The organization that offers or operates this process',
+  })
   org?: Org & {}
 
-  @Field(() => Region, { nullable: true, description: 'The geographic region where this process is available' })
+  @Field(() => Region, {
+    nullable: true,
+    description: 'The geographic region where this process is available',
+  })
   region?: Region
 
-  @Field(() => Place, { nullable: true, description: 'The physical location where this process is carried out' })
+  @Field(() => Place, {
+    nullable: true,
+    description: 'The physical location where this process is carried out',
+  })
   place?: Place
 
   @Field(() => [ProcessHistory], { description: 'Audit history of changes to this process' })

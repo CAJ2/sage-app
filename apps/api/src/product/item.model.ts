@@ -44,7 +44,9 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   @Field(() => TagPage, { description: 'Metadata tags applied to this item' })
   tags!: TagPage
 
-  @Field(() => VariantsPage, { description: 'Product variants of this item (e.g. specific SKUs or models)' })
+  @Field(() => VariantsPage, {
+    description: 'Product variants of this item (e.g. specific SKUs or models)',
+  })
   variants!: VariantsPage & {}
 
   transform(entity: ItemEntity) {

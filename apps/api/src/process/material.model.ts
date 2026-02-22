@@ -36,10 +36,15 @@ export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   @MaxLength(100_000)
   desc?: string
 
-  @Field(() => Boolean, { description: 'If true, this is an internal technical classification not shown to end-users' })
+  @Field(() => Boolean, {
+    description: 'If true, this is an internal technical classification not shown to end-users',
+  })
   technical: boolean = false
 
-  @Field(() => String, { nullable: true, description: 'The physical form or shape of the material (e.g. film, rigid, fibre)' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'The physical form or shape of the material (e.g. film, rigid, fibre)',
+  })
   shape?: string
 
   @Field(() => MaterialsPage, { description: 'Direct parent materials in the hierarchy' })
@@ -115,7 +120,9 @@ export class CreateMaterialInput extends ChangeInputWithLang {
   @Field(() => [TranslatedInput], { nullable: true })
   descTr?: TranslatedInput[]
 
-  @Field(() => Boolean, { description: 'If true, this is an internal technical classification not shown to end-users' })
+  @Field(() => Boolean, {
+    description: 'If true, this is an internal technical classification not shown to end-users',
+  })
   technical: boolean = false
 
   @Field(() => [ID], { nullable: true, description: 'IDs of parent materials in the hierarchy' })
@@ -143,7 +150,10 @@ export class UpdateMaterialInput extends ChangeInputWithLang {
   @Field(() => [TranslatedInput], { nullable: true })
   descTr?: TranslatedInput[]
 
-  @Field(() => Boolean, { nullable: true, description: 'If true, this is an internal technical classification not shown to end-users' })
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'If true, this is an internal technical classification not shown to end-users',
+  })
   technical?: boolean
 
   @Field(() => [ID], { nullable: true, description: 'IDs of parent materials in the hierarchy' })

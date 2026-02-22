@@ -31,7 +31,10 @@ export class ComponentMaterial {
   @Field(() => Material)
   material!: Material & {}
 
-  @Field(() => Float, { nullable: true, description: 'Fraction of this material in the component (0–1)' })
+  @Field(() => Float, {
+    nullable: true,
+    description: 'Fraction of this material in the component (0–1)',
+  })
   materialFraction?: number
 }
 
@@ -65,19 +68,30 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
   @Field(() => Material, { description: 'The primary material this component is made of' })
   primaryMaterial!: Material & {}
 
-  @Field(() => [ComponentMaterial], { description: 'All materials in this component with their fractions' })
+  @Field(() => [ComponentMaterial], {
+    description: 'All materials in this component with their fractions',
+  })
   materials: ComponentMaterial[] = []
 
   @Field(() => [Tag])
   tags!: Tag[]
 
-  @Field(() => Region, { nullable: true, description: 'The geographic region this component\'s recycling data applies to' })
+  @Field(() => Region, {
+    nullable: true,
+    description: "The geographic region this component's recycling data applies to",
+  })
   region?: Region & {}
 
-  @Field(() => [ComponentRecycle], { nullable: true, description: 'Available recycling options for this component by stream' })
+  @Field(() => [ComponentRecycle], {
+    nullable: true,
+    description: 'Available recycling options for this component by stream',
+  })
   recycle?: ComponentRecycle[]
 
-  @Field(() => StreamScore, { nullable: true, description: 'Aggregated recyclability score for this component' })
+  @Field(() => StreamScore, {
+    nullable: true,
+    description: 'Aggregated recyclability score for this component',
+  })
   recycleScore?: StreamScore
 
   @Field(() => [ComponentHistory], { description: 'Audit history of changes to this component' })
@@ -138,7 +152,10 @@ export class ComponentMaterialInput {
   @Field(() => ID)
   id!: string
 
-  @Field(() => Float, { nullable: true, description: 'Fraction of this material in the component (0–1)' })
+  @Field(() => Float, {
+    nullable: true,
+    description: 'Fraction of this material in the component (0–1)',
+  })
   materialFraction?: number
 }
 

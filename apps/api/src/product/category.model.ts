@@ -35,7 +35,10 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @MaxLength(1024)
   name!: string
 
-  @Field(() => [TranslatedOutput], { nullable: true, description: 'Translated versions of the name' })
+  @Field(() => [TranslatedOutput], {
+    nullable: true,
+    description: 'Translated versions of the name',
+  })
   nameTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true, description: 'A short summary description' })
@@ -44,14 +47,20 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @MaxLength(1024)
   descShort?: string
 
-  @Field(() => [TranslatedOutput], { nullable: true, description: 'Translated versions of the short description' })
+  @Field(() => [TranslatedOutput], {
+    nullable: true,
+    description: 'Translated versions of the short description',
+  })
   descShortTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
   desc?: string
 
-  @Field(() => [TranslatedOutput], { nullable: true, description: 'Translated versions of the description' })
+  @Field(() => [TranslatedOutput], {
+    nullable: true,
+    description: 'Translated versions of the description',
+  })
   descTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })

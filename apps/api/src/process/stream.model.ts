@@ -19,7 +19,9 @@ registerEnumType(StreamScoreRating, {
   description: 'A rating enum used to describe scores',
 })
 
-@ObjectType({ description: 'A recyclability score for a component or variant in a recycling stream' })
+@ObjectType({
+  description: 'A recyclability score for a component or variant in a recycling stream',
+})
 export class StreamScore {
   @Field(() => Number, { nullable: true, description: 'Numerical recyclability score' })
   score?: number
@@ -30,16 +32,25 @@ export class StreamScore {
   @Field(() => Number, { nullable: true, description: 'Maximum possible score for this stream' })
   maxScore?: number
 
-  @Field(() => StreamScoreRating, { nullable: true, description: 'Qualitative rating for this score' })
+  @Field(() => StreamScoreRating, {
+    nullable: true,
+    description: 'Qualitative rating for this score',
+  })
   rating?: StreamScoreRating
 
   @Field(() => String, { nullable: true, description: 'Formatted display label for the rating' })
   ratingF?: string
 
-  @Field(() => StreamScoreRating, { nullable: true, description: 'Quality rating for the underlying recycling data' })
+  @Field(() => StreamScoreRating, {
+    nullable: true,
+    description: 'Quality rating for the underlying recycling data',
+  })
   dataQuality?: StreamScoreRating
 
-  @Field(() => String, { nullable: true, description: 'Formatted display label for the data quality rating' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Formatted display label for the data quality rating',
+  })
   dataQualityF?: string
 
   @Field(() => String, { nullable: true })
@@ -76,7 +87,10 @@ export class Container {
   @Field(() => String, { description: 'Container type (e.g. BIN, BAG, BOX)' })
   type!: ProcessInstructionsContainerType
 
-  @Field(() => String, { nullable: true, description: 'Access method for the container (e.g. CURBSIDE, DROP_OFF)' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Access method for the container (e.g. CURBSIDE, DROP_OFF)',
+  })
   access?: ProcessInstructionsAccess
 
   @Field(() => String, { nullable: true, description: 'URL of an image of the container' })
@@ -85,14 +99,22 @@ export class Container {
   @Field(() => String, { nullable: true, description: 'Typical color of the container' })
   color?: string
 
-  @Field(() => ContainerShape, { nullable: true, description: 'Physical dimensions of the container' })
+  @Field(() => ContainerShape, {
+    nullable: true,
+    description: 'Physical dimensions of the container',
+  })
   shape?: ContainerShape
 
-  @Field(() => ContainerImageEntryPoint, { nullable: true, description: 'Coordinates for the item entry point on the container image' })
+  @Field(() => ContainerImageEntryPoint, {
+    nullable: true,
+    description: 'Coordinates for the item entry point on the container image',
+  })
   imageEntryPoint?: ContainerImageEntryPoint
 }
 
-@ObjectType({ description: 'A recycling collection stream in a region, with score and container information' })
+@ObjectType({
+  description: 'A recycling collection stream in a region, with score and container information',
+})
 export class RecyclingStream {
   @Field(() => String, { nullable: true })
   @Transform(translate)
@@ -102,13 +124,22 @@ export class RecyclingStream {
   @Transform(translate)
   desc?: string
 
-  @Field(() => StreamScore, { nullable: true, description: 'Aggregated recyclability score for this stream' })
+  @Field(() => StreamScore, {
+    nullable: true,
+    description: 'Aggregated recyclability score for this stream',
+  })
   score?: StreamScore
 
-  @Field(() => [StreamScore], { nullable: true, description: 'Per-material recyclability scores within this stream' })
+  @Field(() => [StreamScore], {
+    nullable: true,
+    description: 'Per-material recyclability scores within this stream',
+  })
   scores?: StreamScore[]
 
-  @Field(() => Container, { nullable: true, description: 'The collection container used in this stream' })
+  @Field(() => Container, {
+    nullable: true,
+    description: 'The collection container used in this stream',
+  })
   container?: Container
 }
 

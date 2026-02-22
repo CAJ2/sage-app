@@ -52,16 +52,23 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => ItemsPage, { description: 'Product items this variant belongs to' })
   items!: ItemsPage
 
-  @Field(() => VariantOrgsPage, { description: 'Organizations associated with this variant (e.g. manufacturer, importer)' })
+  @Field(() => VariantOrgsPage, {
+    description: 'Organizations associated with this variant (e.g. manufacturer, importer)',
+  })
   orgs!: VariantOrgsPage & {}
 
   @Field(() => TagPage, { description: 'Metadata tags applied to this variant' })
   tags!: TagPage
 
-  @Field(() => StreamScore, { nullable: true, description: 'Aggregated recyclability score for this variant' })
+  @Field(() => StreamScore, {
+    nullable: true,
+    description: 'Aggregated recyclability score for this variant',
+  })
   recycleScore?: StreamScore
 
-  @Field(() => VariantComponentsPage, { description: 'Physical components that make up this variant' })
+  @Field(() => VariantComponentsPage, {
+    description: 'Physical components that make up this variant',
+  })
   components!: VariantComponentsPage & {}
 }
 registerModel('Variant', Variant)
@@ -81,13 +88,19 @@ export class VariantHistory {
   changes?: string
 }
 
-@ObjectType({ description: 'An organization associated with a variant and its role (e.g. manufacturer, importer)' })
+@ObjectType({
+  description:
+    'An organization associated with a variant and its role (e.g. manufacturer, importer)',
+})
 export class VariantOrg extends BaseModel<VariantsOrgs> {
   @Field(() => Org)
   @Type(() => Org)
   org!: Org & {}
 
-  @Field(() => String, { nullable: true, description: "The organization's role for this variant (e.g. manufacturer, importer)" })
+  @Field(() => String, {
+    nullable: true,
+    description: "The organization's role for this variant (e.g. manufacturer, importer)",
+  })
   role?: string
 }
 
@@ -100,7 +113,10 @@ export class VariantComponent extends BaseModel<VariantsComponents> {
   @Field(() => Number, { nullable: true, description: 'Quantity of this component in the variant' })
   quantity?: number
 
-  @Field(() => String, { nullable: true, description: 'Unit of measurement for the component quantity' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Unit of measurement for the component quantity',
+  })
   unit?: string
 }
 
@@ -201,7 +217,10 @@ export class VariantComponentsInput {
   @Field(() => Number, { nullable: true, description: 'Quantity of this component in the variant' })
   quantity?: number
 
-  @Field(() => String, { nullable: true, description: 'Unit of measurement for the component quantity' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Unit of measurement for the component quantity',
+  })
   unit?: string
 }
 
@@ -246,7 +265,10 @@ export class CreateVariantInput extends ChangeInputWithLang {
   @Field(() => [VariantRegionsInput], { nullable: true })
   regions?: VariantRegionsInput[]
 
-  @Field(() => String, { nullable: true, description: 'Manufacturer or product code for this variant' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Manufacturer or product code for this variant',
+  })
   code?: string
 
   @Field(() => [VariantOrgsInput], { nullable: true })

@@ -63,7 +63,10 @@ export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Transform(translate)
   name?: string
 
-  @Field(() => PlaceAddress, { nullable: true, description: 'Structured postal address of this place' })
+  @Field(() => PlaceAddress, {
+    nullable: true,
+    description: 'Structured postal address of this place',
+  })
   @Transform(translate)
   address?: PlaceAddress
 
@@ -71,7 +74,10 @@ export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Transform(translate)
   desc?: string
 
-  @Field(() => PlaceLocation, { nullable: true, description: 'Geographic coordinates of this place' })
+  @Field(() => PlaceLocation, {
+    nullable: true,
+    description: 'Geographic coordinates of this place',
+  })
   location?: PlaceLocation
 
   @Field(() => TagPage, { description: 'Metadata tags applied to this place' })

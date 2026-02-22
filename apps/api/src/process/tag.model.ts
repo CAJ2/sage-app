@@ -32,10 +32,16 @@ export class TagDefinition extends IDCreatedUpdated<TagEntity> implements Named 
   @Transform(translate)
   desc?: string
 
-  @Field(() => JSONObjectResolver, { nullable: true, description: 'JSON schema template for tag instance metadata' })
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
+    description: 'JSON schema template for tag instance metadata',
+  })
   metaTemplate?: Record<string, any>
 
-  @Field(() => String, { nullable: true, description: 'Hex color code for the tag background (e.g. #FF5733)' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Hex color code for the tag background (e.g. #FF5733)',
+  })
   bgColor?: string
 
   @Field(() => String, { nullable: true, description: 'Icon or image URL for this tag' })
@@ -43,9 +49,14 @@ export class TagDefinition extends IDCreatedUpdated<TagEntity> implements Named 
 }
 registerModel('TagDefinition', TagDefinition)
 
-@ObjectType({ description: 'A tag instance applied to a model, with optional instance-specific metadata' })
+@ObjectType({
+  description: 'A tag instance applied to a model, with optional instance-specific metadata',
+})
 export class Tag extends TagDefinition {
-  @Field(() => JSONObjectResolver, { nullable: true, description: 'Instance metadata conforming to the tag definition\'s metaTemplate' })
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
+    description: "Instance metadata conforming to the tag definition's metaTemplate",
+  })
   meta?: Record<string, any>
 }
 registerModel('Tag', Tag)
