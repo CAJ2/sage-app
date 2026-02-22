@@ -439,4 +439,69 @@ describe('CategoryResolver (integration)', () => {
       expect(res.data?.updateCategory?.change?.status).toBe('PROPOSED')
     })
   })
+
+  describe('history tracking', () => {
+    let historyCategoryID: string
+
+    test('should record history on direct create', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation CategoryHistoryCreate($input: CreateCategoryInput!) {
+            createCategory(input: $input) {
+              category {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original
+                  changes
+                }
+              }
+            }
+          }
+        `),
+        { input: { name: 'History Test Category' } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      const category = createRes.data?.createCategory?.category
+      expect(category).toBeDefined()
+      historyCategoryID = category!.id
+      expect(category!.history).toHaveLength(1)
+      expect(category!.history[0].user).toBeDefined()
+      expect(category!.history[0].original).toBeNull()
+      expect(category!.history[0].changes).toBeTruthy()
+    })
+
+    test('should record history on direct update', async () => {
+      const updateRes = await gql.send(
+        graphql(`
+          mutation CategoryHistoryUpdate($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original
+                  changes
+                }
+              }
+            }
+          }
+        `),
+        { input: { id: historyCategoryID, name: 'Updated History Category' } },
+      )
+      expect(updateRes.errors).toBeUndefined()
+      const category = updateRes.data?.updateCategory?.category
+      expect(category).toBeDefined()
+      expect(category!.history).toHaveLength(2)
+      const latest = category!.history.at(-1)!
+      expect(latest.original).toBeTruthy()
+      expect(latest.changes).toBeTruthy()
+    })
+  })
 })

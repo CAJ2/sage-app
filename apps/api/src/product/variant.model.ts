@@ -24,6 +24,7 @@ import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
+import { User } from '@src/users/users.model'
 
 import { ItemsPage } from './item.model'
 import { Variant as VariantEntity, VariantsComponents, VariantsOrgs } from './variant.entity'
@@ -70,22 +71,28 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
     description: 'Physical components that make up this variant',
   })
   components!: VariantComponentsPage & {}
+
+  @Field(() => [VariantHistory], { description: 'Audit history of changes to this variant' })
+  history: VariantHistory[] = []
 }
 registerModel('Variant', Variant)
 
 @ObjectType()
-export class VariantHistory {
+export class VariantHistory extends BaseModel<any> {
   @Field(() => String)
   variant_id!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => User)
+  user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  original?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes?: JSONObject
 }
 
 @ObjectType({

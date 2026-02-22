@@ -13,6 +13,7 @@ import {
   CategoriesArgs,
   CategoriesPage,
   Category,
+  CategoryHistory,
   CategoryItemsArgs,
   CreateCategoryInput,
   CreateCategoryOutput,
@@ -156,5 +157,11 @@ export class CategoryResolver {
       throw NotFoundErr('Category not found')
     }
     return { success: true, id: deleted.id }
+  }
+
+  @ResolveField(() => [CategoryHistory])
+  async history(@Parent() category: Category) {
+    const history = await this.categoryService.history(category.id)
+    return Promise.all(history.map((h) => this.transform.entityToModel(CategoryHistory, h)))
   }
 }

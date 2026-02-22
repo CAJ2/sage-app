@@ -48,6 +48,8 @@ export type Category = Named & {
   descTr?: Maybe<Array<TranslatedOutput>>;
   /** All descendant categories down the hierarchy tree */
   descendants: CategoriesPage;
+  /** Audit history of changes to this category */
+  history: Array<CategoryHistory>;
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   /** Items classified under this category */
@@ -109,6 +111,15 @@ export type CategoryEdge = {
   __typename?: 'CategoryEdge';
   cursor: Scalars['String']['output'];
   node: Category;
+};
+
+export type CategoryHistory = {
+  __typename?: 'CategoryHistory';
+  category_id: Scalars['String']['output'];
+  changes?: Maybe<Scalars['JSONObject']['output']>;
+  datetime: Scalars['DateTime']['output'];
+  original?: Maybe<Scalars['JSONObject']['output']>;
+  user: User;
 };
 
 /** A proposed or merged set of edits to one or more data models */
@@ -224,10 +235,11 @@ export type ComponentEdge = {
 
 export type ComponentHistory = {
   __typename?: 'ComponentHistory';
-  changes?: Maybe<Scalars['String']['output']>;
+  changes?: Maybe<Scalars['JSONObject']['output']>;
   componentID: Scalars['String']['output'];
   datetime: Scalars['DateTime']['output'];
-  original?: Maybe<Scalars['String']['output']>;
+  original?: Maybe<Scalars['JSONObject']['output']>;
+  user: User;
 };
 
 /** The fraction of a specific material within a component */
@@ -602,6 +614,8 @@ export type Item = Named & {
   categories: CategoriesPage;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  /** Audit history of changes to this item */
+  history: Array<ItemHistory>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
@@ -648,6 +662,15 @@ export type ItemEdge = {
   __typename?: 'ItemEdge';
   cursor: Scalars['String']['output'];
   node: Item;
+};
+
+export type ItemHistory = {
+  __typename?: 'ItemHistory';
+  changes?: Maybe<Scalars['JSONObject']['output']>;
+  datetime: Scalars['DateTime']['output'];
+  item_id: Scalars['String']['output'];
+  original?: Maybe<Scalars['JSONObject']['output']>;
+  user: User;
 };
 
 export type ItemTagsInput = {
@@ -1110,9 +1133,9 @@ export type ProcessEfficiency = {
 
 export type ProcessHistory = {
   __typename?: 'ProcessHistory';
-  changes?: Maybe<Scalars['String']['output']>;
+  changes?: Maybe<Scalars['JSONObject']['output']>;
   datetime: Scalars['DateTime']['output'];
-  original?: Maybe<Scalars['String']['output']>;
+  original?: Maybe<Scalars['JSONObject']['output']>;
   process: Process;
   user: User;
 };
@@ -1938,6 +1961,8 @@ export type Variant = Named & {
   components: VariantComponentsPage;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  /** Audit history of changes to this variant */
+  history: Array<VariantHistory>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
@@ -2031,6 +2056,15 @@ export type VariantEdge = {
   __typename?: 'VariantEdge';
   cursor: Scalars['String']['output'];
   node: Variant;
+};
+
+export type VariantHistory = {
+  __typename?: 'VariantHistory';
+  changes?: Maybe<Scalars['JSONObject']['output']>;
+  datetime: Scalars['DateTime']['output'];
+  original?: Maybe<Scalars['JSONObject']['output']>;
+  user: User;
+  variant_id: Scalars['String']['output'];
 };
 
 export type VariantItemsInput = {

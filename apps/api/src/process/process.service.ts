@@ -13,7 +13,7 @@ import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 
 import { Material } from './material.entity'
-import { Process } from './process.entity'
+import { Process, ProcessHistory } from './process.entity'
 import { CreateProcessInput, UpdateProcessInput } from './process.model'
 
 export interface FindProcessFilter {
@@ -58,6 +58,12 @@ export class ProcessService {
     const process = new Process()
     if (!isUsingChange(input)) {
       await this.setFields(process, input)
+      await this.editService.createHistory(
+        Process.name,
+        userID,
+        undefined,
+        this.editService.entityToChangePOJO(Process.name, process),
+      )
       await this.em.persist(process).flush()
       return {
         process,
@@ -88,7 +94,14 @@ export class ProcessService {
       throw new Error(`Process with ID "${input.id}" not found`)
     }
     if (!change) {
+      const original = this.editService.entityToChangePOJO(Process.name, process)
       await this.setFields(process, input)
+      await this.editService.createHistory(
+        Process.name,
+        userID,
+        original,
+        this.editService.entityToChangePOJO(Process.name, process),
+      )
       await this.em.persist(process).flush()
       return {
         process,
@@ -112,6 +125,10 @@ export class ProcessService {
       throw NotFoundErr(`Process with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async history(processID: string) {
+    return this.em.find(ProcessHistory, { process: processID }, { populate: ['user'] })
   }
 
   async setFields(

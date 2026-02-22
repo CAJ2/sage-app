@@ -10,10 +10,16 @@ import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
-import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
+import {
+  BaseModel,
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
+import { User } from '@src/users/users.model'
 
 import { CategoriesPage } from './category.model'
 import { Item as ItemEntity } from './item.entity'
@@ -49,6 +55,9 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   })
   variants!: VariantsPage & {}
 
+  @Field(() => [ItemHistory], { description: 'Audit history of changes to this item' })
+  history: ItemHistory[] = []
+
   transform(entity: ItemEntity) {
     this.imageURL = entity.files?.thumbnail
   }
@@ -56,18 +65,21 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
 registerModel('Item', Item)
 
 @ObjectType()
-export class ItemHistory {
+export class ItemHistory extends BaseModel<any> {
   @Field(() => String)
   item_id!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => User)
+  user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  original?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes?: JSONObject
 }
 
 @ObjectType()

@@ -1,6 +1,7 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
@@ -9,7 +10,9 @@ import { Change } from '@src/changes/change.model'
 import { ImageOrIconSchema } from '@src/common/base.schema'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate, TrArraySchema } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import {
+  BaseModel,
   CreatedUpdated,
   registerModel,
   TranslatedInput,
@@ -81,11 +84,14 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
 
   @Field(() => ItemsPage, { description: 'Items classified under this category' })
   items!: ItemsPage & {}
+
+  @Field(() => [CategoryHistory], { description: 'Audit history of changes to this category' })
+  history: CategoryHistory[] = []
 }
 registerModel('Category', Category)
 
 @ObjectType()
-export class CategoryHistory {
+export class CategoryHistory extends BaseModel<any> {
   @Field(() => String)
   category_id!: string
 
@@ -95,11 +101,11 @@ export class CategoryHistory {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  original?: JSONObject
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes?: JSONObject
 }
 
 @ObjectType()

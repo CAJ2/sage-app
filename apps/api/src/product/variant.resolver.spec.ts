@@ -964,4 +964,69 @@ describe('VariantResolver (integration)', () => {
       expect(res.data?.variant2?.variant?.name).toBe('Batch Variant 2')
     })
   })
+
+  describe('history tracking', () => {
+    let historyVariantID: string
+
+    test('should record history on direct create', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation VariantHistoryCreate($input: CreateVariantInput!) {
+            createVariant(input: $input) {
+              variant {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original
+                  changes
+                }
+              }
+            }
+          }
+        `),
+        { input: { name: 'History Test Variant' } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      const variant = createRes.data?.createVariant?.variant
+      expect(variant).toBeDefined()
+      historyVariantID = variant!.id
+      expect(variant!.history).toHaveLength(1)
+      expect(variant!.history[0].user).toBeDefined()
+      expect(variant!.history[0].original).toBeNull()
+      expect(variant!.history[0].changes).toBeTruthy()
+    })
+
+    test('should record history on direct update', async () => {
+      const updateRes = await gql.send(
+        graphql(`
+          mutation VariantHistoryUpdate($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original
+                  changes
+                }
+              }
+            }
+          }
+        `),
+        { input: { id: historyVariantID, name: 'Updated History Variant' } },
+      )
+      expect(updateRes.errors).toBeUndefined()
+      const variant = updateRes.data?.updateVariant?.variant
+      expect(variant).toBeDefined()
+      expect(variant!.history).toHaveLength(2)
+      const latest = variant!.history.at(-1)!
+      expect(latest.original).toBeTruthy()
+      expect(latest.changes).toBeTruthy()
+    })
+  })
 })

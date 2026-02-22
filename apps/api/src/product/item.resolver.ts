@@ -15,6 +15,7 @@ import {
   CreateItemOutput,
   Item,
   ItemCategoriesArgs,
+  ItemHistory,
   ItemsArgs,
   ItemsPage,
   ItemTagsArgs,
@@ -128,5 +129,11 @@ export class ItemResolver {
       throw NotFoundErr(`Item with ID "${input.id}" not found`)
     }
     return { success: true, id: item.id }
+  }
+
+  @ResolveField(() => [ItemHistory])
+  async history(@Parent() item: Item) {
+    const history = await this.itemService.history(item.id)
+    return Promise.all(history.map((h) => this.transform.entityToModel(ItemHistory, h)))
   }
 }

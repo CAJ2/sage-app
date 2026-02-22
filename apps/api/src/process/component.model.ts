@@ -11,9 +11,15 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate, TrArraySchema } from '@src/common/i18n'
 import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
+import {
+  BaseModel,
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { User } from '@src/users/users.model'
 
 import {
   Component as ComponentEntity,
@@ -104,18 +110,21 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
 registerModel('Component', Component)
 
 @ObjectType()
-export class ComponentHistory {
+export class ComponentHistory extends BaseModel<any> {
   @Field(() => String)
   componentID!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => User)
+  user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  original?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes?: JSONObject
 }
 
 @ObjectType()

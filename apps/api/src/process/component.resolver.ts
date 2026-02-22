@@ -10,6 +10,7 @@ import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   Component,
+  ComponentHistory,
   ComponentRecycleArgs,
   ComponentsPage,
   CreateComponentInput,
@@ -148,5 +149,11 @@ export class ComponentResolver {
     input = await this.z.parse(DeleteInput.schema, input)
     const component = await this.componentService.delete(input)
     return { success: true, id: component.id }
+  }
+
+  @ResolveField(() => [ComponentHistory])
+  async history(@Parent() component: Component) {
+    const history = await this.componentService.history(component.id)
+    return Promise.all(history.map((h) => this.transform.entityToModel(ComponentHistory, h)))
   }
 }

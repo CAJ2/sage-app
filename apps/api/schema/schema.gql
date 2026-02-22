@@ -37,6 +37,9 @@ type Category implements Named {
 
   """All descendant categories down the hierarchy tree"""
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
+
+  """Audit history of changes to this category"""
+  history: [CategoryHistory!]!
   id: ID!
   imageURL: String
 
@@ -55,6 +58,14 @@ type Category implements Named {
 type CategoryEdge {
   cursor: String!
   node: Category!
+}
+
+type CategoryHistory {
+  category_id: String!
+  changes: JSONObject
+  datetime: DateTime!
+  original: JSONObject
+  user: User!
 }
 
 """A proposed or merged set of edits to one or more data models"""
@@ -143,10 +154,11 @@ type ComponentEdge {
 }
 
 type ComponentHistory {
-  changes: String
+  changes: JSONObject
   componentID: String!
   datetime: DateTime!
-  original: String
+  original: JSONObject
+  user: User!
 }
 
 """The fraction of a specific material within a component"""
@@ -548,6 +560,9 @@ type Item implements Named {
   createdAt: DateTime!
   desc: String
 
+  """Audit history of changes to this item"""
+  history: [ItemHistory!]!
+
   """The ID of the model"""
   id: ID!
   imageURL: String
@@ -568,6 +583,14 @@ input ItemCategoriesInput {
 type ItemEdge {
   cursor: String!
   node: Item!
+}
+
+type ItemHistory {
+  changes: JSONObject
+  datetime: DateTime!
+  item_id: String!
+  original: JSONObject
+  user: User!
 }
 
 input ItemTagsInput {
@@ -833,9 +856,9 @@ type ProcessEfficiency {
 }
 
 type ProcessHistory {
-  changes: String
+  changes: JSONObject
   datetime: DateTime!
-  original: String
+  original: JSONObject
   process: Process!
   user: User!
 }
@@ -1505,6 +1528,9 @@ type Variant implements Named {
   createdAt: DateTime!
   desc: String
 
+  """Audit history of changes to this variant"""
+  history: [VariantHistory!]!
+
   """The ID of the model"""
   id: ID!
   imageURL: String
@@ -1562,6 +1588,14 @@ type VariantComponentsPage {
 type VariantEdge {
   cursor: String!
   node: Variant!
+}
+
+type VariantHistory {
+  changes: JSONObject
+  datetime: DateTime!
+  original: JSONObject
+  user: User!
+  variant_id: String!
 }
 
 input VariantItemsInput {

@@ -11,7 +11,12 @@ import { translate, TrArraySchema } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
-import { IDCreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
+import {
+  BaseModel,
+  IDCreatedUpdated,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Variant } from '@src/product/variant.model'
@@ -105,7 +110,7 @@ export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
 registerModel('Process', Process)
 
 @ObjectType()
-export class ProcessHistory {
+export class ProcessHistory extends BaseModel<any> {
   @Field(() => Process)
   process!: Process
 
@@ -115,11 +120,11 @@ export class ProcessHistory {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  original?: JSONObject
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes?: JSONObject
 }
 
 @ObjectType()

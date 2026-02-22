@@ -1,4 +1,4 @@
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
@@ -13,6 +13,7 @@ import {
   CreateProcessOutput,
   Process,
   ProcessArgs,
+  ProcessHistory,
   ProcessPage,
   UpdateProcessInput,
   UpdateProcessOutput,
@@ -103,5 +104,11 @@ export class ProcessResolver {
     input = await this.z.parse(DeleteInput.schema, input)
     const process = await this.processService.delete(input)
     return { success: true, id: process.id }
+  }
+
+  @ResolveField(() => [ProcessHistory])
+  async history(@Parent() process: Process) {
+    const history = await this.processService.history(process.id)
+    return Promise.all(history.map((h) => this.transform.entityToModel(ProcessHistory, h)))
   }
 }

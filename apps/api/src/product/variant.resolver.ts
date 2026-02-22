@@ -19,6 +19,7 @@ import {
   VariantComponent,
   VariantComponentsArgs,
   VariantComponentsPage,
+  VariantHistory,
   VariantItemsArgs,
   VariantOrg,
   VariantOrgsArgs,
@@ -160,5 +161,11 @@ export class VariantResolver {
       throw NotFoundErr(`Variant with ID "${input.id}" not found`)
     }
     return { success: true, id: variant.id }
+  }
+
+  @ResolveField(() => [VariantHistory])
+  async history(@Parent() variant: Variant) {
+    const history = await this.variantService.history(variant.id)
+    return Promise.all(history.map((h) => this.transform.entityToModel(VariantHistory, h)))
   }
 }
