@@ -16,38 +16,20 @@ type CategoriesPage {
   totalCount: Int!
 }
 
-"""A hierarchical category for classifying product items"""
 type Category implements Named {
-  """All ancestor categories up the hierarchy tree"""
   ancestors(after: String, before: String, first: Int, last: Int): CategoriesPage!
-
-  """Direct child categories in the hierarchy"""
   children(after: String, before: String, first: Int, last: Int): CategoriesPage!
   createdAt: DateTime!
   desc: String
-
-  """A short summary description"""
   descShort: String
-
-  """Translated versions of the short description"""
   descShortTr: [TranslatedOutput!]
-
-  """Translated versions of the description"""
   descTr: [TranslatedOutput!]
-
-  """All descendant categories down the hierarchy tree"""
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
   id: ID!
   imageURL: String
-
-  """Items classified under this category"""
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String!
-
-  """Translated versions of the name"""
   nameTr: [TranslatedOutput!]
-
-  """Direct parent categories in the hierarchy"""
   parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
   updatedAt: DateTime!
 }
@@ -57,22 +39,15 @@ type CategoryEdge {
   node: Category!
 }
 
-"""A proposed or merged set of edits to one or more data models"""
 type Change {
   createdAt: DateTime!
   description: String
-
-  """The individual entity edits included in this change"""
   edits(after: String, before: String, first: Int, id: ID, last: Int, type: EditModelType): ChangeEditsPage!
   id: ID!
-
-  """Source references supporting this change"""
   sources(after: String, before: String, first: Int, last: Int): SourcesPage!
   status: ChangeStatus!
   title: String
   updatedAt: DateTime!
-
-  """The user who created this change"""
   user: User!
 }
 
@@ -104,32 +79,19 @@ type ChangesPage {
   totalCount: Int!
 }
 
-"""A physical component of a product variant, made of one or more materials"""
 type Component implements Named {
   createdAt: DateTime!
   desc: String
-
-  """Audit history of changes to this component"""
   history: [ComponentHistory!]!
 
   """The ID of the model"""
   id: ID!
   imageURL: String
-
-  """All materials in this component with their fractions"""
   materials: [ComponentMaterial!]!
   name: String
-
-  """The primary material this component is made of"""
   primaryMaterial: Material!
-
-  """Available recycling options for this component by stream"""
   recycle(regionID: ID): [ComponentRecycle!]
-
-  """Aggregated recyclability score for this component"""
   recycleScore(regionID: ID): StreamScore
-
-  """The geographic region this component's recycling data applies to"""
   region: Region
   tags: [Tag!]!
   updatedAt: DateTime!
@@ -147,22 +109,16 @@ type ComponentHistory {
   original: String
 }
 
-"""The fraction of a specific material within a component"""
 type ComponentMaterial {
   material: Material!
-
-  """Fraction of this material in the component (0–1)"""
   materialFraction: Float
 }
 
 input ComponentMaterialInput {
   id: ID!
-
-  """Fraction of this material in the component (0–1)"""
   materialFraction: Float
 }
 
-"""A recycling option for a component in a specific recycling stream"""
 type ComponentRecycle {
   context: StreamContext
   stream: RecyclingStream
@@ -184,24 +140,12 @@ type ComponentsPage {
   totalCount: Int!
 }
 
-"""A collection container for a recycling stream (e.g. a bin or bag)"""
 type Container {
-  """Access method for the container (e.g. CURBSIDE, DROP_OFF)"""
   access: String
-
-  """Typical color of the container"""
   color: String
-
-  """URL of an image of the container"""
   image: String
-
-  """Coordinates for the item entry point on the container image"""
   imageEntryPoint: ContainerImageEntryPoint
-
-  """Physical dimensions of the container"""
   shape: ContainerShape
-
-  """Container type (e.g. BIN, BAG, BOX)"""
   type: String!
 }
 
@@ -218,24 +162,18 @@ type ContainerShape {
 }
 
 input CreateCategoryInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descShort: String
   descShortTr: [TranslatedInput!]
   descTr: [TranslatedInput!]
   imageURL: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
   nameTr: [TranslatedInput!]
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
 }
 
@@ -256,18 +194,13 @@ type CreateChangeOutput {
 }
 
 input CreateComponentInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descTr: [TranslatedInput!]
   imageURL: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   materials: [ComponentMaterialInput!]
   name: String
@@ -275,7 +208,6 @@ input CreateComponentInput {
   physical: JSONObject
   primaryMaterial: ComponentMaterialInput
   region: ComponentRegionInput
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   tags: [ComponentTagsInput!]
   visual: JSONObject
@@ -287,23 +219,17 @@ type CreateComponentOutput {
 }
 
 input CreateItemInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
   categories: [ItemCategoriesInput!]
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descTr: [TranslatedInput!]
   imageURL: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
   nameTr: [TranslatedInput!]
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   tags: [ItemTagsInput!]
 }
@@ -314,20 +240,14 @@ type CreateItemOutput {
 }
 
 input CreateOrgInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
   avatarURL: String
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String!
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   slug: String!
   websiteURL: String
@@ -339,20 +259,15 @@ type CreateOrgOutput {
 }
 
 input CreateProcessInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descTr: [TranslatedInput!]
   efficiency: JSONObject
   instructions: JSONObject
   intent: String!
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   material: ProcessMaterialInput
   name: String
@@ -360,7 +275,6 @@ input CreateProcessInput {
   org: ProcessOrgInput
   place: ProcessPlaceInput
   region: ProcessRegionInput
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   rules: JSONObject
   variant: ProcessVariantInput
@@ -397,30 +311,22 @@ type CreateTagDefinitionOutput {
 }
 
 input CreateVariantInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
-
-  """Manufacturer or product code for this variant"""
   code: String
   components: [VariantComponentsInput!]
   desc: String
   descTr: [TranslatedInput!]
   imageURL: String
   items: [VariantItemsInput!]
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
   nameTr: [TranslatedInput!]
   orgs: [VariantOrgsInput!]
   region: VariantRegionsInput
   regions: [VariantRegionsInput!]
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   tags: [VariantTagsInput!]
 }
@@ -440,16 +346,11 @@ type DeleteChangeOutput {
 }
 
 input DeleteInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   id: ID!
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
 }
 
@@ -474,22 +375,12 @@ type DiscardEditOutput {
   success: Boolean
 }
 
-"""A tracked edit to a single entity within a change"""
 type Edit {
-  """The proposed state of the entity after this edit"""
   changes: EditModel
-
-  """Raw field values for creating a new entity"""
   createChanges: JSONObject
-
-  """The type name of the entity being edited (e.g. Item, Component)"""
   entityName: String!
   id: ID
-
-  """The state of the entity before this edit"""
   original: EditModel
-
-  """Raw field values for updating an existing entity"""
   updateChanges: JSONObject
 }
 
@@ -512,9 +403,7 @@ enum EditModelType {
   Variant
 }
 
-"""A product or consumable item that can be categorized and have multiple variants"""
 type Item implements Named {
-  """Categories this item belongs to"""
   categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
   createdAt: DateTime!
   desc: String
@@ -523,12 +412,8 @@ type Item implements Named {
   id: ID!
   imageURL: String
   name: String
-
-  """Metadata tags applied to this item"""
   tags(after: String, before: String, first: Int, last: Int): TagPage!
   updatedAt: DateTime!
-
-  """Product variants of this item (e.g. specific SKUs or models)"""
   variants(after: String, before: String, first: Int, last: Int): VariantsPage!
 }
 
@@ -562,37 +447,19 @@ type MarkSourceProcessedOutput {
   success: Boolean
 }
 
-"""A raw or processed material that physical components are composed of"""
 type Material implements Named {
-  """All ancestor materials up the hierarchy"""
   ancestors(after: String, before: String, first: Int, last: Int): MaterialsPage!
-
-  """Direct child materials in the hierarchy"""
   children(after: String, before: String, first: Int, last: Int): MaterialsPage!
-
-  """All components that include this material"""
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   createdAt: DateTime!
   desc: String
-
-  """All descendant materials down the hierarchy"""
   descendants(after: String, before: String, first: Int, last: Int): MaterialsPage!
   id: ID!
   name: String
-
-  """Direct parent materials in the hierarchy"""
   parents(after: String, before: String, first: Int, last: Int): MaterialsPage!
-
-  """Components that primarily use this material"""
   primaryComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
-
-  """Recycling or disposal processes for this material"""
   processes(after: String, before: String, first: Int, last: Int): ProcessPage!
-
-  """The physical form or shape of the material (e.g. film, rigid, fibre)"""
   shape: String
-
-  """If true, this is an internal technical classification not shown to end-users"""
   technical: Boolean!
   updatedAt: DateTime!
 }
@@ -666,7 +533,6 @@ interface Named {
   name: String
 }
 
-"""An organization or company on the platform"""
 type Org implements Named {
   avatarURL: String
   createdAt: DateTime!
@@ -675,15 +541,9 @@ type Org implements Named {
   """The ID of the model"""
   id: ID!
   name: String!
-
-  """URL-friendly unique identifier for this organization"""
   slug: String!
   updatedAt: DateTime!
-
-  """Users that are members of this organization"""
   users(after: String, before: String, first: Int, last: Int): UserPage!
-
-  """URL of the organization's website"""
   websiteURL: String
 }
 
@@ -699,27 +559,18 @@ type PageInfo {
   startCursor: String
 }
 
-"""A specific physical location, such as a business or recycling facility"""
 type Place implements Named {
-  """Structured postal address of this place"""
   address: PlaceAddress
   createdAt: DateTime!
   desc: String
   id: ID!
-
-  """Geographic coordinates of this place"""
   location: PlaceLocation
   name: String
-
-  """The organization associated with this place"""
   org: Org
-
-  """Metadata tags applied to this place"""
   tags: TagPage!
   updatedAt: DateTime!
 }
 
-"""A structured postal address"""
 type PlaceAddress {
   city: String
   country: String
@@ -734,7 +585,6 @@ type PlaceEdge {
   node: Place!
 }
 
-"""Geographic coordinates (latitude and longitude) for a place"""
 type PlaceLocation {
   latitude: Float!
   longitude: Float!
@@ -747,38 +597,21 @@ type PlacesPage {
   totalCount: Int!
 }
 
-"""A recycling, reuse, or disposal process for a product variant or material"""
 type Process implements Named {
   createdAt: DateTime!
   desc: String
-
-  """Efficiency metrics for this process"""
   efficiency: ProcessEfficiency
-
-  """Audit history of changes to this process"""
   history: [ProcessHistory!]!
 
   """The ID of the model"""
   id: ID!
-
-  """The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR)"""
   intent: String!
-
-  """The material this process handles"""
   material: Material
   name: String
-
-  """The organization that offers or operates this process"""
   org: Org
-
-  """The physical location where this process is carried out"""
   place: Place
-
-  """The geographic region where this process is available"""
   region: Region
   updatedAt: DateTime!
-
-  """The product variant this process applies to"""
   variant: Variant
 }
 
@@ -787,15 +620,9 @@ type ProcessEdge {
   node: Process!
 }
 
-"""Efficiency metrics for a recycling or recovery process"""
 type ProcessEfficiency {
-  """Recycling or recovery efficiency ratio (0–1)"""
   efficiency: Float
-
-  """Material equivalency ratio for this process"""
   equivalency: Float
-
-  """Value recovery ratio relative to virgin material"""
   valueRatio: Float
 }
 
@@ -871,32 +698,20 @@ type Query {
   variants(after: String, before: String, first: Int, last: Int): VariantsPage!
 }
 
-"""A recycling collection stream in a region, with score and container information"""
 type RecyclingStream {
-  """The collection container used in this stream"""
   container: Container
   desc: String
   name: String
-
-  """Aggregated recyclability score for this stream"""
   score: StreamScore
-
-  """Per-material recyclability scores within this stream"""
   scores: [StreamScore!]
 }
 
-"""A geographic region based on the Who's On First dataset"""
 type Region {
-  """Bounding box as [minLon, minLat, maxLon, maxLat]"""
   bbox: [Float!]
   createdAt: DateTime!
   id: ID!
-
-  """Minimum map zoom level at which this region should be displayed"""
   minZoom: Float
   name: String
-
-  """The type of geographic entity (e.g. country, region, locality)"""
   placetype: String!
   updatedAt: DateTime!
 }
@@ -939,23 +754,14 @@ enum SearchType {
   VARIANT
 }
 
-"""A reference source used to support data changes, such as a URL, PDF, or image"""
 type Source {
   changes: ChangesPage!
-
-  """Extracted or structured content from the source"""
   content: JSONObject
   contentURL: String
   createdAt: DateTime!
   id: ID!
-
-  """Reference location or citation string (e.g. page number, URL fragment)"""
   location: String
-
-  """Additional metadata about the source (e.g. author, publication date)"""
   metadata: JSONObject
-
-  """Timestamp when this source was processed and ingested"""
   processedAt: DateTime
   type: SourceType!
   updatedAt: DateTime!
@@ -991,43 +797,22 @@ type SourcesPage {
   totalCount: Int!
 }
 
-"""Additional context about a recycling recommendation for a component"""
 type StreamContext {
   desc: String
-
-  """Identifier key for this context entry"""
   key: String!
   name: String
-
-  """Type of contextual information"""
   type: String
-
-  """Value of this context entry"""
   value: String
 }
 
-"""A recyclability score for a component or variant in a recycling stream"""
 type StreamScore {
-  """Quality rating for the underlying recycling data"""
   dataQuality: StreamScoreRating
-
-  """Formatted display label for the data quality rating"""
   dataQualityF: String
-
-  """Maximum possible score for this stream"""
   maxScore: Float
-
-  """Minimum possible score for this stream"""
   minScore: Float
   name: String
-
-  """Qualitative rating for this score"""
   rating: StreamScoreRating
-
-  """Formatted display label for the rating"""
   ratingF: String
-
-  """Numerical recyclability score"""
   score: Float
 }
 
@@ -1041,7 +826,6 @@ enum StreamScoreRating {
   VERY_GOOD
 }
 
-"""A tag instance applied to a model, with optional instance-specific metadata"""
 type Tag implements Named {
   bgColor: String
   createdAt: DateTime!
@@ -1050,8 +834,6 @@ type Tag implements Named {
   """The ID of the model"""
   id: ID!
   image: String
-
-  """Instance metadata conforming to the tag definition's metaTemplate"""
   meta: JSONObject
   metaTemplate: JSONObject
   name: String!
@@ -1059,24 +841,16 @@ type Tag implements Named {
   updatedAt: DateTime!
 }
 
-"""A reusable tag definition for classifying models with custom metadata"""
 type TagDefinition implements Named {
-  """Hex color code for the tag background (e.g. #FF5733)"""
   bgColor: String
   createdAt: DateTime!
   desc: String
 
   """The ID of the model"""
   id: ID!
-
-  """Icon or image URL for this tag"""
   image: String
-
-  """JSON schema template for tag instance metadata"""
   metaTemplate: JSONObject
   name: String!
-
-  """The type of model this tag can be applied to"""
   type: TagType!
   updatedAt: DateTime!
 }
@@ -1108,34 +882,22 @@ enum TagType {
   VARIANT
 }
 
-"""A translated text value for a specific language"""
 input TranslatedInput {
-  """Whether this translation was generated automatically"""
   auto: Boolean! = false
-
-  """BCP 47 language code (e.g. "en", "fr-CA")"""
   lang: String!
   text: String
 }
 
-"""A translated text value for a specific language"""
 type TranslatedOutput {
-  """Whether this translation was generated automatically"""
   auto: Boolean!
-
-  """BCP 47 language code (e.g. "en", "fr-CA")"""
   lang: String!
   text: String
 }
 
 input UpdateCategoryInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descShort: String
@@ -1143,11 +905,9 @@ input UpdateCategoryInput {
   descTr: [TranslatedInput!]
   id: ID!
   imageURL: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
   nameTr: [TranslatedInput!]
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
 }
 
@@ -1169,20 +929,15 @@ type UpdateChangeOutput {
 }
 
 input UpdateComponentInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
   addTags: [ComponentTagsInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descTr: [TranslatedInput!]
   id: ID!
   imageURL: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   materials: [ComponentMaterialInput!]
   name: String
@@ -1190,7 +945,6 @@ input UpdateComponentInput {
   physical: JSONObject
   primaryMaterial: ComponentMaterialInput
   region: ComponentRegionInput
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   removeTags: [ID!]
   tags: [ComponentTagsInput!]
@@ -1204,26 +958,20 @@ type UpdateComponentOutput {
 
 input UpdateItemInput {
   addCategories: [ItemCategoriesInput!]
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
   addTags: [ItemTagsInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
   categories: [ItemCategoriesInput!]
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descTr: [TranslatedInput!]
   id: ID!
   imageURL: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
   nameTr: [TranslatedInput!]
   removeCategories: [ID!]
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   removeTags: [ID!]
   tags: [ItemTagsInput!]
@@ -1235,21 +983,15 @@ type UpdateItemOutput {
 }
 
 input UpdateOrgInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
   avatarURL: String
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   id: String!
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   slug: String
   websiteURL: String
@@ -1261,13 +1003,9 @@ type UpdateOrgOutput {
 }
 
 input UpdateProcessInput {
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
   desc: String
   descTr: [TranslatedInput!]
@@ -1275,7 +1013,6 @@ input UpdateProcessInput {
   id: ID!
   instructions: JSONObject
   intent: String
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   material: ProcessMaterialInput
   name: String
@@ -1283,7 +1020,6 @@ input UpdateProcessInput {
   org: ProcessOrgInput
   place: ProcessPlaceInput
   region: ProcessRegionInput
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   rules: JSONObject
   variant: ProcessVariantInput
@@ -1326,17 +1062,11 @@ input UpdateVariantInput {
   addItems: [VariantItemsInput!]
   addOrgs: [VariantOrgsInput!]
   addRegions: [VariantRegionsInput!]
-  """Sources to associate with this change"""
   addSources: [SourceInput!]
   addTags: [VariantTagsInput!]
-  """If true, immediately apply (merge) the change after creation"""
   apply: Boolean
-  """Details for a new change to create for this edit"""
   change: CreateChangeInput
-  """ID of an existing change to add this edit to"""
   changeID: ID
-
-  """Manufacturer or product code for this variant"""
   code: String
   components: [VariantComponentsInput!]
   desc: String
@@ -1344,7 +1074,6 @@ input UpdateVariantInput {
   id: ID!
   imageURL: String
   items: [VariantItemsInput!]
-  """Language code for text input fields (BCP 47, e.g. "en")"""
   lang: String
   name: String
   nameTr: [TranslatedInput!]
@@ -1354,7 +1083,6 @@ input UpdateVariantInput {
   removeItems: [ID!]
   removeOrgs: [ID!]
   removeRegions: [ID!]
-  """IDs of sources to remove from this change"""
   removeSources: [ID!]
   removeTags: [ID!]
   tags: [VariantTagsInput!]
@@ -1365,7 +1093,6 @@ type UpdateVariantOutput {
   variant: Variant
 }
 
-"""A registered user of the platform"""
 type User {
   avatarURL: String
   createdAt: DateTime!
@@ -1374,11 +1101,7 @@ type User {
   id: ID!
   lang: String
   name: String
-
-  """Organizations this user belongs to"""
   orgs(after: String, before: String, first: Int, last: Int): UserOrgsPage!
-
-  """Extended profile information for this user"""
   profile: UserProfile
   updatedAt: DateTime!
   username: String!
@@ -1389,11 +1112,8 @@ type UserEdge {
   node: User!
 }
 
-"""Membership of a user in an organization"""
 type UserOrg {
   org: Org!
-
-  """The user's role within the organization"""
   role: String
 }
 
@@ -1420,9 +1140,7 @@ type UserProfile {
   bio: String
 }
 
-"""A specific variant or SKU of a product item, composed of physical components"""
 type Variant implements Named {
-  """Physical components that make up this variant"""
   components(after: String, before: String, first: Int, last: Int): VariantComponentsPage!
   createdAt: DateTime!
   desc: String
@@ -1430,30 +1148,17 @@ type Variant implements Named {
   """The ID of the model"""
   id: ID!
   imageURL: String
-
-  """Product items this variant belongs to"""
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
   name: String
-
-  """Organizations associated with this variant (e.g. manufacturer, importer)"""
   orgs(after: String, before: String, first: Int, last: Int): VariantOrgsPage!
-
-  """Aggregated recyclability score for this variant"""
   recycleScore(regionID: ID): StreamScore
-
-  """Metadata tags applied to this variant"""
   tags(after: String, before: String, first: Int, last: Int): TagPage!
   updatedAt: DateTime!
 }
 
-"""A physical component within a variant, with its quantity"""
 type VariantComponent {
   component: Component!
-
-  """Quantity of this component in the variant"""
   quantity: Float
-
-  """Unit of measurement for the component quantity"""
   unit: String
 }
 
@@ -1464,11 +1169,7 @@ type VariantComponentEdge {
 
 input VariantComponentsInput {
   id: ID!
-
-  """Quantity of this component in the variant"""
   quantity: Float
-
-  """Unit of measurement for the component quantity"""
   unit: String
 }
 
@@ -1488,11 +1189,8 @@ input VariantItemsInput {
   id: ID!
 }
 
-"""An organization associated with a variant and its role (e.g. manufacturer, importer)"""
 type VariantOrg {
   org: Org!
-
-  """The organization's role for this variant (e.g. manufacturer, importer)"""
   role: String
 }
 
