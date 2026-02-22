@@ -1,13 +1,15 @@
 import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
 import { Transform } from 'class-transformer'
 import { Validate } from 'class-validator'
+import { JSONObjectResolver } from 'graphql-scalars'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
-import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
+import { type JSONObject } from '@src/common/z.schema'
+import { BaseModel, IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 
@@ -37,11 +39,13 @@ export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
 
   @Field(() => UserPage, { description: 'Users that are members of this organization' })
   users!: UserPage & {}
+  @Field(() => [OrgHistory])
+  history: OrgHistory[] = []
 }
 registerModel('Org', Org)
 
 @ObjectType()
-export class OrgHistory {
+export class OrgHistory extends BaseModel<any> {
   @Field(() => Org)
   org!: Org
 
@@ -51,11 +55,11 @@ export class OrgHistory {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  original?: JSONObject
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => JSONObjectResolver, { nullable: true })
+  changes?: JSONObject
 }
 
 @ObjectType()

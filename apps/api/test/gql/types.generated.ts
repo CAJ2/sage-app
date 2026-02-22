@@ -1002,6 +1002,7 @@ export type Org = Named & {
   avatarURL?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
+  history: Array<OrgHistory>;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -1027,6 +1028,15 @@ export type OrgEdge = {
   __typename?: 'OrgEdge';
   cursor: Scalars['String']['output'];
   node: Org;
+};
+
+export type OrgHistory = {
+  __typename?: 'OrgHistory';
+  changes?: Maybe<Scalars['JSONObject']['output']>;
+  datetime: Scalars['DateTime']['output'];
+  org: Org;
+  original?: Maybe<Scalars['JSONObject']['output']>;
+  user: User;
 };
 
 export type PageInfo = {

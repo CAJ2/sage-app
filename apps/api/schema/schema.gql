@@ -725,6 +725,7 @@ type Org implements Named {
   avatarURL: String
   createdAt: DateTime!
   desc: String
+  history: [OrgHistory!]!
 
   """The ID of the model"""
   id: ID!
@@ -744,6 +745,14 @@ type Org implements Named {
 type OrgEdge {
   cursor: String!
   node: Org!
+}
+
+type OrgHistory {
+  changes: JSONObject
+  datetime: DateTime!
+  org: Org!
+  original: JSONObject
+  user: User!
 }
 
 type PageInfo {

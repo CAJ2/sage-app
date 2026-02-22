@@ -9,7 +9,7 @@ import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 
-import { Org } from './org.entity'
+import { Org, OrgHistory } from './org.entity'
 import { CreateOrgInput, UpdateOrgInput } from './org.model'
 import { User } from './users.entity'
 
@@ -44,6 +44,12 @@ export class OrgService {
     const org = new Org()
     if (!isUsingChange(input)) {
       await this.setFields(org, input)
+      await this.editService.createHistory(
+        Org.name,
+        userID,
+        undefined,
+        this.editService.entityToChangePOJO(Org.name, org),
+      )
       await this.em.persist(org).flush()
       return { org }
     }
@@ -68,7 +74,14 @@ export class OrgService {
       throw NotFoundErr('ORG_NOT_FOUND', `Org with id ${input.id} not found`)
     }
     if (!change) {
+      const original = this.editService.entityToChangePOJO(Org.name, org)
       await this.setFields(org, input)
+      await this.editService.createHistory(
+        Org.name,
+        userID,
+        original,
+        this.editService.entityToChangePOJO(Org.name, org),
+      )
       await this.em.persist(org).flush()
       return { org }
     }
@@ -78,6 +91,10 @@ export class OrgService {
     await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { org, change }
+  }
+
+  async history(orgID: string) {
+    return this.em.find(OrgHistory, { org: orgID }, { populate: ['user'] })
   }
 
   async setFields(org: Org, input: Partial<CreateOrgInput & UpdateOrgInput>, change?: Change) {

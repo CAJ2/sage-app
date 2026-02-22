@@ -9,6 +9,7 @@ import {
   CreateOrgInput,
   CreateOrgOutput,
   Org,
+  OrgHistory,
   OrgUsersArgs,
   UpdateOrgInput,
   UpdateOrgOutput,
@@ -67,5 +68,11 @@ export class OrgResolver {
     }
     const change = await this.transform.entityToModel(Change, updated.change)
     return { org: result, change }
+  }
+
+  @ResolveField(() => [OrgHistory])
+  async history(@Parent() org: Org) {
+    const entries = await this.orgService.history(org.id)
+    return Promise.all(entries.map((h) => this.transform.entityToModel(OrgHistory, h)))
   }
 }

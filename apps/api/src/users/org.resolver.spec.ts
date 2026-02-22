@@ -337,4 +337,66 @@ describe('OrgResolver (integration)', () => {
       expect(res.data?.updateOrg?.change?.status).toBe('PROPOSED')
     })
   })
+
+  describe('history tracking', () => {
+    let historyOrgID: string
+
+    test('should record history on direct create', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation OrgHistoryCreate($input: CreateOrgInput!) {
+            createOrg(input: $input) {
+              org {
+                id
+                history {
+                  datetime
+                  user { id }
+                  original
+                  changes
+                }
+              }
+            }
+          }
+        `),
+        { input: { name: 'History Org', slug: 'history-org' } },
+      )
+      expect(res.errors).toBeUndefined()
+      historyOrgID = res.data!.createOrg!.org!.id
+      const history = res.data?.createOrg?.org?.history
+      expect(history).toHaveLength(1)
+      expect(history![0].user).toBeDefined()
+      expect(history![0].original).toBeNull()
+      expect(history![0].changes).toBeTruthy()
+    })
+
+    test('should record history on direct update', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation OrgHistoryUpdate($input: UpdateOrgInput!) {
+            updateOrg(input: $input) {
+              org {
+                id
+                history {
+                  datetime
+                  user { id }
+                  original
+                  changes
+                }
+              }
+            }
+          }
+        `),
+        { input: { id: historyOrgID, name: 'History Org Updated' } },
+      )
+      expect(res.errors).toBeUndefined()
+      const history = res.data?.updateOrg?.org?.history
+      expect(history).toHaveLength(2)
+      const latest = history!.at(-1)!
+      expect(latest.user).toBeDefined()
+      expect(latest.original).toBeTruthy()
+      expect(latest.changes).toBeTruthy()
+      expect((latest.original as any).name).toBe('History Org')
+      expect((latest.changes as any).name).toBe('History Org Updated')
+    })
+  })
 })
