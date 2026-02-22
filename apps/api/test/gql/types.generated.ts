@@ -115,7 +115,7 @@ export type CategoryEdge = {
 
 export type CategoryHistory = {
   __typename?: 'CategoryHistory';
-  category_id: Scalars['String']['output'];
+  categoryID: Scalars['String']['output'];
   changes?: Maybe<Scalars['JSONObject']['output']>;
   datetime: Scalars['DateTime']['output'];
   original?: Maybe<Scalars['JSONObject']['output']>;
@@ -668,7 +668,7 @@ export type ItemHistory = {
   __typename?: 'ItemHistory';
   changes?: Maybe<Scalars['JSONObject']['output']>;
   datetime: Scalars['DateTime']['output'];
-  item_id: Scalars['String']['output'];
+  itemID: Scalars['String']['output'];
   original?: Maybe<Scalars['JSONObject']['output']>;
   user: User;
 };
@@ -2074,7 +2074,7 @@ export type VariantHistory = {
   datetime: Scalars['DateTime']['output'];
   original?: Maybe<Scalars['JSONObject']['output']>;
   user: User;
-  variant_id: Scalars['String']['output'];
+  variantID: Scalars['String']['output'];
 };
 
 export type VariantItemsInput = {

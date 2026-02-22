@@ -170,7 +170,11 @@ export class ItemService {
   }
 
   async history(itemID: string) {
-    return this.em.find(ItemHistory, { item: itemID }, { populate: ['user'] })
+    return this.em.find(
+      ItemHistory,
+      { item: itemID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(item: Item, input: Partial<CreateItemInput & UpdateItemInput>, change?: Change) {

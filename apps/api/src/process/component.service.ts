@@ -177,7 +177,11 @@ export class ComponentService {
   }
 
   async history(componentID: string) {
-    return this.em.find(ComponentHistory, { component: componentID }, { populate: ['user'] })
+    return this.em.find(
+      ComponentHistory,
+      { component: componentID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

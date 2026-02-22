@@ -94,7 +94,11 @@ export class OrgService {
   }
 
   async history(orgID: string) {
-    return this.em.find(OrgHistory, { org: orgID }, { populate: ['user'] })
+    return this.em.find(
+      OrgHistory,
+      { org: orgID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(org: Org, input: Partial<CreateOrgInput & UpdateOrgInput>, change?: Change) {

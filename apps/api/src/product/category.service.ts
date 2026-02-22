@@ -198,7 +198,11 @@ export class CategoryService {
   }
 
   async history(categoryID: string) {
-    return this.em.find(CategoryHistory, { category: categoryID }, { populate: ['user'] })
+    return this.em.find(
+      CategoryHistory,
+      { category: categoryID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

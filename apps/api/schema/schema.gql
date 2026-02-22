@@ -61,7 +61,7 @@ type CategoryEdge {
 }
 
 type CategoryHistory {
-  category_id: String!
+  categoryID: String!
   changes: JSONObject
   datetime: DateTime!
   original: JSONObject
@@ -588,7 +588,7 @@ type ItemEdge {
 type ItemHistory {
   changes: JSONObject
   datetime: DateTime!
-  item_id: String!
+  itemID: String!
   original: JSONObject
   user: User!
 }
@@ -1604,7 +1604,7 @@ type VariantHistory {
   datetime: DateTime!
   original: JSONObject
   user: User!
-  variant_id: String!
+  variantID: String!
 }
 
 input VariantItemsInput {

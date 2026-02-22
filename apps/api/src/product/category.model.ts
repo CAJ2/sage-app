@@ -93,7 +93,7 @@ registerModel('Category', Category)
 @ObjectType()
 export class CategoryHistory extends BaseModel<any> {
   @Field(() => String)
-  category_id!: string
+  categoryID!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime

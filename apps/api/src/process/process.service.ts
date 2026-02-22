@@ -128,7 +128,11 @@ export class ProcessService {
   }
 
   async history(processID: string) {
-    return this.em.find(ProcessHistory, { process: processID }, { populate: ['user'] })
+    return this.em.find(
+      ProcessHistory,
+      { process: processID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

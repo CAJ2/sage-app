@@ -67,7 +67,7 @@ registerModel('Item', Item)
 @ObjectType()
 export class ItemHistory extends BaseModel<any> {
   @Field(() => String)
-  item_id!: string
+  itemID!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime

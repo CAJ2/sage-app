@@ -212,7 +212,11 @@ export class VariantService {
   }
 
   async history(variantID: string) {
-    return this.em.find(VariantHistory, { variant: variantID }, { populate: ['user'] })
+    return this.em.find(
+      VariantHistory,
+      { variant: variantID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

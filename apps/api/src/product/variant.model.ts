@@ -80,7 +80,7 @@ registerModel('Variant', Variant)
 @ObjectType()
 export class VariantHistory extends BaseModel<any> {
   @Field(() => String)
-  variant_id!: string
+  variantID!: string
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
