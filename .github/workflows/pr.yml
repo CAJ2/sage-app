@@ -151,3 +151,4 @@ jobs:
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NODE_ENV: test
+          TEST_DEVICES: 'Pixel 5'

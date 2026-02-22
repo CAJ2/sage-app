@@ -11,7 +11,7 @@ test('"Go back home" link on error page points to the root', async ({ page, goto
   const href = await link.getAttribute('href')
   // NuxtLinkLocale resolves to="/" to the canonical home path (/main is the file-based
   // route, / is its alias — either is acceptable)
-  expect(href).toMatch(/^\/(main|en)?$|^\/main/)
+  expect(href).toMatch(/^\/(main|en)?$/)
 })
 
 test('"Go back home" navigates back to the home page', async ({ page, goto }) => {

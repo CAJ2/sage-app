@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "e2e": "pnpm exec playwright test || pnpm run reset",
-    "e2e:ui": "pnpm exec playwright test --ui || pnpm run reset",
+    "e2e": "pnpm exec playwright test",
+    "e2e:ui": "pnpm exec playwright test --ui",
     "e2e:ci": "pnpm exec playwright test",
     "reset": "lsof -ti:3000 | xargs kill || true"
   },

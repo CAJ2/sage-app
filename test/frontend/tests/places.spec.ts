@@ -35,7 +35,8 @@ test('/places search input is positioned at the top of the page', async ({ page,
   await navigateToPlaces(page, goto)
   // The input container is fixed-position at the top (uses `fixed top-0` Tailwind classes)
   const searchContainer = page.getByPlaceholder('Search...').locator('..')
-  await expect(searchContainer).toBeVisible()
+  await expect(searchContainer).toHaveClass(/fixed/)
+  await expect(searchContainer).toHaveClass(/top-0/)
 })
 
 test('/places/[id] shows a topbar with title "Place" when no data loads', async ({ page, goto }) => {

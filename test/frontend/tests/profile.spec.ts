@@ -14,7 +14,7 @@ test('/profile "Sign in with Email" button links to /profile/sign_in', async ({ 
   await goto('/profile', { waitUntil: 'hydration' })
   const signInBtn = page.getByRole('button', { name: 'Sign in with Email' })
   const link = signInBtn.locator('..').locator('a[href*="sign_in"]')
-  await expect(link.or(page.locator('a[href*="sign_in"]'))).toBeVisible()
+  await expect(link).toBeVisible()
 })
 
 test('/profile has a "Region" list item', async ({ page, goto }) => {
@@ -47,8 +47,7 @@ test('/profile Dark Mode toggle changes state when clicked', async ({ page, goto
   const toggle = page.locator('#dark-mode')
   const before = await toggle.getAttribute('data-state')
   await toggle.click()
-  const after = await toggle.getAttribute('data-state')
-  expect(after).not.toEqual(before)
+  await expect(toggle).not.toHaveAttribute('data-state', before!)
 })
 
 test('/profile/region shows "Change Region" topbar', async ({ page, goto }) => {

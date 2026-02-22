@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       affected: ${{ steps.affected.outputs.affected }}
+      e2e-affected: ${{ steps.affected.outputs.e2e-affected }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,6 +39,7 @@ jobs:
         id: affected
         run: |
           echo "affected=$(pnpm exec nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
+          echo "e2e-affected=$(pnpm exec nx show projects --affected --with-target e2e:ci --sep ',')" >> $GITHUB_OUTPUT
 
   test:
     name: 'Build & Test API + Frontend'
@@ -95,6 +97,7 @@ jobs:
           TEST_DATABASE_URL: 'cockroachdb://root@localhost:26257/defaultdb?sslmode=disable'
 
       - run: pnpm --filter=@sageleaf/e2e-frontend exec playwright install --with-deps
+        if: contains(needs.nx-affected.outputs.e2e-affected, '@sageleaf/e2e-frontend')
       - run: pnpm exec nx affected -t e2e:ci
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
@@ -140,6 +143,7 @@ jobs:
           NODE_ENV: test
 
       - run: pnpm --filter=@sageleaf/e2e-frontend exec playwright install --with-deps
+        if: contains(needs.nx-affected.outputs.e2e-affected, '@sageleaf/e2e-frontend')
       - run: pnpm exec nx affected -t e2e:ci
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}

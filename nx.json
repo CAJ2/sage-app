@@ -39,6 +39,12 @@
       "inputs": ["default", "^default", "{workspaceRoot}/vitest.config.ts"],
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}", "{projectRoot}/coverage"],
       "executor": "@nx/vitest:vitest"
+    },
+    "generate": {
+      "cache": true,
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/.output", "{projectRoot}/.nuxt"],
+      "dependsOn": ["^build"]
     }
   },
   "nxCloudId": "67acadc6cdcfda5eba4a88e1",

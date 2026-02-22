@@ -30,7 +30,7 @@ test('/explore/categories shows "Categories" in the topbar', async ({ page, goto
 test('/explore/categories topbar has a back button', async ({ page, goto }) => {
   await goto('/explore/categories', { waitUntil: 'hydration' })
   // Back button is rendered when `back` prop is set on NavTopbar
-  const backButton = page.locator('button').filter({ has: page.locator('svg') }).first()
+  const backButton = page.locator('button').filter({ has: page.locator('.fa-angle-left') }).first()
   await expect(backButton).toBeVisible()
 })
 
@@ -57,6 +57,6 @@ test('/explore/categories/[id] shows a topbar with a back button', async ({ page
   await firstCategoryLink.click()
   await expect(page).toHaveURL(/\/explore\/categories\//)
   // NavTopbar with back prop renders a back button
-  const backButton = page.locator('button').filter({ has: page.locator('svg') }).first()
+  const backButton = page.locator('button').filter({ has: page.locator('.fa-angle-left') }).first()
   await expect(backButton).toBeVisible()
 })

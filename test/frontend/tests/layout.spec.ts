@@ -36,13 +36,13 @@ test('NavTabs is visible on sub-page /explore/categories', async ({ page, goto }
 
 test('Explore tab is highlighted when on /explore', async ({ page, goto }) => {
   await goto('/explore', { waitUntil: 'hydration' })
-  // The active tab uses text-accent class; check the button ancestor link points to /explore
+  // The active tab uses aria-current="page" on the link
   const exploreLink = page.locator('a[href*="/explore"]').filter({ has: page.getByRole('button', { name: 'Explore' }) })
-  await expect(exploreLink).toBeVisible()
+  await expect(exploreLink).toHaveAttribute('aria-current', 'page')
 })
 
 test('Contribute tab is highlighted when on /contribute', async ({ page, goto }) => {
   await goto('/contribute', { waitUntil: 'hydration' })
   const contributeLink = page.locator('a[href*="/contribute"]').filter({ has: page.getByRole('button', { name: 'Contribute' }) })
-  await expect(contributeLink).toBeVisible()
+  await expect(contributeLink).toHaveAttribute('aria-current', 'page')
 })

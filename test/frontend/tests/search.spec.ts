@@ -30,7 +30,7 @@ test('/search typing 1 character does not trigger results', async ({ page, goto 
   await page.getByPlaceholder('Search...').fill('a')
   // Empty state disappears (length !== 0) but no results rendered — only the "Search Results (0)" label
   await expect(page.getByText('Search for anything')).not.toBeVisible()
-  await expect(page.locator('.list-row a').first()).not.toBeVisible()
+  await expect(page.locator('.list-row').first()).not.toBeVisible()
 })
 
 test('/search typing 2+ characters returns at least one result from the API', async ({ page, goto }) => {
