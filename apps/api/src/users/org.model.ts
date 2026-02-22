@@ -16,12 +16,13 @@ import { User, UserPage } from './users.model'
 
 @ObjectType({
   implements: () => [Named],
+  description: 'An organization or company on the platform',
 })
 export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
   @Field(() => String)
   name!: string
 
-  @Field(() => String)
+  @Field(() => String, { description: 'URL-friendly unique identifier for this organization' })
   slug!: string
 
   @Field(() => String, { nullable: true })
@@ -31,10 +32,10 @@ export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
   @Field(() => String, { nullable: true })
   avatarURL?: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: "URL of the organization's website" })
   websiteURL?: string
 
-  @Field(() => UserPage)
+  @Field(() => UserPage, { description: 'Users that are members of this organization' })
   users!: UserPage & {}
 }
 registerModel('Org', Org)

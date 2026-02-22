@@ -18,6 +18,7 @@ import { ProcessPage } from './process.model'
 
 @ObjectType({
   implements: () => [Named],
+  description: 'A raw or processed material that physical components are composed of',
 })
 export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   @Field(() => ID)
@@ -35,31 +36,31 @@ export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   @MaxLength(100_000)
   desc?: string
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { description: 'If true, this is an internal technical classification not shown to end-users' })
   technical: boolean = false
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'The physical form or shape of the material (e.g. film, rigid, fibre)' })
   shape?: string
 
-  @Field(() => MaterialsPage)
+  @Field(() => MaterialsPage, { description: 'Direct parent materials in the hierarchy' })
   parents!: MaterialsPage & {}
 
-  @Field(() => MaterialsPage)
+  @Field(() => MaterialsPage, { description: 'Direct child materials in the hierarchy' })
   children!: MaterialsPage & {}
 
-  @Field(() => MaterialsPage)
+  @Field(() => MaterialsPage, { description: 'All ancestor materials up the hierarchy' })
   ancestors!: MaterialsPage & {}
 
-  @Field(() => MaterialsPage)
+  @Field(() => MaterialsPage, { description: 'All descendant materials down the hierarchy' })
   descendants!: MaterialsPage & {}
 
-  @Field(() => ComponentsPage)
+  @Field(() => ComponentsPage, { description: 'Components that primarily use this material' })
   primaryComponents!: ComponentsPage & {}
 
-  @Field(() => ComponentsPage)
+  @Field(() => ComponentsPage, { description: 'All components that include this material' })
   components!: ComponentsPage & {}
 
-  @Field(() => ProcessPage)
+  @Field(() => ProcessPage, { description: 'Recycling or disposal processes for this material' })
   processes!: ProcessPage & {}
 }
 registerModel('Material', Material)
@@ -114,13 +115,13 @@ export class CreateMaterialInput extends ChangeInputWithLang {
   @Field(() => [TranslatedInput], { nullable: true })
   descTr?: TranslatedInput[]
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { description: 'If true, this is an internal technical classification not shown to end-users' })
   technical: boolean = false
 
-  @Field(() => [ID], { nullable: true })
+  @Field(() => [ID], { nullable: true, description: 'IDs of parent materials in the hierarchy' })
   parents?: string[]
 
-  @Field(() => [ID], { nullable: true })
+  @Field(() => [ID], { nullable: true, description: 'IDs of child materials in the hierarchy' })
   children?: string[]
 }
 
@@ -142,13 +143,13 @@ export class UpdateMaterialInput extends ChangeInputWithLang {
   @Field(() => [TranslatedInput], { nullable: true })
   descTr?: TranslatedInput[]
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean, { nullable: true, description: 'If true, this is an internal technical classification not shown to end-users' })
   technical?: boolean
 
-  @Field(() => [ID], { nullable: true })
+  @Field(() => [ID], { nullable: true, description: 'IDs of parent materials in the hierarchy' })
   parents?: string[]
 
-  @Field(() => [ID], { nullable: true })
+  @Field(() => [ID], { nullable: true, description: 'IDs of child materials in the hierarchy' })
   children?: string[]
 }
 

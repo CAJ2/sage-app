@@ -18,33 +18,34 @@ registerEnumType(TagType, {
 
 @ObjectType({
   implements: () => [Named],
+  description: 'A reusable tag definition for classifying models with custom metadata',
 })
 export class TagDefinition extends IDCreatedUpdated<TagEntity> implements Named {
   @Field(() => String)
   @Transform(translate)
   name!: string
 
-  @Field(() => TagType)
+  @Field(() => TagType, { description: 'The type of model this tag can be applied to' })
   type!: TagType
 
   @Field(() => String, { nullable: true })
   @Transform(translate)
   desc?: string
 
-  @Field(() => JSONObjectResolver, { nullable: true })
+  @Field(() => JSONObjectResolver, { nullable: true, description: 'JSON schema template for tag instance metadata' })
   metaTemplate?: Record<string, any>
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'Hex color code for the tag background (e.g. #FF5733)' })
   bgColor?: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'Icon or image URL for this tag' })
   image?: string
 }
 registerModel('TagDefinition', TagDefinition)
 
-@ObjectType()
+@ObjectType({ description: 'A tag instance applied to a model, with optional instance-specific metadata' })
 export class Tag extends TagDefinition {
-  @Field(() => JSONObjectResolver, { nullable: true })
+  @Field(() => JSONObjectResolver, { nullable: true, description: 'Instance metadata conforming to the tag definition\'s metaTemplate' })
   meta?: Record<string, any>
 }
 registerModel('Tag', Tag)

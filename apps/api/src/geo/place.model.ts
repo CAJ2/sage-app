@@ -17,7 +17,7 @@ import { Org } from '@src/users/org.model'
 
 import { Place as PlaceEntity } from './place.entity'
 
-@ObjectType()
+@ObjectType({ description: 'Geographic coordinates (latitude and longitude) for a place' })
 export class PlaceLocation {
   @Field(() => Number)
   @IsNumber()
@@ -30,7 +30,7 @@ export class PlaceLocation {
   longitude!: number
 }
 
-@ObjectType()
+@ObjectType({ description: 'A structured postal address' })
 export class PlaceAddress {
   @Field(() => String, { nullable: true })
   housenumber?: string
@@ -53,6 +53,7 @@ export class PlaceAddress {
 
 @ObjectType({
   implements: () => [Named],
+  description: 'A specific physical location, such as a business or recycling facility',
 })
 export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Field(() => ID)
@@ -62,7 +63,7 @@ export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Transform(translate)
   name?: string
 
-  @Field(() => PlaceAddress, { nullable: true })
+  @Field(() => PlaceAddress, { nullable: true, description: 'Structured postal address of this place' })
   @Transform(translate)
   address?: PlaceAddress
 
@@ -70,13 +71,13 @@ export class Place extends CreatedUpdated<PlaceEntity> implements Named {
   @Transform(translate)
   desc?: string
 
-  @Field(() => PlaceLocation, { nullable: true })
+  @Field(() => PlaceLocation, { nullable: true, description: 'Geographic coordinates of this place' })
   location?: PlaceLocation
 
-  @Field(() => TagPage)
+  @Field(() => TagPage, { description: 'Metadata tags applied to this place' })
   tags!: TagPage
 
-  @Field(() => Org, { nullable: true })
+  @Field(() => Org, { nullable: true, description: 'The organization associated with this place' })
   org?: Org & {}
 }
 registerModel('Place', Place)

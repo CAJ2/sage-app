@@ -17,18 +17,18 @@ registerEnumType(SourceType, {
   description: 'Type of source data',
 })
 
-@ObjectType()
+@ObjectType({ description: 'A reference source used to support data changes, such as a URL, PDF, or image' })
 export class Source extends IDCreatedUpdated<SourceEntity> {
   @Field(() => SourceType)
   type!: SourceType
 
-  @Field(() => LuxonDateTimeResolver, { nullable: true })
+  @Field(() => LuxonDateTimeResolver, { nullable: true, description: 'Timestamp when this source was processed and ingested' })
   processedAt?: DateTime
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'Reference location or citation string (e.g. page number, URL fragment)' })
   location?: string
 
-  @Field(() => JSONObjectResolver, { nullable: true })
+  @Field(() => JSONObjectResolver, { nullable: true, description: 'Extracted or structured content from the source' })
   content?: Record<string, any>
 
   @Field(() => String, { nullable: true })
@@ -40,7 +40,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
   @Field(() => ChangesPage)
   changes!: ChangesPage & {}
 
-  @Field(() => JSONObjectResolver, { nullable: true })
+  @Field(() => JSONObjectResolver, { nullable: true, description: 'Additional metadata about the source (e.g. author, publication date)' })
   metadata?: Record<string, any>
 }
 

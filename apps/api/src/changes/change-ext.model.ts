@@ -79,24 +79,24 @@ export class ChangeInputWithLang {
     lang: LangSchema,
   })
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => ID, { nullable: true, description: 'ID of an existing change to add this edit to' })
   @IsOptional()
   @Validate(IsNanoID)
   changeID?: string
 
-  @Field(() => CreateChangeInput, { nullable: true })
+  @Field(() => CreateChangeInput, { nullable: true, description: 'Details for a new change to create for this edit' })
   change?: CreateChangeInput & {}
 
-  @Field(() => [SourceInput], { nullable: true })
+  @Field(() => [SourceInput], { nullable: true, description: 'Sources to associate with this change' })
   addSources?: SourceInput[]
 
-  @Field(() => [ID], { nullable: true })
+  @Field(() => [ID], { nullable: true, description: 'IDs of sources to remove from this change' })
   removeSources?: string[]
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean, { nullable: true, description: 'If true, immediately apply (merge) the change after creation' })
   apply?: boolean
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'Language code for text input fields (BCP 47, e.g. "en")' })
   lang?: string | string[]
 }
 

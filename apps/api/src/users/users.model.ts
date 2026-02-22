@@ -13,7 +13,7 @@ export class UserProfile {
   bio?: string
 }
 
-@ObjectType()
+@ObjectType({ description: 'A registered user of the platform' })
 export class User extends IDCreatedUpdated<UserEntity> {
   @Field({ nullable: true })
   name?: string
@@ -38,19 +38,19 @@ export class User extends IDCreatedUpdated<UserEntity> {
   @Field({ nullable: true })
   lang?: string
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, description: 'Extended profile information for this user' })
   profile?: UserProfile
 
-  @Field(() => UserOrgsPage)
+  @Field(() => UserOrgsPage, { description: 'Organizations this user belongs to' })
   orgs!: UserOrgsPage & {}
 }
 
-@ObjectType()
+@ObjectType({ description: 'Membership of a user in an organization' })
 export class UserOrg {
   @Field(() => Org)
   org!: Org & {}
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: "The user's role within the organization" })
   role?: string
 }
 

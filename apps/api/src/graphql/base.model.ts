@@ -64,29 +64,29 @@ export class ModelEditSchema {
   delete?: ModelSchema
 }
 
-@ObjectType()
+@ObjectType({ description: 'A translated text value for a specific language' })
 export class TranslatedOutput {
-  @Field(() => String)
+  @Field(() => String, { description: 'BCP 47 language code (e.g. "en", "fr-CA")' })
   lang!: string
 
   @Field(() => String, { nullable: true })
   text?: string
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { description: 'Whether this translation was generated automatically' })
   auto: boolean = false
 }
 
-@InputType()
+@InputType({ description: 'A translated text value for a specific language' })
 export class TranslatedInput {
   static schema = TranslatedInputSchema
 
-  @Field(() => String)
+  @Field(() => String, { description: 'BCP 47 language code (e.g. "en", "fr-CA")' })
   lang!: string
 
   @Field(() => String, { nullable: true })
   text?: string
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { description: 'Whether this translation was generated automatically' })
   auto: boolean = false
 }
 
