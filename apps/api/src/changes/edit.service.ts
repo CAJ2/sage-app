@@ -756,7 +756,7 @@ export class EditService {
         changeOmit.push(rel.name)
       }
     })
-    const pojo: any = entity.toPOJO()
+    const pojo: any = _.cloneDeep(entity.toPOJO())
     flattenRefs.forEach((ref) => {
       if (pojo[ref.ref] && Array.isArray(pojo[ref.ref])) {
         pojo[ref.ref] = pojo[ref.ref].map((item: any) => {
@@ -781,6 +781,6 @@ export class EditService {
         }
       }
     })
-    return _.omit(pojo, changeOmit)
+    return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
   }
 }

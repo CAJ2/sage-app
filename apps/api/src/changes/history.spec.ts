@@ -226,7 +226,11 @@ describe('History via Change/Merge flow (integration)', () => {
       expect(history!.length).toBeGreaterThanOrEqual(1)
       const latest = history!.at(-1)!
       expect(latest.user).toBeDefined()
+      expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
+      // original should have the pre-update name, changes should have the updated name
+      expect((latest.original as any).name.en).not.toBe('Item updated via Change')
+      expect((latest.changes as any).name.en).toBe('Item updated via Change')
     })
 
     test('should have history on the updated Variant after merge', async () => {
@@ -253,7 +257,11 @@ describe('History via Change/Merge flow (integration)', () => {
       expect(history!.length).toBeGreaterThanOrEqual(1)
       const latest = history!.at(-1)!
       expect(latest.user).toBeDefined()
+      expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
+      // original should have the pre-update name, changes should have the updated name
+      expect((latest.original as any).name.en).not.toBe('Variant updated via Change')
+      expect((latest.changes as any).name.en).toBe('Variant updated via Change')
     })
   })
 })
