@@ -17,6 +17,7 @@
     "start:prod": "node dist/main",
     "codegen": "graphql-codegen --config graphql-codegen.ts",
     "codegen:db": "./db-defs.sh",
+    "codegen:schema": "SCHEMA_GEN=1 nest start",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
@@ -112,9 +113,19 @@
           "{projectRoot}/temp/**/*"
         ]
       },
+      "codegen:schema": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/src/**/*.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/schema/schema.gql"
+        ]
+      },
       "build": {
         "dependsOn": [
-          "codegen*"
+          "codegen",
+          "codegen:db"
         ]
       },
       "test": {

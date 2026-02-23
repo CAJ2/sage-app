@@ -43,5 +43,8 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter())
   app.enableShutdownHooks()
   await app.listen(process.env.PORT || 4444)
+  if (process.env.SCHEMA_GEN) {
+    await app.close()
+  }
 }
 bootstrap()
