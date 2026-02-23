@@ -115,10 +115,10 @@ export type CategoryEdge = {
 
 export type CategoryHistory = {
   __typename?: 'CategoryHistory';
-  categoryID: Scalars['String']['output'];
-  changes?: Maybe<Scalars['JSONObject']['output']>;
+  category: Category;
+  changes?: Maybe<Category>;
   datetime: Scalars['DateTime']['output'];
-  original?: Maybe<Scalars['JSONObject']['output']>;
+  original?: Maybe<Category>;
   user: User;
 };
 
@@ -235,10 +235,10 @@ export type ComponentEdge = {
 
 export type ComponentHistory = {
   __typename?: 'ComponentHistory';
-  changes?: Maybe<Scalars['JSONObject']['output']>;
-  componentID: Scalars['String']['output'];
+  changes?: Maybe<Component>;
+  component: Component;
   datetime: Scalars['DateTime']['output'];
-  original?: Maybe<Scalars['JSONObject']['output']>;
+  original?: Maybe<Component>;
   user: User;
 };
 
@@ -666,10 +666,10 @@ export type ItemEdge = {
 
 export type ItemHistory = {
   __typename?: 'ItemHistory';
-  changes?: Maybe<Scalars['JSONObject']['output']>;
+  changes?: Maybe<Item>;
   datetime: Scalars['DateTime']['output'];
-  itemID: Scalars['String']['output'];
-  original?: Maybe<Scalars['JSONObject']['output']>;
+  item: Item;
+  original?: Maybe<Item>;
   user: User;
 };
 
@@ -1032,10 +1032,10 @@ export type OrgEdge = {
 
 export type OrgHistory = {
   __typename?: 'OrgHistory';
-  changes?: Maybe<Scalars['JSONObject']['output']>;
+  changes?: Maybe<Org>;
   datetime: Scalars['DateTime']['output'];
   org: Org;
-  original?: Maybe<Scalars['JSONObject']['output']>;
+  original?: Maybe<Org>;
   user: User;
 };
 
@@ -1143,9 +1143,9 @@ export type ProcessEfficiency = {
 
 export type ProcessHistory = {
   __typename?: 'ProcessHistory';
-  changes?: Maybe<Scalars['JSONObject']['output']>;
+  changes?: Maybe<Process>;
   datetime: Scalars['DateTime']['output'];
-  original?: Maybe<Scalars['JSONObject']['output']>;
+  original?: Maybe<Process>;
   process: Process;
   user: User;
 };
@@ -2070,11 +2070,11 @@ export type VariantEdge = {
 
 export type VariantHistory = {
   __typename?: 'VariantHistory';
-  changes?: Maybe<Scalars['JSONObject']['output']>;
+  changes?: Maybe<Variant>;
   datetime: Scalars['DateTime']['output'];
-  original?: Maybe<Scalars['JSONObject']['output']>;
+  original?: Maybe<Variant>;
   user: User;
-  variantID: Scalars['String']['output'];
+  variant: Variant;
 };
 
 export type VariantItemsInput = {

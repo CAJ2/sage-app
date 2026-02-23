@@ -79,8 +79,8 @@ registerModel('Variant', Variant)
 
 @ObjectType()
 export class VariantHistory extends BaseModel<any> {
-  @Field(() => String)
-  variantID!: string
+  @Field(() => Variant)
+  variant!: Variant
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
@@ -88,11 +88,11 @@ export class VariantHistory extends BaseModel<any> {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  original?: JSONObject
+  @Field(() => Variant, { nullable: true })
+  original?: Variant
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  changes?: JSONObject
+  @Field(() => Variant, { nullable: true })
+  changes?: Variant
 }
 
 @ObjectType({

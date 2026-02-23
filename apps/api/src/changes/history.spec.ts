@@ -186,8 +186,12 @@ describe('History via Change/Merge flow (integration)', () => {
                 user {
                   id
                 }
-                original
-                changes
+                original {
+                  name
+                }
+                changes {
+                  name
+                }
               }
             }
           }
@@ -213,8 +217,12 @@ describe('History via Change/Merge flow (integration)', () => {
                 user {
                   id
                 }
-                original
-                changes
+                original {
+                  name
+                }
+                changes {
+                  name
+                }
               }
             }
           }
@@ -228,9 +236,8 @@ describe('History via Change/Merge flow (integration)', () => {
       expect(latest.user).toBeDefined()
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
-      // original should have the pre-update name, changes should have the updated name
-      expect((latest.original as any).name.en).not.toBe('Item updated via Change')
-      expect((latest.changes as any).name.en).toBe('Item updated via Change')
+      expect(latest.original?.name).not.toBe('Item updated via Change')
+      expect(latest.changes?.name).toBe('Item updated via Change')
     })
 
     test('should have history on the updated Variant after merge', async () => {
@@ -244,8 +251,12 @@ describe('History via Change/Merge flow (integration)', () => {
                 user {
                   id
                 }
-                original
-                changes
+                original {
+                  name
+                }
+                changes {
+                  name
+                }
               }
             }
           }
@@ -259,9 +270,8 @@ describe('History via Change/Merge flow (integration)', () => {
       expect(latest.user).toBeDefined()
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
-      // original should have the pre-update name, changes should have the updated name
-      expect((latest.original as any).name.en).not.toBe('Variant updated via Change')
-      expect((latest.changes as any).name.en).toBe('Variant updated via Change')
+      expect(latest.original?.name).not.toBe('Variant updated via Change')
+      expect(latest.changes?.name).toBe('Variant updated via Change')
     })
   })
 })

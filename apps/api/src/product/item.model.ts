@@ -66,8 +66,8 @@ registerModel('Item', Item)
 
 @ObjectType()
 export class ItemHistory extends BaseModel<any> {
-  @Field(() => String)
-  itemID!: string
+  @Field(() => Item)
+  item!: Item
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
@@ -75,11 +75,11 @@ export class ItemHistory extends BaseModel<any> {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  original?: JSONObject
+  @Field(() => Item, { nullable: true })
+  original?: Item
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  changes?: JSONObject
+  @Field(() => Item, { nullable: true })
+  changes?: Item
 }
 
 @ObjectType()

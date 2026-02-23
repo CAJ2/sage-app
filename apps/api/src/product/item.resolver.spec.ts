@@ -693,8 +693,12 @@ describe('ItemResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }
@@ -724,8 +728,12 @@ describe('ItemResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }

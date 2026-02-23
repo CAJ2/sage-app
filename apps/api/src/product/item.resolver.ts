@@ -26,6 +26,7 @@ import {
 import { ItemSchemaService } from '@src/product/item.schema'
 import { ItemService } from '@src/product/item.service'
 import { Variant, VariantsPage } from '@src/product/variant.model'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Item)
 export class ItemResolver {
@@ -135,5 +136,33 @@ export class ItemResolver {
   async history(@Parent() item: Item) {
     const history = await this.itemService.history(item.id)
     return Promise.all(history.map((h) => this.transform.entityToModel(ItemHistory, h)))
+  }
+}
+
+@Resolver(() => ItemHistory)
+export class ItemHistoryResolver {
+  constructor(private readonly transform: TransformService) {}
+
+  @ResolveField('user', () => User)
+  async user(@Parent() history: ItemHistory) {
+    return this.transform.objectToModel(User, history.user)
+  }
+
+  @ResolveField('original', () => Item, { nullable: true })
+  async historyOriginal(@Parent() history: ItemHistory) {
+    const original = history.original
+    if (!original) {
+      return null
+    }
+    return this.transform.objectToModel(Item, original)
+  }
+
+  @ResolveField('changes', () => Item, { nullable: true })
+  async historyChanges(@Parent() history: ItemHistory) {
+    const changes = history.changes
+    if (!changes) {
+      return null
+    }
+    return this.transform.objectToModel(Item, changes)
   }
 }

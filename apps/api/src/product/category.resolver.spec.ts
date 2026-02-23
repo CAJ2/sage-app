@@ -455,8 +455,12 @@ describe('CategoryResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }
@@ -486,8 +490,12 @@ describe('CategoryResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }

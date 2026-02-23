@@ -20,6 +20,7 @@ import {
 } from '@src/process/process.model'
 import { ProcessSchemaService } from '@src/process/process.schema'
 import { ProcessService } from '@src/process/process.service'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Process)
 export class ProcessResolver {
@@ -110,5 +111,33 @@ export class ProcessResolver {
   async history(@Parent() process: Process) {
     const history = await this.processService.history(process.id)
     return Promise.all(history.map((h) => this.transform.entityToModel(ProcessHistory, h)))
+  }
+}
+
+@Resolver(() => ProcessHistory)
+export class ProcessHistoryResolver {
+  constructor(private readonly transform: TransformService) {}
+
+  @ResolveField('user', () => User)
+  async user(@Parent() history: ProcessHistory) {
+    return this.transform.objectToModel(User, history.user)
+  }
+
+  @ResolveField('original', () => Process, { nullable: true })
+  async historyOriginal(@Parent() history: ProcessHistory) {
+    const original = history.original
+    if (!original) {
+      return null
+    }
+    return this.transform.objectToModel(Process, original)
+  }
+
+  @ResolveField('changes', () => Process, { nullable: true })
+  async historyChanges(@Parent() history: ProcessHistory) {
+    const changes = history.changes
+    if (!changes) {
+      return null
+    }
+    return this.transform.objectToModel(Process, changes)
   }
 }

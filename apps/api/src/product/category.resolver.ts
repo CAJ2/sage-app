@@ -8,6 +8,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { User } from '@src/users/users.model'
 
 import {
   CategoriesArgs,
@@ -163,5 +164,33 @@ export class CategoryResolver {
   async history(@Parent() category: Category) {
     const history = await this.categoryService.history(category.id)
     return Promise.all(history.map((h) => this.transform.entityToModel(CategoryHistory, h)))
+  }
+}
+
+@Resolver(() => CategoryHistory)
+export class CategoryHistoryResolver {
+  constructor(private readonly transform: TransformService) {}
+
+  @ResolveField('user', () => User)
+  async user(@Parent() history: CategoryHistory) {
+    return this.transform.objectToModel(User, history.user)
+  }
+
+  @ResolveField('original', () => Category, { nullable: true })
+  async historyOriginal(@Parent() history: CategoryHistory) {
+    const original = history.original
+    if (!original) {
+      return null
+    }
+    return this.transform.objectToModel(Category, original)
+  }
+
+  @ResolveField('changes', () => Category, { nullable: true })
+  async historyChanges(@Parent() history: CategoryHistory) {
+    const changes = history.changes
+    if (!changes) {
+      return null
+    }
+    return this.transform.objectToModel(Category, changes)
   }
 }

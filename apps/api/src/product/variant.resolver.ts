@@ -31,6 +31,7 @@ import {
 } from '@src/product/variant.model'
 import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Variant)
 export class VariantResolver {
@@ -167,5 +168,33 @@ export class VariantResolver {
   async history(@Parent() variant: Variant) {
     const history = await this.variantService.history(variant.id)
     return Promise.all(history.map((h) => this.transform.entityToModel(VariantHistory, h)))
+  }
+}
+
+@Resolver(() => VariantHistory)
+export class VariantHistoryResolver {
+  constructor(private readonly transform: TransformService) {}
+
+  @ResolveField('user', () => User)
+  async user(@Parent() history: VariantHistory) {
+    return this.transform.objectToModel(User, history.user)
+  }
+
+  @ResolveField('original', () => Variant, { nullable: true })
+  async historyOriginal(@Parent() history: VariantHistory) {
+    const original = history.original
+    if (!original) {
+      return null
+    }
+    return this.transform.objectToModel(Item, original)
+  }
+
+  @ResolveField('changes', () => Variant, { nullable: true })
+  async historyChanges(@Parent() history: VariantHistory) {
+    const changes = history.changes
+    if (!changes) {
+      return null
+    }
+    return this.transform.objectToModel(Item, changes)
   }
 }

@@ -980,8 +980,12 @@ describe('VariantResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }
@@ -1011,8 +1015,12 @@ describe('VariantResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }

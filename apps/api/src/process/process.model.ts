@@ -120,11 +120,11 @@ export class ProcessHistory extends BaseModel<any> {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  original?: JSONObject
+  @Field(() => Process, { nullable: true })
+  original?: Process
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  changes?: JSONObject
+  @Field(() => Process, { nullable: true })
+  changes?: Process
 }
 
 @ObjectType()

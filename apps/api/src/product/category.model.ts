@@ -1,7 +1,6 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
-import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
@@ -10,7 +9,6 @@ import { Change } from '@src/changes/change.model'
 import { ImageOrIconSchema } from '@src/common/base.schema'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate, TrArraySchema } from '@src/common/i18n'
-import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
   CreatedUpdated,
@@ -92,8 +90,8 @@ registerModel('Category', Category)
 
 @ObjectType()
 export class CategoryHistory extends BaseModel<any> {
-  @Field(() => String)
-  categoryID!: string
+  @Field(() => Category)
+  category!: Category
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
@@ -101,11 +99,11 @@ export class CategoryHistory extends BaseModel<any> {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  original?: JSONObject
+  @Field(() => Category, { nullable: true })
+  original?: Category
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  changes?: JSONObject
+  @Field(() => Category, { nullable: true })
+  changes?: Category
 }
 
 @ObjectType()

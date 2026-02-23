@@ -22,6 +22,7 @@ import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { ComponentsArgs, Material } from '@src/process/material.model'
 import { Tag } from '@src/process/tag.model'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Component)
 export class ComponentResolver {
@@ -155,5 +156,33 @@ export class ComponentResolver {
   async history(@Parent() component: Component) {
     const history = await this.componentService.history(component.id)
     return Promise.all(history.map((h) => this.transform.entityToModel(ComponentHistory, h)))
+  }
+}
+
+@Resolver(() => ComponentHistory)
+export class ComponentHistoryResolver {
+  constructor(private readonly transform: TransformService) {}
+
+  @ResolveField('user', () => User)
+  async user(@Parent() history: ComponentHistory) {
+    return this.transform.objectToModel(User, history.user)
+  }
+
+  @ResolveField('original', () => Component, { nullable: true })
+  async historyOriginal(@Parent() history: ComponentHistory) {
+    const original = history.original
+    if (!original) {
+      return null
+    }
+    return this.transform.objectToModel(Component, original)
+  }
+
+  @ResolveField('changes', () => Component, { nullable: true })
+  async historyChanges(@Parent() history: ComponentHistory) {
+    const changes = history.changes
+    if (!changes) {
+      return null
+    }
+    return this.transform.objectToModel(Component, changes)
   }
 }

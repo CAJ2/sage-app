@@ -76,3 +76,31 @@ export class OrgResolver {
     return Promise.all(entries.map((h) => this.transform.entityToModel(OrgHistory, h)))
   }
 }
+
+@Resolver(() => OrgHistory)
+export class OrgHistoryResolver {
+  constructor(private readonly transform: TransformService) {}
+
+  @ResolveField('user', () => User)
+  async user(@Parent() history: OrgHistory) {
+    return this.transform.objectToModel(User, history.user)
+  }
+
+  @ResolveField('original', () => Org, { nullable: true })
+  async historyOriginal(@Parent() history: OrgHistory) {
+    const original = history.original
+    if (!original) {
+      return null
+    }
+    return this.transform.objectToModel(Org, original)
+  }
+
+  @ResolveField('changes', () => Org, { nullable: true })
+  async historyChanges(@Parent() history: OrgHistory) {
+    const changes = history.changes
+    if (!changes) {
+      return null
+    }
+    return this.transform.objectToModel(Org, changes)
+  }
+}

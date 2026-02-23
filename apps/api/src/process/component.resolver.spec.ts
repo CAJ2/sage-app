@@ -602,8 +602,12 @@ describe('ComponentResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }
@@ -633,8 +637,12 @@ describe('ComponentResolver (integration)', () => {
                   user {
                     id
                   }
-                  original
-                  changes
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
                 }
               }
             }

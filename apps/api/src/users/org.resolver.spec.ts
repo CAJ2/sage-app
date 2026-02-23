@@ -351,8 +351,8 @@ describe('OrgResolver (integration)', () => {
                 history {
                   datetime
                   user { id }
-                  original
-                  changes
+                  original { id }
+                  changes { id }
                 }
               }
             }
@@ -379,8 +379,14 @@ describe('OrgResolver (integration)', () => {
                 history {
                   datetime
                   user { id }
-                  original
-                  changes
+                  original {
+                    id
+                    name
+                  }
+                  changes {
+                    id
+                    name
+                  }
                 }
               }
             }
@@ -395,8 +401,8 @@ describe('OrgResolver (integration)', () => {
       expect(latest.user).toBeDefined()
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
-      expect((latest.original as any).name).toBe('History Org')
-      expect((latest.changes as any).name).toBe('History Org Updated')
+      expect(latest.original?.name).toBe('History Org')
+      expect(latest.changes?.name).toBe('History Org Updated')
     })
   })
 })

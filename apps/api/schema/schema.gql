@@ -61,10 +61,10 @@ type CategoryEdge {
 }
 
 type CategoryHistory {
-  categoryID: String!
-  changes: JSONObject
+  category: Category!
+  changes: Category
   datetime: DateTime!
-  original: JSONObject
+  original: Category
   user: User!
 }
 
@@ -154,10 +154,10 @@ type ComponentEdge {
 }
 
 type ComponentHistory {
-  changes: JSONObject
-  componentID: String!
+  changes: Component
+  component: Component!
   datetime: DateTime!
-  original: JSONObject
+  original: Component
   user: User!
 }
 
@@ -586,10 +586,10 @@ type ItemEdge {
 }
 
 type ItemHistory {
-  changes: JSONObject
+  changes: Item
   datetime: DateTime!
-  itemID: String!
-  original: JSONObject
+  item: Item!
+  original: Item
   user: User!
 }
 
@@ -748,10 +748,10 @@ type OrgEdge {
 }
 
 type OrgHistory {
-  changes: JSONObject
+  changes: Org
   datetime: DateTime!
   org: Org!
-  original: JSONObject
+  original: Org
   user: User!
 }
 
@@ -865,9 +865,9 @@ type ProcessEfficiency {
 }
 
 type ProcessHistory {
-  changes: JSONObject
+  changes: Process
   datetime: DateTime!
-  original: JSONObject
+  original: Process
   process: Process!
   user: User!
 }
@@ -1600,11 +1600,11 @@ type VariantEdge {
 }
 
 type VariantHistory {
-  changes: JSONObject
+  changes: Variant
   datetime: DateTime!
-  original: JSONObject
+  original: Variant
   user: User!
-  variantID: String!
+  variant: Variant!
 }
 
 input VariantItemsInput {

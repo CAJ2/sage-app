@@ -111,8 +111,8 @@ registerModel('Component', Component)
 
 @ObjectType()
 export class ComponentHistory extends BaseModel<any> {
-  @Field(() => String)
-  componentID!: string
+  @Field(() => Component)
+  component!: Component
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
@@ -120,11 +120,11 @@ export class ComponentHistory extends BaseModel<any> {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  original?: JSONObject
+  @Field(() => Component, { nullable: true })
+  original?: Component
 
-  @Field(() => JSONObjectResolver, { nullable: true })
-  changes?: JSONObject
+  @Field(() => Component, { nullable: true })
+  changes?: Component
 }
 
 @ObjectType()
