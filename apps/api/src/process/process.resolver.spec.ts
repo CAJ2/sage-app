@@ -214,9 +214,11 @@ describe('ProcessResolver (integration)', () => {
                   }
                   original {
                     id
+                    name
                   }
                   changes {
                     id
+                    name
                   }
                 }
               }
@@ -232,6 +234,8 @@ describe('ProcessResolver (integration)', () => {
       const latest = process!.history.at(-1)!
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
+      expect(latest.original?.name).toBe('History Test Process')
+      expect(latest.changes?.name).toBe('Updated History Process')
     })
   })
 })

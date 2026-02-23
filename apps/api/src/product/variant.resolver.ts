@@ -186,7 +186,7 @@ export class VariantHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Item, original)
+    return this.transform.objectToModel(Variant, original)
   }
 
   @ResolveField('changes', () => Variant, { nullable: true })
@@ -195,6 +195,6 @@ export class VariantHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Item, changes)
+    return this.transform.objectToModel(Variant, changes)
   }
 }
