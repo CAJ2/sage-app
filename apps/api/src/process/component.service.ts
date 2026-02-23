@@ -8,7 +8,12 @@ import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { Region } from '@src/geo/region.entity'
 
-import { Component, ComponentsMaterials, ComponentsTags } from './component.entity'
+import {
+  Component,
+  ComponentHistory,
+  ComponentsMaterials,
+  ComponentsTags,
+} from './component.entity'
 import { CreateComponentInput, UpdateComponentInput } from './component.model'
 import { Material } from './material.entity'
 import { StreamService } from './stream.service'
@@ -101,6 +106,12 @@ export class ComponentService {
     const component = new Component()
     if (!isUsingChange(input)) {
       await this.setFields(component, input)
+      await this.editService.createHistory(
+        Component.name,
+        userID,
+        undefined,
+        this.editService.entityToChangePOJO(Component.name, component),
+      )
       await this.em.persist(component).flush()
       return {
         component,
@@ -132,7 +143,14 @@ export class ComponentService {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
     if (!change) {
+      const original = this.editService.entityToChangePOJO(Component.name, component)
       await this.setFields(component, input)
+      await this.editService.createHistory(
+        Component.name,
+        userID,
+        original,
+        this.editService.entityToChangePOJO(Component.name, component),
+      )
       await this.em.persist(component).flush()
       return {
         component,
@@ -156,6 +174,14 @@ export class ComponentService {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async history(componentID: string) {
+    return this.em.find(
+      ComponentHistory,
+      { component: componentID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

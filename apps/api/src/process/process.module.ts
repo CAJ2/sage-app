@@ -6,12 +6,12 @@ import { AuthModule } from '@src/auth/auth.module'
 import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
 
-import { ComponentResolver } from './component.resolver'
+import { ComponentHistoryResolver, ComponentResolver } from './component.resolver'
 import { ComponentSchemaService } from './component.schema'
 import { ComponentService } from './component.service'
 import { MaterialResolver } from './material.resolver'
 import { MaterialService } from './material.service'
-import { ProcessResolver } from './process.resolver'
+import { ProcessHistoryResolver, ProcessResolver } from './process.resolver'
 import { ProcessSchemaService } from './process.schema'
 import { ProcessService } from './process.service'
 import { StreamService } from './stream.service'
@@ -32,9 +32,11 @@ import { TagService } from './tag.service'
     ComponentResolver,
     ComponentService,
     ComponentSchemaService,
+    ComponentHistoryResolver,
     ProcessResolver,
     ProcessService,
     ProcessSchemaService,
+    ProcessHistoryResolver,
     TagResolver,
     TagService,
     StreamService,

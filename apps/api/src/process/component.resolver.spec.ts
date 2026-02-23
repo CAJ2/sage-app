@@ -586,4 +586,77 @@ describe('ComponentResolver (integration)', () => {
       expect(res.data?.updateComponent?.change?.status).toBe('PROPOSED')
     })
   })
+
+  describe('history tracking', () => {
+    let historyComponentID: string
+
+    test('should record history on direct create', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation ComponentHistoryCreate($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `),
+        { input: { name: 'History Test Component', primaryMaterial: { id: MATERIAL_IDS[0] } } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      const component = createRes.data?.createComponent?.component
+      expect(component).toBeDefined()
+      historyComponentID = component!.id
+      expect(component!.history).toHaveLength(1)
+      expect(component!.history[0].user).toBeDefined()
+      expect(component!.history[0].original).toBeNull()
+      expect(component!.history[0].changes).toBeTruthy()
+    })
+
+    test('should record history on direct update', async () => {
+      const updateRes = await gql.send(
+        graphql(`
+          mutation ComponentHistoryUpdate($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `),
+        { input: { id: historyComponentID, name: 'Updated History Component' } },
+      )
+      expect(updateRes.errors).toBeUndefined()
+      const component = updateRes.data?.updateComponent?.component
+      expect(component).toBeDefined()
+      expect(component!.history).toHaveLength(2)
+      const latest = component!.history.at(-1)!
+      expect(latest.original).toBeTruthy()
+      expect(latest.changes).toBeTruthy()
+    })
+  })
 })

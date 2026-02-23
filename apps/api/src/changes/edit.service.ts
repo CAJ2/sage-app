@@ -639,7 +639,7 @@ export class EditService {
   }
 
   async mergeID(changeID: string) {
-    const change = await this.em.findOne(Change, { id: changeID })
+    const change = await this.em.findOne(Change, { id: changeID }, { populate: ['edits'] })
     if (!change) {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
@@ -664,13 +664,21 @@ export class EditService {
           if (!entity && !edit.original && edit.changes) {
             // This is a create
             this.em.create(edit.entityName, edit.changes)
-            this.createHistory<BaseEntity>(edit.entityName, change.user.id, undefined, edit.changes)
           } else if (entity && edit.original && !edit.changes) {
             // This is a delete
             this.em.remove(entity)
           } else if (entity && edit.original && edit.changes) {
-            // This is an update
-            _.merge(entity, edit.changes)
+            // This is an update — only apply scalar changes to avoid re-inserting existing relations
+            const relationNames = new Set(
+              this.em
+                .getMetadata()
+                .get(edit.entityName)
+                .relations.map((r) => r.name),
+            )
+            const scalarChanges = Object.fromEntries(
+              Object.entries(edit.changes).filter(([k]) => !relationNames.has(k)),
+            )
+            this.em.assign(entity, scalarChanges as any)
           } else {
             throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
           }
@@ -703,7 +711,7 @@ export class EditService {
   ) {
     const historyMeta = this.em.getMetadata().get(name + 'History')
     if (!historyMeta) {
-      throw NotFoundErr(`Entity "${name}" not found in metadata`)
+      return
     }
     const id = (changes as any).id || (original as any).id
     this.em.create(historyMeta.className, {
@@ -715,7 +723,7 @@ export class EditService {
     })
   }
 
-  private entityToChangePOJO(
+  entityToChangePOJO(
     entityName: EntityName<any>,
     entity: BaseEntity & { id: string },
   ): EntityDTO<BaseEntity> {
@@ -748,7 +756,7 @@ export class EditService {
         changeOmit.push(rel.name)
       }
     })
-    const pojo: any = entity.toPOJO()
+    const pojo: any = _.cloneDeep(entity.toPOJO())
     flattenRefs.forEach((ref) => {
       if (pojo[ref.ref] && Array.isArray(pojo[ref.ref])) {
         pojo[ref.ref] = pojo[ref.ref].map((item: any) => {
@@ -773,6 +781,6 @@ export class EditService {
         }
       }
     })
-    return _.omit(pojo, changeOmit)
+    return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
   }
 }

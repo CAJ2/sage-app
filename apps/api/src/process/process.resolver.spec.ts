@@ -161,4 +161,81 @@ describe('ProcessResolver (integration)', () => {
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Process not found')
   })
+
+  describe('history tracking', () => {
+    let historyProcessID: string
+
+    test('should record history on direct create', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation ProcessHistoryCreate($input: CreateProcessInput!) {
+            createProcess(input: $input) {
+              process {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    id
+                  }
+                  changes {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `),
+        { input: { name: 'History Test Process', intent: 'RECYCLE' } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      const process = createRes.data?.createProcess?.process
+      expect(process).toBeDefined()
+      historyProcessID = process!.id
+      expect(process!.history).toHaveLength(1)
+      expect(process!.history[0].user).toBeDefined()
+      expect(process!.history[0].original).toBeNull()
+      expect(process!.history[0].changes).toBeTruthy()
+    })
+
+    test('should record history on direct update', async () => {
+      const updateRes = await gql.send(
+        graphql(`
+          mutation ProcessHistoryUpdate($input: UpdateProcessInput!) {
+            updateProcess(input: $input) {
+              process {
+                id
+                history {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    id
+                    name
+                  }
+                  changes {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        `),
+        { input: { id: historyProcessID, name: 'Updated History Process' } },
+      )
+      expect(updateRes.errors).toBeUndefined()
+      const process = updateRes.data?.updateProcess?.process
+      expect(process).toBeDefined()
+      expect(process!.history).toHaveLength(2)
+      const latest = process!.history.at(-1)!
+      expect(latest.original).toBeTruthy()
+      expect(latest.changes).toBeTruthy()
+      expect(latest.original?.name).toBe('History Test Process')
+      expect(latest.changes?.name).toBe('Updated History Process')
+    })
+  })
 })

@@ -37,6 +37,9 @@ type Category implements Named {
 
   """All descendant categories down the hierarchy tree"""
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
+
+  """Audit history of changes to this category"""
+  history: [CategoryHistory!]!
   id: ID!
   imageURL: String
 
@@ -55,6 +58,14 @@ type Category implements Named {
 type CategoryEdge {
   cursor: String!
   node: Category!
+}
+
+type CategoryHistory {
+  category: Category!
+  changes: Category
+  datetime: DateTime!
+  original: Category
+  user: User!
 }
 
 """A proposed or merged set of edits to one or more data models"""
@@ -143,10 +154,11 @@ type ComponentEdge {
 }
 
 type ComponentHistory {
-  changes: String
-  componentID: String!
+  changes: Component
+  component: Component!
   datetime: DateTime!
-  original: String
+  original: Component
+  user: User!
 }
 
 """The fraction of a specific material within a component"""
@@ -548,6 +560,9 @@ type Item implements Named {
   createdAt: DateTime!
   desc: String
 
+  """Audit history of changes to this item"""
+  history: [ItemHistory!]!
+
   """The ID of the model"""
   id: ID!
   imageURL: String
@@ -568,6 +583,14 @@ input ItemCategoriesInput {
 type ItemEdge {
   cursor: String!
   node: Item!
+}
+
+type ItemHistory {
+  changes: Item
+  datetime: DateTime!
+  item: Item!
+  original: Item
+  user: User!
 }
 
 input ItemTagsInput {
@@ -702,6 +725,7 @@ type Org implements Named {
   avatarURL: String
   createdAt: DateTime!
   desc: String
+  history: [OrgHistory!]!
 
   """The ID of the model"""
   id: ID!
@@ -721,6 +745,14 @@ type Org implements Named {
 type OrgEdge {
   cursor: String!
   node: Org!
+}
+
+type OrgHistory {
+  changes: Org
+  datetime: DateTime!
+  org: Org!
+  original: Org
+  user: User!
 }
 
 type PageInfo {
@@ -833,9 +865,9 @@ type ProcessEfficiency {
 }
 
 type ProcessHistory {
-  changes: String
+  changes: Process
   datetime: DateTime!
-  original: String
+  original: Process
   process: Process!
   user: User!
 }
@@ -1505,6 +1537,9 @@ type Variant implements Named {
   createdAt: DateTime!
   desc: String
 
+  """Audit history of changes to this variant"""
+  history: [VariantHistory!]!
+
   """The ID of the model"""
   id: ID!
   imageURL: String
@@ -1562,6 +1597,14 @@ type VariantComponentsPage {
 type VariantEdge {
   cursor: String!
   node: Variant!
+}
+
+type VariantHistory {
+  changes: Variant
+  datetime: DateTime!
+  original: Variant
+  user: User!
+  variant: Variant!
 }
 
 input VariantItemsInput {

@@ -8,7 +8,13 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 
-import { Category, CATEGORY_ROOT, CategoryEdge, CategoryTree } from './category.entity'
+import {
+  Category,
+  CATEGORY_ROOT,
+  CategoryEdge,
+  CategoryHistory,
+  CategoryTree,
+} from './category.entity'
 import { CreateCategoryInput, UpdateCategoryInput } from './category.model'
 import { Item } from './item.entity'
 
@@ -125,6 +131,12 @@ export class CategoryService {
     const category = new Category()
     if (!isUsingChange(input)) {
       await this.setFields(category, input)
+      await this.editService.createHistory(
+        Category.name,
+        userID,
+        undefined,
+        this.editService.entityToChangePOJO(Category.name, category),
+      )
       await this.em.persist(category).flush()
       return { category }
     }
@@ -152,7 +164,14 @@ export class CategoryService {
       throw new Error(`Category with ID "${input.id}" not found`)
     }
     if (!change) {
+      const original = this.editService.entityToChangePOJO(Category.name, category)
       await this.setFields(category, input)
+      await this.editService.createHistory(
+        Category.name,
+        userID,
+        original,
+        this.editService.entityToChangePOJO(Category.name, category),
+      )
       await this.em.persist(category).flush()
       return {
         category,
@@ -176,6 +195,14 @@ export class CategoryService {
       throw NotFoundErr(`Category with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async history(categoryID: string) {
+    return this.em.find(
+      CategoryHistory,
+      { category: categoryID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

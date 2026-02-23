@@ -10,6 +10,7 @@ import { ImageOrIconSchema } from '@src/common/base.schema'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate, TrArraySchema } from '@src/common/i18n'
 import {
+  BaseModel,
   CreatedUpdated,
   registerModel,
   TranslatedInput,
@@ -81,13 +82,16 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
 
   @Field(() => ItemsPage, { description: 'Items classified under this category' })
   items!: ItemsPage & {}
+
+  @Field(() => [CategoryHistory], { description: 'Audit history of changes to this category' })
+  history: CategoryHistory[] = []
 }
 registerModel('Category', Category)
 
 @ObjectType()
-export class CategoryHistory {
-  @Field(() => String)
-  category_id!: string
+export class CategoryHistory extends BaseModel<any> {
+  @Field(() => Category)
+  category!: Category
 
   @Field(() => LuxonDateTimeResolver)
   datetime!: DateTime
@@ -95,11 +99,11 @@ export class CategoryHistory {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => String, { nullable: true })
-  original?: string
+  @Field(() => Category, { nullable: true })
+  original?: Category
 
-  @Field(() => String, { nullable: true })
-  changes?: string
+  @Field(() => Category, { nullable: true })
+  changes?: Category
 }
 
 @ObjectType()

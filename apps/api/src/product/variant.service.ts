@@ -17,7 +17,13 @@ import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 
 import { Item } from './item.entity'
-import { Variant, VariantsComponents, VariantsOrgs, VariantsTags } from './variant.entity'
+import {
+  Variant,
+  VariantHistory,
+  VariantsComponents,
+  VariantsOrgs,
+  VariantsTags,
+} from './variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 @Injectable()
@@ -147,6 +153,12 @@ export class VariantService {
     const variant = new Variant()
     if (!isUsingChange(input)) {
       await this.setFields(variant, input)
+      await this.editService.createHistory(
+        Variant.name,
+        userID,
+        undefined,
+        this.editService.entityToChangePOJO(Variant.name, variant),
+      )
       await this.em.persist(variant).flush()
       return { variant }
     }
@@ -172,7 +184,14 @@ export class VariantService {
       throw new Error('Variant not found')
     }
     if (!change) {
+      const original = this.editService.entityToChangePOJO(Variant.name, variant)
       await this.setFields(variant, input)
+      await this.editService.createHistory(
+        Variant.name,
+        userID,
+        original,
+        this.editService.entityToChangePOJO(Variant.name, variant),
+      )
       await this.em.persist(variant).flush()
       return { variant }
     }
@@ -190,6 +209,14 @@ export class VariantService {
       throw NotFoundErr(`Variant with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async history(variantID: string) {
+    return this.em.find(
+      VariantHistory,
+      { variant: variantID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(

@@ -13,7 +13,7 @@ import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 
 import { Category } from './category.entity'
-import { Item, ItemsTags } from './item.entity'
+import { Item, ItemHistory, ItemsTags } from './item.entity'
 import { CreateItemInput, UpdateItemInput } from './item.model'
 import { Variant } from './variant.entity'
 
@@ -111,6 +111,12 @@ export class ItemService {
     const item = new Item()
     if (!isUsingChange(input)) {
       await this.setFields(item, input)
+      await this.editService.createHistory(
+        Item.name,
+        userID,
+        undefined,
+        this.editService.entityToChangePOJO(Item.name, item),
+      )
       await this.em.persist(item).flush()
       return { item }
     }
@@ -136,7 +142,14 @@ export class ItemService {
       throw new Error('Item not found')
     }
     if (!change) {
+      const original = this.editService.entityToChangePOJO(Item.name, item)
       await this.setFields(item, input)
+      await this.editService.createHistory(
+        Item.name,
+        userID,
+        original,
+        this.editService.entityToChangePOJO(Item.name, item),
+      )
       await this.em.persist(item).flush()
       return { item }
     }
@@ -154,6 +167,14 @@ export class ItemService {
       throw NotFoundErr(`Item with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async history(itemID: string) {
+    return this.em.find(
+      ItemHistory,
+      { item: itemID },
+      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+    )
   }
 
   async setFields(item: Item, input: Partial<CreateItemInput & UpdateItemInput>, change?: Change) {

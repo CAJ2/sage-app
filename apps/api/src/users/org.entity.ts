@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Collection,
   Entity,
   Index,
@@ -73,7 +74,7 @@ export class Org extends IDCreatedUpdated implements Searchable {
 }
 
 @Entity({ tableName: 'org_history', schema: 'public' })
-export class OrgHistory {
+export class OrgHistory extends BaseEntity {
   @ManyToOne({ primary: true })
   org!: Org
 
