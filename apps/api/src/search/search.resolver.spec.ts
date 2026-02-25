@@ -14,8 +14,7 @@ import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { Variant } from '@src/product/variant.model'
-
-import { SearchService } from './search.service'
+import { SearchService } from '@src/search/search.service'
 
 describe('SearchResolver (integration)', () => {
   let app: INestApplication

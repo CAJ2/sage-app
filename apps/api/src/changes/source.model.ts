@@ -3,14 +3,13 @@ import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
+import { ChangesPage } from '@src/changes/change.model'
+import { Source as SourceEntity, SourceType } from '@src/changes/source.entity'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
-
-import { ChangesPage } from './change.model'
-import { Source as SourceEntity, SourceType } from './source.entity'
 
 registerEnumType(SourceType, {
   name: 'SourceType',

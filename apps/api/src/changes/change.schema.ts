@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { z } from 'zod/v4'
 
+import { CreateChangeInput } from '@src/changes/change-ext.model'
+import { ChangeStatus } from '@src/changes/change.entity'
+import { UpdateChangeInput } from '@src/changes/change.model'
 import { ZService } from '@src/common/z.service'
 import { LangSchema } from '@src/graphql/base.model'
-
-import { CreateChangeInput } from './change-ext.model'
-import { ChangeStatus } from './change.entity'
-import { UpdateChangeInput } from './change.model'
 
 export const ChangeIDSchema = z.string().meta({
   id: 'Change',

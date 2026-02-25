@@ -3,9 +3,8 @@ import { betterAuth } from 'better-auth'
 import { admin, organization, username } from 'better-auth/plugins'
 import { KyselyKnexDialect, PGColdDialect } from 'kysely-knex'
 
+import { reservedUsernames } from '@src/auth/reserved-usernames'
 import { isProd } from '@src/common/common.utils'
-
-import { reservedUsernames } from './reserved-usernames'
 
 export const configureAuth = (orm: MikroORM) => {
   const conn = orm.em.getConnection()

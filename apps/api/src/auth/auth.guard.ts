@@ -11,8 +11,8 @@ import type { getSession } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
 import { ClsService } from 'nestjs-cls'
 
-import { type AuthModuleOptions, MODULE_OPTIONS_TOKEN } from './auth-module-definition'
-import { getRequestFromContext } from './utils'
+import { type AuthModuleOptions, MODULE_OPTIONS_TOKEN } from '@src/auth/auth-module-definition'
+import { getRequestFromContext } from '@src/auth/utils'
 
 /**
  * Lazy-load GraphQLError to make graphql an optional dependency

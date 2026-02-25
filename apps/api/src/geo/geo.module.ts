@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common'
 
 import { CommonModule } from '@src/common/common.module'
-
-import { PlaceResolver } from './place.resolver'
-import { PlaceService } from './place.service'
-import { RegionResolver } from './region.resolver'
-import { RegionService } from './region.service'
+import { PlaceResolver } from '@src/geo/place.resolver'
+import { PlaceService } from '@src/geo/place.service'
+import { RegionResolver } from '@src/geo/region.resolver'
+import { RegionService } from '@src/geo/region.service'
 
 @Module({
   imports: [CommonModule],

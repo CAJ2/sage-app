@@ -8,8 +8,7 @@ import { type JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-
-import { Tag as TagEntity, TagType } from './tag.entity'
+import { Tag as TagEntity, TagType } from '@src/process/tag.entity'
 
 registerEnumType(TagType, {
   name: 'TagType',

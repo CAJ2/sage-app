@@ -11,8 +11,7 @@ import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { ZService } from '@src/common/z.service'
-
-import { CreateCategoryInput, UpdateCategoryInput } from './category.model'
+import { CreateCategoryInput, UpdateCategoryInput } from '@src/product/category.model'
 
 export const CategoryIDSchema = z.string().meta({
   id: 'Category',

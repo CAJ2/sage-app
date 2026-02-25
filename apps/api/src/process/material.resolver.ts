@@ -3,8 +3,7 @@ import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql
 import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-
-import { Component, ComponentsPage } from './component.model'
+import { Component, ComponentsPage } from '@src/process/component.model'
 import {
   ComponentsArgs,
   Material,
@@ -12,9 +11,9 @@ import {
   MaterialsPage,
   PrimaryComponentsArgs,
   ProcessesArgs,
-} from './material.model'
-import { MaterialService } from './material.service'
-import { Process, ProcessPage } from './process.model'
+} from '@src/process/material.model'
+import { MaterialService } from '@src/process/material.service'
+import { Process, ProcessPage } from '@src/process/process.model'
 
 @Resolver(() => Material)
 export class MaterialResolver {

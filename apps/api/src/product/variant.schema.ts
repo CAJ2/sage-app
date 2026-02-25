@@ -19,11 +19,10 @@ import { ZService } from '@src/common/z.service'
 import { RegionIDSchema } from '@src/geo/region.model'
 import { ComponentIDSchema } from '@src/process/component.schema'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
+import { ItemIDSchema } from '@src/product/item.schema'
+import { VariantComponentUnitSchema } from '@src/product/variant.entity'
+import { CreateVariantInput, UpdateVariantInput } from '@src/product/variant.model'
 import { OrgIDSchema } from '@src/users/org.schema'
-
-import { ItemIDSchema } from './item.schema'
-import { VariantComponentUnitSchema } from './variant.entity'
-import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 export const VariantIDSchema = z.string().meta({
   id: 'Variant',

@@ -13,18 +13,17 @@ import { AppController } from '@src/app.controller'
 import { AppService } from '@src/app.service'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
+import { isProd } from '@src/common/common.utils'
 import { parseLanguageHeader } from '@src/common/i18n'
 import config from '@src/config/config'
 import { GeoModule } from '@src/geo/geo.module'
 import { GraphQLModule } from '@src/graphql/graphql.module'
 import { HealthModule } from '@src/health/health.module'
+import { MIKRO_CONFIG } from '@src/mikro-orm.config'
 import { ProcessModule } from '@src/process/process.module'
 import { ProductModule } from '@src/product/product.module'
 import { SearchModule } from '@src/search/search.module'
 import { UsersModule } from '@src/users/users.module'
-
-import { isProd } from './common/common.utils'
-import { MIKRO_CONFIG } from './mikro-orm.config'
 
 if (dotenv) {
   dotenv.config()

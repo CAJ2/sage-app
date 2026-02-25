@@ -11,10 +11,9 @@ import { translate } from '@src/common/i18n'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-
-import { ComponentsPage } from './component.model'
-import { Material as MaterialEntity } from './material.entity'
-import { ProcessPage } from './process.model'
+import { ComponentsPage } from '@src/process/component.model'
+import { Material as MaterialEntity } from '@src/process/material.entity'
+import { ProcessPage } from '@src/process/process.model'
 
 @ObjectType({
   implements: () => [Named],

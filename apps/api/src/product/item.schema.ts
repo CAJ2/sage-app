@@ -18,9 +18,8 @@ import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { ZService } from '@src/common/z.service'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
-
-import { CategoryIDSchema } from './category.schema'
-import { CreateItemInput, UpdateItemInput } from './item.model'
+import { CategoryIDSchema } from '@src/product/category.schema'
+import { CreateItemInput, UpdateItemInput } from '@src/product/item.model'
 
 export const ItemIDSchema = z.string().meta({
   id: 'Item',

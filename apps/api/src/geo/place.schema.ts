@@ -10,10 +10,9 @@ import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { ZService } from '@src/common/z.service'
+import { CreatePlaceInput, UpdatePlaceInput } from '@src/geo/place.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { OrgIDSchema } from '@src/users/org.schema'
-
-import { CreatePlaceInput, UpdatePlaceInput } from './place.model'
 
 export const PlaceIDSchema = z.string().meta({
   id: 'Place',

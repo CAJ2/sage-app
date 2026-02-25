@@ -2,10 +2,9 @@ import { Field, ID, InputType } from '@nestjs/graphql'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 
+import { ChangeStatus } from '@src/changes/change.entity'
 import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject } from '@src/common/z.schema'
-
-import { ChangeStatus } from './change.entity'
 
 export interface ISourceInput {
   id: string

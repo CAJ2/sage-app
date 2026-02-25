@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core'
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express'
 import helmet from 'helmet'
 
-import { AppModule } from './app.module'
-import { HttpExceptionFilter } from './common/http-exception.filter'
+import { AppModule } from '@src/app.module'
+import { HttpExceptionFilter } from '@src/common/http-exception.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {

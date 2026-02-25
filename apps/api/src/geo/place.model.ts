@@ -9,13 +9,12 @@ import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
+import { Place as PlaceEntity } from '@src/geo/place.entity'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
-
-import { Place as PlaceEntity } from './place.entity'
 
 @ObjectType({ description: 'Geographic coordinates (latitude and longitude) for a place' })
 export class PlaceLocation {

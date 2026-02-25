@@ -4,9 +4,8 @@ import { Module } from '@nestjs/common'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
 import { CommonModule } from '@src/common/common.module'
-
-import { SearchResolver } from './search.resolver'
-import { SearchService } from './search.service'
+import { SearchResolver } from '@src/search/search.resolver'
+import { SearchService } from '@src/search/search.service'
 
 @Module({
   imports: [CommonModule, MikroOrmModule.forFeature([]), AuthModule, ChangesModule],

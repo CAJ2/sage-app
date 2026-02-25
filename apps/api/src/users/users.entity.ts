@@ -12,8 +12,7 @@ import type { Opt } from '@mikro-orm/core'
 import { Account } from '@src/auth/account.entity'
 import { Session } from '@src/auth/session.entity'
 import { IDCreatedUpdated } from '@src/db/base.entity'
-
-import { Org } from './org.entity'
+import { Org } from '@src/users/org.entity'
 
 export interface ProfileField {
   bio?: string

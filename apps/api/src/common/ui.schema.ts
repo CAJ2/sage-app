@@ -23,7 +23,7 @@
   THE SOFTWARE.
 */
 
-import type { JsonSchema7 } from './json.schema'
+import type { JsonSchema7 } from '@src/common/json.schema'
 
 /**
  * Interface for describing an UI schema element that is referencing

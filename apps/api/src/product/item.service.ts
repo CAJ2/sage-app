@@ -11,11 +11,10 @@ import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
-
-import { Category } from './category.entity'
-import { Item, ItemHistory, ItemsTags } from './item.entity'
-import { CreateItemInput, UpdateItemInput } from './item.model'
-import { Variant } from './variant.entity'
+import { Category } from '@src/product/category.entity'
+import { Item, ItemHistory, ItemsTags } from '@src/product/item.entity'
+import { CreateItemInput, UpdateItemInput } from '@src/product/item.model'
+import { Variant } from '@src/product/variant.entity'
 
 @Injectable()
 export class ItemService {

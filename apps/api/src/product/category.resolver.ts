@@ -7,8 +7,6 @@ import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
-import { User } from '@src/users/users.model'
-
 import {
   CategoriesArgs,
   CategoriesPage,
@@ -19,10 +17,11 @@ import {
   CreateCategoryOutput,
   UpdateCategoryInput,
   UpdateCategoryOutput,
-} from './category.model'
-import { CategorySchemaService } from './category.schema'
-import { CategoryService } from './category.service'
-import { Item, ItemsPage } from './item.model'
+} from '@src/product/category.model'
+import { CategorySchemaService } from '@src/product/category.schema'
+import { CategoryService } from '@src/product/category.service'
+import { Item, ItemsPage } from '@src/product/item.model'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Category)
 export class CategoryResolver {

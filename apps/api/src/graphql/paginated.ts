@@ -12,7 +12,7 @@ import {
 import { IsOptional } from 'class-validator'
 import { z } from 'zod/v4'
 
-import { BaseModel } from './base.model'
+import { BaseModel } from '@src/graphql/base.model'
 
 export const DEFAULT_PAGE_SIZE = 20
 

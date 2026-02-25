@@ -7,7 +7,7 @@ import { SeedManager } from '@mikro-orm/seeder'
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
 import dotenv from 'dotenv-flow'
 
-import { CustomMigrationGenerator } from './db/migration.gen'
+import { CustomMigrationGenerator } from '@src/db/migration.gen'
 
 if (dotenv) {
   dotenv.config()

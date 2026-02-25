@@ -15,19 +15,19 @@ import { toNodeHandler } from 'better-auth/node'
 import { createAuthMiddleware } from 'better-auth/plugins'
 import type { Request, Response } from 'express'
 
-import { configureAuth } from './auth'
+import { configureAuth } from '@src/auth/auth'
 import {
   type ASYNC_OPTIONS_TYPE,
   type AuthModuleOptions,
   ConfigurableModuleClass,
   MODULE_OPTIONS_TOKEN,
   type OPTIONS_TYPE,
-} from './auth-module-definition'
-import { AuthGuard } from './auth.guard'
-import { AuthService } from './auth.service'
-import { AuthUserService } from './authuser.service'
-import { SkipBodyParsingMiddleware } from './middlewares'
-import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './symbols'
+} from '@src/auth/auth-module-definition'
+import { AuthGuard } from '@src/auth/auth.guard'
+import { AuthService } from '@src/auth/auth.service'
+import { AuthUserService } from '@src/auth/authuser.service'
+import { SkipBodyParsingMiddleware } from '@src/auth/middlewares'
+import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from '@src/auth/symbols'
 
 const HOOKS = [
   { metadataKey: BEFORE_HOOK_KEY, hookType: 'before' as const },

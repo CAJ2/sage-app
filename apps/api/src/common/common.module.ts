@@ -4,11 +4,11 @@ import { Global, Module } from '@nestjs/common'
 import { ClsModule } from 'nestjs-cls'
 import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n'
 
-import { BaseSchemaService } from './base.schema'
-import { I18nService } from './i18n.service'
-import { MeiliService } from './meilisearch.service'
-import { TransformService } from './transform'
-import { ZService } from './z.service'
+import { BaseSchemaService } from '@src/common/base.schema'
+import { I18nService } from '@src/common/i18n.service'
+import { MeiliService } from '@src/common/meilisearch.service'
+import { TransformService } from '@src/common/transform'
+import { ZService } from '@src/common/z.service'
 
 @Global()
 @Module({

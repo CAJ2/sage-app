@@ -19,12 +19,11 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Material } from '@src/process/material.model'
+import { Process as ProcessEntity, ProcessIntent } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
-
-import { Material } from './material.model'
-import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
 @ObjectType({ description: 'Efficiency metrics for a recycling or recovery process' })
 export class ProcessEfficiency {

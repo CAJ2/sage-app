@@ -18,11 +18,10 @@ import {
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
+import { CategoriesPage } from '@src/product/category.model'
+import { Item as ItemEntity } from '@src/product/item.entity'
+import { VariantsPage } from '@src/product/variant.model'
 import { User } from '@src/users/users.model'
-
-import { CategoriesPage } from './category.model'
-import { Item as ItemEntity } from './item.entity'
-import { VariantsPage } from './variant.model'
 
 @ObjectType({
   implements: () => [Named],

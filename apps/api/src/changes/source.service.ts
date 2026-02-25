@@ -1,12 +1,11 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
+import { Source } from '@src/changes/source.entity'
+import { CreateSourceInput, UpdateSourceInput } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
-
-import { Source } from './source.entity'
-import { CreateSourceInput, UpdateSourceInput } from './source.model'
 
 @Injectable()
 export class SourceService {

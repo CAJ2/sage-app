@@ -1,5 +1,6 @@
 import { createUnionType, registerEnumType } from '@nestjs/graphql'
 
+import { ChangeStatus } from '@src/changes/change.entity'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
 import { Component } from '@src/process/component.model'
@@ -8,8 +9,6 @@ import { Process } from '@src/process/process.model'
 import { Category } from '@src/product/category.model'
 import { Item } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.model'
-
-import { ChangeStatus } from './change.entity'
 
 registerEnumType(ChangeStatus, {
   name: 'ChangeStatus',

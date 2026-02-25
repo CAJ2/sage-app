@@ -17,11 +17,10 @@ import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { ZService } from '@src/common/z.service'
 import { RegionIDSchema } from '@src/geo/region.model'
-
-import { ComponentPhysicalSchema, ComponentVisualSchema } from './component.entity'
-import { CreateComponentInput, UpdateComponentInput } from './component.model'
-import { MaterialIDSchema } from './material.model'
-import { TagDefinitionIDSchema } from './tag.model'
+import { ComponentPhysicalSchema, ComponentVisualSchema } from '@src/process/component.entity'
+import { CreateComponentInput, UpdateComponentInput } from '@src/process/component.model'
+import { MaterialIDSchema } from '@src/process/material.model'
+import { TagDefinitionIDSchema } from '@src/process/tag.model'
 
 export const ComponentIDSchema = z.string().meta({
   id: 'Component',

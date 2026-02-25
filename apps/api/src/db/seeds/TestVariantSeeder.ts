@@ -2,14 +2,13 @@ import { type EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 
 import { Source, SourceType } from '@src/changes/source.entity'
+import { MATERIAL_IDS } from '@src/db/seeds/TestMaterialSeeder'
+import { NORMAL_USER_ID } from '@src/db/seeds/UserSeeder'
 import { Component } from '@src/process/component.entity'
 import { Material } from '@src/process/material.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant, VariantsComponents, VariantsSources } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
-
-import { MATERIAL_IDS } from './TestMaterialSeeder'
-import { NORMAL_USER_ID } from './UserSeeder'
 
 export const VARIANT_IDS = [
   '_cGUR-e0HHUYQAZTeN6ft',

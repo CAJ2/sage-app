@@ -7,17 +7,16 @@ import { EditService } from '@src/changes/edit.service'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { Region } from '@src/geo/region.entity'
-
 import {
   Component,
   ComponentHistory,
   ComponentsMaterials,
   ComponentsTags,
-} from './component.entity'
-import { CreateComponentInput, UpdateComponentInput } from './component.model'
-import { Material } from './material.entity'
-import { StreamService } from './stream.service'
-import { TagService } from './tag.service'
+} from '@src/process/component.entity'
+import { CreateComponentInput, UpdateComponentInput } from '@src/process/component.model'
+import { Material } from '@src/process/material.entity'
+import { StreamService } from '@src/process/stream.service'
+import { TagService } from '@src/process/tag.service'
 
 @Injectable()
 export class ComponentService {

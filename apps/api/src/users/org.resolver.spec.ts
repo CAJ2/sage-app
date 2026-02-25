@@ -14,8 +14,7 @@ import { TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-
-import { Org } from './org.entity'
+import { Org } from '@src/users/org.entity'
 
 describe('OrgResolver (integration)', () => {
   let app: INestApplication

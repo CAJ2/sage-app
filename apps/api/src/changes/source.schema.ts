@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { z } from 'zod/v4'
 
+import { SourceType } from '@src/changes/source.entity'
+import { CreateSourceInput, UpdateSourceInput } from '@src/changes/source.model'
 import { ZService } from '@src/common/z.service'
-
-import { SourceType } from './source.entity'
-import { CreateSourceInput, UpdateSourceInput } from './source.model'
 
 export const SourceIDSchema = z.string().meta({
   id: 'Source',

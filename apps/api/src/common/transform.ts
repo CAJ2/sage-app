@@ -10,7 +10,6 @@ import _ from 'lodash'
 import { ClsService } from 'nestjs-cls'
 
 import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
-
 import {
   DEFAULT_PAGE_SIZE,
   EdgeType,
@@ -18,7 +17,7 @@ import {
   OrderDirection,
   PaginatedType,
   PaginationArgsSchema,
-} from '../graphql/paginated'
+} from '@src/graphql/paginated'
 
 export type EntityDTOCtx<T> = EntityDTO<T> & {
   _lang?: string[]

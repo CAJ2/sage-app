@@ -9,12 +9,11 @@ import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
+import { Material } from '@src/process/material.entity'
+import { Process, ProcessHistory } from '@src/process/process.entity'
+import { CreateProcessInput, UpdateProcessInput } from '@src/process/process.model'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
-
-import { Material } from './material.entity'
-import { Process, ProcessHistory } from './process.entity'
-import { CreateProcessInput, UpdateProcessInput } from './process.model'
 
 export interface FindProcessFilter {
   region?: string

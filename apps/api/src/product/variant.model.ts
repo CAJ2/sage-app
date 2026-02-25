@@ -22,16 +22,15 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
-import { Org } from '@src/users/org.model'
-import { User } from '@src/users/users.model'
-
-import { ItemsPage } from './item.model'
+import { ItemsPage } from '@src/product/item.model'
 import {
   VariantComponentUnitSchema,
   Variant as VariantEntity,
   VariantsComponents,
   VariantsOrgs,
-} from './variant.entity'
+} from '@src/product/variant.entity'
+import { Org } from '@src/users/org.model'
+import { User } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],

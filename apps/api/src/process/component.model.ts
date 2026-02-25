@@ -19,16 +19,15 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { User } from '@src/users/users.model'
-
 import {
   Component as ComponentEntity,
   type ComponentPhysical,
   type ComponentVisual,
-} from './component.entity'
-import { Material } from './material.model'
-import { RecyclingStream, StreamContext, StreamScore } from './stream.model'
-import { Tag } from './tag.model'
+} from '@src/process/component.entity'
+import { Material } from '@src/process/material.model'
+import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
+import { Tag } from '@src/process/tag.model'
+import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'The fraction of a specific material within a component' })
 export class ComponentMaterial {

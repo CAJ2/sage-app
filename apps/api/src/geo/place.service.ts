@@ -3,9 +3,8 @@ import { Injectable } from '@nestjs/common'
 
 import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
+import { Place, PlacesTag } from '@src/geo/place.entity'
 import { Tag } from '@src/process/tag.entity'
-
-import { Place, PlacesTag } from './place.entity'
 
 @Injectable()
 export class PlaceService {

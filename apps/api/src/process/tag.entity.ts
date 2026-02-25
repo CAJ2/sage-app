@@ -6,10 +6,9 @@ import { type TranslatedField } from '@src/common/i18n'
 import { AjvTemplateSchema, JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
+import { Component } from '@src/process/component.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
-
-import { Component } from './component.entity'
 
 export enum TagType {
   PLACE = 'PLACE',

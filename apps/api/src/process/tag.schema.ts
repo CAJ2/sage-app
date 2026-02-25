@@ -3,9 +3,8 @@ import { z } from 'zod/v4'
 
 import { HTTPS_OR_ICON } from '@src/common/z.schema'
 import { ZService } from '@src/common/z.service'
-
-import { TagType } from './tag.entity'
-import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'
+import { TagType } from '@src/process/tag.entity'
+import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from '@src/process/tag.model'
 
 export const CreateTagDefinitionInputSchema = z.object({
   name: z.string().max(100),

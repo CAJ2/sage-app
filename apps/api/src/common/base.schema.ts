@@ -4,8 +4,7 @@ import _ from 'lodash'
 import { core, z } from 'zod/v4'
 
 import { I18nService } from '@src/common/i18n.service'
-
-import { ZJSONObject } from './z.schema'
+import { ZJSONObject } from '@src/common/z.schema'
 
 export const zToSchema = (schema: core.$ZodType): core.JSONSchema.BaseSchema => {
   return z.toJSONSchema(schema, {

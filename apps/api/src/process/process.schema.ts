@@ -13,17 +13,16 @@ import { UISchemaElement } from '@src/common/ui.schema'
 import { ZService } from '@src/common/z.service'
 import { PlaceIDSchema } from '@src/geo/place.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { VariantIDSchema } from '@src/product/variant.schema'
-import { OrgIDSchema } from '@src/users/org.schema'
-
-import { MaterialIDSchema } from './material.model'
+import { MaterialIDSchema } from '@src/process/material.model'
 import {
   ProcessEfficiencySchema,
   ProcessInstructionsSchema,
   ProcessIntent,
   ProcessRulesSchema,
-} from './process.entity'
-import { CreateProcessInput, UpdateProcessInput } from './process.model'
+} from '@src/process/process.entity'
+import { CreateProcessInput, UpdateProcessInput } from '@src/process/process.model'
+import { VariantIDSchema } from '@src/product/variant.schema'
+import { OrgIDSchema } from '@src/users/org.schema'
 
 export const ProcessIDSchema = z.string().meta({
   id: 'Process',

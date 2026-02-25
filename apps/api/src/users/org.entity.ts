@@ -16,8 +16,7 @@ import { defaultTranslatedField, flattenTr, type TranslatedField } from '@src/co
 import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
-
-import { User } from './users.entity'
+import { User } from '@src/users/users.entity'
 
 @Entity({ tableName: 'orgs', schema: 'public' })
 export class Org extends IDCreatedUpdated implements Searchable {

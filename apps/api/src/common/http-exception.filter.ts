@@ -15,7 +15,7 @@ import {
   ErrorEntry,
   ForbiddenException,
   NotFoundException,
-} from './exceptions'
+} from '@src/common/exceptions'
 
 @Catch(
   HttpException,

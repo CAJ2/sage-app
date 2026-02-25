@@ -1,12 +1,11 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Test, TestingModule } from '@nestjs/testing'
 
+import { AuthModule } from '@src/auth/auth.module'
+import { AuthService } from '@src/auth/auth.service'
 import { CommonModule } from '@src/common/common.module'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { UsersService } from '@src/users/users.service'
-
-import { AuthModule } from './auth.module'
-import { AuthService } from './auth.service'
 
 describe('AuthService', () => {
   let module: TestingModule

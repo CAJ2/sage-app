@@ -16,10 +16,9 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Category as CategoryEntity } from '@src/product/category.entity'
+import { ItemsPage } from '@src/product/item.model'
 import { User } from '@src/users/users.model'
-
-import { Category as CategoryEntity } from './category.entity'
-import { ItemsPage } from './item.model'
 
 @ObjectType({
   implements: () => [Named],
