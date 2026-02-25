@@ -115,7 +115,7 @@ export class VariantsItems extends BaseEntity {
   variant!: Variant
 
   @ManyToOne({ primary: true })
-  item!: Item
+  item!: Item & {}
 }
 
 @Entity({ tableName: 'variants_tags', schema: 'public' })
@@ -124,7 +124,7 @@ export class VariantsTags extends BaseEntity {
   variant!: Variant
 
   @ManyToOne({ primary: true })
-  tag!: Tag
+  tag!: Tag & {}
 
   @Property({ type: 'json' })
   meta?: Record<string, any>
