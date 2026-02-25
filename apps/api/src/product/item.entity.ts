@@ -15,10 +15,9 @@ import { z } from 'zod/v4'
 import { flattenTr, type TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
+import { Category } from '@src/product/category.entity'
+import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
-
-import { Category } from './category.entity'
-import { Variant } from './variant.entity'
 
 export const ItemFilesSchema = z.object({
   thumbnail: z.url().optional(),

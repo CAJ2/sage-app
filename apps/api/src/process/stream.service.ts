@@ -4,11 +4,10 @@ import { ClsService } from 'nestjs-cls'
 
 import { I18nService } from '@src/common/i18n.service'
 import { Region } from '@src/geo/region.entity'
-
-import { Component } from './component.entity'
-import { ComponentRecycle } from './component.model'
-import { Process } from './process.entity'
-import { RecyclingStream, StreamScore, StreamScoreRating } from './stream.model'
+import { Component } from '@src/process/component.entity'
+import { ComponentRecycle } from '@src/process/component.model'
+import { Process } from '@src/process/process.entity'
+import { RecyclingStream, StreamScore, StreamScoreRating } from '@src/process/stream.model'
 
 @Injectable()
 export class StreamService {

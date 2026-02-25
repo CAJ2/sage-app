@@ -6,26 +6,26 @@ import { SeedManager } from '@mikro-orm/seeder'
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
 import dotenv from 'dotenv-flow'
 
-import { Account } from './auth/account.entity'
-import { Session } from './auth/session.entity'
-import { Verification } from './auth/verification.entity'
-import { Change, ChangeEdits, ChangesSources } from './changes/change.entity'
-import { ExternalSource, Source } from './changes/source.entity'
-import { CustomMigrationGenerator } from './db/migration.gen'
-import { Place, PlaceHistory, PlacesTag } from './geo/place.entity'
-import { Region, RegionHistory } from './geo/region.entity'
+import { Account } from '@src/auth/account.entity'
+import { Session } from '@src/auth/session.entity'
+import { Verification } from '@src/auth/verification.entity'
+import { Change, ChangeEdits, ChangesSources } from '@src/changes/change.entity'
+import { ExternalSource, Source } from '@src/changes/source.entity'
+import { CustomMigrationGenerator } from '@src/db/migration.gen'
+import { Place, PlaceHistory, PlacesTag } from '@src/geo/place.entity'
+import { Region, RegionHistory } from '@src/geo/region.entity'
 import {
   Component,
   ComponentHistory,
   ComponentsMaterials,
   ComponentsSources,
   ComponentsTags,
-} from './process/component.entity'
-import { Material, MaterialEdge, MaterialHistory, MaterialTree } from './process/material.entity'
-import { Process, ProcessHistory, ProcessSources } from './process/process.entity'
-import { Tag } from './process/tag.entity'
-import { Category, CategoryEdge, CategoryHistory, CategoryTree } from './product/category.entity'
-import { Item, ItemHistory, ItemsCategories, ItemsTags } from './product/item.entity'
+} from '@src/process/component.entity'
+import { Material, MaterialEdge, MaterialHistory, MaterialTree } from '@src/process/material.entity'
+import { Process, ProcessHistory, ProcessSources } from '@src/process/process.entity'
+import { Tag } from '@src/process/tag.entity'
+import { Category, CategoryEdge, CategoryHistory, CategoryTree } from '@src/product/category.entity'
+import { Item, ItemHistory, ItemsCategories, ItemsTags } from '@src/product/item.entity'
 import {
   Variant,
   VariantHistory,
@@ -34,9 +34,9 @@ import {
   VariantsOrgs,
   VariantsSources,
   VariantsTags,
-} from './product/variant.entity'
-import { Invitation, Org, OrgHistory } from './users/org.entity'
-import { User, UsersOrgs } from './users/users.entity'
+} from '@src/product/variant.entity'
+import { Invitation, Org, OrgHistory } from '@src/users/org.entity'
+import { User, UsersOrgs } from '@src/users/users.entity'
 
 if (dotenv) {
   dotenv.config()

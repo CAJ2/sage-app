@@ -2,13 +2,11 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { ImageOrIconSchema } from '@src/common/base.schema'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate, TrArraySchema } from '@src/common/i18n'
+import { translate } from '@src/common/i18n'
 import {
   BaseModel,
   CreatedUpdated,
@@ -18,10 +16,9 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { Category as CategoryEntity } from '@src/product/category.entity'
+import { ItemsPage } from '@src/product/item.model'
 import { User } from '@src/users/users.model'
-
-import { Category as CategoryEntity } from './category.entity'
-import { ItemsPage } from './item.model'
 
 @ObjectType({
   implements: () => [Named],
@@ -117,16 +114,6 @@ export class CategoryItemsArgs extends PaginationBasicArgs {}
 
 @InputType()
 export class CreateCategoryInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    name: z.string().max(1024).optional(),
-    nameTr: TrArraySchema,
-    descShort: z.string().max(1024).optional(),
-    descShortTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    imageURL: ImageOrIconSchema.optional(),
-  })
-
   @Field(() => String, { nullable: true })
   name?: string
 
@@ -151,17 +138,6 @@ export class CreateCategoryInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateCategoryInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    id: z.nanoid(),
-    name: z.string().max(1024).optional(),
-    nameTr: TrArraySchema,
-    descShort: z.string().max(1024).optional(),
-    descShortTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    imageURL: ImageOrIconSchema.optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

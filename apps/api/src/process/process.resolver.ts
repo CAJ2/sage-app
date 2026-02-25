@@ -6,7 +6,6 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   CreateProcessInput,
@@ -27,7 +26,6 @@ export class ProcessResolver {
   constructor(
     private readonly processService: ProcessService,
     private readonly transform: TransformService,
-    private readonly z: ZService,
     private readonly processSchemaService: ProcessSchemaService,
   ) {}
 
@@ -72,7 +70,7 @@ export class ProcessResolver {
     @Args('input') input: CreateProcessInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateProcessOutput> {
-    input = await this.z.parse(CreateProcessInput.schema, input)
+    input = await this.processSchemaService.parseCreateInput(input)
     const created = await this.processService.create(input, user.id)
     const model = await this.transform.entityToModel(Process, created.process)
     if (created.change) {
@@ -90,7 +88,7 @@ export class ProcessResolver {
     @Args('input') input: UpdateProcessInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateProcessOutput> {
-    input = await this.z.parse(UpdateProcessInput.schema, input)
+    input = await this.processSchemaService.parseUpdateInput(input)
     const updated = await this.processService.update(input, user.id)
     const model = await this.transform.entityToModel(Process, updated.process)
     if (updated.change) {
@@ -102,7 +100,7 @@ export class ProcessResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteProcess', nullable: true })
   async deleteProcess(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
-    input = await this.z.parse(DeleteInput.schema, input)
+    input = await this.processSchemaService.parseDeleteInput(input)
     const process = await this.processService.delete(input)
     return { success: true, id: process.id }
   }

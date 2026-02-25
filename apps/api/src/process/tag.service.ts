@@ -5,9 +5,8 @@ import { type JSONSchemaType } from 'ajv/dist/2020'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { AjvTemplateSchema, JSONObject } from '@src/common/z.schema'
-
-import { Tag, TagMetaTemplateSchema } from './tag.entity'
-import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from './tag.model'
+import { Tag, TagMetaTemplateSchema } from '@src/process/tag.entity'
+import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from '@src/process/tag.model'
 
 export interface TagInput {
   id: string

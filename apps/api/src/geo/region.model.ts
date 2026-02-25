@@ -5,10 +5,9 @@ import { z } from 'zod/v4'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
+import { Region as RegionEntity } from '@src/geo/region.entity'
 import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-
-import { Region as RegionEntity } from './region.entity'
 
 function extractBbox(obj: RegionEntity): number[] | undefined {
   if (obj.properties && obj.properties['geom:bbox']) {

@@ -3,15 +3,14 @@ import { Transform, Type } from 'class-transformer'
 import { IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { ImageOrIconSchema } from '@src/common/base.schema'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate, TrArraySchema } from '@src/common/i18n'
+import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
-import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
+import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
   IDCreatedUpdated,
@@ -23,11 +22,15 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
+import { ItemsPage } from '@src/product/item.model'
+import {
+  VariantComponentUnitSchema,
+  Variant as VariantEntity,
+  VariantsComponents,
+  VariantsOrgs,
+} from '@src/product/variant.entity'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
-
-import { ItemsPage } from './item.model'
-import { Variant as VariantEntity, VariantsComponents, VariantsOrgs } from './variant.entity'
 
 @ObjectType({
   implements: () => [Named],
@@ -124,7 +127,7 @@ export class VariantComponent extends BaseModel<VariantsComponents> {
     nullable: true,
     description: 'Unit of measurement for the component quantity',
   })
-  unit?: string
+  unit?: z.infer<typeof VariantComponentUnitSchema>
 }
 
 @ObjectType()
@@ -167,31 +170,18 @@ export class VariantRecycleArgs {
 
 @InputType()
 export class VariantItemsInput {
-  static schema = z.object({
-    id: z.nanoid(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class VariantOrgsInput {
-  static schema = z.object({
-    id: z.nanoid(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class VariantTagsInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    meta: ZJSONObject.optional(),
-  })
-
   @Field(() => ID)
   @Validate(IsNanoID)
   id!: string
@@ -202,22 +192,12 @@ export class VariantTagsInput {
 
 @InputType()
 export class VariantRegionsInput {
-  static schema = z.object({
-    id: z.string().startsWith('wof_'),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class VariantComponentsInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    quantity: z.number().min(0.001).max(1).optional(),
-    unit: z.string().max(10).optional(),
-  })
-
   @Field(() => ID)
   id!: string
 
@@ -228,26 +208,11 @@ export class VariantComponentsInput {
     nullable: true,
     description: 'Unit of measurement for the component quantity',
   })
-  unit?: string
+  unit?: z.infer<typeof VariantComponentUnitSchema>
 }
 
 @InputType()
 export class CreateVariantInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    name: z.string().max(1000).optional(),
-    nameTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    imageURL: ImageOrIconSchema,
-    items: z.array(VariantItemsInput.schema).optional(),
-    region: VariantRegionsInput.schema.optional(),
-    regions: z.array(VariantRegionsInput.schema).optional(),
-    code: z.string().max(128).optional(),
-    orgs: z.array(VariantOrgsInput.schema).optional(),
-    tags: z.array(VariantTagsInput.schema).optional(),
-    components: z.array(VariantComponentsInput.schema).optional(),
-  })
-
   @Field(() => String, { nullable: true })
   name?: string
 
@@ -290,31 +255,6 @@ export class CreateVariantInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateVariantInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    id: z.nanoid(),
-    name: z.string().max(1000).optional(),
-    nameTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    imageURL: ImageOrIconSchema.optional(),
-    items: z.array(VariantItemsInput.schema).optional(),
-    addItems: z.array(VariantItemsInput.schema).optional(),
-    removeItems: z.array(z.nanoid()).optional(),
-    region: VariantRegionsInput.schema.optional(),
-    addRegions: z.array(VariantRegionsInput.schema).optional(),
-    removeRegions: z.array(z.string().startsWith('wof_')).optional(),
-    code: z.string().max(128).optional(),
-    orgs: z.array(VariantOrgsInput.schema).optional(),
-    addOrgs: z.array(VariantOrgsInput.schema).optional(),
-    removeOrgs: z.array(z.nanoid()).optional(),
-    tags: z.array(VariantTagsInput.schema).optional(),
-    addTags: z.array(VariantTagsInput.schema).optional(),
-    removeTags: z.array(z.nanoid()).optional(),
-    components: z.array(VariantComponentsInput.schema).optional(),
-    addComponents: z.array(VariantComponentsInput.schema).optional(),
-    removeComponents: z.array(z.nanoid()).optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

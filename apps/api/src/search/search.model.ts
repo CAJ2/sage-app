@@ -66,16 +66,16 @@ registerEnumType(SearchType, {
   description: 'The item type to search',
 })
 
+export const SearchArgsSchema = z.object({
+  query: z.string(),
+  types: z.array(z.enum(SearchType)).optional(),
+  latlong: z.array(z.number()).length(2).optional(),
+  limit: z.number().int().positive().optional(),
+  offset: z.number().int().min(0).optional(),
+})
+
 @ArgsType()
 export class SearchArgs {
-  static schema = z.object({
-    query: z.string(),
-    types: z.array(z.enum(SearchType)).optional(),
-    latlong: z.array(z.number()).length(2).optional(),
-    limit: z.number().int().positive().optional(),
-    offset: z.number().int().min(0).optional(),
-  })
-
   @Field(() => String)
   query!: string
 

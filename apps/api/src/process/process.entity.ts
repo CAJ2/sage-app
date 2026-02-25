@@ -18,11 +18,10 @@ import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
+import { Material } from '@src/process/material.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
-
-import { Material } from './material.entity'
 
 export enum ProcessIntent {
   // Reuse a functional product.

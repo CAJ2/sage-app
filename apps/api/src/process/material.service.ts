@@ -2,10 +2,9 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { CursorOptions } from '@src/common/transform'
-
-import { Component } from './component.entity'
-import { Material, MATERIAL_ROOT, MaterialEdge, MaterialTree } from './material.entity'
-import { Process } from './process.entity'
+import { Component } from '@src/process/component.entity'
+import { Material, MATERIAL_ROOT, MaterialEdge, MaterialTree } from '@src/process/material.entity'
+import { Process } from '@src/process/process.entity'
 
 @Injectable()
 export class MaterialService {

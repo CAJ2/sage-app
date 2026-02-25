@@ -13,18 +13,17 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import _ from 'lodash'
 
 import { AuthUserService } from '@src/auth/authuser.service'
-import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
-import { User } from '@src/users/users.entity'
-
 import {
   CreateChangeInput,
   DeleteInput,
   IChangeInputWithLang,
   isUsingChange,
-} from './change-ext.model'
-import { Change, ChangeEdits, ChangeStatus } from './change.entity'
-import { MergeInput, UpdateChangeInput } from './change.model'
-import { Source } from './source.entity'
+} from '@src/changes/change-ext.model'
+import { Change, ChangeEdits, ChangeStatus } from '@src/changes/change.entity'
+import { MergeInput, UpdateChangeInput } from '@src/changes/change.model'
+import { Source } from '@src/changes/source.entity'
+import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
+import { User } from '@src/users/users.entity'
 
 export interface IEntityService {
   findOneByID<T extends BaseEntity>(id: string): Promise<T | null>

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 
+import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
-import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
+import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
   ImageOrIconSchema,
@@ -13,13 +13,14 @@ import {
   zToSchema,
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
+import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
+import { ZService } from '@src/common/z.service'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
-
-import { ComponentPhysicalSchema, ComponentVisualSchema } from './component.entity'
-import { MaterialIDSchema } from './material.model'
-import { TagDefinitionIDSchema } from './tag.model'
+import { ComponentPhysicalSchema, ComponentVisualSchema } from '@src/process/component.entity'
+import { CreateComponentInput, UpdateComponentInput } from '@src/process/component.model'
+import { MaterialIDSchema } from '@src/process/material.model'
+import { TagDefinitionIDSchema } from '@src/process/tag.model'
 
 export const ComponentIDSchema = z.string().meta({
   id: 'Component',
@@ -28,21 +29,22 @@ export const ComponentIDSchema = z.string().meta({
 
 @Injectable()
 export class ComponentSchemaService {
-  ComponentMaterialInputSchema: z.ZodObject
-  ComponentTagsInputSchema: z.ZodObject
-  ComponentRegionInputSchema: z.ZodObject
-  CreateSchema: z.ZodObject
+  ComponentMaterialInputSchema
+  ComponentTagsInputSchema
+  ComponentRegionInputSchema
+  CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
   CreateUISchema: UISchemaElement
-  UpdateSchema: z.ZodObject
+  UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
   UpdateValidator: ValidateFunction
   UpdateUISchema: UISchemaElement
 
   constructor(
-    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly i18n: I18nService,
     private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
   ) {
     this.ComponentMaterialInputSchema = z
       .strictObject({
@@ -225,5 +227,17 @@ export class ComponentSchemaService {
     }
     this.UpdateValidator(data)
     return data
+  }
+
+  async parseCreateInput(input: CreateComponentInput): Promise<CreateComponentInput> {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: UpdateComponentInput): Promise<UpdateComponentInput> {
+    return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseDeleteInput(input: DeleteInput): Promise<DeleteInput> {
+    return this.zService.parse(DeleteInputSchema, input)
   }
 }

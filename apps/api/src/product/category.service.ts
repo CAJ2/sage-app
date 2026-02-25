@@ -7,16 +7,15 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-
 import {
   Category,
   CATEGORY_ROOT,
   CategoryEdge,
   CategoryHistory,
   CategoryTree,
-} from './category.entity'
-import { CreateCategoryInput, UpdateCategoryInput } from './category.model'
-import { Item } from './item.entity'
+} from '@src/product/category.entity'
+import { CreateCategoryInput, UpdateCategoryInput } from '@src/product/category.model'
+import { Item } from '@src/product/item.entity'
 
 @Injectable()
 export class CategoryService {

@@ -16,11 +16,10 @@ import { Source } from '@src/changes/source.entity'
 import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
+import { Material } from '@src/process/material.entity'
+import { Tag } from '@src/process/tag.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
-
-import { Material } from './material.entity'
-import { Tag } from './tag.entity'
 
 export const ComponentVisualSchema = z.object({
   // The visual representation of the component.

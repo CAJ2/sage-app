@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import Ajv2020 from 'ajv/dist/2020'
 import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
 import { core, z } from 'zod/v4'
+
+import { I18nService } from '@src/common/i18n.service'
+import { ZJSONObject } from '@src/common/z.schema'
 
 export const zToSchema = (schema: core.$ZodType): core.JSONSchema.BaseSchema => {
   return z.toJSONSchema(schema, {
@@ -28,9 +30,7 @@ export const ImageOrIconSchema = z
   .url({ protocol: /^(https|icon)/ })
   .optional()
   .default('')
-export const RelMetaSchema = z
-  .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
-  .optional()
+export const RelMetaSchema = ZJSONObject.optional()
 
 @Injectable()
 export class BaseSchemaService {
@@ -47,6 +47,7 @@ export class BaseSchemaService {
         date: true,
         url: true,
         uri: true,
+        nanoid: true,
       },
     })
   }

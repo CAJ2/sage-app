@@ -6,9 +6,8 @@ import { I18nService as I18nBaseService, Path, PathValue, TranslateOptions } fro
 import { IfAnyOrNever } from 'nestjs-i18n/dist/types'
 import { z } from 'zod/v4'
 
+import { LANG_REGEX, translate, TranslatedField, TrArray, TrArraySchema } from '@src/common/i18n'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
-
-import { LANG_REGEX, translate, TranslatedField, TrArray, TrArraySchema } from './i18n'
 
 @Injectable()
 export class I18nService {

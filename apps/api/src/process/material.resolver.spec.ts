@@ -10,8 +10,7 @@ import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-
-import { MATERIAL_ROOT } from './material.entity'
+import { MATERIAL_ROOT } from '@src/process/material.entity'
 
 describe('MaterialResolver (integration)', () => {
   let app: INestApplication

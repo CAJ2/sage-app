@@ -19,10 +19,9 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { Tag } from '@src/process/tag.entity'
+import { Item } from '@src/product/item.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
-
-import { Item } from './item.entity'
 
 export const VariantComponentUnitSchema = z.enum(['g', 'ml']).optional()
 
@@ -116,7 +115,7 @@ export class VariantsItems extends BaseEntity {
   variant!: Variant
 
   @ManyToOne({ primary: true })
-  item!: Item
+  item!: Item & {}
 }
 
 @Entity({ tableName: 'variants_tags', schema: 'public' })
@@ -125,7 +124,7 @@ export class VariantsTags extends BaseEntity {
   variant!: Variant
 
   @ManyToOne({ primary: true })
-  tag!: Tag
+  tag!: Tag & {}
 
   @Property({ type: 'json' })
   meta?: Record<string, any>

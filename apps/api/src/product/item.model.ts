@@ -3,13 +3,12 @@ import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
-import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
-import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
+import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
   IDCreatedUpdated,
@@ -19,11 +18,10 @@ import {
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
+import { CategoriesPage } from '@src/product/category.model'
+import { Item as ItemEntity } from '@src/product/item.entity'
+import { VariantsPage } from '@src/product/variant.model'
 import { User } from '@src/users/users.model'
-
-import { CategoriesPage } from './category.model'
-import { Item as ItemEntity } from './item.entity'
-import { VariantsPage } from './variant.model'
 
 @ObjectType({
   implements: () => [Named],
@@ -99,21 +97,12 @@ export class ItemVariantsArgs extends PaginationBasicArgs {}
 
 @InputType()
 export class ItemCategoriesInput {
-  static schema = z.object({
-    id: z.nanoid(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ItemTagsInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    meta: ZJSONObject.optional(),
-  })
-
   @Field(() => ID)
   id!: string
 
@@ -123,16 +112,6 @@ export class ItemTagsInput {
 
 @InputType()
 export class CreateItemInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    name: z.string().max(100).optional(),
-    nameTr: TranslatedInput.schema.array().optional(),
-    desc: z.string().max(100_000).optional(),
-    descTr: TranslatedInput.schema.array().optional(),
-    imageURL: z.string().max(1000).optional(),
-    categories: ItemCategoriesInput.schema.array().optional(),
-    tags: ItemTagsInput.schema.array().optional(),
-  })
-
   @Field(() => String, { nullable: true })
   name?: string
 
@@ -157,21 +136,6 @@ export class CreateItemInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateItemInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    id: z.nanoid(),
-    name: z.string().max(100).optional(),
-    nameTr: TranslatedInput.schema.array().optional(),
-    desc: z.string().max(100_000).optional(),
-    descTr: TranslatedInput.schema.array().optional(),
-    imageURL: z.string().max(1000).optional(),
-    categories: ItemCategoriesInput.schema.array().optional(),
-    addCategories: ItemCategoriesInput.schema.array().optional(),
-    removeCategories: z.nanoid().array().optional(),
-    tags: ItemTagsInput.schema.array().optional(),
-    addTags: ItemTagsInput.schema.array().optional(),
-    removeTags: z.nanoid().array().optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

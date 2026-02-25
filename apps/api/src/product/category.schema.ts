@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 
+import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
-import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
+import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, ImageOrIconSchema, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
+import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
+import { ZService } from '@src/common/z.service'
+import { CreateCategoryInput, UpdateCategoryInput } from '@src/product/category.model'
 
 export const CategoryIDSchema = z.string().meta({
   id: 'Category',
@@ -18,22 +20,26 @@ export const CategoryIDSchema = z.string().meta({
 
 @Injectable()
 export class CategorySchemaService {
-  CreateSchema: z.ZodObject
+  CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
   CreateUISchema: UISchemaElement
-  UpdateSchema: z.ZodObject
+  UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
   UpdateValidator: ValidateFunction
   UpdateUISchema: UISchemaElement
 
   constructor(
-    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly i18n: I18nService,
     private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
+      name: z.string().max(1024).optional(),
       nameTr: TrArraySchema,
+      descShort: z.string().max(1024).optional(),
       descShortTr: TrArraySchema,
+      desc: z.string().max(100_000).optional(),
       descTr: TrArraySchema,
       imageURL: ImageOrIconSchema,
     })
@@ -72,7 +78,9 @@ export class CategorySchemaService {
       id: z.string(),
       name: z.string().max(1024).optional(),
       nameTr: TrArraySchema,
+      descShort: z.string().max(1024).optional(),
       descShortTr: TrArraySchema,
+      desc: z.string().max(100_000).optional(),
       descTr: TrArraySchema,
       imageURL: ImageOrIconSchema,
     })
@@ -120,5 +128,17 @@ export class CategorySchemaService {
     const data = _.cloneDeep(edit.changes)
     this.UpdateValidator(data)
     return data
+  }
+
+  async parseCreateInput(input: CreateCategoryInput): Promise<CreateCategoryInput> {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: UpdateCategoryInput): Promise<UpdateCategoryInput> {
+    return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseDeleteInput(input: DeleteInput): Promise<DeleteInput> {
+    return this.zService.parse(DeleteInputSchema, input)
   }
 }

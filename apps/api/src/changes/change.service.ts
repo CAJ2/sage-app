@@ -3,16 +3,15 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { ClsService } from 'nestjs-cls'
 
 import { AuthUserService } from '@src/auth/authuser.service'
+import { CreateChangeInput } from '@src/changes/change-ext.model'
+import { Change, ChangeEdits, ChangeStatus } from '@src/changes/change.entity'
+import { EditModel as EditEnum, EditModelType } from '@src/changes/change.enum'
+import { DirectEdit, Edit as EditModel, UpdateChangeInput } from '@src/changes/change.model'
+import { ChangeMapService } from '@src/changes/change_map.service'
+import { Source } from '@src/changes/source.entity'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions, entityToModelRegistry, TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
-
-import { CreateChangeInput } from './change-ext.model'
-import { Change, ChangeEdits, ChangeStatus } from './change.entity'
-import { EditModel as EditEnum, EditModelType } from './change.enum'
-import { DirectEdit, Edit as EditModel, UpdateChangeInput } from './change.model'
-import { ChangeMapService } from './change_map.service'
-import { Source } from './source.entity'
 
 @Injectable()
 export class ChangeService {

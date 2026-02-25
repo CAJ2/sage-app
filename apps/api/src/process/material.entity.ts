@@ -16,10 +16,9 @@ import { z } from 'zod/v4'
 
 import type { TranslatedField } from '@src/common/i18n'
 import { IDCreatedUpdated } from '@src/db/base.entity'
+import { Component } from '@src/process/component.entity'
+import { Process } from '@src/process/process.entity'
 import { User } from '@src/users/users.entity'
-
-import { Component } from './component.entity'
-import { Process } from './process.entity'
 
 export const MATERIAL_ROOT = 'MATERIAL_ROOT'
 

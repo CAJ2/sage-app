@@ -3,9 +3,8 @@ import { IsEmail, IsOptional, IsUrl, MaxLength } from 'class-validator'
 
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-
-import { Org } from './org.model'
-import { User as UserEntity } from './users.entity'
+import { Org } from '@src/users/org.model'
+import { User as UserEntity } from '@src/users/users.entity'
 
 @ObjectType()
 export class UserProfile {

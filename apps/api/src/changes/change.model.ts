@@ -3,14 +3,13 @@ import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
+import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/change.entity'
+import { EditModel, EditModelType } from '@src/changes/change.enum'
 import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
 import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
 import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
-
-import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from './change.entity'
-import { EditModel, EditModelType } from './change.enum'
 
 @ObjectType({ description: 'A tracked edit to a single entity within a change' })
 export class Edit extends BaseModel<ChangeEdits> {
@@ -150,14 +149,6 @@ export class DirectEditArgs {
 
 @InputType()
 export class UpdateChangeInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    title: z.string().max(1000).optional(),
-    description: z.string().max(100_000).optional(),
-    status: z.enum(ChangeStatus).optional(),
-    sources: z.array(z.nanoid()).optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

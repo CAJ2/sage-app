@@ -17,8 +17,7 @@ import { ADMIN_USER_ID, UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { ProcessModule } from '@src/process/process.module'
-
-import { VariantService } from './variant.service'
+import { VariantService } from '@src/product/variant.service'
 
 describe('VariantService', () => {
   let module: TestingModule

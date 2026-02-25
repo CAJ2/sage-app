@@ -6,10 +6,7 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
-import { User } from '@src/users/users.model'
-
 import {
   CategoriesArgs,
   CategoriesPage,
@@ -20,10 +17,11 @@ import {
   CreateCategoryOutput,
   UpdateCategoryInput,
   UpdateCategoryOutput,
-} from './category.model'
-import { CategorySchemaService } from './category.schema'
-import { CategoryService } from './category.service'
-import { Item, ItemsPage } from './item.model'
+} from '@src/product/category.model'
+import { CategorySchemaService } from '@src/product/category.schema'
+import { CategoryService } from '@src/product/category.service'
+import { Item, ItemsPage } from '@src/product/item.model'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Category)
 export class CategoryResolver {
@@ -31,7 +29,6 @@ export class CategoryResolver {
     private readonly categoryService: CategoryService,
     private readonly categorySchemaService: CategorySchemaService,
     private readonly transform: TransformService,
-    private readonly z: ZService,
   ) {}
 
   @Query(() => CategoriesPage, { name: 'categories' })
@@ -122,7 +119,7 @@ export class CategoryResolver {
     @Args('input') input: CreateCategoryInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateCategoryOutput> {
-    input = await this.z.parse(CreateCategoryInput.schema, input)
+    input = await this.categorySchemaService.parseCreateInput(input)
     const created = await this.categoryService.create(input, user.id)
     const model = await this.transform.entityToModel(Category, created.category)
     if (!created.change) {
@@ -140,7 +137,7 @@ export class CategoryResolver {
     @Args('input') input: UpdateCategoryInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateCategoryOutput> {
-    input = await this.z.parse(UpdateCategoryInput.schema, input)
+    input = await this.categorySchemaService.parseUpdateInput(input)
     const updated = await this.categoryService.update(input, user.id)
     const model = await this.transform.entityToModel(Category, updated.category)
     if (!updated.change) {
@@ -152,7 +149,7 @@ export class CategoryResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteCategory', nullable: true })
   async deleteCategory(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
-    input = await this.z.parse(DeleteInput.schema, input)
+    input = await this.categorySchemaService.parseDeleteInput(input)
     const deleted = await this.categoryService.delete(input)
     if (!deleted) {
       throw NotFoundErr('Category not found')

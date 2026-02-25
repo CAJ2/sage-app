@@ -3,14 +3,13 @@ import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
+import { ChangesPage } from '@src/changes/change.model'
+import { Source as SourceEntity, SourceType } from '@src/changes/source.entity'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
+import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
-
-import { ChangesPage } from './change.model'
-import { Source as SourceEntity, SourceType } from './source.entity'
 
 registerEnumType(SourceType, {
   name: 'SourceType',
@@ -73,14 +72,6 @@ export class SourcesArgs extends PaginationBasicArgs {
 
 @InputType()
 export class CreateSourceInput {
-  static schema = z.object({
-    type: z.enum(SourceType),
-    location: z.string().max(2048).optional(),
-    content: ZJSONObject.optional(),
-    contentURL: z.url({ protocol: /^https$/ }).optional(),
-    metadata: ZJSONObject.optional(),
-  })
-
   @Field(() => SourceType)
   type!: SourceType
 
@@ -99,15 +90,6 @@ export class CreateSourceInput {
 
 @InputType()
 export class UpdateSourceInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    type: z.enum(SourceType).optional(),
-    location: z.string().max(2048).optional(),
-    content: ZJSONObject.optional(),
-    contentURL: z.url({ protocol: /^https$/ }).optional(),
-    metadata: ZJSONObject.optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

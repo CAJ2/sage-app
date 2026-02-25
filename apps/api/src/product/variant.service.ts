@@ -15,16 +15,15 @@ import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
-
-import { Item } from './item.entity'
+import { Item } from '@src/product/item.entity'
 import {
   Variant,
   VariantHistory,
   VariantsComponents,
   VariantsOrgs,
   VariantsTags,
-} from './variant.entity'
-import { CreateVariantInput, UpdateVariantInput } from './variant.model'
+} from '@src/product/variant.entity'
+import { CreateVariantInput, UpdateVariantInput } from '@src/product/variant.model'
 
 @Injectable()
 export class VariantService {

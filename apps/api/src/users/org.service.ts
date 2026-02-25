@@ -8,10 +8,9 @@ import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
-
-import { Org, OrgHistory } from './org.entity'
-import { CreateOrgInput, UpdateOrgInput } from './org.model'
-import { User } from './users.entity'
+import { Org, OrgHistory } from '@src/users/org.entity'
+import { CreateOrgInput, UpdateOrgInput } from '@src/users/org.model'
+import { User } from '@src/users/users.entity'
 
 @Injectable()
 export class OrgService {

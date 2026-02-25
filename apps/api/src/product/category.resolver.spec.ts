@@ -14,8 +14,7 @@ import { TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-
-import { CATEGORY_ROOT } from './category.entity'
+import { CATEGORY_ROOT } from '@src/product/category.entity'
 
 describe('CategoryResolver (integration)', () => {
   let app: INestApplication

@@ -6,7 +6,6 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { TranslatedInputSchema } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
 
 export const ModelRegistry: Record<string, new () => BaseModel<any>> = {}
@@ -78,8 +77,6 @@ export class TranslatedOutput {
 
 @InputType({ description: 'A translated text value for a specific language' })
 export class TranslatedInput {
-  static schema = TranslatedInputSchema
-
   @Field(() => String, { description: 'BCP 47 language code (e.g. "en", "fr-CA")' })
   lang!: string
 
@@ -94,10 +91,6 @@ export const LangSchema = z.union([z.string(), z.array(z.string())]).optional()
 
 @InputType()
 export class InputWithLang {
-  static schema = z.object({
-    lang: LangSchema,
-  })
-
   @Field(() => String, { nullable: true })
   lang?: string | string[]
 }

@@ -8,8 +8,8 @@ import { z } from 'zod/v4'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate, TrArraySchema } from '@src/common/i18n'
-import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
+import { translate } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import { Region } from '@src/geo/region.model'
 import {
   BaseModel,
@@ -19,18 +19,15 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { User } from '@src/users/users.model'
-
 import {
   Component as ComponentEntity,
   type ComponentPhysical,
-  ComponentPhysicalSchema,
   type ComponentVisual,
-  ComponentVisualSchema,
-} from './component.entity'
-import { Material } from './material.model'
-import { RecyclingStream, StreamContext, StreamScore } from './stream.model'
-import { Tag } from './tag.model'
+} from '@src/process/component.entity'
+import { Material } from '@src/process/material.model'
+import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
+import { Tag } from '@src/process/tag.model'
+import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'The fraction of a specific material within a component' })
 export class ComponentMaterial {
@@ -153,11 +150,6 @@ export class ComponentRecycleArgs {
 
 @InputType()
 export class ComponentMaterialInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    materialFraction: z.number().min(0.001).max(1).optional(),
-  })
-
   @Field(() => ID)
   id!: string
 
@@ -170,11 +162,6 @@ export class ComponentMaterialInput {
 
 @InputType()
 export class ComponentTagsInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    meta: ZJSONObject.optional(),
-  })
-
   @Field(() => ID)
   id!: string
 
@@ -184,30 +171,12 @@ export class ComponentTagsInput {
 
 @InputType()
 export class ComponentRegionInput {
-  static schema = z.object({
-    id: z.string().startsWith('wof_'),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class CreateComponentInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    name: z.string().max(1024).optional(),
-    nameTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    imageURL: z.string().optional(),
-    visual: ComponentVisualSchema.optional(),
-    physical: ComponentPhysicalSchema.optional(),
-    primaryMaterial: ComponentMaterialInput.schema,
-    materials: z.array(ComponentMaterialInput.schema).optional(),
-    tags: z.array(ComponentTagsInput.schema).optional(),
-    region: ComponentRegionInput.schema.optional(),
-  })
-
   @Field(() => String, { nullable: true })
   name?: string
 
@@ -244,25 +213,6 @@ export class CreateComponentInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateComponentInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    id: z.nanoid(),
-    name: z.string().max(1024).optional(),
-    nameTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    imageURL: z.string().optional(),
-    visual: ComponentVisualSchema.optional(),
-    physical: ComponentPhysicalSchema.optional(),
-    primaryMaterial: ComponentMaterialInput.schema.optional(),
-    materials: z.array(ComponentMaterialInput.schema).optional(),
-    addMaterials: z.array(ComponentMaterialInput.schema).optional(),
-    removeMaterials: z.array(z.nanoid()).optional(),
-    tags: z.array(ComponentTagsInput.schema).optional(),
-    addTags: z.array(ComponentTagsInput.schema).optional(),
-    removeTags: z.array(z.nanoid()).optional(),
-    region: ComponentRegionInput.schema.optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

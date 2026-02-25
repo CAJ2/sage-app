@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
+import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
+import { ZService } from '@src/common/z.service'
+import { CreatePlaceInput, UpdatePlaceInput } from '@src/geo/place.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { OrgIDSchema } from '@src/users/org.schema'
 
@@ -28,18 +29,19 @@ export const PlaceOrgInputSchema = z.strictObject({
 
 @Injectable()
 export class PlaceSchemaService {
-  CreateSchema: z.ZodObject<any>
+  CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
   CreateUISchema: UISchemaElement
-  UpdateSchema: z.ZodObject<any>
+  UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
   UpdateValidator: ValidateFunction
   UpdateUISchema: UISchemaElement
 
   constructor(
-    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly i18n: I18nService,
     private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
@@ -160,5 +162,13 @@ export class PlaceSchemaService {
     }
     this.UpdateValidator(data)
     return data
+  }
+
+  async parseCreateInput(input: CreatePlaceInput) {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: UpdatePlaceInput) {
+    return this.zService.parse(this.UpdateSchema, input)
   }
 }

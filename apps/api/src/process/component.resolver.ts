@@ -6,7 +6,6 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   Component,
@@ -30,7 +29,6 @@ export class ComponentResolver {
     private readonly componentService: ComponentService,
     private readonly componentSchemaService: ComponentSchemaService,
     private readonly transform: TransformService,
-    private readonly z: ZService,
   ) {}
 
   @Query(() => ComponentsPage, { name: 'components' })
@@ -117,7 +115,7 @@ export class ComponentResolver {
     @Args('input') input: CreateComponentInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateComponentOutput> {
-    input = await this.z.parse(CreateComponentInput.schema, input)
+    input = await this.componentSchemaService.parseCreateInput(input)
     const created = await this.componentService.create(input, user.id)
     const model = await this.transform.entityToModel(Component, created.component)
     if (created.change) {
@@ -135,7 +133,7 @@ export class ComponentResolver {
     @Args('input') input: UpdateComponentInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateComponentOutput> {
-    input = await this.z.parse(UpdateComponentInput.schema, input)
+    input = await this.componentSchemaService.parseUpdateInput(input)
     const updated = await this.componentService.update(input, user.id)
     const model = await this.transform.entityToModel(Component, updated.component)
     if (updated.change) {
@@ -147,7 +145,7 @@ export class ComponentResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteComponent', nullable: true })
   async deleteComponent(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
-    input = await this.z.parse(DeleteInput.schema, input)
+    input = await this.componentSchemaService.parseDeleteInput(input)
     const component = await this.componentService.delete(input)
     return { success: true, id: component.id }
   }

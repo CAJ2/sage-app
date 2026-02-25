@@ -11,9 +11,8 @@ import type { GraphQLFormattedError } from 'graphql'
 import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-
-import { CacheControlScopeEnum } from './cache-control'
-import { Context, IncomingMessageWithAuthCode } from './graphql.context'
+import { CacheControlScopeEnum } from '@src/graphql/cache-control'
+import { Context, IncomingMessageWithAuthCode } from '@src/graphql/graphql.context'
 
 @Module({})
 export class GraphQLModule {
