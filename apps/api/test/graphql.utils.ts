@@ -87,9 +87,13 @@ export class GraphQLTestClient {
       variables: variables ?? undefined,
     })
     if (res.body.errors) {
-      /* oxlint-disable */
-      console.log('GraphQL Errors:')
-      console.dir(res.body.errors, { depth: 4 })
+      for (const err of res.body.errors) {
+        if (err?.extensions?.code === 'INTERNAL_SERVER_ERROR') {
+          throw new Error(
+            `GraphQL response contained INTERNAL_SERVER_ERROR: ${JSON.stringify(err)}`,
+          )
+        }
+      }
     }
     return res.body
   }

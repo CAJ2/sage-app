@@ -3,6 +3,7 @@ import path from 'path'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { APP_FILTER } from '@nestjs/core'
 import dotenv from 'dotenv-flow'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
@@ -14,6 +15,7 @@ import { AppService } from '@src/app.service'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
 import { isProd } from '@src/common/common.utils'
+import { HttpExceptionFilter } from '@src/common/http-exception.filter'
 import { parseLanguageHeader } from '@src/common/i18n'
 import config from '@src/config/config'
 import { GeoModule } from '@src/geo/geo.module'
@@ -81,6 +83,6 @@ if (dotenv) {
     ChangesModule,
     SearchModule,
   ],
-  providers: [AppService],
+  providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }, AppService],
 })
 export class AppModule {}
