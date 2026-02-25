@@ -19,12 +19,12 @@ import {
   UpdateChangeInput,
   UpdateChangeOutput,
 } from '@src/changes/change.model'
+import { ChangeSchemaService } from '@src/changes/change.schema'
 import { ChangeService } from '@src/changes/change.service'
 import { EditService } from '@src/changes/edit.service'
 import { Source, SourcesPage } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ZService } from '@src/common/z.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Change)
@@ -32,7 +32,7 @@ export class ChangeResolver {
   constructor(
     private readonly changeService: ChangeService,
     private readonly transform: TransformService,
-    private readonly z: ZService,
+    private readonly changeSchemaService: ChangeSchemaService,
     private readonly editService: EditService,
   ) {}
 
@@ -68,7 +68,7 @@ export class ChangeResolver {
     @Args('input') input: CreateChangeInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateChangeOutput> {
-    input = await this.z.parse(CreateChangeInput.schema, input)
+    input = await this.changeSchemaService.parseCreateInput(input)
     const change = await this.changeService.create(input, user.id)
     const model = await this.transform.entityToModel(Change, change)
     return {
@@ -78,7 +78,7 @@ export class ChangeResolver {
 
   @Mutation(() => UpdateChangeOutput, { nullable: true })
   async updateChange(@Args('input') input: UpdateChangeInput): Promise<UpdateChangeOutput> {
-    input = await this.z.parse(UpdateChangeInput.schema, input)
+    input = await this.changeSchemaService.parseUpdateInput(input)
     const change = await this.changeService.update(input)
     const model = await this.transform.entityToModel(Change, change)
     return {

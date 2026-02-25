@@ -1,11 +1,9 @@
 import { Field, ID, InputType } from '@nestjs/graphql'
 import { IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
-import { z } from 'zod/v4'
 
 import { IsNanoID } from '@src/common/validator.model'
-import { type JSONObject, ZJSONObject } from '@src/common/z.schema'
-import { LangSchema } from '@src/graphql/base.model'
+import { type JSONObject } from '@src/common/z.schema'
 
 import { ChangeStatus } from './change.entity'
 
@@ -28,13 +26,6 @@ export const isUsingChange = (input: IChangeInputWithLang): boolean => {
 
 @InputType()
 export class CreateChangeInput {
-  static schema = z.object({
-    title: z.string().min(1).max(1000).optional(),
-    description: z.string().max(100000).optional(),
-    status: z.enum(ChangeStatus).optional(),
-    sources: z.array(z.string().nanoid()).optional(),
-  })
-
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1000)
@@ -54,11 +45,6 @@ export class CreateChangeInput {
 
 @InputType()
 class SourceInput {
-  static schema = z.object({
-    id: z.string().nanoid(),
-    meta: ZJSONObject.optional(),
-  })
-
   @Field(() => ID)
   @Validate(IsNanoID)
   id!: string
@@ -70,15 +56,6 @@ class SourceInput {
 
 @InputType()
 export class ChangeInputWithLang {
-  static schema = z.object({
-    changeID: z.nanoid().optional(),
-    change: CreateChangeInput.schema.optional(),
-    addSources: SourceInput.schema.array().optional(),
-    removeSources: z.array(z.nanoid()).optional(),
-    apply: z.boolean().optional(),
-    lang: LangSchema,
-  })
-
   @Field(() => ID, { nullable: true, description: 'ID of an existing change to add this edit to' })
   @IsOptional()
   @Validate(IsNanoID)
@@ -114,15 +91,6 @@ export class ChangeInputWithLang {
 
 @InputType()
 export class DeleteInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    changeID: z.nanoid().optional(),
-    change: CreateChangeInput.schema.optional(),
-    addSources: SourceInput.schema.array().optional(),
-    removeSources: z.array(z.nanoid()).optional(),
-    apply: z.boolean().optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

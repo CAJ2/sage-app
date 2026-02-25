@@ -12,8 +12,10 @@ import { ProcessModule } from '@src/process/process.module'
 import { ProductModule } from '@src/product/product.module'
 import { UsersModule } from '@src/users/users.module'
 
+import { ChangeSchemaService } from './change.schema'
 import { ChangeMapService } from './change_map.service'
 import { EditsModule } from './edits.module'
+import { SourceSchemaService } from './source.schema'
 
 @Module({
   imports: [
@@ -26,7 +28,21 @@ import { EditsModule } from './edits.module'
     GeoModule,
     EditsModule,
   ],
-  providers: [ChangeResolver, SourceResolver, ChangeService, SourceService, ChangeMapService],
-  exports: [ChangeService, SourceService, ChangeMapService],
+  providers: [
+    ChangeResolver,
+    SourceResolver,
+    ChangeService,
+    SourceService,
+    ChangeSchemaService,
+    SourceSchemaService,
+    ChangeMapService,
+  ],
+  exports: [
+    ChangeService,
+    SourceService,
+    ChangeSchemaService,
+    SourceSchemaService,
+    ChangeMapService,
+  ],
 })
 export class ChangesModule {}

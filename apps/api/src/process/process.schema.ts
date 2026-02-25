@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 
+import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
-import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
+import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
+import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
+import { ZService } from '@src/common/z.service'
 import { PlaceIDSchema } from '@src/geo/place.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { VariantIDSchema } from '@src/product/variant.schema'
 import { OrgIDSchema } from '@src/users/org.schema'
 
@@ -22,6 +23,7 @@ import {
   ProcessIntent,
   ProcessRulesSchema,
 } from './process.entity'
+import { CreateProcessInput, UpdateProcessInput } from './process.model'
 
 export const ProcessIDSchema = z.string().meta({
   id: 'Process',
@@ -30,23 +32,24 @@ export const ProcessIDSchema = z.string().meta({
 
 @Injectable()
 export class ProcessSchemaService {
-  ProcessMaterialInputSchema: z.ZodObject
-  ProcessVariantInputSchema: z.ZodObject
-  ProcessOrgInputSchema: z.ZodObject
-  ProcessRegionInputSchema: z.ZodObject
-  ProcessPlaceInputSchema: z.ZodObject
-  CreateSchema: z.ZodObject<any>
+  ProcessMaterialInputSchema
+  ProcessVariantInputSchema
+  ProcessOrgInputSchema
+  ProcessRegionInputSchema
+  ProcessPlaceInputSchema
+  CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
   CreateUISchema: UISchemaElement
-  UpdateSchema: z.ZodObject<any>
+  UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
   UpdateValidator: ValidateFunction
   UpdateUISchema: UISchemaElement
 
   constructor(
-    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly i18n: I18nService,
     private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
   ) {
     this.ProcessMaterialInputSchema = z.strictObject({
       id: MaterialIDSchema,
@@ -65,7 +68,9 @@ export class ProcessSchemaService {
     })
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       intent: z.enum(ProcessIntent),
+      name: z.string().max(1024).optional(),
       nameTr: TrArraySchema.optional(),
+      desc: z.string().max(100_000).optional(),
       descTr: TrArraySchema.optional(),
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
@@ -132,7 +137,9 @@ export class ProcessSchemaService {
     this.UpdateSchema = ChangeInputWithLangSchema.extend({
       id: ProcessIDSchema,
       intent: z.enum(ProcessIntent).optional(),
+      name: z.string().max(1024).optional(),
       nameTr: TrArraySchema.optional(),
+      desc: z.string().max(100_000).optional(),
       descTr: TrArraySchema.optional(),
       instructions: ProcessInstructionsSchema.optional(),
       efficiency: ProcessEfficiencySchema.optional(),
@@ -209,5 +216,17 @@ export class ProcessSchemaService {
     const data = _.cloneDeep(edit.changes)
     this.UpdateValidator(data)
     return data
+  }
+
+  async parseCreateInput(input: CreateProcessInput): Promise<CreateProcessInput> {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: UpdateProcessInput): Promise<UpdateProcessInput> {
+    return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseDeleteInput(input: DeleteInput): Promise<DeleteInput> {
+    return this.zService.parse(DeleteInputSchema, input)
   }
 }

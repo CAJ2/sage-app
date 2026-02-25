@@ -3,7 +3,7 @@ import { Args, Query, Resolver } from '@nestjs/graphql'
 import { OptionalAuth } from '@src/auth/decorators'
 import { BadRequestErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { SearchArgs, SearchResultPage } from '@src/search/search.model'
+import { SearchArgs, SearchArgsSchema, SearchResultPage } from '@src/search/search.model'
 import { SearchService } from '@src/search/search.service'
 
 @Resolver(() => SearchResultPage)
@@ -16,7 +16,7 @@ export class SearchResolver {
   @Query(() => SearchResultPage, { name: 'search' })
   @OptionalAuth()
   async search(@Args() args: SearchArgs): Promise<any> {
-    const result = SearchArgs.schema.safeParse(args)
+    const result = SearchArgsSchema.safeParse(args)
     if (!result.success) {
       throw BadRequestErr('Invalid search arguments')
     }

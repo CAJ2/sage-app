@@ -150,14 +150,6 @@ export class DirectEditArgs {
 
 @InputType()
 export class UpdateChangeInput {
-  static schema = z.object({
-    id: z.nanoid(),
-    title: z.string().max(1000).optional(),
-    description: z.string().max(100_000).optional(),
-    status: z.enum(ChangeStatus).optional(),
-    sources: z.array(z.nanoid()).optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

@@ -7,7 +7,7 @@ import { z } from 'zod/v4'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate, TrArraySchema } from '@src/common/i18n'
+import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
@@ -24,13 +24,7 @@ import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
 
 import { Material } from './material.model'
-import {
-  ProcessEfficiencySchema,
-  Process as ProcessEntity,
-  ProcessInstructionsSchema,
-  ProcessIntent,
-  ProcessRulesSchema,
-} from './process.entity'
+import { Process as ProcessEntity, ProcessIntent } from './process.entity'
 
 @ObjectType({ description: 'Efficiency metrics for a recycling or recovery process' })
 export class ProcessEfficiency {
@@ -146,72 +140,36 @@ export class ProcessArgs extends PaginationBasicArgs {
 
 @InputType()
 export class ProcessMaterialInput {
-  static schema = z.object({
-    id: z.nanoid(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessVariantInput {
-  static schema = z.object({
-    id: z.nanoid(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessOrgInput {
-  static schema = z.object({
-    id: z.nanoid(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessRegionInput {
-  static schema = z.object({
-    id: z.string(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class ProcessPlaceInput {
-  static schema = z.object({
-    id: z.string(),
-  })
-
   @Field(() => ID)
   id!: string
 }
 
 @InputType()
 export class CreateProcessInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    intent: z.enum(ProcessIntent),
-    name: z.string().max(1000).optional(),
-    nameTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    instructions: ProcessInstructionsSchema,
-    efficiency: ProcessEfficiencySchema.optional(),
-    rules: ProcessRulesSchema.optional(),
-    material: ProcessMaterialInput.schema.optional(),
-    variant: ProcessVariantInput.schema.optional(),
-    org: ProcessOrgInput.schema.optional(),
-    region: ProcessRegionInput.schema.optional(),
-    place: ProcessPlaceInput.schema.optional(),
-  })
-
   @Field(() => String)
   @IsEnum(ProcessIntent, { message: 'Invalid process intent' })
   intent!: ProcessIntent
@@ -255,23 +213,6 @@ export class CreateProcessInput extends ChangeInputWithLang {
 
 @InputType()
 export class UpdateProcessInput extends ChangeInputWithLang {
-  static schema = ChangeInputWithLang.schema.extend({
-    id: z.nanoid(),
-    intent: z.enum(ProcessIntent).optional(),
-    name: z.string().max(1000).optional(),
-    nameTr: TrArraySchema,
-    desc: z.string().max(100_000).optional(),
-    descTr: TrArraySchema,
-    instructions: ProcessInstructionsSchema.optional(),
-    efficiency: ProcessEfficiencySchema.optional(),
-    rules: ProcessRulesSchema.optional(),
-    material: ProcessMaterialInput.schema.optional(),
-    variant: ProcessVariantInput.schema.optional(),
-    org: ProcessOrgInput.schema.optional(),
-    region: ProcessRegionInput.schema.optional(),
-    place: ProcessPlaceInput.schema.optional(),
-  })
-
   @Field(() => ID)
   id!: string
 

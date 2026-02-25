@@ -6,7 +6,6 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { ZService } from '@src/common/z.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { CategoriesPage, Category } from '@src/product/category.model'
@@ -33,7 +32,6 @@ export class ItemResolver {
   constructor(
     private readonly itemService: ItemService,
     private readonly transform: TransformService,
-    private readonly z: ZService,
     private readonly itemSchemaService: ItemSchemaService,
   ) {}
 
@@ -97,7 +95,7 @@ export class ItemResolver {
     @Args('input') input: CreateItemInput,
     @AuthUser() user: ReqUser,
   ): Promise<CreateItemOutput> {
-    input = await this.z.parse(CreateItemInput.schema, input)
+    input = await this.itemSchemaService.parseCreateInput(input)
     const created = await this.itemService.create(input, user.id)
     const result = await this.transform.entityToModel(Item, created.item)
     if (!created.change) {
@@ -112,7 +110,7 @@ export class ItemResolver {
     @Args('input') input: UpdateItemInput,
     @AuthUser() user: ReqUser,
   ): Promise<UpdateItemOutput> {
-    input = await this.z.parse(UpdateItemInput.schema, input)
+    input = await this.itemSchemaService.parseUpdateInput(input)
     const updated = await this.itemService.update(input, user.id)
     const result = await this.transform.entityToModel(Item, updated.item)
     if (!updated.change) {
@@ -124,7 +122,7 @@ export class ItemResolver {
 
   @Mutation(() => DeleteOutput, { name: 'deleteItem', nullable: true })
   async deleteItem(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
-    input = await this.z.parse(DeleteInput.schema, input)
+    input = await this.itemSchemaService.parseDeleteInput(input)
     const item = await this.itemService.delete(input)
     if (!item) {
       throw NotFoundErr(`Item with ID "${input.id}" not found`)

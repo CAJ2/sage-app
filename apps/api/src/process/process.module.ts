@@ -16,6 +16,7 @@ import { ProcessSchemaService } from './process.schema'
 import { ProcessService } from './process.service'
 import { StreamService } from './stream.service'
 import { TagResolver } from './tag.resolver'
+import { TagSchemaService } from './tag.schema'
 import { TagService } from './tag.service'
 
 @Module({
@@ -39,10 +40,12 @@ import { TagService } from './tag.service'
     ProcessHistoryResolver,
     TagResolver,
     TagService,
+    TagSchemaService,
     StreamService,
   ],
   exports: [
     TagService,
+    TagSchemaService,
     StreamService,
     ComponentService,
     ComponentSchemaService,

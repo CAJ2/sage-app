@@ -1,22 +1,29 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
-import { I18nService } from 'nestjs-i18n'
 import { z } from 'zod/v4'
 
+import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
-import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, ImageOrIconSchema, zToSchema } from '@src/common/base.schema'
+import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
+import {
+  BaseSchemaService,
+  ImageOrIconSchema,
+  RelMetaSchema,
+  zToSchema,
+} from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
+import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
+import { ZService } from '@src/common/z.service'
 import { RegionIDSchema } from '@src/geo/region.model'
-import { I18nTranslations } from '@src/i18n/i18n.generated'
 import { ComponentIDSchema } from '@src/process/component.schema'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { OrgIDSchema } from '@src/users/org.schema'
 
 import { ItemIDSchema } from './item.schema'
 import { VariantComponentUnitSchema } from './variant.entity'
+import { CreateVariantInput, UpdateVariantInput } from './variant.model'
 
 export const VariantIDSchema = z.string().meta({
   id: 'Variant',
@@ -33,6 +40,7 @@ export const VariantOrgsInputSchema = z.strictObject({
 
 export const VariantTagsInputSchema = z.strictObject({
   id: TagDefinitionIDSchema,
+  meta: RelMetaSchema,
 })
 
 export const VariantRegionsInputSchema = z.strictObject({
@@ -47,18 +55,19 @@ export const VariantComponentsInputSchema = z.strictObject({
 
 @Injectable()
 export class VariantSchemaService {
-  CreateSchema: z.ZodObject
+  CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
   CreateUISchema: UISchemaElement
-  UpdateSchema: z.ZodObject
+  UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
   UpdateValidator: ValidateFunction
   UpdateUISchema: UISchemaElement
 
   constructor(
-    private readonly i18n: I18nService<I18nTranslations>,
+    private readonly i18n: I18nService,
     private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
   ) {
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
@@ -226,5 +235,17 @@ export class VariantSchemaService {
     }
     this.UpdateValidator(data)
     return data
+  }
+
+  async parseCreateInput(input: CreateVariantInput): Promise<CreateVariantInput> {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: UpdateVariantInput): Promise<UpdateVariantInput> {
+    return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseDeleteInput(input: DeleteInput): Promise<DeleteInput> {
+    return this.zService.parse(DeleteInputSchema, input)
   }
 }
