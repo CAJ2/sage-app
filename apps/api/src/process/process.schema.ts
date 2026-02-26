@@ -222,10 +222,10 @@ export class ProcessSchemaService {
 
   async processUpdateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    runAjvValidator(this.UpdateValidator, data)
     for (const field of ['material', 'variant', 'org', 'region', 'place']) {
       this.baseSchema.relToInput(data, field)
     }
+    runAjvValidator(this.UpdateValidator, data)
     return this.parseUpdateInput(data as UpdateProcessInput)
   }
 
