@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common'
 import _ from 'lodash'
 
 import type { Edit as EditModel } from '@src/changes/change.model'
+import { BadRequestErr } from '@src/common/exceptions'
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { ProcessSchemaService } from '@src/process/process.schema'
@@ -76,7 +77,7 @@ export class ChangeMapService {
       }))
     }
     if (!this.serviceMap[entityName]) {
-      throw new Error(`No service registered for entity: ${entityName}`)
+      throw BadRequestErr(`No service registered for entity: ${entityName}`)
     }
     return [{ name: entityName, service: this.serviceMap[entityName] }]
   }

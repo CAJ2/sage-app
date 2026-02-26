@@ -6,7 +6,13 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, ImageOrIconSchema, zToSchema } from '@src/common/base.schema'
+import {
+  BaseSchemaService,
+  ImageOrIconSchema,
+  runAjvValidator,
+  stripNulls,
+  zToSchema,
+} from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
@@ -119,15 +125,15 @@ export class CategorySchemaService {
   }
 
   async categoryCreateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.CreateValidator(data)
-    return data
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    runAjvValidator(this.CreateValidator, data)
+    return this.parseCreateInput(data as CreateCategoryInput)
   }
 
   async categoryUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.UpdateValidator(data)
-    return data
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    runAjvValidator(this.UpdateValidator, data)
+    return this.parseUpdateInput(data as UpdateCategoryInput)
   }
 
   async parseCreateInput(input: CreateCategoryInput): Promise<CreateCategoryInput> {

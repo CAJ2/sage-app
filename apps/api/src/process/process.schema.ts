@@ -6,7 +6,7 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import { BaseSchemaService, runAjvValidator, stripNulls, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
@@ -37,8 +37,11 @@ export class ProcessSchemaService {
   ProcessRegionInputSchema
   ProcessPlaceInputSchema
   CreateSchema
+  CreateEditSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
+  CreateEditJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
+  CreateEditValidator: ValidateFunction
   CreateUISchema: UISchemaElement
   UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
@@ -80,7 +83,12 @@ export class ProcessSchemaService {
       region: this.ProcessRegionInputSchema.optional(),
       place: this.ProcessPlaceInputSchema.optional(),
     })
+    // Relaxed version of CreateSchema used for edit forms where intent may not yet be set
+    this.CreateEditSchema = this.CreateSchema.extend({
+      intent: z.enum(ProcessIntent).optional(),
+    })
     this.CreateJSONSchema = zToSchema(this.CreateSchema)
+    this.CreateEditJSONSchema = zToSchema(this.CreateEditSchema)
     this.CreateUISchema = {
       type: 'VerticalLayout',
       elements: [
@@ -202,19 +210,23 @@ export class ProcessSchemaService {
       ],
     }
     this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
+    this.CreateEditValidator = this.baseSchema.ajv.compile(this.CreateEditJSONSchema)
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
   async processCreateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.CreateValidator(data)
-    return data
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    runAjvValidator(this.CreateEditValidator, data)
+    return this.zService.parse(this.CreateEditSchema, data)
   }
 
   async processUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.UpdateValidator(data)
-    return data
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    for (const field of ['material', 'variant', 'org', 'region', 'place']) {
+      this.baseSchema.relToInput(data, field)
+    }
+    runAjvValidator(this.UpdateValidator, data)
+    return this.parseUpdateInput(data as UpdateProcessInput)
   }
 
   async parseCreateInput(input: CreateProcessInput): Promise<CreateProcessInput> {

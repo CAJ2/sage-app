@@ -83,7 +83,7 @@ const editQuery = graphql(`
     directEdit(id: $id) {
       entityName
       id
-      updateModel
+      updateInput
     }
   }
 `)
@@ -98,7 +98,7 @@ if (modelId !== 'new') {
       if (result?.directEdit?.id) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.directEdit.updateModel,
+          result.directEdit.updateInput,
         )
       }
     },

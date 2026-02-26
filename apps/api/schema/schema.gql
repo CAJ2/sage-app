@@ -502,10 +502,10 @@ type DeleteSourceOutput {
 }
 
 type DirectEdit {
-  createModel: JSONObject
+  createInput: JSONObject
   entityName: String!
   id: ID
-  updateModel: JSONObject
+  updateInput: JSONObject
 }
 
 type DiscardEditOutput {
@@ -518,8 +518,8 @@ type Edit {
   """The proposed state of the entity after this edit"""
   changes: EditModel
 
-  """Raw field values for creating a new entity"""
-  createChanges: JSONObject
+  """Input values for creating a new entity"""
+  createInput: JSONObject
 
   """The type name of the entity being edited (e.g. Item, Component)"""
   entityName: String!
@@ -528,8 +528,8 @@ type Edit {
   """The state of the entity before this edit"""
   original: EditModel
 
-  """Raw field values for updating an existing entity"""
-  updateChanges: JSONObject
+  """Current input values for updating an existing entity"""
+  updateInput: JSONObject
 }
 
 type EditEdge {
@@ -909,7 +909,7 @@ type Query {
   component(id: ID!, withChange: ID): Component
   componentSchema: ModelEditSchema
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
-  directEdit(entityName: String, id: ID): DirectEdit
+  directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
   item(id: ID!): Item
   itemSchema: ModelEditSchema
   items(after: String, before: String, first: Int, last: Int): ItemsPage!

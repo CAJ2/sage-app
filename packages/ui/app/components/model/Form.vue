@@ -91,7 +91,7 @@ const editQuery = graphql(`
       status
       edits(id: $id) {
         nodes {
-          updateChanges
+          updateInput
         }
       }
     }
@@ -102,7 +102,7 @@ const directEditQuery = graphql(`
     directEdit(id: $id) {
       entityName
       id
-      updateModel
+      updateInput
     }
   }
 `)
@@ -117,7 +117,7 @@ if (modelId !== 'new' && changeId) {
       if (result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.change.edits.nodes[0]!.updateChanges,
+          result.change.edits.nodes[0]!.updateInput,
         )
       }
       if (result?.change?.status) {
@@ -138,7 +138,7 @@ if (modelId !== 'new' && changeId) {
       if (result?.directEdit?.id) {
         updateData.value = sanitizeFormData(
           jsonSchema.value as JSONSchemaType<unknown>,
-          result.directEdit.updateModel,
+          result.directEdit.updateInput,
         )
       }
     },

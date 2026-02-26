@@ -4,13 +4,13 @@ import { ClsService } from 'nestjs-cls'
 
 import { AuthUserService } from '@src/auth/authuser.service'
 import { CreateChangeInput } from '@src/changes/change-ext.model'
-import { Change, ChangeEdits, ChangeStatus } from '@src/changes/change.entity'
+import { Change, ChangeStatus } from '@src/changes/change.entity'
 import { EditModel as EditEnum, EditModelType } from '@src/changes/change.enum'
 import { DirectEdit, Edit as EditModel, UpdateChangeInput } from '@src/changes/change.model'
 import { ChangeMapService } from '@src/changes/change_map.service'
 import { Source } from '@src/changes/source.entity'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
-import { CursorOptions, entityToModelRegistry, TransformService } from '@src/common/transform'
+import { CursorOptions, TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.entity'
 
 @Injectable()
@@ -48,72 +48,67 @@ export class ChangeService {
       throw NotFoundErr(`Change with ID "${changeID}" not found`)
     }
     if (editID) {
-      let edit = change.edits.find(
+      const edit = change.edits.find(
         (e) => e.entityID === editID && (editType ? e.entityName === editType : true),
       )
       if (!edit) {
-        const directEdit = await this.directEdit(editID, editType)
-        if (!directEdit) {
-          throw NotFoundErr(`Edit or model with ID "${editID}" not found`)
-        }
-        edit = new ChangeEdits()
-        edit._type = EditModel
-        edit.entityID = directEdit.id
-        edit.entityName = directEdit.entityName
-        const editModel = await this.transform.objectToModel(EditModel, edit)
-        editModel.original = directEdit.original
-        editModel.changes = directEdit.changes
-        editModel.createChanges = directEdit.createModel
-        editModel.updateChanges = directEdit.updateModel
-        return [editModel]
+        throw NotFoundErr(`Edit with ID "${editID}" not found in change "${changeID}"`)
       }
       edit._type = EditModel
       const editModel = await this.transform.objectToModel(EditModel, edit)
-      editModel.createChanges = await this.changeMapService.createEdit(edit.entityName, editModel)
-      editModel.updateChanges = await this.changeMapService.updateEdit(edit.entityName, editModel)
+      editModel.createInput = await this.changeMapService.createEdit(edit.entityName, editModel)
+      editModel.updateInput = await this.changeMapService.updateEdit(edit.entityName, editModel)
       return [editModel]
     }
     return Promise.all(
       change.edits.map(async (edit) => {
         edit._type = EditModel
         const editModel = await this.transform.entityToModel(EditModel, edit)
-        editModel.createChanges = await this.changeMapService.createEdit(edit.entityName, editModel)
-        editModel.updateChanges = await this.changeMapService.updateEdit(edit.entityName, editModel)
+        editModel.createInput = await this.changeMapService.createEdit(edit.entityName, editModel)
+        editModel.updateInput = await this.changeMapService.updateEdit(edit.entityName, editModel)
         return editModel
       }),
     )
   }
 
-  async directEdit(id?: string, entityName?: string) {
+  async directEdit(id?: string, entityName?: string, changeID?: string) {
     if (!id && !entityName) {
       throw BadRequestErr('Must provide either ID or entity name for direct edit')
     }
     const svcs = this.changeMapService.findEditServices(entityName)
     if (id) {
       for (const svc of svcs) {
-        const entity = await svc.service.findOneByID(id)
-        if (entity) {
-          const editModel = entityToModelRegistry(
-            svc.name,
-            wrap(entity).toPOJO(),
-            this.cls.get('lang'),
-          )
-          const directEdit = new DirectEdit()
-          if (!(entity as any).id) {
+        const originalEntity = await svc.service.findOneByID(id)
+        let changesEntity: any = null
+        if (changeID) {
+          const change = await this.findOne(changeID)
+          const edit = change.edits.find((e) => e.entityID === id && e.entityName === svc.name)
+          if (edit && edit.changes) {
+            changesEntity = edit.changes
+          }
+        }
+        if (originalEntity) {
+          if (!(originalEntity as any).id) {
             throw NotFoundErr(`Entity with ID "${id}" not found in "${svc.name}"`)
           }
-          directEdit.id = (entity as any).id
+          const originalPojo = wrap(originalEntity).toPOJO()
+          const originalModel = this.transform.entityToModelRegistry(svc.name, originalPojo)
+          const changesModel = changesEntity
+            ? this.transform.entityToModelRegistry(svc.name, changesEntity)
+            : originalModel
+          const directEdit = new DirectEdit()
+          directEdit.id = (originalEntity as any).id
           directEdit.entityName = svc.name
-          directEdit.original = editModel as typeof EditEnum
-          directEdit.changes = editModel as typeof EditEnum
-          directEdit.updateModel = await this.changeMapService.updateEdit(svc.name, directEdit)
+          directEdit.original = originalModel as typeof EditEnum
+          directEdit.changes = changesModel as typeof EditEnum
+          directEdit.updateInput = await this.changeMapService.updateEdit(svc.name, directEdit)
           return directEdit
         }
       }
     } else if (entityName) {
       const editModel = new DirectEdit()
       editModel.entityName = entityName
-      editModel.createModel = await this.changeMapService.createEdit(entityName, editModel)
+      editModel.createInput = await this.changeMapService.createEdit(entityName, editModel)
       return editModel
     }
     return null

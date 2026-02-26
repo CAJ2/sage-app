@@ -10,6 +10,8 @@ import {
   BaseSchemaService,
   ImageOrIconSchema,
   RelMetaSchema,
+  runAjvValidator,
+  stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
@@ -215,25 +217,23 @@ export class VariantSchemaService {
   }
 
   async variantCreateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.CreateValidator(data)
-    return data
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    runAjvValidator(this.CreateValidator, data)
+    return this.parseCreateInput(data as CreateVariantInput)
   }
 
   async variantUpdateEdit(edit: Edit) {
-    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
-    if (data) {
-      data.items = this.baseSchema.collectionToInput(data.addItems || [], 'variant', 'item')
-      data.orgs = this.baseSchema.collectionToInput(data.variant_orgs || [], 'variant', 'org')
-      data.tags = this.baseSchema.collectionToInput(data.variant_tags || [], 'variant', 'tag')
-      data.components = this.baseSchema.collectionToInput(
-        data.variant_components || [],
-        'variant',
-        'component',
-      )
-    }
-    this.UpdateValidator(data)
-    return data
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    data.items = this.baseSchema.collectionToInput(data.variantItems || [], 'variant', 'item')
+    data.orgs = this.baseSchema.collectionToInput(data.variantOrgs || [], 'variant', 'org')
+    data.tags = this.baseSchema.collectionToInput(data.variantTags || [], 'variant', 'tag')
+    data.components = this.baseSchema.collectionToInput(
+      data.variantComponents || [],
+      'variant',
+      'component',
+    )
+    runAjvValidator(this.UpdateValidator, data)
+    return this.parseUpdateInput(data as UpdateVariantInput)
   }
 
   async parseCreateInput(input: CreateVariantInput): Promise<CreateVariantInput> {

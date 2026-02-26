@@ -52,7 +52,7 @@ const categoryEditQuery = graphql(`
       status
       edits(id: $id) {
         nodes {
-          updateChanges
+          updateInput
         }
       }
     }
@@ -82,7 +82,7 @@ if (categoryID !== 'new') {
   if (data?.value?.change?.edits.nodes && data.value.change.edits.nodes.length > 0) {
     updateData.value = sanitizeFormData(
       jsonSchema.value,
-      data.value.change.edits.nodes[0]?.updateChanges,
+      data.value.change.edits.nodes[0]?.updateInput,
     ) as UpdateCategoryInput
   }
   if (data?.value?.change?.status) {

@@ -263,6 +263,23 @@ export class TransformService {
     }
     return page
   }
+
+  entityToModelRegistry(entity: string, obj: object) {
+    if (!obj) {
+      return {}
+    }
+    const constr = ModelRegistry[entity]
+    if (!constr) {
+      throw new Error(`Model ${entity} not found in registry`)
+    }
+    const lang: string[] | undefined = this.cls.get('lang')
+    ;(obj as any)._lang = lang
+    const instance = plainToInstance(constr, obj, {
+      lang,
+    } as ClassTransformOptions)
+    specialCases(instance, obj)
+    return instance
+  }
 }
 
 export function transformUnion(field: string): (params: TransformFnParams) => object {
@@ -282,22 +299,6 @@ export function transformUnion(field: string): (params: TransformFnParams) => ob
     specialCases(instance, params.value)
     return instance
   }
-}
-
-export function entityToModelRegistry(entity: string, obj: object, lang: string[]) {
-  if (!obj) {
-    return {}
-  }
-  const constr = ModelRegistry[entity]
-  if (!constr) {
-    throw new Error(`Model ${entity} not found in registry`)
-  }
-  ;(obj as any)._lang = lang
-  const instance = plainToInstance(constr, obj, {
-    lang,
-  } as ClassTransformOptions)
-  specialCases(instance, obj)
-  return instance
 }
 
 function specialCases(instance: any, obj: any) {
