@@ -3,7 +3,6 @@ import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express
 import helmet from 'helmet'
 
 import { AppModule } from '@src/app.module'
-import { HttpExceptionFilter } from '@src/common/http-exception.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
@@ -40,7 +39,6 @@ async function bootstrap() {
       crossOriginEmbedderPolicy: false,
     }),
   )
-  app.useGlobalFilters(new HttpExceptionFilter())
   app.enableShutdownHooks()
   await app.listen(process.env.PORT || 4444)
   if (process.env.SCHEMA_GEN) {

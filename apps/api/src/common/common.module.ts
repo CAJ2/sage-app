@@ -7,6 +7,7 @@ import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } fro
 import { BaseSchemaService } from '@src/common/base.schema'
 import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
+import { PosthogService } from '@src/common/posthog.service'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 
@@ -28,7 +29,21 @@ import { ZService } from '@src/common/z.service'
       ],
     }),
   ],
-  providers: [TransformService, MeiliService, BaseSchemaService, ZService, I18nService],
-  exports: [TransformService, MeiliService, BaseSchemaService, ZService, I18nService],
+  providers: [
+    TransformService,
+    MeiliService,
+    BaseSchemaService,
+    ZService,
+    I18nService,
+    PosthogService,
+  ],
+  exports: [
+    TransformService,
+    MeiliService,
+    BaseSchemaService,
+    ZService,
+    I18nService,
+    PosthogService,
+  ],
 })
 export class CommonModule {}

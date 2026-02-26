@@ -12,7 +12,7 @@ import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CacheControlScopeEnum } from '@src/graphql/cache-control'
-import { Context, IncomingMessageWithAuthCode } from '@src/graphql/graphql.context'
+import { Context } from '@src/graphql/graphql.context'
 
 @Module({})
 export class GraphQLModule {
@@ -71,7 +71,7 @@ export class GraphQLModule {
             DateTime: LuxonDateTimeResolver,
             JSONObject: JSONObjectResolver,
           },
-          formatError: (err: GraphQLFormattedError) => this.formatError(err, context),
+          formatError: (err: GraphQLFormattedError) => GraphQLModule.formatError(err),
         }
       },
     })
@@ -84,32 +84,11 @@ export class GraphQLModule {
     }
   }
 
-  private static formatError(error: GraphQLFormattedError, ctx: Context): GraphQLFormattedError {
-    const msg = ctx.req as IncomingMessageWithAuthCode
+  private static formatError(error: GraphQLFormattedError): GraphQLFormattedError {
     if (!['PRODUCTION', 'TEST'].includes((process.env.NODE_ENV || '').toUpperCase())) {
       // oxlint-disable-next-line no-console
       console.error('GraphQL Error:', error)
     }
-    if (msg.authCode) {
-      if (msg.authCode === 401) {
-        return {
-          message: 'Unauthorized',
-          extensions: {
-            code: 401,
-          },
-        }
-      }
-      if (msg.authCode === 403) {
-        return {
-          message: 'Forbidden',
-          extensions: {
-            code: 403,
-          },
-        }
-      }
-    }
-
-    // If in production, delete stacktrace
     if (process.env.NODE_ENV === 'production') {
       delete error.extensions?.stacktrace
     }

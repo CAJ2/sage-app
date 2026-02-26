@@ -193,6 +193,9 @@ importers:
       nestjs-i18n:
         specifier: ^10.5.1
         version: 10.5.1(@nestjs/common@11.0.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.0.9)(class-validator@0.14.1)(rxjs@7.8.1)
+      posthog-node:
+        specifier: ^5.26.0
+        version: 5.26.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -10114,6 +10117,10 @@ packages:
 
   posthog-node@5.24.17:
     resolution: {integrity: sha512-mdb8TKt+YCRbGQdYar3AKNUPCyEiqcprScF4unYpGALF6HlBaEuO6wPuIqXXpCWkw4VclJYCKbb6lq6pH6bJeA==}
+    engines: {node: ^20.20.0 || >=22.22.0}
+
+  posthog-node@5.26.0:
+    resolution: {integrity: sha512-DK1XF/RiunhvT57cFyPxW9OaliZzl5aREHFwY/AISL3MVOaDUb4wIccMn0G3ws3Ounen8iGH7xvzZQ0x2vEOEQ==}
     engines: {node: ^20.20.0 || >=22.22.0}
 
   potpack@2.0.0:
@@ -22422,6 +22429,10 @@ snapshots:
       web-vitals: 5.1.0
 
   posthog-node@5.24.17:
+    dependencies:
+      '@posthog/core': 1.23.1
+
+  posthog-node@5.26.0:
     dependencies:
       '@posthog/core': 1.23.1
 

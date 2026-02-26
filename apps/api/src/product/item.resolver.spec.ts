@@ -436,7 +436,7 @@ describe('ItemResolver (integration)', () => {
           input: {
             name: 'Complete Item',
             desc: 'All fields test',
-            imageURL: 'https://example.com/complete-item.jpg',
+            imageURL: 'icon://complete-item',
             lang: 'en',
             categories: [{ id: CATEGORY_IDS[0] }],
             tags: [{ id: TAG_IDS[1], meta: { time: 'slow' } }],
@@ -447,7 +447,7 @@ describe('ItemResolver (integration)', () => {
       expect(res.data?.createItem?.item).toBeDefined()
       expect(res.data?.createItem?.item?.name).toBe('Complete Item')
       expect(res.data?.createItem?.item?.desc).toBe('All fields test')
-      expect(res.data?.createItem?.item?.imageURL).toBe('https://example.com/complete-item.jpg')
+      expect(res.data?.createItem?.item?.imageURL).toBe('icon://complete-item')
       expect(res.data?.createItem?.item?.categories?.totalCount).toBe(1)
       expect(res.data?.createItem?.item?.tags?.totalCount).toBe(1)
     })

@@ -8,4 +8,7 @@ export default (): Record<string, unknown> => ({
     url: process.env.DATABASE_URL,
   },
   port: parseInt(process.env.PORT ?? '4444', 10),
+  posthog: {
+    apiKey: process.env.POSTHOG_API_KEY,
+  },
 })
