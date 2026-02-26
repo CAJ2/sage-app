@@ -1,5 +1,5 @@
 import { DriverException } from '@mikro-orm/core'
-import { ArgumentsHost, Catch, HttpException, HttpStatus } from '@nestjs/common'
+import { ArgumentsHost, Catch, HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { GqlArgumentsHost, GqlExceptionFilter } from '@nestjs/graphql'
 import { Response } from 'express'
 import { GraphQLError } from 'graphql'
@@ -11,9 +11,12 @@ import {
   httpStatusToCode,
   zodIssuesToFieldErrors,
 } from '@src/common/exceptions'
+import { PosthogService } from '@src/common/posthog.service'
 
+@Injectable()
 @Catch()
 export class HttpExceptionFilter implements GqlExceptionFilter {
+  constructor(private readonly posthog: PosthogService) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const gql = GqlArgumentsHost.create(host)
     const ctx = gql.switchToHttp()
@@ -102,6 +105,7 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
   }
 
   private logError(exception: unknown) {
+    this.posthog.captureException(exception)
     if (!['PRODUCTION', 'TEST'].includes((process.env.NODE_ENV || '').toUpperCase())) {
       // oxlint-disable-next-line no-console
       console.error('Unhandled exception:', exception)
