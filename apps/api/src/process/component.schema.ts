@@ -10,6 +10,7 @@ import {
   BaseSchemaService,
   ImageOrIconSchema,
   RelMetaSchema,
+  stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
@@ -210,23 +211,23 @@ export class ComponentSchemaService {
   }
 
   async componentCreateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.CreateValidator(data)
-    return data
+    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    return this.parseCreateInput(data as CreateComponentInput)
   }
 
   async componentUpdateEdit(edit: Edit) {
-    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
-    if (data) {
-      data.materials = this.baseSchema.collectionToInput(
-        data.component_materials || [],
-        'component',
-        'material',
-      )
-      data.tags = this.baseSchema.collectionToInput(data.componentTags || [], 'component', 'tag')
+    const data = stripNulls(_.cloneDeep(edit.changes) ?? {}) as Record<string, any>
+    data.materials = this.baseSchema.collectionToInput(
+      data.component_materials || [],
+      'component',
+      'material',
+    )
+    data.tags = this.baseSchema.collectionToInput(data.componentTags || [], 'component', 'tag')
+    // Reduce loaded relation objects to their id (input format)
+    if (data.primaryMaterial?.id) {
+      data.primaryMaterial = { id: data.primaryMaterial.id }
     }
-    this.UpdateValidator(data)
-    return data
+    return this.parseUpdateInput(data as UpdateComponentInput)
   }
 
   async parseCreateInput(input: CreateComponentInput): Promise<CreateComponentInput> {

@@ -26,10 +26,12 @@ export const zToSchema = (schema: core.$ZodType): core.JSONSchema.BaseSchema => 
   })
 }
 
-export const ImageOrIconSchema = z
-  .url({ protocol: /^(https|icon)/ })
-  .optional()
-  .default('')
+export const ImageOrIconSchema = z.url({ protocol: /^(https|icon)/ }).optional()
+
+/** Remove null/undefined values from a plain object (shallow). */
+export function stripNulls<T extends Record<string, any>>(obj: T): Partial<T> {
+  return _.omitBy(obj, (v) => v === null || v === undefined) as Partial<T>
+}
 export const RelMetaSchema = ZJSONObject.optional()
 
 @Injectable()

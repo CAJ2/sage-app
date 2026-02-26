@@ -559,10 +559,10 @@ export type DeleteSourceOutput = {
 
 export type DirectEdit = {
   __typename?: 'DirectEdit';
-  createModel?: Maybe<Scalars['JSONObject']['output']>;
+  createInput?: Maybe<Scalars['JSONObject']['output']>;
   entityName: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
-  updateModel?: Maybe<Scalars['JSONObject']['output']>;
+  updateInput?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type DiscardEditOutput = {
@@ -576,15 +576,15 @@ export type Edit = {
   __typename?: 'Edit';
   /** The proposed state of the entity after this edit */
   changes?: Maybe<EditModel>;
-  /** Raw field values for creating a new entity */
-  createChanges?: Maybe<Scalars['JSONObject']['output']>;
+  /** Input values for creating a new entity */
+  createInput?: Maybe<Scalars['JSONObject']['output']>;
   /** The type name of the entity being edited (e.g. Item, Component) */
   entityName: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
   /** The state of the entity before this edit */
   original?: Maybe<EditModel>;
-  /** Raw field values for updating an existing entity */
-  updateChanges?: Maybe<Scalars['JSONObject']['output']>;
+  /** Current input values for updating an existing entity */
+  updateInput?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type EditEdge = {
@@ -1260,6 +1260,7 @@ export type QueryComponentsArgs = {
 
 
 export type QueryDirectEditArgs = {
+  changeID?: InputMaybe<Scalars['ID']['input']>;
   entityName?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
 };

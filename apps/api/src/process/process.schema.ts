@@ -6,7 +6,7 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import { BaseSchemaService, stripNulls, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
@@ -206,15 +206,14 @@ export class ProcessSchemaService {
   }
 
   async processCreateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.CreateValidator(data)
-    return data
+    // Process requires `intent` which may not be set for a blank form state;
+    // return cleaned data without strict Zod validation for the create path.
+    return stripNulls(_.cloneDeep(edit.changes) ?? {})
   }
 
   async processUpdateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.UpdateValidator(data)
-    return data
+    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    return this.parseUpdateInput(data as UpdateProcessInput)
   }
 
   async parseCreateInput(input: CreateProcessInput): Promise<CreateProcessInput> {

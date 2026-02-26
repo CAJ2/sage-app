@@ -11,6 +11,7 @@ import {
   BaseSchemaService,
   ImageOrIconSchema,
   RelMetaSchema,
+  stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
@@ -149,18 +150,14 @@ export class ItemSchemaService {
   }
 
   async itemCreateEdit(edit: Edit) {
-    const data = _.cloneDeep(edit.changes)
-    this.CreateValidator(data)
-    return data
+    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    return this.parseCreateInput(data as CreateItemInput)
   }
 
   async itemUpdateEdit(edit: Edit) {
-    const data: Record<string, any> | undefined = _.cloneDeep(edit.changes)
-    if (data) {
-      data.tags = this.baseSchema.collectionToInput(data.item_tags || [], 'item', 'tag')
-    }
-    this.UpdateValidator(data)
-    return data
+    const data = stripNulls(_.cloneDeep(edit.changes) ?? {}) as Record<string, any>
+    data.tags = this.baseSchema.collectionToInput(data.item_tags || [], 'item', 'tag')
+    return this.parseUpdateInput(data as UpdateItemInput)
   }
 
   async parseCreateInput(input: CreateItemInput): Promise<CreateItemInput> {

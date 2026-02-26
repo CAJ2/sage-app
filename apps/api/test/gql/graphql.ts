@@ -563,10 +563,10 @@ export type DeleteSourceOutput = {
 
 export type DirectEdit = {
   __typename?: 'DirectEdit';
-  createModel?: Maybe<Scalars['JSONObject']['output']>;
+  createInput?: Maybe<Scalars['JSONObject']['output']>;
   entityName: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
-  updateModel?: Maybe<Scalars['JSONObject']['output']>;
+  updateInput?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type DiscardEditOutput = {
@@ -580,15 +580,15 @@ export type Edit = {
   __typename?: 'Edit';
   /** The proposed state of the entity after this edit */
   changes?: Maybe<EditModel>;
-  /** Raw field values for creating a new entity */
-  createChanges?: Maybe<Scalars['JSONObject']['output']>;
+  /** Input values for creating a new entity */
+  createInput?: Maybe<Scalars['JSONObject']['output']>;
   /** The type name of the entity being edited (e.g. Item, Component) */
   entityName: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
   /** The state of the entity before this edit */
   original?: Maybe<EditModel>;
-  /** Raw field values for updating an existing entity */
-  updateChanges?: Maybe<Scalars['JSONObject']['output']>;
+  /** Current input values for updating an existing entity */
+  updateInput?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type EditEdge = {
@@ -1264,6 +1264,7 @@ export type QueryComponentsArgs = {
 
 
 export type QueryDirectEditArgs = {
+  changeID?: InputMaybe<Scalars['ID']['input']>;
   entityName?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -2178,6 +2179,36 @@ export type ChangeResolverDeleteChangeMutationVariables = Exact<{
 
 
 export type ChangeResolverDeleteChangeMutation = { __typename?: 'Mutation', deleteChange?: { __typename?: 'DeleteChangeOutput', success?: boolean | null } | null };
+
+export type DirectEditResolverTestQueryVariables = Exact<{
+  id?: InputMaybe<Scalars['ID']['input']>;
+  entityName?: InputMaybe<Scalars['String']['input']>;
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type DirectEditResolverTestQuery = { __typename?: 'Query', directEdit?: { __typename?: 'DirectEdit', entityName: string, id?: string | null, createInput?: any | null, updateInput?: any | null } | null };
+
+export type DirectEditUpdateVariantChange1MutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type DirectEditUpdateVariantChange1Mutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null } | null };
+
+export type DirectEditUpdateVariantChange2MutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type DirectEditUpdateVariantChange2Mutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null } | null };
+
+export type DirectEditUpdateCategoryChange1MutationVariables = Exact<{
+  input: UpdateCategoryInput;
+}>;
+
+
+export type DirectEditUpdateCategoryChange1Mutation = { __typename?: 'Mutation', updateCategory?: { __typename?: 'UpdateCategoryOutput', category?: { __typename?: 'Category', id: string } | null } | null };
 
 export type HistorySpecCreateProcessMutationVariables = Exact<{
   input: CreateProcessInput;
@@ -3393,6 +3424,10 @@ export const ChangeResolverUpdateChangeDocument = {"kind":"Document","definition
 export const ChangeResolverEditVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeResolverEditVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"edits"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"entityName"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<ChangeResolverEditVariantMutation, ChangeResolverEditVariantMutationVariables>;
 export const ChangeResolverDiscardEditDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeResolverDiscardEdit"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"editID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discardEdit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"changeID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}}},{"kind":"Argument","name":{"kind":"Name","value":"editID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"editID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ChangeResolverDiscardEditMutation, ChangeResolverDiscardEditMutationVariables>;
 export const ChangeResolverDeleteChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeResolverDeleteChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<ChangeResolverDeleteChangeMutation, ChangeResolverDeleteChangeMutationVariables>;
+export const DirectEditResolverTestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DirectEditResolverTest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityName"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"directEdit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityName"}}},{"kind":"Argument","name":{"kind":"Name","value":"changeID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"entityName"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createInput"}},{"kind":"Field","name":{"kind":"Name","value":"updateInput"}}]}}]}}]} as unknown as DocumentNode<DirectEditResolverTestQuery, DirectEditResolverTestQueryVariables>;
+export const DirectEditUpdateVariantChange1Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DirectEditUpdateVariantChange1"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<DirectEditUpdateVariantChange1Mutation, DirectEditUpdateVariantChange1MutationVariables>;
+export const DirectEditUpdateVariantChange2Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DirectEditUpdateVariantChange2"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<DirectEditUpdateVariantChange2Mutation, DirectEditUpdateVariantChange2MutationVariables>;
+export const DirectEditUpdateCategoryChange1Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DirectEditUpdateCategoryChange1"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<DirectEditUpdateCategoryChange1Mutation, DirectEditUpdateCategoryChange1MutationVariables>;
 export const HistorySpecCreateProcessDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"HistorySpecCreateProcess"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<HistorySpecCreateProcessMutation, HistorySpecCreateProcessMutationVariables>;
 export const HistorySpecUpdateItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"HistorySpecUpdateItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"item"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<HistorySpecUpdateItemMutation, HistorySpecUpdateItemMutationVariables>;
 export const HistorySpecUpdateVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"HistorySpecUpdateVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<HistorySpecUpdateVariantMutation, HistorySpecUpdateVariantMutationVariables>;

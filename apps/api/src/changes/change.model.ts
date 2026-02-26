@@ -7,6 +7,7 @@ import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/
 import { EditModel, EditModelType } from '@src/changes/change.enum'
 import { SourcesPage } from '@src/changes/source.model'
 import { transformUnion } from '@src/common/transform'
+import { type JSONObject } from '@src/common/z.schema'
 import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
 import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
@@ -37,15 +38,15 @@ export class Edit extends BaseModel<ChangeEdits> {
 
   @Field(() => JSONObjectResolver, {
     nullable: true,
-    description: 'Raw field values for creating a new entity',
+    description: 'Input values for creating a new entity',
   })
-  createChanges?: Record<string, any>
+  createInput?: JSONObject
 
   @Field(() => JSONObjectResolver, {
     nullable: true,
-    description: 'Raw field values for updating an existing entity',
+    description: 'Current input values for updating an existing entity',
   })
-  updateChanges?: Record<string, any>
+  updateInput?: JSONObject
 
   transform(entity: ChangeEdits) {
     this.id = entity.entityID
@@ -61,10 +62,10 @@ export class DirectEdit {
   id?: string
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  createModel?: Record<string, any>
+  createInput?: JSONObject
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  updateModel?: Record<string, any>
+  updateInput?: JSONObject
 
   // Not exposed in GraphQL
   original?: typeof EditModel
@@ -145,6 +146,9 @@ export class DirectEditArgs {
 
   @Field(() => String, { nullable: true })
   entityName?: string
+
+  @Field(() => ID, { nullable: true })
+  changeID?: string
 }
 
 @InputType()

@@ -56,7 +56,7 @@ export class ChangeResolver {
 
   @Query(() => DirectEdit, { nullable: true })
   async directEdit(@Args() args: DirectEditArgs) {
-    const directEdit = await this.changeService.directEdit(args.id, args.entityName)
+    const directEdit = await this.changeService.directEdit(args.id, args.entityName, args.changeID)
     if (!directEdit) {
       throw NotFoundErr('Direct edit not found')
     }
