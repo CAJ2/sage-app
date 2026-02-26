@@ -6,7 +6,7 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
-import { BaseSchemaService, stripNulls, zToSchema } from '@src/common/base.schema'
+import { BaseSchemaService, runAjvValidator, stripNulls, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
@@ -39,7 +39,9 @@ export class ProcessSchemaService {
   CreateSchema
   CreateEditSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
+  CreateEditJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
+  CreateEditValidator: ValidateFunction
   CreateUISchema: UISchemaElement
   UpdateSchema
   UpdateJSONSchema: z.core.JSONSchema.BaseSchema
@@ -86,6 +88,7 @@ export class ProcessSchemaService {
       intent: z.enum(ProcessIntent).optional(),
     })
     this.CreateJSONSchema = zToSchema(this.CreateSchema)
+    this.CreateEditJSONSchema = zToSchema(this.CreateEditSchema)
     this.CreateUISchema = {
       type: 'VerticalLayout',
       elements: [
@@ -207,23 +210,21 @@ export class ProcessSchemaService {
       ],
     }
     this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
+    this.CreateEditValidator = this.baseSchema.ajv.compile(this.CreateEditJSONSchema)
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
   async processCreateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.CreateValidator(data)
+    runAjvValidator(this.CreateEditValidator, data)
     return this.zService.parse(this.CreateEditSchema, data)
   }
 
   async processUpdateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.UpdateValidator(data)
-    // Reduce loaded relation objects to {id} input format
+    runAjvValidator(this.UpdateValidator, data)
     for (const field of ['material', 'variant', 'org', 'region', 'place']) {
-      if (data[field]?.id) {
-        data[field] = { id: data[field].id }
-      }
+      this.baseSchema.relToInput(data, field)
     }
     return this.parseUpdateInput(data as UpdateProcessInput)
   }

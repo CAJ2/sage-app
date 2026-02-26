@@ -10,6 +10,7 @@ import {
   BaseSchemaService,
   ImageOrIconSchema,
   RelMetaSchema,
+  runAjvValidator,
   stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
@@ -212,23 +213,20 @@ export class ComponentSchemaService {
 
   async componentCreateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.CreateValidator(data)
+    runAjvValidator(this.CreateValidator, data)
     return this.parseCreateInput(data as CreateComponentInput)
   }
 
   async componentUpdateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
     data.materials = this.baseSchema.collectionToInput(
-      data.component_materials || [],
+      data.componentMaterials || [],
       'component',
       'material',
     )
     data.tags = this.baseSchema.collectionToInput(data.componentTags || [], 'component', 'tag')
-    this.UpdateValidator(data)
-    // Reduce loaded relation objects to {id} input format
-    if (data.primaryMaterial?.id) {
-      data.primaryMaterial = { id: data.primaryMaterial.id }
-    }
+    runAjvValidator(this.UpdateValidator, data)
+    this.baseSchema.relToInput(data, 'primaryMaterial', ['materialFraction'])
     return this.parseUpdateInput(data as UpdateComponentInput)
   }
 

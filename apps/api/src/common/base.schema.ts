@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import type { ValidateFunction } from 'ajv'
 import Ajv2020 from 'ajv/dist/2020'
 import _ from 'lodash'
 import { core, z } from 'zod/v4'
@@ -32,6 +33,13 @@ export const ImageOrIconSchema = z.url({ protocol: /^(https|icon)/ }).optional()
 export function stripNulls<T extends Record<string, any>>(obj: T): Partial<T> {
   return _.omitBy(obj, (v) => v === null || v === undefined) as Partial<T>
 }
+
+/** Run an AJV validator (which strips additional properties in place) and throw if data is invalid. */
+export function runAjvValidator(validator: ValidateFunction, data: unknown): void {
+  if (!validator(data)) {
+    throw new Error(`AJV validation failed: ${JSON.stringify(validator.errors)}`)
+  }
+}
 export const RelMetaSchema = ZJSONObject.optional()
 
 @Injectable()
@@ -54,14 +62,29 @@ export class BaseSchemaService {
     })
   }
 
-  collectionToInput(collection: Record<string, string>[], refField: string, foreignField: string) {
+  collectionToInput(collection: Record<string, any>[], refField: string, foreignField: string) {
     return collection.map((item) => {
-      const obj = {
-        id: item[foreignField],
-        ..._.omit(item, [refField, foreignField]),
-      }
-      return obj
+      const foreignValue = item[foreignField]
+      const id =
+        typeof foreignValue === 'object' && foreignValue !== null ? foreignValue.id : foreignValue
+      const extras = _.omit(item, [refField, foreignField])
+      // Strip null/undefined/empty-string from extras (MikroORM can serialize undefined as "")
+      const cleanExtras = _.omitBy(extras, (v) => v === null || v === undefined || v === '')
+      return { id, ...cleanExtras }
     })
+  }
+
+  /** Reduce a loaded relation object on `data[field]` to only `id` plus any specified `extraFields`. */
+  relToInput(data: Record<string, any>, field: string, extraFields: string[] = []): void {
+    if (data[field]?.id) {
+      const kept: Record<string, any> = { id: data[field].id }
+      for (const f of extraFields) {
+        if (data[field][f] !== undefined) {
+          kept[f] = data[field][f]
+        }
+      }
+      data[field] = kept
+    }
   }
 
   flattenRefs(data: any) {

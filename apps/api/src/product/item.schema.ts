@@ -11,6 +11,7 @@ import {
   BaseSchemaService,
   ImageOrIconSchema,
   RelMetaSchema,
+  runAjvValidator,
   stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
@@ -151,14 +152,14 @@ export class ItemSchemaService {
 
   async itemCreateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.CreateValidator(data)
+    runAjvValidator(this.CreateValidator, data)
     return this.parseCreateInput(data as CreateItemInput)
   }
 
   async itemUpdateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    data.tags = this.baseSchema.collectionToInput(data.item_tags || [], 'item', 'tag')
-    this.UpdateValidator(data)
+    data.tags = this.baseSchema.collectionToInput(data.itemTags || [], 'item', 'tag')
+    runAjvValidator(this.UpdateValidator, data)
     return this.parseUpdateInput(data as UpdateItemInput)
   }
 

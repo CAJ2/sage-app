@@ -10,6 +10,7 @@ import {
   BaseSchemaService,
   ImageOrIconSchema,
   RelMetaSchema,
+  runAjvValidator,
   stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
@@ -217,21 +218,21 @@ export class VariantSchemaService {
 
   async variantCreateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.CreateValidator(data)
+    runAjvValidator(this.CreateValidator, data)
     return this.parseCreateInput(data as CreateVariantInput)
   }
 
   async variantUpdateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    data.items = this.baseSchema.collectionToInput(data.addItems || [], 'variant', 'item')
-    data.orgs = this.baseSchema.collectionToInput(data.variant_orgs || [], 'variant', 'org')
-    data.tags = this.baseSchema.collectionToInput(data.variant_tags || [], 'variant', 'tag')
+    data.items = this.baseSchema.collectionToInput(data.variantItems || [], 'variant', 'item')
+    data.orgs = this.baseSchema.collectionToInput(data.variantOrgs || [], 'variant', 'org')
+    data.tags = this.baseSchema.collectionToInput(data.variantTags || [], 'variant', 'tag')
     data.components = this.baseSchema.collectionToInput(
-      data.variant_components || [],
+      data.variantComponents || [],
       'variant',
       'component',
     )
-    this.UpdateValidator(data)
+    runAjvValidator(this.UpdateValidator, data)
     return this.parseUpdateInput(data as UpdateVariantInput)
   }
 

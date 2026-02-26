@@ -5,11 +5,13 @@ import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
+import { Change, ChangeEdits } from '@src/changes/change.entity'
 import { ChangeService } from '@src/changes/change.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
-import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { PROCESS_IDS, TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
+import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import {
   COMPONENT_IDS,
   ITEM_IDS,
@@ -68,6 +70,7 @@ describe('DirectEdit (integration)', () => {
       BaseSeeder,
       UserSeeder,
       TestMaterialSeeder,
+      TestTagSeeder,
       TestCategorySeeder,
       TestVariantSeeder,
       TestProcessSeeder,
@@ -285,6 +288,102 @@ describe('DirectEdit (integration)', () => {
       expect(resWithChange.data?.directEdit?.updateInput?.name).toEqual(
         resWithout.data?.directEdit?.updateInput?.name,
       )
+    })
+  })
+
+  describe('pivot relation field preservation in updateInput', () => {
+    let changeID: string
+
+    beforeAll(async () => {
+      const orm = app.get<MikroORM>(MikroORM)
+      const em = orm.em.fork()
+      const user = await em.findOne(User, { username: 'admin' })
+      if (!user) throw new Error('Admin user not found')
+
+      const change = await changeService.create({ title: 'Pivot Fields Change' }, user.id)
+      changeID = change.id
+
+      // Component edit: materials with materialFraction, tags with meta
+      const componentEdit = new ChangeEdits({
+        entityName: 'Component',
+        entityID: COMPONENT_IDS[0],
+        userID: user.id,
+        changes: {
+          id: COMPONENT_IDS[0],
+          componentMaterials: [
+            { component: COMPONENT_IDS[0], material: MATERIAL_IDS[0], materialFraction: 0.75 },
+            { component: COMPONENT_IDS[0], material: MATERIAL_IDS[1], materialFraction: 0.25 },
+          ],
+          componentTags: [
+            { component: COMPONENT_IDS[0], tag: TAG_IDS[0], meta: { source: 'test_source' } },
+          ],
+        },
+      })
+      componentEdit.change = em.getReference(Change, changeID)
+      em.persist(componentEdit)
+
+      // Variant edit: components with quantity and unit
+      const variantEdit = new ChangeEdits({
+        entityName: 'Variant',
+        entityID: VARIANT_IDS[0],
+        userID: user.id,
+        changes: {
+          id: VARIANT_IDS[0],
+          variantComponents: [
+            { variant: VARIANT_IDS[0], component: COMPONENT_IDS[0], quantity: 3, unit: 'g' },
+          ],
+        },
+      })
+      variantEdit.change = em.getReference(Change, changeID)
+      em.persist(variantEdit)
+
+      await em.flush()
+    })
+
+    it('preserves materialFraction on Component materials', async () => {
+      const res = await gql.send(DirectEditQuery, {
+        id: COMPONENT_IDS[0],
+        entityName: 'Component',
+        changeID,
+      })
+
+      expect(res.errors).toBeUndefined()
+      const updateInput = res.data?.directEdit?.updateInput
+      expect(updateInput).toBeDefined()
+      const mat0 = updateInput?.materials?.find((m: any) => m.id === MATERIAL_IDS[0])
+      const mat1 = updateInput?.materials?.find((m: any) => m.id === MATERIAL_IDS[1])
+      expect(mat0?.materialFraction).toBe(0.75)
+      expect(mat1?.materialFraction).toBe(0.25)
+      await expect(componentSchema.parseUpdateInput(updateInput as any)).resolves.toBeDefined()
+    })
+
+    it('preserves meta on Component tags', async () => {
+      const res = await gql.send(DirectEditQuery, {
+        id: COMPONENT_IDS[0],
+        entityName: 'Component',
+        changeID,
+      })
+
+      expect(res.errors).toBeUndefined()
+      const updateInput = res.data?.directEdit?.updateInput
+      const tag = updateInput?.tags?.find((t: any) => t.id === TAG_IDS[0])
+      expect(tag?.meta).toEqual({ source: 'test_source' })
+      await expect(componentSchema.parseUpdateInput(updateInput as any)).resolves.toBeDefined()
+    })
+
+    it('preserves quantity and unit on Variant components', async () => {
+      const res = await gql.send(DirectEditQuery, {
+        id: VARIANT_IDS[0],
+        entityName: 'Variant',
+        changeID,
+      })
+
+      expect(res.errors).toBeUndefined()
+      const updateInput = res.data?.directEdit?.updateInput
+      const comp = updateInput?.components?.find((c: any) => c.id === COMPONENT_IDS[0])
+      expect(comp?.quantity).toBe(3)
+      expect(comp?.unit).toBe('g')
+      await expect(variantSchema.parseUpdateInput(updateInput as any)).resolves.toBeDefined()
     })
   })
 

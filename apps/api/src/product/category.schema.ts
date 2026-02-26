@@ -9,6 +9,7 @@ import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/chang
 import {
   BaseSchemaService,
   ImageOrIconSchema,
+  runAjvValidator,
   stripNulls,
   zToSchema,
 } from '@src/common/base.schema'
@@ -125,13 +126,13 @@ export class CategorySchemaService {
 
   async categoryCreateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.CreateValidator(data)
+    runAjvValidator(this.CreateValidator, data)
     return this.parseCreateInput(data as CreateCategoryInput)
   }
 
   async categoryUpdateEdit(edit: Edit) {
     const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    this.UpdateValidator(data)
+    runAjvValidator(this.UpdateValidator, data)
     return this.parseUpdateInput(data as UpdateCategoryInput)
   }
 
