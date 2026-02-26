@@ -290,7 +290,10 @@ describe('DirectEdit (integration)', () => {
 
   describe('error cases', () => {
     it('returns 400/error when neither id nor entityName is provided', async () => {
-      const res = await gql.send(DirectEditQuery, {})
+      const res = await gql.send(
+        DirectEditQuery,
+        {} as { id?: string; entityName?: string; changeID?: string },
+      )
       expect(res.errors).toBeDefined()
     })
 

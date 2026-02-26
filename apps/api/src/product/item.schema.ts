@@ -150,13 +150,15 @@ export class ItemSchemaService {
   }
 
   async itemCreateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.CreateValidator(data)
     return this.parseCreateInput(data as CreateItemInput)
   }
 
   async itemUpdateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {}) as Record<string, any>
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
     data.tags = this.baseSchema.collectionToInput(data.item_tags || [], 'item', 'tag')
+    this.UpdateValidator(data)
     return this.parseUpdateInput(data as UpdateItemInput)
   }
 

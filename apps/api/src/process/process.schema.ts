@@ -37,6 +37,7 @@ export class ProcessSchemaService {
   ProcessRegionInputSchema
   ProcessPlaceInputSchema
   CreateSchema
+  CreateEditSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
   CreateUISchema: UISchemaElement
@@ -79,6 +80,10 @@ export class ProcessSchemaService {
       org: this.ProcessOrgInputSchema.optional(),
       region: this.ProcessRegionInputSchema.optional(),
       place: this.ProcessPlaceInputSchema.optional(),
+    })
+    // Relaxed version of CreateSchema used for edit forms where intent may not yet be set
+    this.CreateEditSchema = this.CreateSchema.extend({
+      intent: z.enum(ProcessIntent).optional(),
     })
     this.CreateJSONSchema = zToSchema(this.CreateSchema)
     this.CreateUISchema = {
@@ -206,13 +211,20 @@ export class ProcessSchemaService {
   }
 
   async processCreateEdit(edit: Edit) {
-    // Process requires `intent` which may not be set for a blank form state;
-    // return cleaned data without strict Zod validation for the create path.
-    return stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.CreateValidator(data)
+    return this.zService.parse(this.CreateEditSchema, data)
   }
 
   async processUpdateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.UpdateValidator(data)
+    // Reduce loaded relation objects to {id} input format
+    for (const field of ['material', 'variant', 'org', 'region', 'place']) {
+      if (data[field]?.id) {
+        data[field] = { id: data[field].id }
+      }
+    }
     return this.parseUpdateInput(data as UpdateProcessInput)
   }
 

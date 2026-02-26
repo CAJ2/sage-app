@@ -216,12 +216,13 @@ export class VariantSchemaService {
   }
 
   async variantCreateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.CreateValidator(data)
     return this.parseCreateInput(data as CreateVariantInput)
   }
 
   async variantUpdateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {}) as Record<string, any>
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
     data.items = this.baseSchema.collectionToInput(data.addItems || [], 'variant', 'item')
     data.orgs = this.baseSchema.collectionToInput(data.variant_orgs || [], 'variant', 'org')
     data.tags = this.baseSchema.collectionToInput(data.variant_tags || [], 'variant', 'tag')
@@ -230,6 +231,7 @@ export class VariantSchemaService {
       'variant',
       'component',
     )
+    this.UpdateValidator(data)
     return this.parseUpdateInput(data as UpdateVariantInput)
   }
 

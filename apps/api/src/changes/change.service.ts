@@ -78,28 +78,29 @@ export class ChangeService {
     const svcs = this.changeMapService.findEditServices(entityName)
     if (id) {
       for (const svc of svcs) {
-        let entity = await svc.service.findOneByID(id)
+        const originalEntity = await svc.service.findOneByID(id)
+        let changesEntity: any = null
         if (changeID) {
           const change = await this.findOne(changeID)
-          if (!change) {
-            throw NotFoundErr(`Change with ID "${changeID}" not found`)
-          }
           const edit = change.edits.find((e) => e.entityID === id && e.entityName === svc.name)
           if (edit && edit.changes) {
-            entity = edit.changes
+            changesEntity = edit.changes
           }
         }
-        if (entity) {
-          const pojo = typeof (entity as any).toPOJO === 'function' ? wrap(entity).toPOJO() : entity
-          const editModel = this.transform.entityToModelRegistry(svc.name, pojo)
-          const directEdit = new DirectEdit()
-          if (!(entity as any).id) {
+        if (originalEntity) {
+          if (!(originalEntity as any).id) {
             throw NotFoundErr(`Entity with ID "${id}" not found in "${svc.name}"`)
           }
-          directEdit.id = (entity as any).id
+          const originalPojo = wrap(originalEntity).toPOJO()
+          const originalModel = this.transform.entityToModelRegistry(svc.name, originalPojo)
+          const changesModel = changesEntity
+            ? this.transform.entityToModelRegistry(svc.name, changesEntity)
+            : originalModel
+          const directEdit = new DirectEdit()
+          directEdit.id = (originalEntity as any).id
           directEdit.entityName = svc.name
-          directEdit.original = editModel as typeof EditEnum
-          directEdit.changes = editModel as typeof EditEnum
+          directEdit.original = originalModel as typeof EditEnum
+          directEdit.changes = changesModel as typeof EditEnum
           directEdit.updateInput = await this.changeMapService.updateEdit(svc.name, directEdit)
           return directEdit
         }

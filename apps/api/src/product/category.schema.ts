@@ -124,12 +124,14 @@ export class CategorySchemaService {
   }
 
   async categoryCreateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.CreateValidator(data)
     return this.parseCreateInput(data as CreateCategoryInput)
   }
 
   async categoryUpdateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.UpdateValidator(data)
     return this.parseUpdateInput(data as UpdateCategoryInput)
   }
 

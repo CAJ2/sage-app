@@ -211,19 +211,21 @@ export class ComponentSchemaService {
   }
 
   async componentCreateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+    this.CreateValidator(data)
     return this.parseCreateInput(data as CreateComponentInput)
   }
 
   async componentUpdateEdit(edit: Edit) {
-    const data = stripNulls(_.cloneDeep(edit.changes) ?? {}) as Record<string, any>
+    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
     data.materials = this.baseSchema.collectionToInput(
       data.component_materials || [],
       'component',
       'material',
     )
     data.tags = this.baseSchema.collectionToInput(data.componentTags || [], 'component', 'tag')
-    // Reduce loaded relation objects to their id (input format)
+    this.UpdateValidator(data)
+    // Reduce loaded relation objects to {id} input format
     if (data.primaryMaterial?.id) {
       data.primaryMaterial = { id: data.primaryMaterial.id }
     }
