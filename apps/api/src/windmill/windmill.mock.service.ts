@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import type { CompletedJob, Job } from 'windmill-client'
 
-import type { IWindmillService, PollOpts, RunOpts } from '@src/windmill/windmill.service'
+import type {
+  IWindmillService,
+  PollOpts,
+  RunOpts,
+  WaitRunOpts,
+} from '@src/windmill/windmill.service'
 
 @Injectable()
 export class WindmillMockService implements IWindmillService {
@@ -54,7 +59,7 @@ export class WindmillMockService implements IWindmillService {
   async runScriptAndWait<T = unknown>(
     path: string,
     _args: Record<string, unknown>,
-    _opts: RunOpts = {},
+    _opts: WaitRunOpts = {},
   ): Promise<T> {
     return this.getResult<T>(path)
   }
@@ -62,7 +67,7 @@ export class WindmillMockService implements IWindmillService {
   async runFlowAndWait<T = unknown>(
     path: string,
     _args: Record<string, unknown>,
-    _opts: RunOpts = {},
+    _opts: WaitRunOpts = {},
   ): Promise<T> {
     return this.getResult<T>(path)
   }

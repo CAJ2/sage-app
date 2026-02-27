@@ -8,8 +8,13 @@ export interface Searchable {
 }
 
 function isTestRequest() {
-  const cls = ClsServiceManager.getClsService()
-  return cls.get('x-env') === 'test'
+  if (process.env.NODE_ENV === 'production' && !process.env.IS_DEV) return false
+  try {
+    const cls = ClsServiceManager.getClsService()
+    return cls.get('x-env') === 'test'
+  } catch {
+    return false
+  }
 }
 
 export function generateID() {

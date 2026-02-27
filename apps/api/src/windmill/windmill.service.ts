@@ -10,6 +10,9 @@ export interface RunOpts {
   jobId?: string
 }
 
+/** Options for wait-result variants — scheduling is not supported when blocking for a result. */
+export type WaitRunOpts = Omit<RunOpts, 'scheduledFor' | 'scheduledInSecs'>
+
 export interface PollOpts {
   workspace?: string
   intervalMs?: number
@@ -22,12 +25,12 @@ export interface IWindmillService {
   runScriptAndWait<T = unknown>(
     path: string,
     args: Record<string, unknown>,
-    opts?: RunOpts,
+    opts?: WaitRunOpts,
   ): Promise<T>
   runFlowAndWait<T = unknown>(
     path: string,
     args: Record<string, unknown>,
-    opts?: RunOpts,
+    opts?: WaitRunOpts,
   ): Promise<T>
   getJob(id: string, workspace?: string): Promise<Job>
   getJobResult<T = unknown>(id: string, workspace?: string): Promise<T>
@@ -95,7 +98,7 @@ export class WindmillService implements OnModuleInit, IWindmillService {
   async runScriptAndWait<T = unknown>(
     path: string,
     args: Record<string, unknown>,
-    opts: RunOpts = {},
+    opts: WaitRunOpts = {},
   ): Promise<T> {
     return JobService.runWaitResultScriptByPath({
       workspace: this.workspace(opts.workspace),
@@ -109,7 +112,7 @@ export class WindmillService implements OnModuleInit, IWindmillService {
   async runFlowAndWait<T = unknown>(
     path: string,
     args: Record<string, unknown>,
-    opts: RunOpts = {},
+    opts: WaitRunOpts = {},
   ): Promise<T> {
     return JobService.runWaitResultFlowByPath({
       workspace: this.workspace(opts.workspace),
