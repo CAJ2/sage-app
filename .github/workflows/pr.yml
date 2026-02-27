@@ -20,8 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
-          filter: tree:0
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -45,8 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
-          filter: tree:0
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -88,8 +86,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
-          filter: tree:0
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -130,8 +127,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
-          filter: tree:0
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
