@@ -72,6 +72,7 @@
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.1",
     "sql-formatter": "^15.5.2",
+    "windmill-client": "^1.646.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

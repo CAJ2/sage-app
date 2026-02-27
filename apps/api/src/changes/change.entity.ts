@@ -10,10 +10,9 @@ import {
   Property,
 } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
-import { nanoid } from 'nanoid'
 
 import { Source } from '@src/changes/source.entity'
-import { CreatedUpdated, IDCreatedUpdated } from '@src/db/base.entity'
+import { CreatedUpdated, generateID, IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
 
 export enum ChangeStatus {
@@ -73,7 +72,7 @@ export class Change extends IDCreatedUpdated {
 export class ChangeEdits extends CreatedUpdated {
   constructor(init?: Partial<ChangeEdits>) {
     super()
-    this.edit_id = nanoid()
+    this.edit_id = generateID()
     Object.assign(this, init)
   }
 

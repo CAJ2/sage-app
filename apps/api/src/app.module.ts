@@ -26,6 +26,7 @@ import { ProcessModule } from '@src/process/process.module'
 import { ProductModule } from '@src/product/product.module'
 import { SearchModule } from '@src/search/search.module'
 import { UsersModule } from '@src/users/users.module'
+import { WindmillModule } from '@src/windmill/windmill.module'
 
 if (dotenv) {
   dotenv.config()
@@ -47,6 +48,9 @@ if (dotenv) {
         setup: (cls: ClsService, req: Request) => {
           if (req.headers['accept-language']) {
             cls.set('lang', parseLanguageHeader(req.headers['accept-language']))
+          }
+          if (req.headers['x-env']) {
+            cls.set('x-env', req.headers['x-env'])
           }
         },
         generateId: true,
@@ -82,6 +86,7 @@ if (dotenv) {
     ProcessModule,
     ChangesModule,
     SearchModule,
+    WindmillModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }, AppService],
 })

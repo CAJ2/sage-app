@@ -48,6 +48,9 @@ if (dotenv) {
           if (req.headers['accept-language']) {
             cls.set('lang', parseLanguageHeader(req.headers['accept-language']))
           }
+          if (req.headers['x-env']) {
+            cls.set('x-env', req.headers['x-env'])
+          }
         },
         generateId: true,
         idGenerator: (req: Request) => {

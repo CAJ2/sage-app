@@ -1,15 +1,34 @@
 import { BaseEntity, PrimaryKey, Property } from '@mikro-orm/core'
 import { nanoid } from 'nanoid'
+import { ClsServiceManager } from 'nestjs-cls'
 
 export interface Searchable {
   searchIndex(): string
   toSearchDoc(): Promise<Record<string, any>>
 }
 
+function isTestRequest() {
+  if (process.env.NODE_ENV === 'production' && !process.env.IS_DEV) return false
+  try {
+    const cls = ClsServiceManager.getClsService()
+    return cls.get('x-env') === 'test'
+  } catch {
+    return false
+  }
+}
+
+export function generateID() {
+  if (isTestRequest()) {
+    // When 'x-env: test' is set, we override the primary ids with the __test_ prefix
+    return `__test_${nanoid(14)}`
+  }
+  return nanoid()
+}
+
 export abstract class IDCreatedUpdated extends BaseEntity {
   constructor() {
     super()
-    this.id = nanoid()
+    this.id = generateID()
     this.createdAt = new Date()
     this.updatedAt = new Date()
   }
