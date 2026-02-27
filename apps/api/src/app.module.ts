@@ -26,6 +26,7 @@ import { ProcessModule } from '@src/process/process.module'
 import { ProductModule } from '@src/product/product.module'
 import { SearchModule } from '@src/search/search.module'
 import { UsersModule } from '@src/users/users.module'
+import { WindmillModule } from '@src/windmill/windmill.module'
 
 if (dotenv) {
   dotenv.config()
@@ -82,6 +83,7 @@ if (dotenv) {
     ProcessModule,
     ChangesModule,
     SearchModule,
+    WindmillModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }, AppService],
 })

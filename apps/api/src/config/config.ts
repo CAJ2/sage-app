@@ -11,4 +11,9 @@ export default (): Record<string, unknown> => ({
   posthog: {
     apiKey: process.env.POSTHOG_API_KEY,
   },
+  windmill: {
+    baseUrl: process.env.WINDMILL_BASE_URL,
+    token: process.env.WINDMILL_TOKEN,
+    workspace: process.env.WINDMILL_WORKSPACE,
+  },
 })
