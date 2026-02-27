@@ -22,6 +22,9 @@ jobs:
       e2e-affected: ${{ steps.affected.outputs.e2e-affected }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          filter: tree:0
 
       - uses: pnpm/action-setup@v4
 
@@ -56,6 +59,9 @@ jobs:
           --health-cmd "curl -f http://localhost:8080/health?ready=1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          filter: tree:0
 
       - uses: pnpm/action-setup@v4
 
@@ -107,6 +113,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          filter: tree:0
 
       - uses: pnpm/action-setup@v4
 
