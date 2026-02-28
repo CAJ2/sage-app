@@ -196,6 +196,8 @@ type Documents = {
     "\n          mutation OrgHistoryUpdate($input: UpdateOrgInput!) {\n            updateOrg(input: $input) {\n              org {\n                id\n                history {\n                  datetime\n                  user { id }\n                  original {\n                    id\n                    name\n                  }\n                  changes {\n                    id\n                    name\n                  }\n                }\n              }\n            }\n          }\n        ": typeof types.OrgHistoryUpdateDocument,
     "\n        query UsersResolverGetUser($id: ID!) {\n          user(id: $id) {\n            id\n            username\n            email\n            name\n          }\n        }\n      ": typeof types.UsersResolverGetUserDocument,
     "\n        query UsersResolverGetUserOrgs($id: ID!, $first: Int) {\n          user(id: $id) {\n            id\n            orgs(first: $first) {\n              nodes {\n                org {\n                  id\n                  name\n                }\n              }\n              totalCount\n              pageInfo {\n                hasNextPage\n                hasPreviousPage\n              }\n            }\n          }\n        }\n      ": typeof types.UsersResolverGetUserOrgsDocument,
+    "\n        query UsersResolverMe {\n          me {\n            id\n            username\n            email\n          }\n        }\n      ": typeof types.UsersResolverMeDocument,
+    "\n          query UsersResolverMeUnauthenticated {\n            me {\n              id\n            }\n          }\n        ": typeof types.UsersResolverMeUnauthenticatedDocument,
     "\n        query UsersResolverGetNonExistentUser($id: ID!) {\n          user(id: $id) {\n            id\n          }\n        }\n      ": typeof types.UsersResolverGetNonExistentUserDocument,
 };
 const documents: Documents = {
@@ -381,6 +383,8 @@ const documents: Documents = {
     "\n          mutation OrgHistoryUpdate($input: UpdateOrgInput!) {\n            updateOrg(input: $input) {\n              org {\n                id\n                history {\n                  datetime\n                  user { id }\n                  original {\n                    id\n                    name\n                  }\n                  changes {\n                    id\n                    name\n                  }\n                }\n              }\n            }\n          }\n        ": types.OrgHistoryUpdateDocument,
     "\n        query UsersResolverGetUser($id: ID!) {\n          user(id: $id) {\n            id\n            username\n            email\n            name\n          }\n        }\n      ": types.UsersResolverGetUserDocument,
     "\n        query UsersResolverGetUserOrgs($id: ID!, $first: Int) {\n          user(id: $id) {\n            id\n            orgs(first: $first) {\n              nodes {\n                org {\n                  id\n                  name\n                }\n              }\n              totalCount\n              pageInfo {\n                hasNextPage\n                hasPreviousPage\n              }\n            }\n          }\n        }\n      ": types.UsersResolverGetUserOrgsDocument,
+    "\n        query UsersResolverMe {\n          me {\n            id\n            username\n            email\n          }\n        }\n      ": types.UsersResolverMeDocument,
+    "\n          query UsersResolverMeUnauthenticated {\n            me {\n              id\n            }\n          }\n        ": types.UsersResolverMeUnauthenticatedDocument,
     "\n        query UsersResolverGetNonExistentUser($id: ID!) {\n          user(id: $id) {\n            id\n          }\n        }\n      ": types.UsersResolverGetNonExistentUserDocument,
 };
 
@@ -1126,6 +1130,14 @@ export function graphql(source: "\n        query UsersResolverGetUser($id: ID!) 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        query UsersResolverGetUserOrgs($id: ID!, $first: Int) {\n          user(id: $id) {\n            id\n            orgs(first: $first) {\n              nodes {\n                org {\n                  id\n                  name\n                }\n              }\n              totalCount\n              pageInfo {\n                hasNextPage\n                hasPreviousPage\n              }\n            }\n          }\n        }\n      "): (typeof documents)["\n        query UsersResolverGetUserOrgs($id: ID!, $first: Int) {\n          user(id: $id) {\n            id\n            orgs(first: $first) {\n              nodes {\n                org {\n                  id\n                  name\n                }\n              }\n              totalCount\n              pageInfo {\n                hasNextPage\n                hasPreviousPage\n              }\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        query UsersResolverMe {\n          me {\n            id\n            username\n            email\n          }\n        }\n      "): (typeof documents)["\n        query UsersResolverMe {\n          me {\n            id\n            username\n            email\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n          query UsersResolverMeUnauthenticated {\n            me {\n              id\n            }\n          }\n        "): (typeof documents)["\n          query UsersResolverMeUnauthenticated {\n            me {\n              id\n            }\n          }\n        "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

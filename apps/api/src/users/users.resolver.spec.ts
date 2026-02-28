@@ -87,6 +87,40 @@ describe('UsersResolver (integration)', () => {
     expect(Array.isArray(res.data?.user?.orgs.nodes)).toBe(true)
   })
 
+  test('me query should return the current authenticated user', async () => {
+    const res = await gql.send(
+      graphql(`
+        query UsersResolverMe {
+          me {
+            id
+            username
+            email
+          }
+        }
+      `),
+      {},
+    )
+    expect(res.data?.me).toBeTruthy()
+    expect(res.data?.me?.id).toBe(userID)
+    expect(res.data?.me?.username).toBe('admin')
+  })
+
+  test('me query should return an error when unauthenticated', async () => {
+    const unauthGql = new GraphQLTestClient(app)
+    await expect(
+      unauthGql.send(
+        graphql(`
+          query UsersResolverMeUnauthenticated {
+            me {
+              id
+            }
+          }
+        `),
+        {},
+      ),
+    ).rejects.toThrow()
+  })
+
   test('should return null for non-existent user', async () => {
     const res = await gql.send(
       graphql(`

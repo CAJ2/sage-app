@@ -916,6 +916,7 @@ type Query {
   material(id: ID!): Material
   materialRoot: Material!
   materials(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  me: User
   org(id: ID!): Org
   place(id: ID!): Place
   places(after: String, before: String, first: Int, last: Int): PlacesPage!
