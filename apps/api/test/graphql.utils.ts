@@ -52,6 +52,15 @@ export class GraphQLTestClient {
   }
 
   /**
+   * Switch to API key authentication. Clears cookies and sets the x-api-key header.
+   * @param key The API key value
+   */
+  useApiKey(key: string): void {
+    this.cookies = []
+    this.headers!['x-api-key'] = key
+  }
+
+  /**
    * Set the language(s) for the request using the Accept-Language header.
    */
   setLanguage(lang: string | string[]): void {

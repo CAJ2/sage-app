@@ -7,6 +7,7 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter'
 import dotenv from 'dotenv-flow'
 
 import { Account } from '@src/auth/account.entity'
+import { ApiKey } from '@src/auth/apikey.entity'
 import { Session } from '@src/auth/session.entity'
 import { Verification } from '@src/auth/verification.entity'
 import { Change, ChangeEdits, ChangesSources } from '@src/changes/change.entity'
@@ -55,6 +56,7 @@ export const MIKRO_TEST_CONFIG = defineConfig({
   // TODO(CAJ2): Auto-discovery does not seem to work with Vitest, so for now we manually import entities
   entitiesTs: [
     Account,
+    ApiKey,
     Category,
     CategoryEdge,
     CategoryHistory,

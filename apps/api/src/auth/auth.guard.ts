@@ -1,8 +1,10 @@
+import { EntityManager } from '@mikro-orm/postgresql'
 import {
   createParamDecorator,
   ForbiddenException,
   Inject,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common'
 import type { CanActivate, ContextType, ExecutionContext } from '@nestjs/common'
@@ -13,6 +15,7 @@ import { ClsService } from 'nestjs-cls'
 
 import { type AuthModuleOptions, MODULE_OPTIONS_TOKEN } from '@src/auth/auth-module-definition'
 import { getRequestFromContext } from '@src/auth/utils'
+import { User } from '@src/users/users.entity'
 
 /**
  * Lazy-load GraphQLError to make graphql an optional dependency
@@ -50,7 +53,6 @@ export type UserSession = BaseUserSession & {
 
 export type ReqUser = UserSession['user']
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AuthErrorType = {
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
@@ -146,12 +148,15 @@ const AuthContextErrorMap: Record<
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name)
+
   constructor(
     @Inject(Reflector)
     private readonly reflector: Reflector,
     @Inject(MODULE_OPTIONS_TOKEN)
     private readonly options: AuthModuleOptions,
     private readonly cls: ClsService,
+    private readonly em: EntityManager,
   ) {}
 
   /**
@@ -163,14 +168,25 @@ export class AuthGuard implements CanActivate {
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = getRequestFromContext(context)
+    const nodeHeaders = request.headers || request?.handshake?.headers || []
     const session: UserSession | null = await this.options.auth.api.getSession({
-      headers: fromNodeHeaders(request.headers || request?.handshake?.headers || []),
+      headers: fromNodeHeaders(nodeHeaders),
     })
 
     // Store session in CLS for access in AuthUserService
     this.cls.set('session', session)
     request.session = session
-    request.user = session?.user ?? null // useful for observability tools like Sentry
+
+    // If no session, try API key authentication (does not mock a session)
+    let apiKeyUser: ReqUser | null = null
+    if (!session) {
+      apiKeyUser = await this.authenticateViaApiKey(nodeHeaders)
+      if (apiKeyUser) {
+        this.cls.set('user', apiKeyUser)
+      }
+    }
+
+    request.user = session?.user ?? apiKeyUser ?? null // useful for observability tools like Sentry
 
     const isPublic = this.reflector.getAllAndOverride<boolean>('PUBLIC', [
       context.getHandler(),
@@ -184,12 +200,14 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ])
 
-    if (!session && isOptional) return true
+    const effectiveUser = session?.user ?? apiKeyUser ?? null
+
+    if (!effectiveUser && isOptional) return true
 
     const ctxType = context.getType()
-    if (!session) throw AuthContextErrorMap[ctxType].UNAUTHORIZED()
+    if (!effectiveUser) throw AuthContextErrorMap[ctxType].UNAUTHORIZED()
 
-    const headers = fromNodeHeaders(request.headers || request?.handshake?.headers || [])
+    const headers = fromNodeHeaders(nodeHeaders)
 
     // Check @Roles() - user.role only (admin plugin)
     const requiredRoles = this.reflector.getAllAndOverride<string[]>('ROLES', [
@@ -198,22 +216,51 @@ export class AuthGuard implements CanActivate {
     ])
 
     if (requiredRoles && requiredRoles.length > 0) {
-      const hasRole = this.checkUserRole(session, requiredRoles)
+      const hasRole = this.matchesRequiredRole(effectiveUser.role, requiredRoles)
       if (!hasRole) throw AuthContextErrorMap[ctxType].FORBIDDEN()
     }
 
-    // Check @OrgRoles() - organization member role only
+    // Check @OrgRoles() - organization member role only (requires a real session)
     const requiredOrgRoles = this.reflector.getAllAndOverride<string[]>('ORG_ROLES', [
       context.getHandler(),
       context.getClass(),
     ])
 
     if (requiredOrgRoles && requiredOrgRoles.length > 0) {
+      if (!session) throw AuthContextErrorMap[ctxType].FORBIDDEN()
       const hasOrgRole = await this.checkOrgRole(session, headers, requiredOrgRoles)
       if (!hasOrgRole) throw AuthContextErrorMap[ctxType].FORBIDDEN()
     }
 
     return true
+  }
+
+  /**
+   * Attempts to authenticate the request using an API key from the `x-api-key` header.
+   * Returns the owning user if valid, or null if no key is present or the key is invalid.
+   */
+  private async authenticateViaApiKey(nodeHeaders: any): Promise<ReqUser | null> {
+    const headers = fromNodeHeaders(nodeHeaders)
+    const apiKey = headers.get('x-api-key')
+    if (!apiKey) return null
+
+    try {
+      const result = await this.options.auth.api.verifyApiKey({ body: { key: apiKey } })
+      if (!result?.valid || !result.key?.referenceId) return null
+
+      const user = await this.em.findOne(User, { id: result.key.referenceId })
+      if (!user) {
+        this.logger.warn(`API key referenceId ${result.key.referenceId} has no matching user`)
+        return null
+      }
+      return user as unknown as ReqUser
+    } catch (error) {
+      this.logger.error(
+        'API key authentication failed',
+        error instanceof Error ? error.stack : error,
+      )
+      return null
+    }
   }
 
   /**
@@ -247,7 +294,6 @@ export class AuthGuard implements CanActivate {
    * @returns The member's role in the organization, or undefined if not found
    */
   private async getMemberRoleInOrganization(headers: Headers): Promise<string | undefined> {
-    // eslint-disable-next-line no-useless-catch
     try {
       // Better Auth organization plugin exposes getActiveMemberRole or getActiveMember API
       // biome-ignore lint/suspicious/noExplicitAny: Better Auth API types vary by plugin configuration
@@ -271,17 +317,6 @@ export class AuthGuard implements CanActivate {
       // Re-throw to surface organization plugin errors
       throw error
     }
-  }
-
-  /**
-   * Checks if the user has any of the required roles in user.role only.
-   * Used by @Roles() decorator for system-level role checks (admin plugin).
-   * @param session - The user's session
-   * @param requiredRoles - Array of roles that grant access
-   * @returns True if user.role matches any required role
-   */
-  private checkUserRole(session: UserSession, requiredRoles: string[]): boolean {
-    return this.matchesRequiredRole(session.user.role, requiredRoles)
   }
 
   /**
@@ -320,7 +355,8 @@ export const AuthUser = createParamDecorator(
   (data: keyof ReqUser | undefined, ctx: ExecutionContext) => {
     const request = getRequestFromContext(ctx)
     const session = request.session as UserSession
+    const user: ReqUser | null = session?.user ?? (request.user as ReqUser | null) ?? null
 
-    return data ? session?.user[data] : session?.user
+    return data ? user?.[data] : user
   },
 )
