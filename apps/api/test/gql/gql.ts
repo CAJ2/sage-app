@@ -14,6 +14,8 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n        mutation ApiKeyCreateChange($input: CreateChangeInput!) {\n          createChange(input: $input) {\n            change {\n              id\n              title\n            }\n          }\n        }\n      ": typeof types.ApiKeyCreateChangeDocument,
+    "\n        mutation ApiKeyCreateSource($input: CreateSourceInput!) {\n          createSource(input: $input) {\n            source {\n              id\n              type\n            }\n          }\n        }\n      ": typeof types.ApiKeyCreateSourceDocument,
     "\n        query ChangeResolverListChanges($after: String, $first: Int) {\n          changes(after: $after, first: $first) {\n            nodes {\n              id\n              title\n              description\n            }\n            totalCount\n          }\n        }\n      ": typeof types.ChangeResolverListChangesDocument,
     "\n        query ChangeResolverGetChange($id: ID!) {\n          change(id: $id) {\n            id\n            title\n            description\n          }\n        }\n      ": typeof types.ChangeResolverGetChangeDocument,
     "\n        mutation ChangeResolverCreateChange($input: CreateChangeInput!) {\n          createChange(input: $input) {\n            change {\n              id\n              title\n            }\n          }\n        }\n      ": typeof types.ChangeResolverCreateChangeDocument,
@@ -197,6 +199,8 @@ type Documents = {
     "\n        query UsersResolverGetNonExistentUser($id: ID!) {\n          user(id: $id) {\n            id\n          }\n        }\n      ": typeof types.UsersResolverGetNonExistentUserDocument,
 };
 const documents: Documents = {
+    "\n        mutation ApiKeyCreateChange($input: CreateChangeInput!) {\n          createChange(input: $input) {\n            change {\n              id\n              title\n            }\n          }\n        }\n      ": types.ApiKeyCreateChangeDocument,
+    "\n        mutation ApiKeyCreateSource($input: CreateSourceInput!) {\n          createSource(input: $input) {\n            source {\n              id\n              type\n            }\n          }\n        }\n      ": types.ApiKeyCreateSourceDocument,
     "\n        query ChangeResolverListChanges($after: String, $first: Int) {\n          changes(after: $after, first: $first) {\n            nodes {\n              id\n              title\n              description\n            }\n            totalCount\n          }\n        }\n      ": types.ChangeResolverListChangesDocument,
     "\n        query ChangeResolverGetChange($id: ID!) {\n          change(id: $id) {\n            id\n            title\n            description\n          }\n        }\n      ": types.ChangeResolverGetChangeDocument,
     "\n        mutation ChangeResolverCreateChange($input: CreateChangeInput!) {\n          createChange(input: $input) {\n            change {\n              id\n              title\n            }\n          }\n        }\n      ": types.ChangeResolverCreateChangeDocument,
@@ -394,6 +398,14 @@ const documents: Documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation ApiKeyCreateChange($input: CreateChangeInput!) {\n          createChange(input: $input) {\n            change {\n              id\n              title\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation ApiKeyCreateChange($input: CreateChangeInput!) {\n          createChange(input: $input) {\n            change {\n              id\n              title\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation ApiKeyCreateSource($input: CreateSourceInput!) {\n          createSource(input: $input) {\n            source {\n              id\n              type\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation ApiKeyCreateSource($input: CreateSourceInput!) {\n          createSource(input: $input) {\n            source {\n              id\n              type\n            }\n          }\n        }\n      "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

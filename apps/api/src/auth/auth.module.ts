@@ -11,8 +11,8 @@ import {
   MetadataScanner,
 } from '@nestjs/core'
 import { mapToExcludeRoute } from '@nestjs/core/middleware/utils.js'
+import { createAuthMiddleware } from 'better-auth/api'
 import { toNodeHandler } from 'better-auth/node'
-import { createAuthMiddleware } from 'better-auth/plugins'
 import type { Request, Response } from 'express'
 
 import { configureAuth } from '@src/auth/auth'

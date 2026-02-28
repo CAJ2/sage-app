@@ -1,3 +1,4 @@
+import { apiKey } from '@better-auth/api-key'
 import { MikroORM } from '@mikro-orm/postgresql'
 import { betterAuth } from 'better-auth'
 import { admin, organization, username } from 'better-auth/plugins'
@@ -71,6 +72,29 @@ export const configureAuth = (orm: MikroORM) => {
         },
       }),
       admin(),
+      apiKey({
+        enableMetadata: true,
+        schema: {
+          apikey: {
+            modelName: 'auth.apikey',
+            fields: {
+              createdAt: 'created_at',
+              updatedAt: 'updated_at',
+              configId: 'config_id',
+              referenceId: 'reference_id',
+              refillInterval: 'refill_interval',
+              refillAmount: 'refill_amount',
+              lastRefillAt: 'last_refill_at',
+              rateLimitEnabled: 'rate_limit_enabled',
+              rateLimitTimeWindow: 'rate_limit_time_window',
+              rateLimitMax: 'rate_limit_max',
+              requestCount: 'request_count',
+              lastRequest: 'last_request',
+              expiresAt: 'expires_at',
+            },
+          },
+        },
+      }),
     ],
     user: {
       modelName: 'users',

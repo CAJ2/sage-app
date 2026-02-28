@@ -7,27 +7,26 @@ export class AuthUserService {
   constructor(private readonly cls: ClsService) {}
 
   userID(): string | null {
-    const session = this.getSession()
-    if (!session) {
-      return null
-    }
-    return session.user.id
+    return this.getUser()?.id ?? null
   }
 
   sameUserOrAdmin(userID: string): boolean {
-    const session = this.getSession()
-    if (!session) {
-      return false
-    }
-    return session.user.id === userID || session.user.role === 'admin'
+    const user = this.getUser()
+    if (!user) return false
+    return user.id === userID || user.role === 'admin'
   }
 
   admin(): boolean {
+    const user = this.getUser()
+    if (!user) return false
+    return user.role === 'admin'
+  }
+
+  private getUser(): (User & { role: string | null }) | null {
     const session = this.getSession()
-    if (!session) {
-      return false
-    }
-    return session.user.role === 'admin'
+    if (session) return session.user
+    // API key auth stores user directly without a session
+    return (this.cls.get('user') as (User & { role: string | null }) | null) ?? null
   }
 
   private getSession(): {

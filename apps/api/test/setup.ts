@@ -25,6 +25,8 @@ export async function setup(project: TestProject) {
   await app.init()
   const orm = module.get<MikroORM>(MikroORM)
 
+  // Run migrations automatically in test envs
+  await orm.migrator.up()
   await clearDatabase(orm, 'public', ['users'])
   await orm.seeder.seed(BaseSeeder, UserSeeder)
 }
