@@ -1,5 +1,6 @@
 import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
+import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -23,6 +24,15 @@ export class UsersResolver {
     }
     const result = await this.transform.entityToModel(User, user)
     return result
+  }
+
+  @Query(() => User, { name: 'me', nullable: true })
+  async me(@AuthUser() authUser: ReqUser) {
+    const user = await this.usersService.findOneByID(authUser.id)
+    if (!user) {
+      throw NotFoundErr('User not found')
+    }
+    return this.transform.entityToModel(User, user)
   }
 
   @ResolveField()

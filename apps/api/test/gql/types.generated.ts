@@ -1196,6 +1196,7 @@ export type Query = {
   material?: Maybe<Material>;
   materialRoot: Material;
   materials: MaterialsPage;
+  me?: Maybe<User>;
   org?: Maybe<Org>;
   place?: Maybe<Place>;
   places: PlacesPage;
