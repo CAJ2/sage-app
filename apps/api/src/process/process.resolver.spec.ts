@@ -173,15 +173,17 @@ describe('ProcessResolver (integration)', () => {
               process {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -194,10 +196,10 @@ describe('ProcessResolver (integration)', () => {
       const process = createRes.data?.createProcess?.process
       expect(process).toBeDefined()
       historyProcessID = process!.id
-      expect(process!.history).toHaveLength(1)
-      expect(process!.history[0].user).toBeDefined()
-      expect(process!.history[0].original).toBeNull()
-      expect(process!.history[0].changes).toBeTruthy()
+      expect(process!.history.nodes).toHaveLength(1)
+      expect(process!.history.nodes![0].user).toBeDefined()
+      expect(process!.history.nodes![0].original).toBeNull()
+      expect(process!.history.nodes![0].changes).toBeTruthy()
     })
 
     test('should record history on direct update', async () => {
@@ -208,17 +210,19 @@ describe('ProcessResolver (integration)', () => {
               process {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                    name
-                  }
-                  changes {
-                    id
-                    name
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                      name
+                    }
+                    changes {
+                      id
+                      name
+                    }
                   }
                 }
               }
@@ -230,8 +234,8 @@ describe('ProcessResolver (integration)', () => {
       expect(updateRes.errors).toBeUndefined()
       const process = updateRes.data?.updateProcess?.process
       expect(process).toBeDefined()
-      expect(process!.history).toHaveLength(2)
-      const latest = process!.history.at(-1)!
+      expect(process!.history.nodes).toHaveLength(2)
+      const latest = process!.history.nodes!.at(-1)!
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
       expect(latest.original?.name).toBe('History Test Process')

@@ -123,7 +123,7 @@ type Component implements Named {
   desc: String
 
   """Audit history of changes to this component"""
-  history: [ComponentHistory!]!
+  history(after: String, before: String, first: Int, last: Int): ComponentHistoryPage!
 
   """The ID of the model"""
   id: ID!
@@ -144,6 +144,7 @@ type Component implements Named {
 
   """The geographic region this component's recycling data applies to"""
   region: Region
+  sources(after: String, before: String, first: Int, last: Int): ComponentSourcesPage!
   tags: [Tag!]!
   updatedAt: DateTime!
 }
@@ -159,6 +160,18 @@ type ComponentHistory {
   datetime: DateTime!
   original: Component
   user: User!
+}
+
+type ComponentHistoryEdge {
+  cursor: String!
+  node: ComponentHistory!
+}
+
+type ComponentHistoryPage {
+  edges: [ComponentHistoryEdge!]
+  nodes: [ComponentHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 """The fraction of a specific material within a component"""
@@ -184,6 +197,13 @@ type ComponentRecycle {
 
 input ComponentRegionInput {
   id: ID!
+}
+
+type ComponentSourcesPage {
+  edges: [SourceEdge!]
+  nodes: [Source!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 input ComponentTagsInput {
@@ -821,7 +841,7 @@ type Process implements Named {
   efficiency: ProcessEfficiency
 
   """Audit history of changes to this process"""
-  history: [ProcessHistory!]!
+  history(after: String, before: String, first: Int, last: Int): ProcessHistoryPage!
 
   """The ID of the model"""
   id: ID!
@@ -841,6 +861,7 @@ type Process implements Named {
 
   """The geographic region where this process is available"""
   region: Region
+  sources(after: String, before: String, first: Int, last: Int): ProcessSourcesPage!
   updatedAt: DateTime!
 
   """The product variant this process applies to"""
@@ -872,6 +893,18 @@ type ProcessHistory {
   user: User!
 }
 
+type ProcessHistoryEdge {
+  cursor: String!
+  node: ProcessHistory!
+}
+
+type ProcessHistoryPage {
+  edges: [ProcessHistoryEdge!]
+  nodes: [ProcessHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 input ProcessMaterialInput {
   id: ID!
 }
@@ -893,6 +926,13 @@ input ProcessPlaceInput {
 
 input ProcessRegionInput {
   id: ID!
+}
+
+type ProcessSourcesPage {
+  edges: [SourceEdge!]
+  nodes: [Source!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 input ProcessVariantInput {
@@ -1539,7 +1579,7 @@ type Variant implements Named {
   desc: String
 
   """Audit history of changes to this variant"""
-  history: [VariantHistory!]!
+  history(after: String, before: String, first: Int, last: Int): VariantHistoryPage!
 
   """The ID of the model"""
   id: ID!
@@ -1556,6 +1596,7 @@ type Variant implements Named {
 
   """Aggregated recyclability score for this variant"""
   recycleScore(regionID: ID): StreamScore
+  sources(after: String, before: String, first: Int, last: Int): VariantSourcesPage!
 
   """Metadata tags applied to this variant"""
   tags(after: String, before: String, first: Int, last: Int): TagPage!
@@ -1608,6 +1649,18 @@ type VariantHistory {
   variant: Variant!
 }
 
+type VariantHistoryEdge {
+  cursor: String!
+  node: VariantHistory!
+}
+
+type VariantHistoryPage {
+  edges: [VariantHistoryEdge!]
+  nodes: [VariantHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 input VariantItemsInput {
   id: ID!
 }
@@ -1640,6 +1693,13 @@ type VariantOrgsPage {
 
 input VariantRegionsInput {
   id: ID!
+}
+
+type VariantSourcesPage {
+  edges: [SourceEdge!]
+  nodes: [Source!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 input VariantTagsInput {

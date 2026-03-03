@@ -210,12 +210,26 @@ export class VariantService {
     return deleted
   }
 
-  async history(variantID: string) {
-    return this.em.find(
+  async sources(variantID: string, opts: CursorOptions<Source>) {
+    opts.where.variants = this.em.getReference(Variant, variantID)
+    const sources = await this.em.find(Source, opts.where, opts.options)
+    const count = await this.em.count(Source, { variants: opts.where.variants })
+    return { items: sources, count }
+  }
+
+  async history(variantID: string, opts: CursorOptions<VariantHistory>) {
+    const items = await this.em.find(
       VariantHistory,
       { variant: variantID },
-      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+      {
+        populate: ['user'],
+        orderBy: { datetime: 'ASC' },
+        limit: opts.options.limit,
+        offset: opts.options.offset,
+      },
     )
+    const count = await this.em.count(VariantHistory, { variant: variantID })
+    return { items, count }
   }
 
   async setFields(

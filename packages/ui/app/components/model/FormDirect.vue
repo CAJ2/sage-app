@@ -156,7 +156,7 @@ const saveForm = async () => {
           ...createData.value,
         },
       })
-      .then((modelResult) => {
+      .then((modelResult: { data?: unknown } | null) => {
         if (!modelResult?.data) {
           saveStatus.value = 'error'
           return

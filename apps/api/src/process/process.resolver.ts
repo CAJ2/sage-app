@@ -4,6 +4,7 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -13,7 +14,11 @@ import {
   Process,
   ProcessArgs,
   ProcessHistory,
+  ProcessHistoryArgs,
+  ProcessHistoryPage,
   ProcessPage,
+  ProcessSourcesArgs,
+  ProcessSourcesPage,
   UpdateProcessInput,
   UpdateProcessOutput,
 } from '@src/process/process.model'
@@ -105,10 +110,25 @@ export class ProcessResolver {
     return { success: true, id: process.id }
   }
 
-  @ResolveField(() => [ProcessHistory])
-  async history(@Parent() process: Process) {
-    const history = await this.processService.history(process.id)
-    return Promise.all(history.map((h) => this.transform.entityToModel(ProcessHistory, h)))
+  @ResolveField(() => ProcessSourcesPage)
+  async sources(@Parent() process: Process, @Args() args: ProcessSourcesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessSourcesArgs, args)
+    const cursor = await this.processService.sources(process.id, filter)
+    return this.transform.entityToPaginated(Source, ProcessSourcesPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => ProcessHistoryPage)
+  async history(@Parent() process: Process, @Args() args: ProcessHistoryArgs) {
+    const [, filter] = await this.transform.paginationArgs(ProcessHistoryArgs, args)
+    const cursor = await this.processService.history(process.id, filter)
+    const items = await Promise.all(
+      cursor.items.map((h) => this.transform.entityToModel(ProcessHistory, h)),
+    )
+    return this.transform.objectsToPaginated(
+      ProcessHistoryPage,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 

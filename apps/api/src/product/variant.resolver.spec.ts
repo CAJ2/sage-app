@@ -976,15 +976,17 @@ describe('VariantResolver (integration)', () => {
               variant {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -997,10 +999,10 @@ describe('VariantResolver (integration)', () => {
       const variant = createRes.data?.createVariant?.variant
       expect(variant).toBeDefined()
       historyVariantID = variant!.id
-      expect(variant!.history).toHaveLength(1)
-      expect(variant!.history[0].user).toBeDefined()
-      expect(variant!.history[0].original).toBeNull()
-      expect(variant!.history[0].changes).toBeTruthy()
+      expect(variant!.history.nodes).toHaveLength(1)
+      expect(variant!.history.nodes![0].user).toBeDefined()
+      expect(variant!.history.nodes![0].original).toBeNull()
+      expect(variant!.history.nodes![0].changes).toBeTruthy()
     })
 
     test('should record history on direct update', async () => {
@@ -1011,15 +1013,17 @@ describe('VariantResolver (integration)', () => {
               variant {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -1031,8 +1035,8 @@ describe('VariantResolver (integration)', () => {
       expect(updateRes.errors).toBeUndefined()
       const variant = updateRes.data?.updateVariant?.variant
       expect(variant).toBeDefined()
-      expect(variant!.history).toHaveLength(2)
-      const latest = variant!.history.at(-1)!
+      expect(variant!.history.nodes).toHaveLength(2)
+      const latest = variant!.history.nodes!.at(-1)!
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
     })

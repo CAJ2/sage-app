@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common'
 import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
+import { Source } from '@src/changes/source.entity'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
@@ -126,12 +127,26 @@ export class ProcessService {
     return deleted
   }
 
-  async history(processID: string) {
-    return this.em.find(
+  async sources(processID: string, opts: CursorOptions<Source>) {
+    opts.where.processes = this.em.getReference(Process, processID)
+    const sources = await this.em.find(Source, opts.where, opts.options)
+    const count = await this.em.count(Source, { processes: opts.where.processes })
+    return { items: sources, count }
+  }
+
+  async history(processID: string, opts: CursorOptions<ProcessHistory>) {
+    const items = await this.em.find(
       ProcessHistory,
       { process: processID },
-      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+      {
+        populate: ['user'],
+        orderBy: { datetime: 'ASC' },
+        limit: opts.options.limit,
+        offset: opts.options.offset,
+      },
     )
+    const count = await this.em.count(ProcessHistory, { process: processID })
+    return { items, count }
   }
 
   async setFields(
