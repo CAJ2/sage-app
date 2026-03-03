@@ -1,0 +1,49 @@
+apps/api/src/process/component.service.ts
+  f32edf2f6f1595c9 7,179-187,192-194,197-198
+apps/api/src/process/process.resolver.ts
+  f32edf2f6f1595c9 7,17-18,20-21,113-129
+apps/api/src/process/component.resolver.spec.ts
+  f32edf2f6f1595c9 601,603-605,611,624-627,638,640-642,648,660-661
+apps/api/src/process/process.model.ts
+  f32edf2f6f1595c9 9,101-105,128-132,136-140
+apps/api/src/changes/history.spec.ts
+  f32edf2f6f1595c9 185,189,204,252,256,271
+apps/api/src/product/variant.resolver.spec.ts
+  f32edf2f6f1595c9 979,981-983,989,1002-1005,1016,1018-1020,1026,1038-1039
+apps/api/src/product/variant.resolver.ts
+  f32edf2f6f1595c9 7,23-24,31-32,170-186
+apps/api/src/process/process.resolver.spec.ts
+  f32edf2f6f1595c9 176,178-180,186,199-202,213,215-217,224-225,237-238
+apps/api/src/product/variant.model.ts
+  f32edf2f6f1595c9 10,79-83,138-142,153-157
+apps/api/src/changes/source.entity.ts
+  f32edf2f6f1595c9 46-54
+apps/api/src/process/process.service.ts
+  f32edf2f6f1595c9 7,130-138,143-145,148-149
+apps/api/src/product/variant.service.ts
+  f32edf2f6f1595c9 213-221,226-228,231-232
+apps/api/src/process/component.resolver.ts
+  f32edf2f6f1595c9 7,14-15,17-18,158-170,172-174,176
+apps/api/src/process/component.model.ts
+  f32edf2f6f1595c9 10,101-105,132-136,140-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "1d660a82f053633270dcdd71db37a206e9842ed8",
+  "prompts": {
+    "f32edf2f6f1595c9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f52d3af-ca32-4788-8e01-452309646be5",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 335,
+      "total_deletions": 205,
+      "accepted_lines": 231,
+      "overriden_lines": 3
+    }
+  }
+}
