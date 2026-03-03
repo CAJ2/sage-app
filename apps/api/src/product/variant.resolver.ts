@@ -4,6 +4,7 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -19,12 +20,16 @@ import {
   VariantComponentsArgs,
   VariantComponentsPage,
   VariantHistory,
+  VariantHistoryArgs,
+  VariantHistoryPage,
   VariantItemsArgs,
   VariantOrg,
   VariantOrgsArgs,
   VariantOrgsPage,
   VariantRecycleArgs,
   VariantsArgs,
+  VariantSourcesArgs,
+  VariantSourcesPage,
   VariantsPage,
   VariantTagsArgs,
 } from '@src/product/variant.model'
@@ -162,10 +167,25 @@ export class VariantResolver {
     return { success: true, id: variant.id }
   }
 
-  @ResolveField(() => [VariantHistory])
-  async history(@Parent() variant: Variant) {
-    const history = await this.variantService.history(variant.id)
-    return Promise.all(history.map((h) => this.transform.entityToModel(VariantHistory, h)))
+  @ResolveField(() => VariantSourcesPage)
+  async sources(@Parent() variant: Variant, @Args() args: VariantSourcesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantSourcesArgs, args)
+    const cursor = await this.variantService.sources(variant.id, filter)
+    return this.transform.entityToPaginated(Source, VariantSourcesPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => VariantHistoryPage)
+  async history(@Parent() variant: Variant, @Args() args: VariantHistoryArgs) {
+    const [, filter] = await this.transform.paginationArgs(VariantHistoryArgs, args)
+    const cursor = await this.variantService.history(variant.id, filter)
+    const items = await Promise.all(
+      cursor.items.map((h) => this.transform.entityToModel(VariantHistory, h)),
+    )
+    return this.transform.objectsToPaginated(
+      VariantHistoryPage,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 

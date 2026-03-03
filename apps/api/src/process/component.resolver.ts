@@ -4,13 +4,18 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import {
   Component,
   ComponentHistory,
+  ComponentHistoryArgs,
+  ComponentHistoryPage,
   ComponentRecycleArgs,
+  ComponentSourcesArgs,
+  ComponentSourcesPage,
   ComponentsPage,
   CreateComponentInput,
   CreateComponentOutput,
@@ -150,10 +155,25 @@ export class ComponentResolver {
     return { success: true, id: component.id }
   }
 
-  @ResolveField(() => [ComponentHistory])
-  async history(@Parent() component: Component) {
-    const history = await this.componentService.history(component.id)
-    return Promise.all(history.map((h) => this.transform.entityToModel(ComponentHistory, h)))
+  @ResolveField(() => ComponentSourcesPage)
+  async sources(@Parent() component: Component, @Args() args: ComponentSourcesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentSourcesArgs, args)
+    const cursor = await this.componentService.sources(component.id, filter)
+    return this.transform.entityToPaginated(Source, ComponentSourcesPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => ComponentHistoryPage)
+  async history(@Parent() component: Component, @Args() args: ComponentHistoryArgs) {
+    const [, filter] = await this.transform.paginationArgs(ComponentHistoryArgs, args)
+    const cursor = await this.componentService.history(component.id, filter)
+    const items = await Promise.all(
+      cursor.items.map((h) => this.transform.entityToModel(ComponentHistory, h)),
+    )
+    return this.transform.objectsToPaginated(
+      ComponentHistoryPage,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 

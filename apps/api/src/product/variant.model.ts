@@ -7,6 +7,7 @@ import { z } from 'zod'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { SourcesPage } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
@@ -75,8 +76,11 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   })
   components!: VariantComponentsPage & {}
 
-  @Field(() => [VariantHistory], { description: 'Audit history of changes to this variant' })
-  history: VariantHistory[] = []
+  @Field(() => VariantSourcesPage)
+  sources!: VariantSourcesPage & {}
+
+  @Field(() => VariantHistoryPage, { description: 'Audit history of changes to this variant' })
+  history!: VariantHistoryPage & {}
 }
 registerModel('Variant', Variant)
 
@@ -131,6 +135,12 @@ export class VariantComponent extends BaseModel<VariantsComponents> {
 }
 
 @ObjectType()
+export class VariantSourcesPage extends SourcesPage {}
+
+@ObjectType()
+export class VariantHistoryPage extends Paginated(VariantHistory) {}
+
+@ObjectType()
 export class VariantsPage extends Paginated(Variant) {}
 
 @ObjectType()
@@ -138,6 +148,12 @@ export class VariantOrgsPage extends Paginated(VariantOrg) {}
 
 @ObjectType()
 export class VariantComponentsPage extends Paginated(VariantComponent) {}
+
+@ArgsType()
+export class VariantHistoryArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class VariantSourcesArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class VariantsArgs extends PaginationBasicArgs {}

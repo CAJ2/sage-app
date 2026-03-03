@@ -43,6 +43,15 @@ export class Source extends IDCreatedUpdated {
   @ManyToMany(() => Change, (change) => change.sources)
   changes = new Collection<Change>(this)
 
+  @ManyToMany(() => Component, (c) => c.sources)
+  components = new Collection<Component>(this)
+
+  @ManyToMany(() => Process, (p) => p.sources)
+  processes = new Collection<Process>(this)
+
+  @ManyToMany(() => Variant, (v) => v.sources)
+  variants = new Collection<Variant>(this)
+
   @Property({ type: 'json', nullable: true })
   metadata?: Record<string, any>
 }

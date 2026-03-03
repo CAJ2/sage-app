@@ -207,7 +207,7 @@ if (changeId && autoSave && modelId === 'new') {
           ...createData.value,
         },
       })
-      .then((modelResult) => {
+      .then((modelResult: { data?: unknown } | null) => {
         if (!modelResult?.data) {
           saveStatus.value = 'error'
           return
@@ -260,7 +260,7 @@ const saveForm = async () => {
           ...createData.value,
         },
       })
-      .then((modelResult) => {
+      .then((modelResult: { data?: unknown } | null) => {
         if (!modelResult?.data) {
           saveStatus.value = 'error'
           return

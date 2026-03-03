@@ -6,6 +6,7 @@ import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { SourcesPage } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
@@ -97,8 +98,11 @@ export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
   })
   place?: Place
 
-  @Field(() => [ProcessHistory], { description: 'Audit history of changes to this process' })
-  history: ProcessHistory[] = []
+  @Field(() => ProcessSourcesPage)
+  sources!: ProcessSourcesPage & {}
+
+  @Field(() => ProcessHistoryPage, { description: 'Audit history of changes to this process' })
+  history!: ProcessHistoryPage & {}
 }
 registerModel('Process', Process)
 
@@ -121,7 +125,19 @@ export class ProcessHistory extends BaseModel<any> {
 }
 
 @ObjectType()
+export class ProcessSourcesPage extends SourcesPage {}
+
+@ObjectType()
+export class ProcessHistoryPage extends Paginated(ProcessHistory) {}
+
+@ObjectType()
 export class ProcessPage extends Paginated(Process) {}
+
+@ArgsType()
+export class ProcessHistoryArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class ProcessSourcesArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class ProcessArgs extends PaginationBasicArgs {

@@ -182,15 +182,17 @@ describe('History via Change/Merge flow (integration)', () => {
             process(id: $id) {
               id
               history {
-                datetime
-                user {
-                  id
-                }
-                original {
-                  name
-                }
-                changes {
-                  name
+                nodes {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    name
+                  }
+                  changes {
+                    name
+                  }
                 }
               }
             }
@@ -199,7 +201,7 @@ describe('History via Change/Merge flow (integration)', () => {
         { id: newProcessID },
       )
       expect(res.errors).toBeUndefined()
-      const history = res.data?.process?.history
+      const history = res.data?.process?.history.nodes
       expect(history).toHaveLength(1)
       expect(history![0].user).toBeDefined()
       expect(history![0].original).toBeNull()
@@ -247,15 +249,17 @@ describe('History via Change/Merge flow (integration)', () => {
             variant(id: $id) {
               id
               history {
-                datetime
-                user {
-                  id
-                }
-                original {
-                  name
-                }
-                changes {
-                  name
+                nodes {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    name
+                  }
+                  changes {
+                    name
+                  }
                 }
               }
             }
@@ -264,7 +268,7 @@ describe('History via Change/Merge flow (integration)', () => {
         { id: existingVariantID },
       )
       expect(res.errors).toBeUndefined()
-      const history = res.data?.variant?.history
+      const history = res.data?.variant?.history.nodes
       expect(history!.length).toBeGreaterThanOrEqual(1)
       const latest = history!.at(-1)!
       expect(latest.user).toBeDefined()

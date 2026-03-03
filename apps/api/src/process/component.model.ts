@@ -7,6 +7,7 @@ import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { SourcesPage } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
@@ -97,8 +98,11 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
   })
   recycleScore?: StreamScore
 
-  @Field(() => [ComponentHistory], { description: 'Audit history of changes to this component' })
-  history: ComponentHistory[] = []
+  @Field(() => ComponentSourcesPage)
+  sources!: ComponentSourcesPage & {}
+
+  @Field(() => ComponentHistoryPage, { description: 'Audit history of changes to this component' })
+  history!: ComponentHistoryPage & {}
 
   transform(entity: ComponentEntity) {
     this.imageURL = entity.visual?.image
@@ -125,7 +129,19 @@ export class ComponentHistory extends BaseModel<any> {
 }
 
 @ObjectType()
+export class ComponentSourcesPage extends SourcesPage {}
+
+@ObjectType()
+export class ComponentHistoryPage extends Paginated(ComponentHistory) {}
+
+@ObjectType()
 export class ComponentsPage extends Paginated(Component) {}
+
+@ArgsType()
+export class ComponentHistoryArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class ComponentSourcesArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {

@@ -196,7 +196,7 @@ export type Component = Named & {
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this component */
-  history: Array<ComponentHistory>;
+  history: ComponentHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
@@ -211,8 +211,18 @@ export type Component = Named & {
   recycleScore?: Maybe<StreamScore>;
   /** The geographic region this component's recycling data applies to */
   region?: Maybe<Region>;
+  sources: ComponentSourcesPage;
   tags: Array<Tag>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -225,6 +235,15 @@ export type ComponentRecycleArgs = {
 /** A physical component of a product variant, made of one or more materials */
 export type ComponentRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ComponentEdge = {
@@ -240,6 +259,20 @@ export type ComponentHistory = {
   datetime: Scalars['DateTime']['output'];
   original?: Maybe<Component>;
   user: User;
+};
+
+export type ComponentHistoryEdge = {
+  __typename?: 'ComponentHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: ComponentHistory;
+};
+
+export type ComponentHistoryPage = {
+  __typename?: 'ComponentHistoryPage';
+  edges?: Maybe<Array<ComponentHistoryEdge>>;
+  nodes?: Maybe<Array<ComponentHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** The fraction of a specific material within a component */
@@ -265,6 +298,14 @@ export type ComponentRecycle = {
 
 export type ComponentRegionInput = {
   id: Scalars['ID']['input'];
+};
+
+export type ComponentSourcesPage = {
+  __typename?: 'ComponentSourcesPage';
+  edges?: Maybe<Array<SourceEdge>>;
+  nodes?: Maybe<Array<Source>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type ComponentTagsInput = {
@@ -1105,7 +1146,7 @@ export type Process = Named & {
   /** Efficiency metrics for this process */
   efficiency?: Maybe<ProcessEfficiency>;
   /** Audit history of changes to this process */
-  history: Array<ProcessHistory>;
+  history: ProcessHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   /** The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR) */
@@ -1119,9 +1160,28 @@ export type Process = Named & {
   place?: Maybe<Place>;
   /** The geographic region where this process is available */
   region?: Maybe<Region>;
+  sources: ProcessSourcesPage;
   updatedAt: Scalars['DateTime']['output'];
   /** The product variant this process applies to */
   variant?: Maybe<Variant>;
+};
+
+
+/** A recycling, reuse, or disposal process for a product variant or material */
+export type ProcessHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A recycling, reuse, or disposal process for a product variant or material */
+export type ProcessSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ProcessEdge = {
@@ -1150,6 +1210,20 @@ export type ProcessHistory = {
   user: User;
 };
 
+export type ProcessHistoryEdge = {
+  __typename?: 'ProcessHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: ProcessHistory;
+};
+
+export type ProcessHistoryPage = {
+  __typename?: 'ProcessHistoryPage';
+  edges?: Maybe<Array<ProcessHistoryEdge>>;
+  nodes?: Maybe<Array<ProcessHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type ProcessMaterialInput = {
   id: Scalars['ID']['input'];
 };
@@ -1174,6 +1248,14 @@ export type ProcessRegionInput = {
   id: Scalars['ID']['input'];
 };
 
+export type ProcessSourcesPage = {
+  __typename?: 'ProcessSourcesPage';
+  edges?: Maybe<Array<SourceEdge>>;
+  nodes?: Maybe<Array<Source>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type ProcessVariantInput = {
   id: Scalars['ID']['input'];
 };
@@ -1196,6 +1278,7 @@ export type Query = {
   material?: Maybe<Material>;
   materialRoot: Material;
   materials: MaterialsPage;
+  me?: Maybe<User>;
   org?: Maybe<Org>;
   place?: Maybe<Place>;
   places: PlacesPage;
@@ -1973,7 +2056,7 @@ export type Variant = Named & {
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this variant */
-  history: Array<VariantHistory>;
+  history: VariantHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
@@ -1984,6 +2067,7 @@ export type Variant = Named & {
   orgs: VariantOrgsPage;
   /** Aggregated recyclability score for this variant */
   recycleScore?: Maybe<StreamScore>;
+  sources: VariantSourcesPage;
   /** Metadata tags applied to this variant */
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
@@ -1992,6 +2076,15 @@ export type Variant = Named & {
 
 /** A specific variant or SKU of a product item, composed of physical components */
 export type VariantComponentsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A specific variant or SKU of a product item, composed of physical components */
+export type VariantHistoryArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2020,6 +2113,15 @@ export type VariantOrgsArgs = {
 /** A specific variant or SKU of a product item, composed of physical components */
 export type VariantRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+/** A specific variant or SKU of a product item, composed of physical components */
+export type VariantSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2078,6 +2180,20 @@ export type VariantHistory = {
   variant: Variant;
 };
 
+export type VariantHistoryEdge = {
+  __typename?: 'VariantHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: VariantHistory;
+};
+
+export type VariantHistoryPage = {
+  __typename?: 'VariantHistoryPage';
+  edges?: Maybe<Array<VariantHistoryEdge>>;
+  nodes?: Maybe<Array<VariantHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type VariantItemsInput = {
   id: Scalars['ID']['input'];
 };
@@ -2110,6 +2226,14 @@ export type VariantOrgsPage = {
 
 export type VariantRegionsInput = {
   id: Scalars['ID']['input'];
+};
+
+export type VariantSourcesPage = {
+  __typename?: 'VariantSourcesPage';
+  edges?: Maybe<Array<SourceEdge>>;
+  nodes?: Maybe<Array<Source>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type VariantTagsInput = {
