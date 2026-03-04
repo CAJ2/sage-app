@@ -1,0 +1,47 @@
+---
+paths:
+  - "apps/science/**"
+---
+
+# Science App (`apps/science/`) — Agent Rules
+
+**Package Name:** `@sageleaf/science`
+
+## Overview
+
+Nuxt 3-based scientific/research frontend for the Sage platform. Focused on data analysis, visualization, and scientific tools. **Desktop only** — no mobile targets.
+
+## Framework & Architecture
+
+Same stack as `apps/frontend/` (Nuxt 4.x, Vue 3, Apollo GraphQL, DaisyUI/Tailwind, Pinia) but without Tauri mobile integration.
+
+**Key difference from frontend:** Science is desktop-focused with an emphasis on scientific features and data visualization. Refer to `.claude/rules/frontend.md` for shared patterns (Vue/Nuxt component structure, composables, GraphQL usage, routing, state management, styling, i18n).
+
+## Common Commands
+
+```bash
+# Development
+nx dev science                    # Start dev server
+
+# Build
+nx build science                  # Build for production
+nx generate science               # Generate static site (dev env)
+nx generate:prod science          # Generate static (prod env)
+
+# GraphQL Code Generation
+nx codegen science                # Generate TypeScript types from GraphQL
+
+# Linting & Formatting
+nx lint science                   # Lint with oxlint + ESLint, auto-fix
+nx lint:ci science                # Lint for CI (no fixes, fail on warnings)
+nx fmt science                    # Format code with oxfmt
+nx fmt:ci science                 # Check formatting for CI
+```
+
+## GraphQL Types
+
+After API schema changes, regenerate science types:
+```bash
+nx codegen:schema api             # Regenerate schema from code
+nx codegen science                # Update science types
+```
