@@ -1,0 +1,33 @@
+.claude/rules/monorepo.md
+  76ee7d3e1eab1082 1-280
+.claude/rules/ui.md
+  76ee7d3e1eab1082 1-45
+.claude/rules/science.md
+  76ee7d3e1eab1082 1-47
+.claude/rules/api.md
+  76ee7d3e1eab1082 1-129
+.claude/rules/frontend.md
+  76ee7d3e1eab1082 1-169
+.claude/CLAUDE.md
+  76ee7d3e1eab1082 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "41a96d2e2c49fe82195332236daae515ae212aea",
+  "prompts": {
+    "76ee7d3e1eab1082": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "93f43b05-55b0-4109-9831-611be3eac87e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 726,
+      "total_deletions": 4,
+      "accepted_lines": 722,
+      "overriden_lines": 0
+    }
+  }
+}
