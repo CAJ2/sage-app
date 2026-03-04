@@ -1,0 +1,53 @@
+apps/api/src/geo/geo.module.ts
+  2a33e644de9e92b2 5,8,16,18,21
+apps/api/src/common/z.service.ts
+  2a33e644de9e92b2 10,13-16,25,32-33,37-41,43-48,58-62,79-86,100,107-110
+apps/api/src/changes/change.schema.ts
+  2a33e644de9e92b2 5-7,60-79,81,84-85,87,90-93,97,101
+apps/api/src/users/org.schema.ts
+  2a33e644de9e92b2 1,4-9,14-60
+apps/api/src/process/process.module.ts
+  2a33e644de9e92b2 12,33,56
+apps/api/src/product/category.schema.ts
+  2a33e644de9e92b2 19,21,23-26,52-98,100-101
+apps/api/src/process/material.schema.ts
+  2a33e644de9e92b2 1-25
+apps/api/src/product/item.schema.ts
+  2a33e644de9e92b2 21,24-25,51-74
+apps/api/src/users/users.module.ts
+  2a33e644de9e92b2 8,20,23
+apps/api/src/product/variant.schema.ts
+  2a33e644de9e92b2 22,28-31,36-39,41,88-133
+apps/api/src/process/tag.schema.ts
+  2a33e644de9e92b2 5-6,8-10,38-70,74,78
+apps/api/src/process/process.schema.ts
+  2a33e644de9e92b2 13,20,27-29,32,65-128
+apps/api/src/geo/place.schema.ts
+  2a33e644de9e92b2 12-14,47-79
+apps/api/src/process/component.schema.ts
+  2a33e644de9e92b2 23-24,29-30,32,61-94,96-97
+apps/api/src/geo/region.schema.ts
+  2a33e644de9e92b2 1-29
+apps/api/src/common/i18n.service.ts
+  2a33e644de9e92b2 27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "21496d4fd53347d865b85c6becb2e4fdfdc0b8b0",
+  "prompts": {
+    "2a33e644de9e92b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01aa2b25-7d23-4358-95db-1990fcab36f5",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 553,
+      "total_deletions": 173,
+      "accepted_lines": 519,
+      "overriden_lines": 12
+    }
+  }
+}
