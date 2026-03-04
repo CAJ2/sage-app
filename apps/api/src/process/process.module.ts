@@ -9,6 +9,7 @@ import { ComponentHistoryResolver, ComponentResolver } from '@src/process/compon
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { MaterialResolver } from '@src/process/material.resolver'
+import { MaterialSchemaService } from '@src/process/material.schema'
 import { MaterialService } from '@src/process/material.service'
 import { ProcessHistoryResolver, ProcessResolver } from '@src/process/process.resolver'
 import { ProcessSchemaService } from '@src/process/process.schema'
@@ -29,6 +30,7 @@ import { TagService } from '@src/process/tag.service'
   providers: [
     MaterialResolver,
     MaterialService,
+    MaterialSchemaService,
     ComponentResolver,
     ComponentService,
     ComponentSchemaService,
@@ -51,6 +53,7 @@ import { TagService } from '@src/process/tag.service'
     ProcessService,
     ProcessSchemaService,
     MaterialService,
+    MaterialSchemaService,
   ],
 })
 export class ProcessModule {}

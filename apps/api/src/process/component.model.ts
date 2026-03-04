@@ -1,5 +1,4 @@
 import { ArgsType, Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -7,9 +6,8 @@ import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { SourcesPage } from '@src/changes/source.model'
+import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import { Region } from '@src/geo/region.model'
 import {
@@ -57,16 +55,13 @@ export class ComponentRecycle {
 })
 export class Component extends IDCreatedUpdated<ComponentEntity> implements Named {
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(({ value }) => value.image)
   imageURL?: string
 
   @Field(() => Material, { description: 'The primary material this component is made of' })
@@ -103,10 +98,6 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
 
   @Field(() => ComponentHistoryPage, { description: 'Audit history of changes to this component' })
   history!: ComponentHistoryPage & {}
-
-  transform(entity: ComponentEntity) {
-    this.imageURL = entity.visual?.image
-  }
 }
 registerModel('Component', Component)
 
@@ -129,7 +120,16 @@ export class ComponentHistory extends BaseModel<any> {
 }
 
 @ObjectType()
-export class ComponentSourcesPage extends SourcesPage {}
+export class ComponentSource {
+  @Field(() => Source)
+  source!: Source & {}
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: JSONObject
+}
+
+@ObjectType()
+export class ComponentSourcesPage extends Paginated(ComponentSource) {}
 
 @ObjectType()
 export class ComponentHistoryPage extends Paginated(ComponentHistory) {}

@@ -9,8 +9,9 @@ import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ZService } from '@src/common/z.service'
-import { CreatePlaceInput, UpdatePlaceInput } from '@src/geo/place.model'
+import { TransformInput, ZService } from '@src/common/z.service'
+import { Place as PlaceEntity } from '@src/geo/place.entity'
+import { CreatePlaceInput, Place, PlaceAddress, UpdatePlaceInput } from '@src/geo/place.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { OrgIDSchema } from '@src/users/org.schema'
 
@@ -43,6 +44,39 @@ export class PlaceSchemaService {
     private readonly baseSchema: BaseSchemaService,
     private readonly zService: ZService,
   ) {
+    const PlaceTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as PlaceEntity
+      const model = new Place()
+      model.id = entity.id
+      model.createdAt = entity.createdAt as any
+      model.updatedAt = entity.updatedAt as any
+      model.name = input.i18n.tr(entity.name)
+      model.desc = input.i18n.tr(entity.desc)
+      const addressStr = input.i18n.tr(entity.address)
+      if (addressStr) {
+        try {
+          const parsed = JSON.parse(addressStr)
+          if (typeof parsed === 'object' && parsed !== null) {
+            const addr = new PlaceAddress()
+            addr.housenumber = parsed.housenumber
+            addr.street = parsed.street
+            addr.city = parsed.city
+            addr.region = parsed.region
+            addr.postalCode = parsed.postalCode
+            addr.country = parsed.country
+            model.address = addr
+          }
+        } catch {
+          // address is a plain string, not JSON
+        }
+      }
+      if (entity.location) {
+        model.location = entity.location as any
+      }
+      return model
+    })
+    this.zService.registerTransform(PlaceEntity, Place, PlaceTransform)
+
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
       nameTr: TrArraySchema,

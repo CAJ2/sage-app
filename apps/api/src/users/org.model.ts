@@ -1,11 +1,9 @@
 import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { Validate } from 'class-validator'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
 import { BaseModel, IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
@@ -25,7 +23,6 @@ export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
   slug!: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })

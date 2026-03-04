@@ -4,7 +4,6 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -28,6 +27,7 @@ import {
   VariantOrgsPage,
   VariantRecycleArgs,
   VariantsArgs,
+  VariantSource,
   VariantSourcesArgs,
   VariantSourcesPage,
   VariantsPage,
@@ -171,7 +171,7 @@ export class VariantResolver {
   async sources(@Parent() variant: Variant, @Args() args: VariantSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantSourcesArgs, args)
     const cursor = await this.variantService.sources(variant.id, filter)
-    return this.transform.entityToPaginated(Source, VariantSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(VariantSource, VariantSourcesPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => VariantHistoryPage)

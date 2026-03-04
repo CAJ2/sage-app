@@ -1,5 +1,4 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
@@ -7,7 +6,6 @@ import { z } from 'zod/v4'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -24,13 +22,11 @@ export class Material extends CreatedUpdated<MaterialEntity> implements Named {
   id!: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(100_000)
   desc?: string

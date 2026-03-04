@@ -39,7 +39,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
     nullable: true,
     description: 'Extracted or structured content from the source',
   })
-  content?: Record<string, any>
+  content?: JSONObject
 
   @Field(() => String, { nullable: true })
   contentURL?: string
@@ -54,7 +54,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
     nullable: true,
     description: 'Additional metadata about the source (e.g. author, publication date)',
   })
-  metadata?: Record<string, any>
+  metadata?: JSONObject
 }
 
 @ObjectType()

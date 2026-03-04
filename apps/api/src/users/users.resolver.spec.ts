@@ -98,7 +98,6 @@ describe('UsersResolver (integration)', () => {
           }
         }
       `),
-      {},
     )
     expect(res.data?.me).toBeTruthy()
     expect(res.data?.me?.id).toBe(userID)
@@ -116,7 +115,6 @@ describe('UsersResolver (integration)', () => {
             }
           }
         `),
-        {},
       ),
     ).rejects.toThrow()
   })

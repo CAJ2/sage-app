@@ -18,10 +18,11 @@ import {
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ZService } from '@src/common/z.service'
+import { TransformInput, ZService } from '@src/common/z.service'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { CategoryIDSchema } from '@src/product/category.schema'
-import { CreateItemInput, UpdateItemInput } from '@src/product/item.model'
+import { Item as ItemEntity, ItemHistory as ItemHistoryEntity } from '@src/product/item.entity'
+import { CreateItemInput, Item, ItemHistory, UpdateItemInput } from '@src/product/item.model'
 
 export const ItemIDSchema = z.string().meta({
   id: 'Item',
@@ -47,6 +48,30 @@ export class ItemSchemaService {
     private readonly editService: EditService,
     private readonly zService: ZService,
   ) {
+    const ItemTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ItemEntity
+      const model = new Item()
+      model.id = entity.id
+      model.createdAt = entity.createdAt as any
+      model.updatedAt = entity.updatedAt as any
+      model.name = input.i18n.tr(entity.name)
+      model.desc = input.i18n.tr(entity.desc)
+      model.imageURL = (entity as any).files?.thumbnail
+      return model
+    })
+    this.zService.registerTransform(ItemEntity, Item, ItemTransform)
+
+    const ItemHistoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ItemHistoryEntity
+      const model = new ItemHistory()
+      model.datetime = entity.datetime as any
+      model.user = (entity as any).user
+      model.original = (entity as any).original
+      model.changes = (entity as any).changes
+      return model
+    })
+    this.zService.registerTransform(ItemHistoryEntity, ItemHistory, ItemHistoryTransform)
+
     this.ItemCategoriesInputSchema = z.strictObject({
       id: CategoryIDSchema,
     })

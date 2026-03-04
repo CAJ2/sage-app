@@ -24,7 +24,8 @@ export class I18nService {
   }
 
   // Non class-transformer version of the translate function.
-  tr(field: TranslatedField | undefined, lang: string[]): string | undefined {
+  tr(field: TranslatedField | undefined): string | undefined {
+    const lang: string[] = this.cls.get('lang') || []
     return translate({
       value: field,
       obj: {

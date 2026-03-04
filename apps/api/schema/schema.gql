@@ -78,7 +78,7 @@ type Change {
   id: ID!
 
   """Source references supporting this change"""
-  sources(after: String, before: String, first: Int, last: Int): SourcesPage!
+  sources(after: String, before: String, first: Int, last: Int): ChangeSourcesPage!
   status: ChangeStatus!
   title: String
   updatedAt: DateTime!
@@ -95,6 +95,22 @@ type ChangeEdge {
 type ChangeEditsPage {
   edges: [EditEdge!]
   nodes: [Edit!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ChangeSource {
+  source: Source!
+}
+
+type ChangeSourceEdge {
+  cursor: String!
+  node: ChangeSource!
+}
+
+type ChangeSourcesPage {
+  edges: [ChangeSourceEdge!]
+  nodes: [ChangeSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -199,9 +215,19 @@ input ComponentRegionInput {
   id: ID!
 }
 
+type ComponentSource {
+  meta: JSONObject
+  source: Source!
+}
+
+type ComponentSourceEdge {
+  cursor: String!
+  node: ComponentSource!
+}
+
 type ComponentSourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+  edges: [ComponentSourceEdge!]
+  nodes: [ComponentSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -928,9 +954,19 @@ input ProcessRegionInput {
   id: ID!
 }
 
+type ProcessSource {
+  meta: JSONObject
+  source: Source!
+}
+
+type ProcessSourceEdge {
+  cursor: String!
+  node: ProcessSource!
+}
+
 type ProcessSourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+  edges: [ProcessSourceEdge!]
+  nodes: [ProcessSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1695,9 +1731,19 @@ input VariantRegionsInput {
   id: ID!
 }
 
+type VariantSource {
+  meta: JSONObject
+  source: Source!
+}
+
+type VariantSourceEdge {
+  cursor: String!
+  node: VariantSource!
+}
+
 type VariantSourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+  edges: [VariantSourceEdge!]
+  nodes: [VariantSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }

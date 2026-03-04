@@ -4,11 +4,10 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import type { ClassConstructor, ClassTransformOptions, TransformFnParams } from 'class-transformer'
-import { validateOrReject } from 'class-validator'
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
-import { ClsService } from 'nestjs-cls'
 
+import { ZService } from '@src/common/z.service'
 import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 import {
   DEFAULT_PAGE_SIZE,
@@ -37,45 +36,26 @@ export interface CursorOptions<T> {
 
 @Injectable()
 export class TransformService {
-  constructor(private readonly cls: ClsService) {}
+  constructor(private readonly zService: ZService) {}
 
-  async entityToModel<T extends BaseEntity, S extends BaseModel<T>>(
+  async entityToModel<T extends BaseEntity, S extends object>(
     model: new () => S,
     entity: Loaded<T, never>,
   ): Promise<S> {
-    const entityObj: EntityDTOCtx<T> = entity.toObject()
-    ;(entityObj as any)._lang = this.cls.get('lang')
-    const inst = plainToInstance(model, entityObj, {
-      lang: this.cls.get('lang'),
-    } as ClassTransformOptions)
-    specialCases(inst, entityObj)
-    await validateOrReject(inst).catch((errors) => {
-      throw new GraphQLError(errors.toString())
-    })
-    inst.entity = entity
-    return inst
+    return this.zService.entityToModel(model, entity)
   }
 
   async objectToModel<T, S extends object>(model: new () => S, object: T): Promise<S> {
-    const obj = object as EntityDTOCtx<T>
-    ;(obj as any)._lang = this.cls.get('lang')
-    const inst = plainToInstance(model, obj, {
-      lang: this.cls.get('lang'),
-    } as ClassTransformOptions)
-    specialCases(inst, obj)
-    await validateOrReject(inst).catch((errors) => {
-      throw new GraphQLError(errors.toString())
-    })
-    return inst
+    return this.zService.objectToModel(model, object)
   }
 
-  async entitiesToModels<T extends BaseEntity, S extends BaseModel<T>>(
+  async entitiesToModels<T extends BaseEntity, S extends object>(
     model: new () => S,
     entities: Loaded<T, never>[],
   ): Promise<S[]> {
     const models: S[] = []
     for (const entity of entities) {
-      const inst = await this.entityToModel(model, entity)
+      const inst = await this.zService.entityToModel(model, entity)
       models.push(inst)
     }
     return models
@@ -84,7 +64,7 @@ export class TransformService {
   async objectsToModels<T, S extends object>(model: new () => S, objects: T[]): Promise<S[]> {
     const models: S[] = []
     for (const obj of objects) {
-      const inst = await this.objectToModel(model, obj)
+      const inst = await this.zService.objectToModel(model, obj)
       models.push(inst)
     }
     return models
@@ -132,11 +112,7 @@ export class TransformService {
     return [args, options]
   }
 
-  async entityToPaginated<
-    T extends BaseEntity,
-    U extends BaseModel<T>,
-    S extends PaginatedType<U, T>,
-  >(
+  async entityToPaginated<T extends BaseEntity, U extends object, S extends PaginatedType<U, T>>(
     model: new () => U,
     PageModel: new () => S,
     cursor: Cursor<T, '*'>,
@@ -148,7 +124,7 @@ export class TransformService {
     const flip = options.before || options.last
     cursor.items = flip ? cursor.items.reverse() : cursor.items
     for (const item of cursor.items) {
-      const cls = await this.entityToModel(model, item)
+      const cls = await this.zService.entityToModel(model, item)
       nodes.push(cls)
       const itemOrderField = (item as any)[options.orderBy()[0] || 'id']
       const cid = Buffer.from(
@@ -221,11 +197,6 @@ export class TransformService {
     }
   }
 
-  getCurrentLang() {
-    const lang: string[] | undefined = this.cls.get('lang')
-    return lang ? lang[0] : undefined
-  }
-
   async objectsToPaginated<T, S extends PaginatedType<any, any>>(
     PageModel: new () => S,
     cursor: { items: EntityDTO<T>[]; count: number },
@@ -239,14 +210,7 @@ export class TransformService {
         if (!(obj as any)._type) {
           continue
         }
-        ;(obj as any)._lang = this.cls.get('lang')
-        const inst: object = plainToInstance((obj as any)._type, obj, {
-          lang: this.cls.get('lang'),
-        } as ClassTransformOptions)
-        specialCases(inst, obj)
-        await validateOrReject(inst).catch((errors) => {
-          throw new GraphQLError(errors.toString())
-        })
+        const inst = await this.zService.objectToModel((obj as any)._type, obj)
         entities.push(inst)
       }
     }
@@ -262,23 +226,6 @@ export class TransformService {
       hasNextPage: false,
     }
     return page
-  }
-
-  entityToModelRegistry(entity: string, obj: object) {
-    if (!obj) {
-      return {}
-    }
-    const constr = ModelRegistry[entity]
-    if (!constr) {
-      throw new Error(`Model ${entity} not found in registry`)
-    }
-    const lang: string[] | undefined = this.cls.get('lang')
-    ;(obj as any)._lang = lang
-    const instance = plainToInstance(constr, obj, {
-      lang,
-    } as ClassTransformOptions)
-    specialCases(instance, obj)
-    return instance
   }
 }
 

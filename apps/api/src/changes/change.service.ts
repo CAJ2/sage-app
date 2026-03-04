@@ -1,6 +1,5 @@
 import { EntityManager, ref, wrap } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { ClsService } from 'nestjs-cls'
 
 import { AuthUserService } from '@src/auth/authuser.service'
 import { CreateChangeInput } from '@src/changes/change-ext.model'
@@ -11,6 +10,7 @@ import { ChangeMapService } from '@src/changes/change_map.service'
 import { Source } from '@src/changes/source.entity'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions, TransformService } from '@src/common/transform'
+import { ZService } from '@src/common/z.service'
 import { User } from '@src/users/users.entity'
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ChangeService {
   constructor(
     private readonly em: EntityManager,
     private readonly transform: TransformService,
-    private readonly cls: ClsService,
+    private readonly zService: ZService,
     private readonly changeMapService: ChangeMapService,
     private readonly authUser: AuthUserService,
   ) {}
@@ -92,9 +92,9 @@ export class ChangeService {
             throw NotFoundErr(`Entity with ID "${id}" not found in "${svc.name}"`)
           }
           const originalPojo = wrap(originalEntity).toPOJO()
-          const originalModel = this.transform.entityToModelRegistry(svc.name, originalPojo)
+          const originalModel = await this.zService.objectToModel(svc.name, originalPojo)
           const changesModel = changesEntity
-            ? this.transform.entityToModelRegistry(svc.name, changesEntity)
+            ? await this.zService.objectToModel(svc.name, changesEntity)
             : originalModel
           const directEdit = new DirectEdit()
           directEdit.id = (originalEntity as any).id

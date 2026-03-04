@@ -1,14 +1,12 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsEnum, IsOptional } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { SourcesPage } from '@src/changes/source.model'
+import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import { Place } from '@src/geo/place.model'
 import { Region } from '@src/geo/region.model'
@@ -58,11 +56,9 @@ export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
   intent!: ProcessIntent
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => ProcessEfficiency, {
@@ -125,7 +121,16 @@ export class ProcessHistory extends BaseModel<any> {
 }
 
 @ObjectType()
-export class ProcessSourcesPage extends SourcesPage {}
+export class ProcessSource extends BaseModel<any> {
+  @Field(() => Source)
+  source!: Source & {}
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: JSONObject
+}
+
+@ObjectType()
+export class ProcessSourcesPage extends Paginated(ProcessSource) {}
 
 @ObjectType()
 export class ProcessHistoryPage extends Paginated(ProcessHistory) {}

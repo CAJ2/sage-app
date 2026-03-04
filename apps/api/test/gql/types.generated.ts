@@ -131,7 +131,7 @@ export type Change = {
   edits: ChangeEditsPage;
   id: Scalars['ID']['output'];
   /** Source references supporting this change */
-  sources: SourcesPage;
+  sources: ChangeSourcesPage;
   status: ChangeStatus;
   title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
@@ -169,6 +169,25 @@ export type ChangeEditsPage = {
   __typename?: 'ChangeEditsPage';
   edges?: Maybe<Array<EditEdge>>;
   nodes?: Maybe<Array<Edit>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChangeSource = {
+  __typename?: 'ChangeSource';
+  source: Source;
+};
+
+export type ChangeSourceEdge = {
+  __typename?: 'ChangeSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: ChangeSource;
+};
+
+export type ChangeSourcesPage = {
+  __typename?: 'ChangeSourcesPage';
+  edges?: Maybe<Array<ChangeSourceEdge>>;
+  nodes?: Maybe<Array<ChangeSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -300,10 +319,22 @@ export type ComponentRegionInput = {
   id: Scalars['ID']['input'];
 };
 
+export type ComponentSource = {
+  __typename?: 'ComponentSource';
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  source: Source;
+};
+
+export type ComponentSourceEdge = {
+  __typename?: 'ComponentSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: ComponentSource;
+};
+
 export type ComponentSourcesPage = {
   __typename?: 'ComponentSourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+  edges?: Maybe<Array<ComponentSourceEdge>>;
+  nodes?: Maybe<Array<ComponentSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1248,10 +1279,22 @@ export type ProcessRegionInput = {
   id: Scalars['ID']['input'];
 };
 
+export type ProcessSource = {
+  __typename?: 'ProcessSource';
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  source: Source;
+};
+
+export type ProcessSourceEdge = {
+  __typename?: 'ProcessSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: ProcessSource;
+};
+
 export type ProcessSourcesPage = {
   __typename?: 'ProcessSourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+  edges?: Maybe<Array<ProcessSourceEdge>>;
+  nodes?: Maybe<Array<ProcessSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -2228,10 +2271,22 @@ export type VariantRegionsInput = {
   id: Scalars['ID']['input'];
 };
 
+export type VariantSource = {
+  __typename?: 'VariantSource';
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  source: Source;
+};
+
+export type VariantSourceEdge = {
+  __typename?: 'VariantSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: VariantSource;
+};
+
 export type VariantSourcesPage = {
   __typename?: 'VariantSourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+  edges?: Maybe<Array<VariantSourceEdge>>;
+  nodes?: Maybe<Array<VariantSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };

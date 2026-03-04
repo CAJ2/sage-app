@@ -1,9 +1,7 @@
 import { ArgsType, Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
-import { translate } from '@src/common/i18n'
 import { type JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
@@ -21,14 +19,12 @@ registerEnumType(TagType, {
 })
 export class TagDefinition extends IDCreatedUpdated<TagEntity> implements Named {
   @Field(() => String)
-  @Transform(translate)
   name!: string
 
   @Field(() => TagType, { description: 'The type of model this tag can be applied to' })
   type!: TagType
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => JSONObjectResolver, {

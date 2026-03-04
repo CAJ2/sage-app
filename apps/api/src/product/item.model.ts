@@ -1,5 +1,4 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -7,7 +6,6 @@ import { DateTime } from 'luxon'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
@@ -29,13 +27,11 @@ import { User } from '@src/users/users.model'
 })
 export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })
@@ -55,10 +51,6 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
 
   @Field(() => [ItemHistory], { description: 'Audit history of changes to this item' })
   history: ItemHistory[] = []
-
-  transform(entity: ItemEntity) {
-    this.imageURL = entity.files?.thumbnail
-  }
 }
 registerModel('Item', Item)
 

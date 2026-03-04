@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { z } from 'zod/v4'
 
 import { CreateChangeInput } from '@src/changes/change-ext.model'
-import { ChangeStatus } from '@src/changes/change.entity'
-import { UpdateChangeInput } from '@src/changes/change.model'
-import { ZService } from '@src/common/z.service'
+import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/change.entity'
+import { Change, Edit, UpdateChangeInput } from '@src/changes/change.model'
+import { TransformInput, ZService } from '@src/common/z.service'
 import { LangSchema } from '@src/graphql/base.model'
 
 export const ChangeIDSchema = z.string().meta({
@@ -57,13 +57,47 @@ export class ChangeSchemaService {
   CreateSchema = CreateChangeInputSchema
   UpdateSchema = UpdateChangeInputSchema
 
-  constructor(private readonly z: ZService) {}
+  constructor(private readonly zService: ZService) {
+    const ChangeTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ChangeEntity
+      const model = new Change()
+      model.id = entity.id
+      model.createdAt = entity.createdAt as any
+      model.updatedAt = entity.updatedAt as any
+      model.title = entity.title
+      model.description = entity.description
+      model.status = entity.status
+      return model
+    })
+    this.zService.registerTransform(ChangeEntity, Change, ChangeTransform)
+
+    const EditTransform = z.transform(async (input: TransformInput) => {
+      const entity = input.input as ChangeEdits
+      const model = new Edit()
+      model.entityName = entity.entityName
+      model.id = entity.entityID
+      if (entity.original) {
+        model.original = (await this.zService.objectToModel(
+          entity.entityName,
+          entity.original,
+        )) as any
+      }
+      if (entity.changes) {
+        model.changes = (await this.zService.objectToModel(
+          entity.entityName,
+          entity.changes,
+        )) as any
+      }
+      return model
+    })
+    this.zService.registerTransform(ChangeEdits, Edit, EditTransform)
+  }
 
   async parseCreateInput(input: CreateChangeInput): Promise<CreateChangeInput> {
-    return this.z.parse(this.CreateSchema, input)
+    return this.zService.parse(this.CreateSchema, input)
   }
 
   async parseUpdateInput(input: UpdateChangeInput): Promise<UpdateChangeInput> {
-    return this.z.parse(this.UpdateSchema, input)
+    return this.zService.parse(this.UpdateSchema, input)
   }
 }

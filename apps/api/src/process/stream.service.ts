@@ -1,6 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { ClsService } from 'nestjs-cls'
 
 import { I18nService } from '@src/common/i18n.service'
 import { Region } from '@src/geo/region.entity'
@@ -13,7 +12,6 @@ import { RecyclingStream, StreamScore, StreamScoreRating } from '@src/process/st
 export class StreamService {
   constructor(
     private readonly em: EntityManager,
-    private readonly cls: ClsService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -45,13 +43,12 @@ export class StreamService {
     })
 
     const recycle: ComponentRecycle[] = []
-    const lang = this.cls.get('lang')
     if (processes.length > 0) {
       const r = new ComponentRecycle()
       const processMatch = processes[0]
       r.stream = new RecyclingStream()
-      r.stream.name = this.i18n.tr(processMatch.name, lang)
-      r.stream.desc = this.i18n.tr(processMatch.desc, lang)
+      r.stream.name = this.i18n.tr(processMatch.name)
+      r.stream.desc = this.i18n.tr(processMatch.desc)
       r.stream.score = this.calculateScore(processMatch)
       r.stream.container = processMatch.instructions.container
       recycle.push(r)

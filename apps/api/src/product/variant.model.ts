@@ -1,5 +1,4 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform, Type } from 'class-transformer'
 import { IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -7,9 +6,8 @@ import { z } from 'zod'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { SourcesPage } from '@src/changes/source.model'
+import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject } from '@src/common/z.schema'
 import {
@@ -29,6 +27,7 @@ import {
   Variant as VariantEntity,
   VariantsComponents,
   VariantsOrgs,
+  VariantsSources,
 } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.model'
 import { User } from '@src/users/users.model'
@@ -39,13 +38,11 @@ import { User } from '@src/users/users.model'
 })
 export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   desc?: string
 
@@ -108,7 +105,6 @@ export class VariantHistory extends BaseModel<any> {
 })
 export class VariantOrg extends BaseModel<VariantsOrgs> {
   @Field(() => Org)
-  @Type(() => Org)
   org!: Org & {}
 
   @Field(() => String, {
@@ -121,7 +117,6 @@ export class VariantOrg extends BaseModel<VariantsOrgs> {
 @ObjectType({ description: 'A physical component within a variant, with its quantity' })
 export class VariantComponent extends BaseModel<VariantsComponents> {
   @Field(() => Component)
-  @Type(() => Component)
   component!: Component & {}
 
   @Field(() => Number, { nullable: true, description: 'Quantity of this component in the variant' })
@@ -135,7 +130,16 @@ export class VariantComponent extends BaseModel<VariantsComponents> {
 }
 
 @ObjectType()
-export class VariantSourcesPage extends SourcesPage {}
+export class VariantSource extends BaseModel<VariantsSources> {
+  @Field(() => Source)
+  source!: Source & {}
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: JSONObject
+}
+
+@ObjectType()
+export class VariantSourcesPage extends Paginated(VariantSource) {}
 
 @ObjectType()
 export class VariantHistoryPage extends Paginated(VariantHistory) {}

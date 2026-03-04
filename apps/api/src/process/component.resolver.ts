@@ -4,7 +4,6 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -14,6 +13,7 @@ import {
   ComponentHistoryArgs,
   ComponentHistoryPage,
   ComponentRecycleArgs,
+  ComponentSource,
   ComponentSourcesArgs,
   ComponentSourcesPage,
   ComponentsPage,
@@ -159,7 +159,12 @@ export class ComponentResolver {
   async sources(@Parent() component: Component, @Args() args: ComponentSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentSourcesArgs, args)
     const cursor = await this.componentService.sources(component.id, filter)
-    return this.transform.entityToPaginated(Source, ComponentSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(
+      ComponentSource,
+      ComponentSourcesPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @ResolveField(() => ComponentHistoryPage)

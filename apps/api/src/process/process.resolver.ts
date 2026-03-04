@@ -4,7 +4,6 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -17,6 +16,7 @@ import {
   ProcessHistoryArgs,
   ProcessHistoryPage,
   ProcessPage,
+  ProcessSource,
   ProcessSourcesArgs,
   ProcessSourcesPage,
   UpdateProcessInput,
@@ -114,7 +114,7 @@ export class ProcessResolver {
   async sources(@Parent() process: Process, @Args() args: ProcessSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessSourcesArgs, args)
     const cursor = await this.processService.sources(process.id, filter)
-    return this.transform.entityToPaginated(Source, ProcessSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(ProcessSource, ProcessSourcesPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => ProcessHistoryPage)

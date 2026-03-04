@@ -1,12 +1,10 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import {
   BaseModel,
   CreatedUpdated,
@@ -29,7 +27,6 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   id!: string
 
   @Field(() => String)
-  @Transform(translate)
   @MaxLength(1024)
   name!: string
 
@@ -40,7 +37,6 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   nameTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true, description: 'A short summary description' })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   descShort?: string
@@ -52,7 +48,6 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   descShortTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => [TranslatedOutput], {

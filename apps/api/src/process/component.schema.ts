@@ -17,10 +17,20 @@ import {
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ZService } from '@src/common/z.service'
-import { RegionIDSchema } from '@src/geo/region.model'
-import { ComponentPhysicalSchema, ComponentVisualSchema } from '@src/process/component.entity'
-import { CreateComponentInput, UpdateComponentInput } from '@src/process/component.model'
+import { TransformInput, ZService } from '@src/common/z.service'
+import { RegionIDSchema, Region as RegionModel } from '@src/geo/region.model'
+import {
+  Component as ComponentEntity,
+  ComponentHistory as ComponentHistoryEntity,
+  ComponentPhysicalSchema,
+  ComponentVisualSchema,
+} from '@src/process/component.entity'
+import {
+  Component,
+  ComponentHistory,
+  CreateComponentInput,
+  UpdateComponentInput,
+} from '@src/process/component.model'
 import { MaterialIDSchema } from '@src/process/material.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 
@@ -48,6 +58,43 @@ export class ComponentSchemaService {
     private readonly baseSchema: BaseSchemaService,
     private readonly zService: ZService,
   ) {
+    const ComponentTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ComponentEntity
+      const model = new Component()
+      model.id = entity.id
+      model.createdAt = entity.createdAt as any
+      model.updatedAt = entity.updatedAt as any
+      model.name = input.i18n.tr(entity.name)
+      model.desc = input.i18n.tr(entity.desc)
+      model.imageURL = entity.visual?.image
+      if (entity.region) {
+        const regionRef = entity.region as any
+        const regionId = regionRef.id ?? regionRef.$id
+        if (regionId) {
+          const regionModel = new RegionModel()
+          regionModel.id = regionId
+          model.region = regionModel
+        }
+      }
+      return model
+    })
+    this.zService.registerTransform(ComponentEntity, Component, ComponentTransform)
+
+    const ComponentHistoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ComponentHistoryEntity
+      const model = new ComponentHistory()
+      model.datetime = entity.datetime as any
+      model.user = (entity as any).user
+      model.original = (entity as any).original
+      model.changes = (entity as any).changes
+      return model
+    })
+    this.zService.registerTransform(
+      ComponentHistoryEntity,
+      ComponentHistory,
+      ComponentHistoryTransform,
+    )
+
     this.ComponentMaterialInputSchema = z
       .strictObject({
         id: MaterialIDSchema,
