@@ -1,5 +1,6 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import jsonld from 'jsonld'
 
 import { Source } from '@src/changes/source.entity'
 import {
@@ -8,6 +9,7 @@ import {
   UnlinkSourceInput,
   UpdateSourceInput,
 } from '@src/changes/source.model'
+import { JSONLD_CONTEXT } from '@src/changes/source.schema'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { type JSONObject } from '@src/common/z.schema'
@@ -64,26 +66,44 @@ export class SourceService {
     return true
   }
 
+  private async expandJsonLdGraph(source: Source): Promise<jsonld.NodeObject[]> {
+    const doc = source.content?.jsonld as JSONObject | undefined
+    if (!doc?.['@graph']) return []
+    return jsonld.expand(doc as jsonld.JsonLdDocument) as Promise<jsonld.NodeObject[]>
+  }
+
+  private async compactJsonLdGraph(graph: jsonld.NodeObject[]): Promise<JSONObject> {
+    const compacted = await jsonld.compact(
+      { '@graph': graph } as jsonld.JsonLdDocument,
+      JSONLD_CONTEXT,
+    )
+    // jsonld.compact flattens single-node graphs to top level; normalize to always use @graph
+    if (!compacted['@graph']) {
+      const { '@context': ctx, ...node } = compacted
+      return { '@context': ctx, '@graph': [node] } as JSONObject
+    }
+    return compacted as JSONObject
+  }
+
   async link(input: LinkSourceInput) {
     const source = await this.em.findOneOrFail(Source, { id: input.id })
-    const nodes: JSONObject[] = Array.isArray(source.content?.jsonld)
-      ? (source.content!.jsonld as JSONObject[])
-      : []
-    const idx = nodes.findIndex((n) => n['@id'] === input.jsonld['@id'])
-    if (idx >= 0) nodes[idx] = input.jsonld
-    else nodes.push(input.jsonld)
-    source.content = { ...source.content, jsonld: nodes }
+    const graph = await this.expandJsonLdGraph(source)
+    const [expanded] = await jsonld.expand(input.jsonld as jsonld.JsonLdDocument)
+    const idx = graph.findIndex((n) => n['@id'] === expanded['@id'])
+    if (idx >= 0) graph[idx] = expanded
+    else graph.push(expanded)
+    source.content = { ...source.content, jsonld: await this.compactJsonLdGraph(graph) }
     await this.em.flush()
     return { source }
   }
 
   async unlink(input: UnlinkSourceInput) {
     const source = await this.em.findOneOrFail(Source, { id: input.id })
-    if (!Array.isArray(source.content?.jsonld)) return { source }
-    const filtered = (source.content!.jsonld as JSONObject[]).filter(
-      (n) => n['@id'] !== input.jsonld['@id'],
-    )
-    source.content = { ...source.content, jsonld: filtered }
+    const graph = await this.expandJsonLdGraph(source)
+    if (graph.length === 0) return { source }
+    const targetId = input.jsonld['@id'] as string
+    const filtered = graph.filter((n) => n['@id'] !== targetId)
+    source.content = { ...source.content, jsonld: await this.compactJsonLdGraph(filtered) }
     await this.em.flush()
     return { source }
   }

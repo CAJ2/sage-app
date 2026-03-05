@@ -295,6 +295,384 @@ describe('SourceResolver (integration)', () => {
     })
   })
 
+  // LinkSource Tests
+  describe('linkSource', () => {
+    test('should link a JSON-LD node to a source', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverLinkSource($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+                content
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/m/05z87',
+              '@type': ['Thing'],
+              name: 'Plastic',
+              detailedDescription: {
+                url: 'https://en.wikipedia.org/wiki/Plastic',
+                license:
+                  'https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License',
+                articleBody:
+                  'Plastics are a wide range of synthetic or semisynthetic materials composed primarily of polymers. Their defining characteristic, plasticity, allows them to be molded, extruded, or pressed into a diverse range of solid forms. ',
+              },
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.linkSource?.source).toBeDefined()
+      expect(res.data?.linkSource?.source?.id).toBe(sourceID)
+      expect(res.data?.linkSource?.source?.content).toBeDefined()
+      const content = res.data?.linkSource?.source?.content as Record<string, unknown>
+      const doc = content.jsonld as Record<string, unknown>
+      expect(doc['@context']).toBeDefined()
+      const graph = doc['@graph'] as Array<Record<string, unknown>>
+      expect(Array.isArray(graph)).toBe(true)
+      expect(graph.some((n) => n['@id'] === 'http://g.co/kg/m/05z87')).toBe(true)
+    })
+
+    test('should replace an existing JSON-LD node with the same @id', async () => {
+      // First link
+      await gql.send(
+        graphql(`
+          mutation SourceResolverLinkFirst($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/glass',
+              '@type': 'Material',
+              name: 'Glass',
+            },
+          },
+        },
+      )
+      // Link again with same @id but different data
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverLinkReplace($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+                content
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/glass',
+              '@type': 'Material',
+              name: 'Updated Glass',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      const content = res.data?.linkSource?.source?.content as Record<string, unknown>
+      const doc = content.jsonld as Record<string, unknown>
+      const graph = doc['@graph'] as Array<Record<string, unknown>>
+      const glassNodes = graph.filter((n) => n['@id'] === 'http://g.co/kg/glass')
+      expect(glassNodes).toHaveLength(1)
+    })
+
+    test('should accept a Wikidata entity IRI', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverLinkWikidata($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+                content
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'https://www.wikidata.org/entity/Q11469',
+              '@type': 'Material',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.linkSource?.source).toBeDefined()
+      const content = res.data?.linkSource?.source?.content as Record<string, unknown>
+      const doc = content.jsonld as Record<string, unknown>
+      const graph = doc['@graph'] as Array<Record<string, unknown>>
+      expect(graph.some((n) => n['@id'] === 'wd:Q11469')).toBe(true)
+    })
+
+    test('should reject an invalid @id IRI', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverLinkInvalidId($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'https://example.com/not-valid',
+              '@type': 'Material',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeDefined()
+    })
+
+    test('should reject invalid JSON-LD document', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverLinkInvalidJsonLd($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/test',
+              '@type': 'Material',
+              '@value': 'bad',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeDefined()
+    })
+  })
+
+  // UnlinkSource Tests
+  describe('unlinkSource', () => {
+    test('should unlink a JSON-LD node from a source', async () => {
+      // First, link a node
+      await gql.send(
+        graphql(`
+          mutation SourceResolverLinkForUnlink($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/aluminum',
+              '@type': 'Material',
+              name: 'Aluminum',
+            },
+          },
+        },
+      )
+      // Now unlink it
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverUnlinkSource($input: UnlinkSourceInput!) {
+            unlinkSource(input: $input) {
+              source {
+                id
+                content
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/aluminum',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.unlinkSource?.source).toBeDefined()
+      expect(res.data?.unlinkSource?.source?.id).toBe(sourceID)
+      const content = res.data?.unlinkSource?.source?.content as Record<string, unknown>
+      const doc = content.jsonld as Record<string, unknown>
+      const graph = (doc?.['@graph'] ?? []) as Array<Record<string, unknown>>
+      expect(graph.some((n) => n['@id'] === 'http://g.co/kg/aluminum')).toBe(false)
+    })
+
+    test('should be a no-op when unlinking a non-existent @id', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverUnlinkNonExistent($input: UnlinkSourceInput!) {
+            unlinkSource(input: $input) {
+              source {
+                id
+                content
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/does-not-exist',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.unlinkSource?.source).toBeDefined()
+      expect(res.data?.unlinkSource?.source?.id).toBe(sourceID)
+    })
+
+    test('should reject an invalid @id IRI', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverUnlinkInvalidId($input: UnlinkSourceInput!) {
+            unlinkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'not-a-valid-iri',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeDefined()
+    })
+
+    test('should reject invalid JSON-LD document', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverUnlinkInvalidJsonLd($input: UnlinkSourceInput!) {
+            unlinkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/test',
+              '@value': 'bad',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeDefined()
+    })
+
+    test('should not affect other linked nodes', async () => {
+      // Link two nodes
+      await gql.send(
+        graphql(`
+          mutation SourceResolverLinkNodeA($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/steel',
+              '@type': 'Material',
+            },
+          },
+        },
+      )
+      await gql.send(
+        graphql(`
+          mutation SourceResolverLinkNodeB($input: LinkSourceInput!) {
+            linkSource(input: $input) {
+              source {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/copper',
+              '@type': 'Material',
+            },
+          },
+        },
+      )
+      // Unlink only steel
+      const res = await gql.send(
+        graphql(`
+          mutation SourceResolverUnlinkNodeA($input: UnlinkSourceInput!) {
+            unlinkSource(input: $input) {
+              source {
+                id
+                content
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: sourceID,
+            jsonld: {
+              '@id': 'http://g.co/kg/steel',
+            },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      const content = res.data?.unlinkSource?.source?.content as Record<string, unknown>
+      const doc = content.jsonld as Record<string, unknown>
+      const graph = doc['@graph'] as Array<Record<string, unknown>>
+      expect(graph.some((n) => n['@id'] === 'http://g.co/kg/steel')).toBe(false)
+      expect(graph.some((n) => n['@id'] === 'http://g.co/kg/copper')).toBe(true)
+    })
+  })
+
   // Comprehensive Update Tests
   describe('UpdateSource comprehensive field tests', () => {
     test('should update source fields', async () => {

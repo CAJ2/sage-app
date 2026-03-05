@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import jsonld from 'jsonld'
 import { z } from 'zod/v4'
 
 import { Source, SourceType } from '@src/changes/source.entity'
@@ -10,6 +11,13 @@ import {
   UpdateSourceInput,
 } from '@src/changes/source.model'
 import { TransformInput, ZService } from '@src/common/z.service'
+
+export const JSONLD_CONTEXT: jsonld.ContextDefinition = {
+  kg: 'http://g.co/kg',
+  wd: 'https://www.wikidata.org/entity/',
+}
+
+const JSONLD_IRI_PREFIXES = Object.values(JSONLD_CONTEXT) as string[]
 
 export const SourceIDSchema = z.string().meta({
   id: 'Source',
@@ -37,19 +45,31 @@ export const UpdateSourceInputJSONSchema = z.toJSONSchema(UpdateSourceInputSchem
 
 const JsonLdIdSchema = z
   .string()
-  .refine(
-    (v) => v.startsWith('http://g.co/kg/') || v.startsWith('https://www.wikidata.org/entity/Q'),
-    { message: '@id must be a Google Knowledge Graph or Wikidata entity IRI' },
-  )
+  .refine((v) => JSONLD_IRI_PREFIXES.some((prefix) => v.startsWith(prefix)), {
+    message: '@id must be a Google Knowledge Graph or Wikidata entity IRI',
+  })
+
+async function canCompactJsonLd(doc: Record<string, unknown>): Promise<boolean> {
+  try {
+    await jsonld.compact(doc as jsonld.JsonLdDocument, JSONLD_CONTEXT)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export const LinkSourceInputSchema = z.object({
   id: z.nanoid(),
-  jsonld: z.looseObject({ '@id': JsonLdIdSchema, '@type': z.string().min(1) }),
+  jsonld: z
+    .looseObject({ '@id': JsonLdIdSchema })
+    .refine(canCompactJsonLd, { message: 'jsonld must be a valid JSON-LD document' }),
 })
 
 export const UnlinkSourceInputSchema = z.object({
   id: z.nanoid(),
-  jsonld: z.looseObject({ '@id': JsonLdIdSchema }),
+  jsonld: z
+    .looseObject({ '@id': JsonLdIdSchema })
+    .refine(canCompactJsonLd, { message: 'jsonld must be a valid JSON-LD document' }),
 })
 
 const ModelTransform = z.transform((input: TransformInput) => {
