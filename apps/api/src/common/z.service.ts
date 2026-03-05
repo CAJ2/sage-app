@@ -1,5 +1,6 @@
-import { BaseEntity, Loaded } from '@mikro-orm/postgresql'
+import { BaseEntity, Loaded, Ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
+import _ from 'lodash'
 import { z, ZodObject } from 'zod/v4'
 
 import { I18nService } from '@src/common/i18n.service'
@@ -34,17 +35,17 @@ export class ZService {
     })
   }
 
-  registerTransform<M extends object>(
+  registerTransform<M extends BaseModel>(
     entity: undefined,
     model: new () => M,
     transform: z.ZodTransform<M, TransformInput>,
   ): void
-  registerTransform<E extends BaseEntity, M extends object>(
+  registerTransform<E extends BaseEntity, M extends BaseModel>(
     entity: (new () => E) | string,
     model: new () => M | string,
     transform: z.ZodTransform<M, TransformInput>,
   ): void
-  registerTransform<E extends BaseEntity, M extends object>(
+  registerTransform<E extends BaseEntity, M extends BaseModel>(
     entity: (new () => E) | string | undefined,
     model: new () => M | string,
     transform: z.ZodTransform<M, TransformInput>,
@@ -62,7 +63,7 @@ export class ZService {
     }
   }
 
-  private async transformToModel<M extends object>(
+  private async transformToModel<M extends BaseModel>(
     Model: new () => M,
     input: Loaded<any, never> | object,
     transform: TransformSchema<any>,
@@ -87,14 +88,22 @@ export class ZService {
     return modelInstance
   }
 
-  async entityToModel<E extends BaseEntity, M extends object>(
+  async entityToModel<E extends BaseEntity, M extends BaseModel>(
     Model: (new () => M) | string,
-    entity: Loaded<E, never>,
+    entity: Loaded<E, never> | Ref<E>,
   ): Promise<M> {
     const model: (new () => M) | undefined =
       typeof Model === 'string' ? (ModelRegistry[Model] as (new () => M) | undefined) : Model
     if (!model) {
       throw new Error(`No model registered for ${Model}`)
+    }
+    if (_.isPlainObject(entity)) {
+      throw new Error(
+        `Called entityToModel with plain object value: ${typeof entity}. You should probably call objectToModel instead`,
+      )
+    }
+    if (!entity.isInitialized()) {
+      throw new Error(`Entity is not initialized: ${entity.constructor.name}`)
     }
     const transform = this.transformMap.get(
       transformKey(entity.constructor.name, model.prototype.constructor.name),
@@ -106,15 +115,23 @@ export class ZService {
     }
     const result = await this.transformToModel(model, entity, transform)
     // Preserve reference to original entity (used by field resolvers that need the entity)
-    ;(result as BaseModel<E>).entity = entity
+    // ;(result as BaseModel).entity = entity
     return result
   }
 
-  async objectToModel<T, S extends object>(Model: (new () => S) | string, object: T): Promise<S> {
+  async objectToModel<T, S extends BaseModel>(
+    Model: (new () => S) | string,
+    object: T,
+  ): Promise<S> {
     const model: (new () => S) | undefined =
       typeof Model === 'string' ? (ModelRegistry[Model] as (new () => S) | undefined) : Model
     if (!model) {
       throw new Error(`No model registered for ${Model}`)
+    }
+    if (!_.isPlainObject(object)) {
+      throw new Error(
+        `Called objectToModel with non-object value: ${typeof object}. You should probably call entityToModel instead`,
+      )
     }
     const transform = this.transformMap.get(
       transformKey(undefined, model.prototype.constructor.name),

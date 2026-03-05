@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -40,6 +41,7 @@ import {
 } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
 import { OrgIDSchema } from '@src/users/org.schema'
+import { User } from '@src/users/users.model'
 
 export const VariantIDSchema = z.string().meta({
   id: 'Variant',
@@ -89,8 +91,8 @@ export class VariantSchemaService {
       const entity = input.input as VariantEntity
       const model = new Variant()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
       return model
@@ -100,9 +102,9 @@ export class VariantSchemaService {
     const VariantOrgTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as VariantsOrgs
       const model = new VariantOrg()
-      model.role = (entity as any).role
-      if ((entity as any).org) {
-        model.org = await this.zService.entityToModel(Org, (entity as any).org)
+      model.role = entity.role
+      if (entity.org) {
+        model.org = await this.zService.entityToModel(Org, entity.org)
       }
       return model
     })
@@ -111,10 +113,10 @@ export class VariantSchemaService {
     const VariantComponentTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as VariantsComponents
       const model = new VariantComponent()
-      model.quantity = (entity as any).quantity
-      model.unit = (entity as any).unit
-      if ((entity as any).component) {
-        model.component = await this.zService.entityToModel(Component, (entity as any).component)
+      model.quantity = entity.quantity
+      model.unit = entity.unit
+      if (entity.component) {
+        model.component = await this.zService.entityToModel(Component, entity.component)
       }
       return model
     })
@@ -123,10 +125,10 @@ export class VariantSchemaService {
     const VariantHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as VariantHistoryEntity
       const model = new VariantHistory()
-      model.datetime = entity.datetime as any
-      model.user = (entity as any).user
-      model.original = (entity as any).original
-      model.changes = (entity as any).changes
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Variant | undefined
+      model.changes = entity.changes as Variant | undefined
       return model
     })
     this.zService.registerTransform(VariantHistoryEntity, VariantHistory, VariantHistoryTransform)

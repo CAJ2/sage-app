@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -33,6 +34,7 @@ import {
 } from '@src/process/component.model'
 import { MaterialIDSchema } from '@src/process/material.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
+import { User } from '@src/users/users.model'
 
 export const ComponentIDSchema = z.string().meta({
   id: 'Component',
@@ -62,8 +64,8 @@ export class ComponentSchemaService {
       const entity = input.input as ComponentEntity
       const model = new Component()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
       model.imageURL = entity.visual?.image
@@ -83,10 +85,10 @@ export class ComponentSchemaService {
     const ComponentHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as ComponentHistoryEntity
       const model = new ComponentHistory()
-      model.datetime = entity.datetime as any
-      model.user = (entity as any).user
-      model.original = (entity as any).original
-      model.changes = (entity as any).changes
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Component | undefined
+      model.changes = entity.changes as Component | undefined
       return model
     })
     this.zService.registerTransform(

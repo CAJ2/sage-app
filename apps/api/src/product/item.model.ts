@@ -10,6 +10,7 @@ import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
   IDCreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
 } from '@src/graphql/base.model'
@@ -17,15 +18,15 @@ import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { TagPage } from '@src/process/tag.model'
 import { CategoriesPage } from '@src/product/category.model'
-import { Item as ItemEntity } from '@src/product/item.entity'
 import { VariantsPage } from '@src/product/variant.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'A product or consumable item that can be categorized and have multiple variants',
 })
-export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
+export class Item extends IDCreatedUpdated implements Named {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1024)
@@ -55,7 +56,7 @@ export class Item extends IDCreatedUpdated<ItemEntity> implements Named {
 registerModel('Item', Item)
 
 @ObjectType()
-export class ItemHistory extends BaseModel<any> {
+export class ItemHistory extends BaseModel {
   @Field(() => Item)
   item!: Item
 
@@ -63,7 +64,7 @@ export class ItemHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Item, { nullable: true })
   original?: Item

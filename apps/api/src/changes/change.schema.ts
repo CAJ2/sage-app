@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { CreateChangeInput } from '@src/changes/change-ext.model'
@@ -62,8 +63,8 @@ export class ChangeSchemaService {
       const entity = input.input as ChangeEntity
       const model = new Change()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.title = entity.title
       model.description = entity.description
       model.status = entity.status
@@ -80,13 +81,13 @@ export class ChangeSchemaService {
         model.original = (await this.zService.objectToModel(
           entity.entityName,
           entity.original,
-        )) as any
+        )) as typeof model.original
       }
       if (entity.changes) {
         model.changes = (await this.zService.objectToModel(
           entity.entityName,
           entity.changes,
-        )) as any
+        )) as typeof model.changes
       }
       return model
     })

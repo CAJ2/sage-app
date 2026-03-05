@@ -55,11 +55,12 @@ export class ComponentService {
     )
   }
 
-  async primaryMaterial(id: string, component?: Component) {
-    if (component) {
-      return component.primaryMaterial.load()
+  async primaryMaterial(id: string) {
+    const component = await this.em.findOne(Component, { id }, { populate: ['primaryMaterial'] })
+    if (!component) {
+      return null
     }
-    return null
+    return component.primaryMaterial.load()
   }
 
   async materials(componentId: string) {

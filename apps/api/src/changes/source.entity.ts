@@ -2,6 +2,7 @@ import { Collection, Entity, Enum, ManyToMany, ManyToOne, Property } from '@mikr
 import type { Ref } from '@mikro-orm/core'
 
 import { Change } from '@src/changes/change.entity'
+import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
@@ -53,7 +54,7 @@ export class Source extends IDCreatedUpdated {
   variants = new Collection<Variant>(this)
 
   @Property({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: JSONObject
 }
 
 @Entity({ tableName: 'external_sources', schema: 'public' })

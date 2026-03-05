@@ -7,7 +7,7 @@ import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
-import { Place as PlaceEntity } from '@src/geo/place.entity'
+import { type JSONObject } from '@src/common/z.schema'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -52,7 +52,7 @@ export class PlaceAddress {
   implements: () => [Named],
   description: 'A specific physical location, such as a business or recycling facility',
 })
-export class Place extends CreatedUpdated<PlaceEntity> implements Named {
+export class Place extends CreatedUpdated implements Named {
   @Field(() => ID)
   id!: string
 
@@ -114,7 +114,7 @@ export class PlaceTagsInput {
 
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 
 @InputType()

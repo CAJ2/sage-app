@@ -8,21 +8,22 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import {
   BaseModel,
   CreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
   TranslatedOutput,
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Category as CategoryEntity } from '@src/product/category.entity'
 import { ItemsPage } from '@src/product/item.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'A hierarchical category for classifying product items',
 })
-export class Category extends CreatedUpdated<CategoryEntity> implements Named {
+export class Category extends CreatedUpdated implements Named {
   @Field(() => ID)
   id!: string
 
@@ -81,7 +82,7 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
 registerModel('Category', Category)
 
 @ObjectType()
-export class CategoryHistory extends BaseModel<any> {
+export class CategoryHistory extends BaseModel {
   @Field(() => Category)
   category!: Category
 
@@ -89,7 +90,7 @@ export class CategoryHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Category, { nullable: true })
   original?: Category

@@ -3,12 +3,11 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { Region as RegionEntity } from '@src/geo/region.entity'
 import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 
 @ObjectType({ description: "A geographic region based on the Who's On First dataset" })
-export class Region extends CreatedUpdated<RegionEntity> {
+export class Region extends CreatedUpdated {
   @Field(() => ID)
   id!: string
 

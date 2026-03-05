@@ -1,3 +1,4 @@
+import { Reference } from '@mikro-orm/core'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
@@ -75,7 +76,7 @@ export class ComponentResolver {
 
   @ResolveField()
   async primaryMaterial(@Parent() component: Component) {
-    const material = await this.componentService.primaryMaterial(component.id, component.entity)
+    const material = await this.componentService.primaryMaterial(component.id)
     if (!material) {
       return null
     }
@@ -188,7 +189,13 @@ export class ComponentHistoryResolver {
 
   @ResolveField('user', () => User)
   async user(@Parent() history: ComponentHistory) {
-    return this.transform.objectToModel(User, history.user)
+    if (history.user instanceof User) {
+      return history.user
+    }
+    if (Reference.isReference(history.user)) {
+      history.user = await history.user.loadOrFail()
+    }
+    return this.transform.entityToModel(User, history.user)
   }
 
   @ResolveField('original', () => Component, { nullable: true })

@@ -13,19 +13,17 @@ import { Region } from '@src/geo/region.model'
 import {
   BaseModel,
   IDCreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import {
-  Component as ComponentEntity,
-  type ComponentPhysical,
-  type ComponentVisual,
-} from '@src/process/component.entity'
+import { type ComponentPhysical, type ComponentVisual } from '@src/process/component.entity'
 import { Material } from '@src/process/material.model'
 import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
 import { Tag } from '@src/process/tag.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'The fraction of a specific material within a component' })
@@ -53,7 +51,7 @@ export class ComponentRecycle {
   implements: () => [Named],
   description: 'A physical component of a product variant, made of one or more materials',
 })
-export class Component extends IDCreatedUpdated<ComponentEntity> implements Named {
+export class Component extends IDCreatedUpdated implements Named {
   @Field(() => String, { nullable: true })
   @MaxLength(1024)
   name?: string
@@ -102,7 +100,7 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
 registerModel('Component', Component)
 
 @ObjectType()
-export class ComponentHistory extends BaseModel<any> {
+export class ComponentHistory extends BaseModel {
   @Field(() => Component)
   component!: Component
 
@@ -110,7 +108,7 @@ export class ComponentHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Component, { nullable: true })
   original?: Component

@@ -1,6 +1,7 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { IsEnum, IsOptional } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
@@ -13,15 +14,17 @@ import { Region } from '@src/geo/region.model'
 import {
   BaseModel,
   IDCreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Material } from '@src/process/material.model'
-import { Process as ProcessEntity, ProcessIntent } from '@src/process/process.entity'
+import { ProcessIntent } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'Efficiency metrics for a recycling or recovery process' })
@@ -49,7 +52,7 @@ export class ProcessEfficiency {
   implements: () => [Named],
   description: 'A recycling, reuse, or disposal process for a product variant or material',
 })
-export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
+export class Process extends IDCreatedUpdated implements Named {
   @Field(() => String, {
     description: 'The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR)',
   })
@@ -103,15 +106,15 @@ export class Process extends IDCreatedUpdated<ProcessEntity> implements Named {
 registerModel('Process', Process)
 
 @ObjectType()
-export class ProcessHistory extends BaseModel<any> {
+export class ProcessHistory extends BaseModel {
   @Field(() => Process)
   process!: Process
 
   @Field(() => LuxonDateTimeResolver)
-  datetime!: Date
+  datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Process, { nullable: true })
   original?: Process
@@ -121,7 +124,7 @@ export class ProcessHistory extends BaseModel<any> {
 }
 
 @ObjectType()
-export class ProcessSource extends BaseModel<any> {
+export class ProcessSource extends BaseModel {
   @Field(() => Source)
   source!: Source & {}
 

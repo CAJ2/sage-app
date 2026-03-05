@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -23,6 +24,7 @@ import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { CategoryIDSchema } from '@src/product/category.schema'
 import { Item as ItemEntity, ItemHistory as ItemHistoryEntity } from '@src/product/item.entity'
 import { CreateItemInput, Item, ItemHistory, UpdateItemInput } from '@src/product/item.model'
+import { User } from '@src/users/users.model'
 
 export const ItemIDSchema = z.string().meta({
   id: 'Item',
@@ -52,11 +54,11 @@ export class ItemSchemaService {
       const entity = input.input as ItemEntity
       const model = new Item()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
-      model.imageURL = (entity as any).files?.thumbnail
+      model.imageURL = entity.files?.thumbnail
       return model
     })
     this.zService.registerTransform(ItemEntity, Item, ItemTransform)
@@ -64,10 +66,10 @@ export class ItemSchemaService {
     const ItemHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as ItemHistoryEntity
       const model = new ItemHistory()
-      model.datetime = entity.datetime as any
-      model.user = (entity as any).user
-      model.original = (entity as any).original
-      model.changes = (entity as any).changes
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Item | undefined
+      model.changes = entity.changes as Item | undefined
       return model
     })
     this.zService.registerTransform(ItemHistoryEntity, ItemHistory, ItemHistoryTransform)

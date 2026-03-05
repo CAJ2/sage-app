@@ -13,12 +13,24 @@ import type { Ref } from '@mikro-orm/core'
 import _ from 'lodash'
 
 import type { TranslatedField } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { MultiPolygon, MultiPolygonType } from '@src/db/custom.types'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
+
+export interface RegionProperties {
+  hierarchy: {
+    admin_level: number
+    id: number
+    placetype: string
+  }[]
+  'geom:bbox'?: string
+  'lbl:min_zoom'?: number
+  'lbl:max_zoom'?: number
+}
 
 @Entity({ tableName: 'regions', schema: 'public' })
 @Index({ properties: ['geo'], type: 'gist' })
@@ -30,7 +42,7 @@ export class Region extends IDCreatedUpdated {
   geo?: MultiPolygon
 
   @Property({ type: 'json' })
-  properties!: Record<string, any>
+  properties!: RegionProperties
 
   @Property()
   placetype!: string
@@ -54,7 +66,9 @@ export class Region extends IDCreatedUpdated {
     const hierarchy: string[] = [this.id]
     const adminLevel = this.adminLevel || 11
     if (this.properties && this.properties['hierarchy']) {
-      const hierarchyData: Record<string, string | number>[] = this.properties['hierarchy']
+      const hierarchyData: Record<string, string | number>[] = this.properties[
+        'hierarchy'
+      ] as Record<string, string | number>[]
       hierarchy.push(
         ..._.values(hierarchyData)
           .filter((item) => (item['admin_level'] as number) <= adminLevel)
@@ -79,8 +93,8 @@ export class RegionHistory extends BaseEntity {
   user!: Ref<User>
 
   @Property({ type: 'json' })
-  original?: Record<string, any>
+  original?: JSONObject
 
   @Property({ type: 'json' })
-  changes?: Record<string, any>
+  changes?: JSONObject
 }

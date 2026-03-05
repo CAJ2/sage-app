@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -32,6 +33,7 @@ import {
 import { RecyclingStream, StreamScore } from '@src/process/stream.model'
 import { VariantIDSchema } from '@src/product/variant.schema'
 import { OrgIDSchema } from '@src/users/org.schema'
+import { User } from '@src/users/users.model'
 
 export const ProcessIDSchema = z.string().meta({
   id: 'Process',
@@ -66,8 +68,8 @@ export class ProcessSchemaService {
       const entity = input.input as ProcessEntity
       const model = new Process()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.intent = entity.intent
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
@@ -118,10 +120,10 @@ export class ProcessSchemaService {
     const ProcessHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as ProcessHistoryEntity
       const model = new ProcessHistory()
-      model.datetime = entity.datetime as any
-      model.user = (entity as any).user
-      model.original = (entity as any).original
-      model.changes = (entity as any).changes
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Process | undefined
+      model.changes = entity.changes as Process | undefined
       return model
     })
     this.zService.registerTransform(ProcessHistoryEntity, ProcessHistory, ProcessHistoryTransform)

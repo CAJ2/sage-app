@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { HTTPS_OR_ICON } from '@src/common/z.schema'
@@ -40,12 +41,12 @@ export class TagSchemaService {
       const entity = input.input as TagEntity
       const model = new TagDefinition()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name) as string
       model.type = entity.type
       model.desc = input.i18n.tr(entity.desc)
-      model.metaTemplate = entity.metaTemplate as any
+      model.metaTemplate = entity.metaTemplate as unknown as typeof model.metaTemplate
       model.bgColor = entity.bgColor
       model.image = entity.image
       return model
@@ -56,12 +57,12 @@ export class TagSchemaService {
       const entity = input.input as TagEntity
       const model = new Tag()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name) as string
       model.type = entity.type
       model.desc = input.i18n.tr(entity.desc)
-      model.metaTemplate = entity.metaTemplate as any
+      model.metaTemplate = entity.metaTemplate as unknown as typeof model.metaTemplate
       model.bgColor = entity.bgColor
       model.image = entity.image
       model.meta = (entity as any).meta

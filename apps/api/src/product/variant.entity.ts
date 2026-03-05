@@ -15,6 +15,7 @@ import { z } from 'zod/v4'
 
 import { Source } from '@src/changes/source.entity'
 import { type TranslatedField } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
@@ -174,8 +175,8 @@ export class VariantHistory extends BaseEntity {
   user!: Ref<User>
 
   @Property({ type: 'json' })
-  original?: Record<string, any>
+  original?: JSONObject
 
   @Property({ type: 'json' })
-  changes?: Record<string, any>
+  changes?: JSONObject
 }

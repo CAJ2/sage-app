@@ -2,7 +2,7 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
-import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/change.entity'
+import { ChangeStatus } from '@src/changes/change.entity'
 import { EditModel, EditModelType } from '@src/changes/change.enum'
 import { Source } from '@src/changes/source.model'
 import { type JSONObject } from '@src/common/z.schema'
@@ -11,7 +11,7 @@ import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/pag
 import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'A tracked edit to a single entity within a change' })
-export class Edit extends BaseModel<ChangeEdits> {
+export class Edit extends BaseModel {
   @Field(() => String, {
     description: 'The type name of the entity being edited (e.g. Item, Component)',
   })
@@ -68,7 +68,7 @@ export class DirectEdit {
 export class ChangeEditsPage extends Paginated(Edit) {}
 
 @ObjectType({ description: 'A proposed or merged set of edits to one or more data models' })
-export class Change extends IDCreatedUpdated<ChangeEntity> {
+export class Change extends IDCreatedUpdated {
   @Field(() => String, { nullable: true })
   title?: string
 

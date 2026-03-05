@@ -1,21 +1,22 @@
 import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql'
 import { Validate } from 'class-validator'
+import { DateTime } from 'luxon'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
-import { BaseModel, IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
+import { BaseModel, IDCreatedUpdated, type ModelRef, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Org as OrgEntity } from '@src/users/org.entity'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User, UserPage } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'An organization or company on the platform',
 })
-export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
+export class Org extends IDCreatedUpdated implements Named {
   @Field(() => String)
   name!: string
 
@@ -39,15 +40,15 @@ export class Org extends IDCreatedUpdated<OrgEntity> implements Named {
 registerModel('Org', Org)
 
 @ObjectType()
-export class OrgHistory extends BaseModel<any> {
+export class OrgHistory extends BaseModel {
   @Field(() => Org)
   org!: Org
 
   @Field(() => LuxonDateTimeResolver)
-  datetime!: Date
+  datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Org, { nullable: true })
   original?: Org

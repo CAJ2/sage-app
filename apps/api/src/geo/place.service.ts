@@ -69,7 +69,8 @@ export class PlaceService {
     }
   }
 
-  async org(placeID: string, place?: Place) {
+  async org(placeID: string) {
+    const place = await this.em.findOne(Place, { id: placeID }, { populate: ['org'] })
     if (place && place.org) {
       return place.org.load()
     }

@@ -10,14 +10,13 @@ import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/bas
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { ComponentsPage } from '@src/process/component.model'
-import { Material as MaterialEntity } from '@src/process/material.entity'
 import { ProcessPage } from '@src/process/process.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'A raw or processed material that physical components are composed of',
 })
-export class Material extends CreatedUpdated<MaterialEntity> implements Named {
+export class Material extends CreatedUpdated implements Named {
   @Field(() => ID)
   id!: string
 

@@ -22,7 +22,12 @@ export class TestProcessSeeder extends Seeder {
       em.create(Region, {
         id,
         name: { en: `Region ${id}`, sv: `Region ${id} Svenska` },
-        properties: {},
+        properties: {
+          hierarchy: [],
+          'geom:bbox': '-180,-90,180,90',
+          'lbl:min_zoom': 10,
+          'lbl:max_zoom': 14,
+        },
         placetype: 'region',
         adminLevel: 4,
         createdAt: new Date(),

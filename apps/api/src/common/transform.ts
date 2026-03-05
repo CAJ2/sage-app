@@ -1,5 +1,12 @@
 import { BaseEntity } from '@mikro-orm/core'
-import type { EntityDTO, FindOptions, Loaded, ObjectQuery, QueryOrderMap } from '@mikro-orm/core'
+import type {
+  EntityDTO,
+  FindOptions,
+  Loaded,
+  ObjectQuery,
+  QueryOrderMap,
+  Ref,
+} from '@mikro-orm/core'
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
@@ -38,18 +45,18 @@ export interface CursorOptions<T> {
 export class TransformService {
   constructor(private readonly zService: ZService) {}
 
-  async entityToModel<T extends BaseEntity, S extends object>(
+  async entityToModel<T extends BaseEntity, S extends BaseModel>(
     model: new () => S,
-    entity: Loaded<T, never>,
+    entity: Loaded<T, never> | Ref<T>,
   ): Promise<S> {
     return this.zService.entityToModel(model, entity)
   }
 
-  async objectToModel<T, S extends object>(model: new () => S, object: T): Promise<S> {
+  async objectToModel<T, S extends BaseModel>(model: new () => S, object: T): Promise<S> {
     return this.zService.objectToModel(model, object)
   }
 
-  async entitiesToModels<T extends BaseEntity, S extends object>(
+  async entitiesToModels<T extends BaseEntity, S extends BaseModel>(
     model: new () => S,
     entities: Loaded<T, never>[],
   ): Promise<S[]> {
@@ -61,7 +68,7 @@ export class TransformService {
     return models
   }
 
-  async objectsToModels<T, S extends object>(model: new () => S, objects: T[]): Promise<S[]> {
+  async objectsToModels<T, S extends BaseModel>(model: new () => S, objects: T[]): Promise<S[]> {
     const models: S[] = []
     for (const obj of objects) {
       const inst = await this.zService.objectToModel(model, obj)
@@ -112,15 +119,15 @@ export class TransformService {
     return [args, options]
   }
 
-  async entityToPaginated<T extends BaseEntity, U extends object, S extends PaginatedType<U, T>>(
+  async entityToPaginated<T extends BaseEntity, U extends BaseModel, S extends PaginatedType<U>>(
     model: new () => U,
     PageModel: new () => S,
     cursor: Cursor<T, '*'>,
     options: IPaginationArgs,
-  ): Promise<PaginatedType<U, T>> {
+  ): Promise<PaginatedType<U>> {
     const page: S = new PageModel()
     const nodes: U[] = []
-    const edges: EdgeType<U, T>[] = []
+    const edges: EdgeType<U>[] = []
     const flip = options.before || options.last
     cursor.items = flip ? cursor.items.reverse() : cursor.items
     for (const item of cursor.items) {
@@ -197,11 +204,11 @@ export class TransformService {
     }
   }
 
-  async objectsToPaginated<T, S extends PaginatedType<any, any>>(
+  async objectsToPaginated<T, S extends PaginatedType<any>>(
     PageModel: new () => S,
     cursor: { items: EntityDTO<T>[]; count: number },
     skipTransform?: boolean,
-  ): Promise<PaginatedType<any, any>> {
+  ): Promise<PaginatedType<any>> {
     const entities: any[] = []
     if (skipTransform) {
       entities.push(...cursor.items)

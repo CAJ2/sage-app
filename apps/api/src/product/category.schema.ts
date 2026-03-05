@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -27,6 +28,7 @@ import {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from '@src/product/category.model'
+import { User } from '@src/users/users.model'
 
 export const CategoryIDSchema = z.string().meta({
   id: 'Category',
@@ -53,8 +55,8 @@ export class CategorySchemaService {
       const entity = input.input as CategoryEntity
       const model = new Category()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name) as string
       model.nameTr = entity.name
         ? Object.entries(entity.name).map(([key, text]) => ({
@@ -87,10 +89,10 @@ export class CategorySchemaService {
     const CategoryHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as CategoryHistoryEntity
       const model = new CategoryHistory()
-      model.datetime = entity.datetime as any
-      model.user = (entity as any).user
-      model.original = (entity as any).original
-      model.changes = (entity as any).changes
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Category | undefined
+      model.changes = entity.changes as Category | undefined
       return model
     })
     this.zService.registerTransform(

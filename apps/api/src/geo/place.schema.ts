@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import type { Edit } from '@src/changes/change.model'
@@ -11,7 +12,13 @@ import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { Place as PlaceEntity } from '@src/geo/place.entity'
-import { CreatePlaceInput, Place, PlaceAddress, UpdatePlaceInput } from '@src/geo/place.model'
+import {
+  CreatePlaceInput,
+  Place,
+  PlaceAddress,
+  PlaceLocation,
+  UpdatePlaceInput,
+} from '@src/geo/place.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { OrgIDSchema } from '@src/users/org.schema'
 
@@ -48,8 +55,8 @@ export class PlaceSchemaService {
       const entity = input.input as PlaceEntity
       const model = new Place()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
       const addressStr = input.i18n.tr(entity.address)
@@ -71,7 +78,9 @@ export class PlaceSchemaService {
         }
       }
       if (entity.location) {
-        model.location = entity.location as any
+        model.location = new PlaceLocation()
+        model.location.latitude = entity.location.latitude
+        model.location.longitude = entity.location.longitude
       }
       return model
     })

@@ -13,6 +13,7 @@ import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
   IDCreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
 } from '@src/graphql/base.model'
@@ -22,21 +23,16 @@ import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
 import { ItemsPage } from '@src/product/item.model'
-import {
-  VariantComponentUnitSchema,
-  Variant as VariantEntity,
-  VariantsComponents,
-  VariantsOrgs,
-  VariantsSources,
-} from '@src/product/variant.entity'
+import { VariantComponentUnitSchema } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'A specific variant or SKU of a product item, composed of physical components',
 })
-export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
+export class Variant extends IDCreatedUpdated implements Named {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @MaxLength(1024)
@@ -82,7 +78,7 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
 registerModel('Variant', Variant)
 
 @ObjectType()
-export class VariantHistory extends BaseModel<any> {
+export class VariantHistory extends BaseModel {
   @Field(() => Variant)
   variant!: Variant
 
@@ -90,7 +86,7 @@ export class VariantHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Variant, { nullable: true })
   original?: Variant
@@ -103,7 +99,7 @@ export class VariantHistory extends BaseModel<any> {
   description:
     'An organization associated with a variant and its role (e.g. manufacturer, importer)',
 })
-export class VariantOrg extends BaseModel<VariantsOrgs> {
+export class VariantOrg extends BaseModel {
   @Field(() => Org)
   org!: Org & {}
 
@@ -115,7 +111,7 @@ export class VariantOrg extends BaseModel<VariantsOrgs> {
 }
 
 @ObjectType({ description: 'A physical component within a variant, with its quantity' })
-export class VariantComponent extends BaseModel<VariantsComponents> {
+export class VariantComponent extends BaseModel {
   @Field(() => Component)
   component!: Component & {}
 
@@ -130,7 +126,7 @@ export class VariantComponent extends BaseModel<VariantsComponents> {
 }
 
 @ObjectType()
-export class VariantSource extends BaseModel<VariantsSources> {
+export class VariantSource extends BaseModel {
   @Field(() => Source)
   source!: Source & {}
 

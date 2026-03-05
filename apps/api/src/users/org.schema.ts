@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { TransformInput, ZService } from '@src/common/z.service'
@@ -19,8 +20,8 @@ export class OrgSchemaService {
       const entity = input.input as OrgEntity
       const model = new Org()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = entity.name
       model.slug = entity.slug
       model.desc = input.i18n.tr(entity.desc)
@@ -34,8 +35,8 @@ export class OrgSchemaService {
       const entity = input.input as UserEntity
       const model = new User()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = entity.name
       model.email = entity.email
       model.emailVerified = entity.emailVerified
@@ -49,10 +50,10 @@ export class OrgSchemaService {
     const OrgHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as OrgHistoryEntity
       const model = new OrgHistory()
-      model.datetime = entity.datetime as any
-      model.user = (entity as any).user
-      model.original = (entity as any).original
-      model.changes = (entity as any).changes
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user
+      model.original = entity.original as Org | undefined
+      model.changes = entity.changes as Org | undefined
       return model
     })
     this.zService.registerTransform(OrgHistoryEntity, OrgHistory, OrgHistoryTransform)

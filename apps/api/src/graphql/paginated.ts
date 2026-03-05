@@ -1,4 +1,3 @@
-import { BaseEntity } from '@mikro-orm/core'
 import { Type } from '@nestjs/common'
 import {
   ArgsType,
@@ -35,15 +34,12 @@ export interface IPaginatedType<T> {
   pageInfo: IPageInfoType
 }
 
-export class EdgeType<T extends BaseModel<S>, S extends BaseEntity> implements IEdgeType<T> {
+export class EdgeType<T extends BaseModel> implements IEdgeType<T> {
   cursor: string = ''
   node!: T
 }
 
-export class PaginatedType<
-  T extends BaseModel<S>,
-  S extends BaseEntity,
-> implements IPaginatedType<T> {
+export class PaginatedType<T extends BaseModel> implements IPaginatedType<T> {
   edges?: IEdgeType<T>[]
   nodes?: T[]
   totalCount: number = 0

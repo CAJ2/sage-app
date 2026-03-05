@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { TransformInput, ZService } from '@src/common/z.service'
@@ -12,15 +13,15 @@ export class RegionSchemaService {
       const entity = input.input as RegionEntity
       const model = new Region()
       model.id = entity.id
-      model.createdAt = entity.createdAt as any
-      model.updatedAt = entity.updatedAt as any
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
       model.placetype = entity.placetype
       if (entity.properties && entity.properties['geom:bbox']) {
         model.bbox = entity.properties['geom:bbox'].split(',').map(Number)
       }
-      if (entity.properties && entity.properties['lbl:minZoom']) {
-        model.minZoom = Number(entity.properties['lbl:minZoom'])
+      if (entity.properties && entity.properties['lbl:min_zoom']) {
+        model.minZoom = Number(entity.properties['lbl:min_zoom'])
       }
       return model
     })
