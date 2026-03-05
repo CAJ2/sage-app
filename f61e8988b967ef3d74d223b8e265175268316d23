@@ -1,0 +1,27 @@
+apps/api/src/changes/source.resolver.spec.ts
+  c5b6695a53c1b3d6 298-315,318,326-473,475-675
+apps/api/src/changes/source.service.ts
+  c5b6695a53c1b3d6 12,69-87,90-95,102-106
+apps/api/src/changes/source.schema.ts
+  c5b6695a53c1b3d6 2,15,17-21,48,50,52-59,65,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "f61e8988b967ef3d74d223b8e265175268316d23",
+  "prompts": {
+    "c5b6695a53c1b3d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a461cf08-cc5a-490d-baba-9a1933eeae0f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 532,
+      "total_deletions": 100,
+      "accepted_lines": 420,
+      "overriden_lines": 3
+    }
+  }
+}
