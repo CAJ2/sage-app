@@ -12,6 +12,7 @@ import {
   Component,
   ComponentHistory,
   ComponentsMaterials,
+  ComponentsSources,
   ComponentsTags,
 } from '@src/process/component.entity'
 import { CreateComponentInput, UpdateComponentInput } from '@src/process/component.model'
@@ -141,7 +142,7 @@ export class ComponentService {
       {
         id: input.id,
       },
-      { populate: ['materials', 'tags', 'componentTags'] },
+      { populate: ['materials', 'tags', 'componentTags', 'componentSources'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${input.id}" not found`)
@@ -180,11 +181,12 @@ export class ComponentService {
     return deleted
   }
 
-  async sources(componentID: string, opts: CursorOptions<Source>) {
-    opts.where.components = this.em.getReference(Component, componentID)
-    const sources = await this.em.find(Source, opts.where, opts.options)
-    const count = await this.em.count(Source, { components: opts.where.components })
-    return { items: sources, count }
+  async sources(componentID: string, opts: CursorOptions<ComponentsSources>) {
+    opts.where.component = this.em.getReference(Component, componentID)
+    opts.options.populate = ['source']
+    const items = await this.em.find(ComponentsSources, opts.where, opts.options)
+    const count = await this.em.count(ComponentsSources, { component: opts.where.component })
+    return { items, count }
   }
 
   async history(componentID: string, opts: CursorOptions<ComponentHistory>) {
@@ -207,6 +209,30 @@ export class ComponentService {
     input: Partial<CreateComponentInput & UpdateComponentInput>,
     change?: Change,
   ) {
+    if (!change && input.addSources) {
+      for (const source of input.addSources) {
+        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const existing = component.componentSources.find((cs) => cs.source.id === source.id)
+        if (existing) {
+          existing.meta = source.meta
+          this.em.persist(existing)
+        } else {
+          const pivot = new ComponentsSources()
+          pivot.component = component
+          pivot.source = sourceEntity
+          pivot.meta = source.meta
+          this.em.persist(pivot)
+        }
+      }
+    }
+    if (!change && input.removeSources) {
+      for (const sourceId of input.removeSources) {
+        const existing = component.componentSources.find((cs) => cs.source.id === sourceId)
+        if (existing) {
+          this.em.remove(existing)
+        }
+      }
+    }
     if (input.name) {
       component.name = this.i18n.addTrReq(component.name, input.name, input.lang)
     }

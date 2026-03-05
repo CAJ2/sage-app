@@ -59,4 +59,6 @@ export class UserPage extends Paginated(User) {}
 export class UserOrgsPage extends Paginated(UserOrg) {}
 
 @ArgsType()
-export class UsersOrgsArgs extends PaginationBasicArgs {}
+export class UsersOrgsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}

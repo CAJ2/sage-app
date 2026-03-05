@@ -2,9 +2,15 @@ import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { Source } from '@src/changes/source.entity'
-import { CreateSourceInput, UpdateSourceInput } from '@src/changes/source.model'
+import {
+  CreateSourceInput,
+  LinkSourceInput,
+  UnlinkSourceInput,
+  UpdateSourceInput,
+} from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
+import { type JSONObject } from '@src/common/z.schema'
 import { User } from '@src/users/users.entity'
 
 @Injectable()
@@ -56,6 +62,30 @@ export class SourceService {
     const source = await this.findOneByID(id)
     await this.em.remove(source).flush()
     return true
+  }
+
+  async link(input: LinkSourceInput) {
+    const source = await this.em.findOneOrFail(Source, { id: input.id })
+    const nodes: JSONObject[] = Array.isArray(source.content?.jsonld)
+      ? (source.content!.jsonld as JSONObject[])
+      : []
+    const idx = nodes.findIndex((n) => n['@id'] === input.jsonld['@id'])
+    if (idx >= 0) nodes[idx] = input.jsonld
+    else nodes.push(input.jsonld)
+    source.content = { ...source.content, jsonld: nodes }
+    await this.em.flush()
+    return { source }
+  }
+
+  async unlink(input: UnlinkSourceInput) {
+    const source = await this.em.findOneOrFail(Source, { id: input.id })
+    if (!Array.isArray(source.content?.jsonld)) return { source }
+    const filtered = (source.content!.jsonld as JSONObject[]).filter(
+      (n) => n['@id'] !== input.jsonld['@id'],
+    )
+    source.content = { ...source.content, jsonld: filtered }
+    await this.em.flush()
+    return { source }
   }
 
   async setFields(source: Source, input: Partial<CreateSourceInput & UpdateSourceInput>) {

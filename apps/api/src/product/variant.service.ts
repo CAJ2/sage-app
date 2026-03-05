@@ -10,7 +10,6 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { Region } from '@src/geo/region.entity'
-import { Component } from '@src/process/component.entity'
 import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
 import { Tag } from '@src/process/tag.entity'
@@ -21,6 +20,7 @@ import {
   VariantHistory,
   VariantsComponents,
   VariantsOrgs,
+  VariantsSources,
   VariantsTags,
 } from '@src/product/variant.entity'
 import { CreateVariantInput, UpdateVariantInput } from '@src/product/variant.model'
@@ -177,7 +177,17 @@ export class VariantService {
       {
         id: input.id,
       },
-      { populate: ['items', 'components', 'tags', 'orgs', 'sources', 'variantSources'] },
+      {
+        populate: [
+          'items',
+          'components',
+          'variantComponents',
+          'tags',
+          'orgs',
+          'sources',
+          'variantSources',
+        ],
+      },
     )
     if (!variant) {
       throw new Error('Variant not found')
@@ -210,11 +220,12 @@ export class VariantService {
     return deleted
   }
 
-  async sources(variantID: string, opts: CursorOptions<Source>) {
-    opts.where.variants = this.em.getReference(Variant, variantID)
-    const sources = await this.em.find(Source, opts.where, opts.options)
-    const count = await this.em.count(Source, { variants: opts.where.variants })
-    return { items: sources, count }
+  async sources(variantID: string, opts: CursorOptions<VariantsSources>) {
+    opts.where.variant = this.em.getReference(Variant, variantID)
+    opts.options.populate = ['source']
+    const items = await this.em.find(VariantsSources, opts.where, opts.options)
+    const count = await this.em.count(VariantsSources, { variant: opts.where.variant })
+    return { items, count }
   }
 
   async history(variantID: string, opts: CursorOptions<VariantHistory>) {
@@ -254,22 +265,25 @@ export class VariantService {
     }
     if (!change && input.addSources) {
       for (const source of input.addSources) {
-        const sourceEntity = await this.em.findOneOrFail(Source, {
-          id: source.id,
-        })
-        if (variant.sources.contains(ref(sourceEntity))) {
-          variant.sources.remove(ref(sourceEntity))
+        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const existing = variant.variantSources.find((vs) => vs.source.id === source.id)
+        if (existing) {
+          existing.meta = source.meta
+          this.em.persist(existing)
+        } else {
+          const pivot = new VariantsSources()
+          pivot.variant = variant
+          pivot.source = sourceEntity
+          pivot.meta = source.meta
+          this.em.persist(pivot)
         }
-        variant.sources.add(ref(sourceEntity))
       }
     }
     if (!change && input.removeSources) {
-      for (const source of input.removeSources) {
-        const sourceEntity = await this.em.findOneOrFail(Source, {
-          id: source,
-        })
-        if (variant.sources.contains(ref(sourceEntity))) {
-          variant.sources.remove(ref(sourceEntity))
+      for (const sourceId of input.removeSources) {
+        const existing = variant.variantSources.find((vs) => vs.source.id === sourceId)
+        if (existing) {
+          this.em.remove(existing)
         }
       }
     }
@@ -364,59 +378,46 @@ export class VariantService {
     }
     if (input.tags || input.addTags) {
       for (const tag of input.tags || input.addTags || []) {
-        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
-        const tagDef = await this.tagService.validateTagInput(tag)
-        const tagEx = variant.variantTags.find((t) => t.tag.id === tag.id)
-        if (tagEx) {
-          tagEx.meta = tagDef.meta
-          this.em.persist(tagEx)
-          continue
-        }
-        const tagInst = new VariantsTags()
-        tagInst.tag = tagEntity
-        tagInst.variant = variant
-        tagInst.meta = tagDef.meta
-        this.em.persist(tagInst)
+        await this.tagService.validateTagInput(tag)
       }
+      variant.variantTags = await this.editService.setOrAddPivot(
+        variant.id,
+        change?.id,
+        variant.variantTags,
+        Variant,
+        VariantsTags,
+        input.tags,
+        input.addTags,
+      )
     }
     if (input.removeTags) {
-      for (const tag of input.removeTags) {
-        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag })
-        variant.tags.remove(ref(tagEntity))
-      }
+      variant.variantTags = await this.editService.removeFromPivot(
+        change?.id,
+        variant.variantTags,
+        Variant,
+        VariantsTags,
+        input.removeTags,
+      )
     }
     if (input.components || input.addComponents) {
-      for (const component of input.components || input.addComponents || []) {
-        if (!change) {
-          const comp = await this.em.findOneOrFail(Component, {
-            id: component.id,
-          })
-          if (variant.components.contains(ref(comp))) {
-            variant.components.remove(ref(comp))
-          }
-          variant.components.add(ref(comp))
-        } else {
-          const comp = await this.editService.findRefWithChange(change, Component, {
-            id: component.id,
-          })
-          variant.components.add(comp)
-        }
-      }
+      variant.variantComponents = await this.editService.setOrAddPivot(
+        variant.id,
+        change?.id,
+        variant.variantComponents,
+        Variant,
+        VariantsComponents,
+        input.components,
+        input.addComponents,
+      )
     }
     if (input.removeComponents) {
-      for (const component of input.removeComponents) {
-        if (!change) {
-          const comp = await this.em.findOneOrFail(Component, {
-            id: component,
-          })
-          variant.components.remove(ref(comp))
-        } else {
-          const comp = await this.editService.findRefWithChange(change, Component, {
-            id: component,
-          })
-          variant.components.remove(comp)
-        }
-      }
+      variant.variantComponents = await this.editService.removeFromPivot(
+        change?.id,
+        variant.variantComponents,
+        Variant,
+        VariantsComponents,
+        input.removeComponents,
+      )
     }
   }
 }

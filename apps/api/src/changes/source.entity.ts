@@ -1,5 +1,6 @@
 import { Collection, Entity, Enum, ManyToMany, ManyToOne, Property } from '@mikro-orm/core'
 import type { Ref } from '@mikro-orm/core'
+import { z } from 'zod/v4'
 
 import { Change } from '@src/changes/change.entity'
 import { type JSONObject } from '@src/common/z.schema'
@@ -21,6 +22,15 @@ export enum SourceType {
   OTHER = 'OTHER',
 }
 
+export const ContentSchema = z.object({
+  text: z.string().optional(),
+  context: z.string().optional(),
+  icon: z.string().optional(),
+  jsonld: z.json().optional(),
+})
+
+export type Content = z.infer<typeof ContentSchema>
+
 @Entity({ tableName: 'sources', schema: 'public' })
 export class Source extends IDCreatedUpdated {
   @Enum(() => SourceType)
@@ -33,7 +43,7 @@ export class Source extends IDCreatedUpdated {
   location?: string
 
   @Property({ type: 'json', nullable: true })
-  content?: any
+  content?: Content
 
   @Property()
   contentURL?: string

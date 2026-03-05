@@ -105,10 +105,11 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
   }
 
   private logError(exception: unknown) {
-    this.posthog.captureException(exception)
-    if (!['PRODUCTION', 'TEST'].includes((process.env.NODE_ENV || '').toUpperCase())) {
+    if (process.env.NODE_ENV !== 'production') {
       // oxlint-disable-next-line no-console
       console.error('Unhandled exception:', exception)
+    } else {
+      this.posthog.captureException(exception)
     }
   }
 }

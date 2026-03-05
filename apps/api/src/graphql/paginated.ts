@@ -8,7 +8,6 @@ import {
   PickType,
   registerEnumType,
 } from '@nestjs/graphql'
-import { IsOptional } from 'class-validator'
 import { z } from 'zod/v4'
 
 import { BaseModel } from '@src/graphql/base.model'
@@ -159,8 +158,16 @@ export function PaginationOrderArgs(
 
   @ArgsType()
   class PaginationOrderArgs extends PaginationBasicArgs {
+    static schema = PaginationBasicArgs.schema.extend({
+      order: z
+        .union([
+          z.array(z.record(z.string(), z.enum(OrderDirection))),
+          z.record(z.string(), z.enum(OrderDirection)),
+        ])
+        .optional(),
+    })
+
     @Field(() => [OrderType], { nullable: true })
-    @IsOptional()
     order?: Record<string, OrderDirection>[] | Record<string, OrderDirection>
   }
   return PaginationOrderArgs as Type<IPaginationArgs>

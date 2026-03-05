@@ -4,7 +4,9 @@ import { z } from 'zod/v4'
 import { Source, SourceType } from '@src/changes/source.entity'
 import {
   CreateSourceInput,
+  LinkSourceInput,
   Source as SourceModel,
+  UnlinkSourceInput,
   UpdateSourceInput,
 } from '@src/changes/source.model'
 import { TransformInput, ZService } from '@src/common/z.service'
@@ -33,6 +35,23 @@ export const UpdateSourceInputSchema = z.object({
 })
 export const UpdateSourceInputJSONSchema = z.toJSONSchema(UpdateSourceInputSchema)
 
+const JsonLdIdSchema = z
+  .string()
+  .refine(
+    (v) => v.startsWith('http://g.co/kg/') || v.startsWith('https://www.wikidata.org/entity/Q'),
+    { message: '@id must be a Google Knowledge Graph or Wikidata entity IRI' },
+  )
+
+export const LinkSourceInputSchema = z.object({
+  id: z.nanoid(),
+  jsonld: z.looseObject({ '@id': JsonLdIdSchema, '@type': z.string().min(1) }),
+})
+
+export const UnlinkSourceInputSchema = z.object({
+  id: z.nanoid(),
+  jsonld: z.looseObject({ '@id': JsonLdIdSchema }),
+})
+
 const ModelTransform = z.transform((input: TransformInput) => {
   const entity = input.input as Source
   const model = new SourceModel()
@@ -60,5 +79,13 @@ export class SourceSchemaService {
 
   async parseUpdateInput(input: UpdateSourceInput): Promise<UpdateSourceInput> {
     return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseLinkInput(input: LinkSourceInput): Promise<LinkSourceInput> {
+    return this.zService.parse(LinkSourceInputSchema, input as any) as Promise<LinkSourceInput>
+  }
+
+  async parseUnlinkInput(input: UnlinkSourceInput): Promise<UnlinkSourceInput> {
+    return this.zService.parse(UnlinkSourceInputSchema, input as any) as Promise<UnlinkSourceInput>
   }
 }

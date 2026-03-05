@@ -80,19 +80,29 @@ export class ItemHistoryPage extends Paginated(ItemHistory) {}
 export class ItemsPage extends Paginated(Item) {}
 
 @ArgsType()
-export class ItemHistoryArgs extends PaginationBasicArgs {}
+export class ItemHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ItemsArgs extends PaginationBasicArgs {}
+export class ItemsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ItemCategoriesArgs extends PaginationBasicArgs {}
+export class ItemCategoriesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ItemTagsArgs extends PaginationBasicArgs {}
+export class ItemTagsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ItemVariantsArgs extends PaginationBasicArgs {}
+export class ItemVariantsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @InputType()
 export class ItemCategoriesInput {

@@ -7,6 +7,7 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
+import { Source as SourceModel } from '@src/changes/source.model'
 import {
   BaseSchemaService,
   ImageOrIconSchema,
@@ -30,6 +31,7 @@ import {
   VariantHistory as VariantHistoryEntity,
   VariantsComponents,
   VariantsOrgs,
+  VariantsSources,
 } from '@src/product/variant.entity'
 import {
   CreateVariantInput,
@@ -38,6 +40,7 @@ import {
   VariantComponent,
   VariantHistory,
   VariantOrg,
+  VariantSource,
 } from '@src/product/variant.model'
 import { Org } from '@src/users/org.model'
 import { OrgIDSchema } from '@src/users/org.schema'
@@ -132,6 +135,17 @@ export class VariantSchemaService {
       return model
     })
     this.zService.registerTransform(VariantHistoryEntity, VariantHistory, VariantHistoryTransform)
+
+    const VariantSourceTransform = z.transform(async (input: TransformInput) => {
+      const entity = input.input as VariantsSources
+      const model = new VariantSource()
+      model.meta = entity.meta
+      if (entity.source) {
+        model.source = await this.zService.entityToModel(SourceModel, entity.source as any)
+      }
+      return model
+    })
+    this.zService.registerTransform(VariantsSources, VariantSource, VariantSourceTransform)
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),

@@ -438,9 +438,12 @@ export class EditService {
           )
         }
         // Find the actual pivot entities to remove
-        const pivotItems = collection.getItems().filter((item: any) => {
-          return toRemove.includes(item[relField]?.id || item[relField])
-        })
+        const pivotItems = await collection.matching({
+          where: { [relField]: { $in: toRemove } },
+        } as any)
+        if (!collection.isInitialized()) {
+          await collection.init({ ref: true })
+        }
         collection.remove(pivotItems)
       } else {
         const foundItem = await this.em.findOne(relEntity, { id: toRemove } as any, {

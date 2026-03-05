@@ -7,6 +7,7 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
+import { Source as SourceModel } from '@src/changes/source.model'
 import { BaseSchemaService, runAjvValidator, stripNulls, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
@@ -22,12 +23,14 @@ import {
   ProcessInstructionsSchema,
   ProcessIntent,
   ProcessRulesSchema,
+  ProcessSources,
 } from '@src/process/process.entity'
 import {
   CreateProcessInput,
   Process,
   ProcessEfficiency,
   ProcessHistory,
+  ProcessSource,
   UpdateProcessInput,
 } from '@src/process/process.model'
 import { RecyclingStream, StreamScore } from '@src/process/stream.model'
@@ -127,6 +130,17 @@ export class ProcessSchemaService {
       return model
     })
     this.zService.registerTransform(ProcessHistoryEntity, ProcessHistory, ProcessHistoryTransform)
+
+    const ProcessSourceTransform = z.transform(async (input: TransformInput) => {
+      const entity = input.input as ProcessSources
+      const model = new ProcessSource()
+      model.meta = entity.meta
+      if (entity.source) {
+        model.source = await this.zService.entityToModel(SourceModel, entity.source as any)
+      }
+      return model
+    })
+    this.zService.registerTransform(ProcessSources, ProcessSource, ProcessSourceTransform)
 
     this.ProcessMaterialInputSchema = z.strictObject({
       id: MaterialIDSchema,

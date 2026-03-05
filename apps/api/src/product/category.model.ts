@@ -106,13 +106,19 @@ export class CategoryHistoryPage extends Paginated(CategoryHistory) {}
 export class CategoriesPage extends Paginated(Category) {}
 
 @ArgsType()
-export class CategoryHistoryArgs extends PaginationBasicArgs {}
+export class CategoryHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class CategoriesArgs extends PaginationBasicArgs {}
+export class CategoriesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class CategoryItemsArgs extends PaginationBasicArgs {}
+export class CategoryItemsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @InputType()
 export class CreateCategoryInput extends ChangeInputWithLang {
