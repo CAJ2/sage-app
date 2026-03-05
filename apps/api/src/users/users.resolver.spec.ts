@@ -57,6 +57,8 @@ describe('UsersResolver (integration)', () => {
     expect(res.data?.user).toBeTruthy()
     expect(res.data?.user?.id).toBe(userID)
     expect(res.data?.user?.username).toBe('admin')
+    expect(res.data?.user?.email).toBe('admin@sageleaf.app')
+    expect(res.data?.user?.name).toBe('Admin')
   })
 
   test('should query user orgs with pagination', async () => {
@@ -102,6 +104,7 @@ describe('UsersResolver (integration)', () => {
     expect(res.data?.me).toBeTruthy()
     expect(res.data?.me?.id).toBe(userID)
     expect(res.data?.me?.username).toBe('admin')
+    expect(res.data?.me?.email).toBe('admin@sageleaf.app')
   })
 
   test('me query should return an error when unauthenticated', async () => {
@@ -132,5 +135,6 @@ describe('UsersResolver (integration)', () => {
     )
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('User not found')
+    expect(res.errors?.[0].extensions?.code).toBe('NOT_FOUND')
   })
 })

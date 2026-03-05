@@ -58,6 +58,8 @@ describe('ProcessResolver (integration)', () => {
     )
     expect(res.data?.processes).toBeTruthy()
     expect(Array.isArray(res.data?.processes.nodes)).toBe(true)
+    expect(typeof res.data?.processes.totalCount).toBe('number')
+    expect(res.data?.processes.pageInfo.hasNextPage).toBe(false)
   })
 
   test('should query process schema', async () => {
@@ -122,6 +124,7 @@ describe('ProcessResolver (integration)', () => {
     )
     expect(res.data?.process).toBeTruthy()
     expect(res.data?.process?.id).toBe(processID)
+    expect(res.data?.process?.name).toBe('Test Process')
   })
 
   test('should update a process', async () => {
@@ -160,6 +163,7 @@ describe('ProcessResolver (integration)', () => {
     )
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Process not found')
+    expect(res.errors?.[0].extensions?.code).toBe('NOT_FOUND')
   })
 
   describe('history tracking', () => {

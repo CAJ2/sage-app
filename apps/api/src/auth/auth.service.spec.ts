@@ -27,4 +27,16 @@ describe('AuthService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
+
+  it('api getter returns the auth api object', () => {
+    const api = service.api
+    expect(api).toBeDefined()
+    expect(typeof api).toBe('object')
+  })
+
+  it('instance getter returns the full auth instance', () => {
+    const instance = service.instance
+    expect(instance).toBeDefined()
+    expect(instance.api).toBe(service.api)
+  })
 })

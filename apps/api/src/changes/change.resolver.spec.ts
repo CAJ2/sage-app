@@ -77,6 +77,8 @@ describe('ChangeResolver (integration)', () => {
     )
     expect(res.data?.changes.nodes?.length).toBeGreaterThan(0)
     expect(res.data?.changes.nodes?.at(0)).toHaveProperty('id')
+    expect(res.data?.changes.nodes?.[0].title).toBeDefined()
+    expect(res.data?.changes.totalCount).toBeGreaterThanOrEqual(1)
   })
 
   test('should query a single change', async () => {
@@ -94,6 +96,7 @@ describe('ChangeResolver (integration)', () => {
     )
     expect(res.data?.change).toBeTruthy()
     expect(res.data?.change?.id).toBe(changeID)
+    expect(res.data?.change?.title).toBe('Test Change')
   })
 
   test('should create a change', async () => {
