@@ -83,7 +83,7 @@ export class TransformService {
   ): Promise<[T, CursorOptions<any>]> {
     const result = await cls.schema.safeParseAsync(argsObj)
     if (!result.success) {
-      throw new GraphQLError(result.error.toString())
+      throw result.error
     }
     const args = plainToInstance(cls, result.data)
     const where: ObjectQuery<any> = {}

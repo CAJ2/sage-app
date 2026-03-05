@@ -150,16 +150,28 @@ export class VariantOrgsPage extends Paginated(VariantOrg) {}
 export class VariantComponentsPage extends Paginated(VariantComponent) {}
 
 @ArgsType()
-export class VariantHistoryArgs extends PaginationBasicArgs {}
+export class VariantHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class VariantSourcesArgs extends PaginationBasicArgs {}
+export class VariantSourcesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+
+  orderBy(): string[] {
+    return ['source']
+  }
+}
 
 @ArgsType()
-export class VariantsArgs extends PaginationBasicArgs {}
+export class VariantsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
 export class VariantComponentsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+
   orderBy(): string[] {
     return ['component']
   }
@@ -167,19 +179,29 @@ export class VariantComponentsArgs extends PaginationBasicArgs {
 
 @ArgsType()
 export class VariantOrgsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+
   orderBy(): string[] {
     return ['org']
   }
 }
 
 @ArgsType()
-export class VariantTagsArgs extends PaginationBasicArgs {}
+export class VariantTagsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class VariantItemsArgs extends PaginationBasicArgs {}
+export class VariantItemsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
 export class VariantRecycleArgs {
+  static schema = z.object({
+    regionID: z.string().optional(),
+  })
+
   @Field(() => ID, { nullable: true })
   regionID?: string
 }

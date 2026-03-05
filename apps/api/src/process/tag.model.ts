@@ -60,13 +60,17 @@ registerModel('Tag', Tag)
 export class TagDefinitionPage extends Paginated(TagDefinition) {}
 
 @ArgsType()
-export class TagDefinitionArgs extends PaginationBasicArgs {}
+export class TagDefinitionArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ObjectType()
 export class TagPage extends Paginated(Tag) {}
 
 @ArgsType()
-export class TagArgs extends PaginationBasicArgs {}
+export class TagArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 export const TagDefinitionIDSchema = z.string().meta({
   id: 'TagDefinition',

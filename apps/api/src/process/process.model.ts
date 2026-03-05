@@ -142,10 +142,18 @@ export class ProcessHistoryPage extends Paginated(ProcessHistory) {}
 export class ProcessPage extends Paginated(Process) {}
 
 @ArgsType()
-export class ProcessHistoryArgs extends PaginationBasicArgs {}
+export class ProcessHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ProcessSourcesArgs extends PaginationBasicArgs {}
+export class ProcessSourcesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+
+  orderBy(): string[] {
+    return ['source']
+  }
+}
 
 @ArgsType()
 export class ProcessArgs extends PaginationBasicArgs {

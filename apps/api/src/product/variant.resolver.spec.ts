@@ -824,10 +824,7 @@ describe('VariantResolver (integration)', () => {
       expect(res.data?.updateVariant?.change?.status).toBe('DRAFT')
     })
 
-    test.skip('should add and remove tags', async () => {
-      // NOTE: Skipped - requires special database state and collection initialization
-      // Tags collection may not exist for this test variant
-      // First add tags
+    test('should add and remove tags', async () => {
       const addRes = await gql.send(
         graphql(`
           mutation UpdateVariantAddTags($input: UpdateVariantInput!) {
@@ -876,10 +873,7 @@ describe('VariantResolver (integration)', () => {
       expect(removeRes.data?.updateVariant?.variant).toBeDefined()
     })
 
-    test.skip('should add and remove orgs', async () => {
-      // NOTE: Skipped - requires special database state and collection initialization
-      // Orgs collection may not exist for this test variant
-      // First add orgs
+    test('should add and remove orgs', async () => {
       const addRes = await gql.send(
         graphql(`
           mutation UpdateVariantAddOrgs($input: UpdateVariantInput!) {
@@ -962,6 +956,34 @@ describe('VariantResolver (integration)', () => {
       expect(res.data?.variant1?.variant?.name).toBe('Batch Variant 1')
       expect(res.data?.variant2?.variant).toBeDefined()
       expect(res.data?.variant2?.variant?.name).toBe('Batch Variant 2')
+    })
+  })
+
+  describe('sources', () => {
+    test('should query variant sources with source id', async () => {
+      const res = await gql.send(
+        graphql(`
+          query VariantResolverGetVariantSources($id: ID!, $first: Int) {
+            variant(id: $id) {
+              id
+              sources(first: $first) {
+                nodes {
+                  source {
+                    id
+                  }
+                  meta
+                }
+                totalCount
+              }
+            }
+          }
+        `),
+        { id: variantID, first: 10 },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.variant?.sources).toBeDefined()
+      expect(Array.isArray(res.data?.variant?.sources.nodes)).toBe(true)
+      expect(res.data?.variant?.sources.nodes?.[0]?.source?.id).toBeDefined()
     })
   })
 

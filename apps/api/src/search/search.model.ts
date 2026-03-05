@@ -76,6 +76,8 @@ export const SearchArgsSchema = z.object({
 
 @ArgsType()
 export class SearchArgs {
+  static schema = SearchArgsSchema
+
   @Field(() => String)
   query!: string
 

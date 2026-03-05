@@ -65,10 +65,14 @@ export class OrgHistoryPage extends Paginated(OrgHistory) {}
 export class OrgsPage extends Paginated(Org) {}
 
 @ArgsType()
-export class OrgHistoryArgs extends PaginationBasicArgs {}
+export class OrgHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class OrgUsersArgs extends PaginationBasicArgs {}
+export class OrgUsersArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @InputType()
 export class CreateOrgInput extends ChangeInputWithLang {

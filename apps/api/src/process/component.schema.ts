@@ -7,6 +7,7 @@ import { z } from 'zod/v4'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
+import { Source as SourceModel } from '@src/changes/source.model'
 import {
   BaseSchemaService,
   ImageOrIconSchema,
@@ -24,11 +25,13 @@ import {
   Component as ComponentEntity,
   ComponentHistory as ComponentHistoryEntity,
   ComponentPhysicalSchema,
+  ComponentsSources,
   ComponentVisualSchema,
 } from '@src/process/component.entity'
 import {
   Component,
   ComponentHistory,
+  ComponentSource,
   CreateComponentInput,
   UpdateComponentInput,
 } from '@src/process/component.model'
@@ -96,6 +99,17 @@ export class ComponentSchemaService {
       ComponentHistory,
       ComponentHistoryTransform,
     )
+
+    const ComponentSourceTransform = z.transform(async (input: TransformInput) => {
+      const entity = input.input as ComponentsSources
+      const model = new ComponentSource()
+      model.meta = entity.meta
+      if (entity.source) {
+        model.source = await this.zService.entityToModel(SourceModel, entity.source as any)
+      }
+      return model
+    })
+    this.zService.registerTransform(ComponentsSources, ComponentSource, ComponentSourceTransform)
 
     this.ComponentMaterialInputSchema = z
       .strictObject({

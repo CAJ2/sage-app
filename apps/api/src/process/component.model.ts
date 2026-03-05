@@ -136,13 +136,28 @@ export class ComponentHistoryPage extends Paginated(ComponentHistory) {}
 export class ComponentsPage extends Paginated(Component) {}
 
 @ArgsType()
-export class ComponentHistoryArgs extends PaginationBasicArgs {}
+export class ComponentHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ComponentTagsArgs extends PaginationBasicArgs {}
+export class ComponentTagsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ComponentSourcesArgs extends PaginationBasicArgs {}
+export class ComponentSourcesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    type: z.string().optional(),
+  })
+
+  @Field(() => String, { nullable: true })
+  type?: string
+
+  orderBy(): string[] {
+    return ['source']
+  }
+}
 
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {
@@ -160,6 +175,10 @@ export class ComponentsArgs extends PaginationBasicArgs {
 
 @ArgsType()
 export class ComponentRecycleArgs {
+  static schema = z.object({
+    regionID: z.string().optional(),
+  })
+
   @Field(() => ID, { nullable: true })
   @IsOptional()
   regionID?: string

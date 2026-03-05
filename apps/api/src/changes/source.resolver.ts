@@ -6,10 +6,14 @@ import {
   CreateSourceInput,
   CreateSourceOutput,
   DeleteSourceOutput,
+  LinkSourceInput,
+  LinkSourceOutput,
   MarkSourceProcessedOutput,
   Source,
   SourcesArgs,
   SourcesPage,
+  UnlinkSourceInput,
+  UnlinkSourceOutput,
   UpdateSourceInput,
   UpdateSourceOutput,
 } from '@src/changes/source.model'
@@ -81,5 +85,21 @@ export class SourceResolver {
     return {
       success: true,
     }
+  }
+
+  @Mutation(() => LinkSourceOutput)
+  async linkSource(@Args('input') input: LinkSourceInput): Promise<LinkSourceOutput> {
+    const parsed = await this.sourceSchemaService.parseLinkInput(input)
+    const result = await this.sourceService.link(parsed)
+    const model = await this.transform.entityToModel(Source, result.source)
+    return { source: model }
+  }
+
+  @Mutation(() => UnlinkSourceOutput)
+  async unlinkSource(@Args('input') input: UnlinkSourceInput): Promise<UnlinkSourceOutput> {
+    const parsed = await this.sourceSchemaService.parseUnlinkInput(input)
+    const result = await this.sourceService.unlink(parsed)
+    const model = await this.transform.entityToModel(Source, result.source)
+    return { source: model }
   }
 }

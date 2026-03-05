@@ -11,7 +11,7 @@ import { CursorOptions } from '@src/common/transform'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
-import { Process, ProcessHistory } from '@src/process/process.entity'
+import { Process, ProcessHistory, ProcessSources } from '@src/process/process.entity'
 import { CreateProcessInput, UpdateProcessInput } from '@src/process/process.model'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
@@ -89,6 +89,7 @@ export class ProcessService {
       {
         id: input.id,
       },
+      { populate: ['processSources'] },
     )
     if (!process) {
       throw new Error(`Process with ID "${input.id}" not found`)
@@ -127,11 +128,12 @@ export class ProcessService {
     return deleted
   }
 
-  async sources(processID: string, opts: CursorOptions<Source>) {
-    opts.where.processes = this.em.getReference(Process, processID)
-    const sources = await this.em.find(Source, opts.where, opts.options)
-    const count = await this.em.count(Source, { processes: opts.where.processes })
-    return { items: sources, count }
+  async sources(processID: string, opts: CursorOptions<ProcessSources>) {
+    opts.where.process = this.em.getReference(Process, processID)
+    opts.options.populate = ['source']
+    const items = await this.em.find(ProcessSources, opts.where, opts.options)
+    const count = await this.em.count(ProcessSources, { process: opts.where.process })
+    return { items, count }
   }
 
   async history(processID: string, opts: CursorOptions<ProcessHistory>) {
@@ -154,6 +156,30 @@ export class ProcessService {
     input: Partial<CreateProcessInput & UpdateProcessInput>,
     change?: Change,
   ) {
+    if (!change && input.addSources) {
+      for (const source of input.addSources) {
+        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const existing = process.processSources.find((ps) => ps.source.id === source.id)
+        if (existing) {
+          existing.meta = source.meta
+          this.em.persist(existing)
+        } else {
+          const pivot = new ProcessSources()
+          pivot.process = process
+          pivot.source = sourceEntity
+          pivot.meta = source.meta
+          this.em.persist(pivot)
+        }
+      }
+    }
+    if (!change && input.removeSources) {
+      for (const sourceId of input.removeSources) {
+        const existing = process.processSources.find((ps) => ps.source.id === sourceId)
+        if (existing) {
+          this.em.remove(existing)
+        }
+      }
+    }
     if (input.intent) {
       process.intent = input.intent
     }

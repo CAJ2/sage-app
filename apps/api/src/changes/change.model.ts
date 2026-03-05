@@ -125,10 +125,17 @@ export class ChangesArgs extends PaginationBasicArgs {
 }
 
 @ArgsType()
-export class ChangeSourcesArgs extends PaginationBasicArgs {}
+export class ChangeSourcesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
 export class ChangeEditsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    id: z.string().optional(),
+    type: z.enum(EditModelType).optional(),
+  })
+
   @Field(() => ID, { nullable: true })
   id?: string
 
@@ -138,6 +145,12 @@ export class ChangeEditsArgs extends PaginationBasicArgs {
 
 @ArgsType()
 export class DirectEditArgs {
+  static schema = z.object({
+    id: z.string().optional(),
+    entityName: z.string().optional(),
+    changeID: z.string().optional(),
+  })
+
   @Field(() => ID, { nullable: true })
   id?: string
 

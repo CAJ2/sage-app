@@ -1,4 +1,5 @@
 import { ArgsType, Field, ID, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
+import { Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
@@ -6,6 +7,7 @@ import { z } from 'zod/v4'
 import { ChangesPage } from '@src/changes/change.model'
 import { SourceType } from '@src/changes/source.entity'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -125,6 +127,38 @@ export class UpdateSourceOutput {
 export class DeleteSourceOutput {
   @Field(() => Boolean, { nullable: true })
   success?: boolean
+}
+
+@InputType()
+export class LinkSourceInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+
+  @Field(() => JSONObjectResolver, { description: 'JSON-LD document with @id and @type' })
+  jsonld!: JSONObject
+}
+
+@InputType()
+export class UnlinkSourceInput {
+  @Field(() => ID)
+  @Validate(IsNanoID)
+  id!: string
+
+  @Field(() => JSONObjectResolver, { description: 'JSON-LD document identifying the node by @id' })
+  jsonld!: JSONObject
+}
+
+@ObjectType()
+export class LinkSourceOutput {
+  @Field(() => Source, { nullable: true })
+  source?: Source & {}
+}
+
+@ObjectType()
+export class UnlinkSourceOutput {
+  @Field(() => Source, { nullable: true })
+  source?: Source & {}
 }
 
 @ObjectType()

@@ -55,10 +55,16 @@ export class RegionHistory {
 export class RegionsPage extends Paginated(Region) {}
 
 @ArgsType()
-export class RegionsArgs extends PaginationBasicArgs {}
+export class RegionsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
 export class RegionsSearchByPointArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    latlong: z.array(z.number()),
+  })
+
   @Field(() => [Number])
   latlong!: number[]
 }

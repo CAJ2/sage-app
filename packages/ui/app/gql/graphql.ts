@@ -290,6 +290,7 @@ export type ComponentSourcesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -817,6 +818,17 @@ export type ItemsPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type LinkSourceInput = {
+  id: Scalars['ID']['input'];
+  /** JSON-LD document with @id and @type */
+  jsonld: Scalars['JSONObject']['input'];
+};
+
+export type LinkSourceOutput = {
+  __typename?: 'LinkSourceOutput';
+  source?: Maybe<Source>;
+};
+
 export type MarkSourceProcessedOutput = {
   __typename?: 'MarkSourceProcessedOutput';
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -964,8 +976,10 @@ export type Mutation = {
   deleteSource?: Maybe<DeleteSourceOutput>;
   deleteVariant?: Maybe<DeleteOutput>;
   discardEdit?: Maybe<DiscardEditOutput>;
+  linkSource: LinkSourceOutput;
   markSourceProcessed?: Maybe<MarkSourceProcessedOutput>;
   mergeChange?: Maybe<MergeChangeOutput>;
+  unlinkSource: UnlinkSourceOutput;
   updateCategory?: Maybe<UpdateCategoryOutput>;
   updateChange?: Maybe<UpdateChangeOutput>;
   updateComponent?: Maybe<UpdateComponentOutput>;
@@ -1064,6 +1078,11 @@ export type MutationDiscardEditArgs = {
 };
 
 
+export type MutationLinkSourceArgs = {
+  input: LinkSourceInput;
+};
+
+
 export type MutationMarkSourceProcessedArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1071,6 +1090,11 @@ export type MutationMarkSourceProcessedArgs = {
 
 export type MutationMergeChangeArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUnlinkSourceArgs = {
+  input: UnlinkSourceInput;
 };
 
 
@@ -1859,6 +1883,17 @@ export type TranslatedOutput = {
   /** BCP 47 language code (e.g. "en", "fr-CA") */
   lang: Scalars['String']['output'];
   text?: Maybe<Scalars['String']['output']>;
+};
+
+export type UnlinkSourceInput = {
+  id: Scalars['ID']['input'];
+  /** JSON-LD document identifying the node by @id */
+  jsonld: Scalars['JSONObject']['input'];
+};
+
+export type UnlinkSourceOutput = {
+  __typename?: 'UnlinkSourceOutput';
+  source?: Maybe<Source>;
 };
 
 export type UpdateCategoryInput = {

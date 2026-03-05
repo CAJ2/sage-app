@@ -104,7 +104,9 @@ export class PlaceHistory {
 export class PlacesPage extends Paginated(Place) {}
 
 @ArgsType()
-export class PlacesArgs extends PaginationBasicArgs {}
+export class PlacesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @InputType()
 export class PlaceTagsInput {

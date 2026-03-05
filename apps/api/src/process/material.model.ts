@@ -83,16 +83,24 @@ export class MaterialHistory {
 export class MaterialsPage extends Paginated(Material) {}
 
 @ArgsType()
-export class MaterialsArgs extends PaginationBasicArgs {}
+export class MaterialsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class PrimaryComponentsArgs extends PaginationBasicArgs {}
+export class PrimaryComponentsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ComponentsArgs extends PaginationBasicArgs {}
+export class ComponentsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
-export class ProcessesArgs extends PaginationBasicArgs {}
+export class ProcessesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 export const MaterialIDSchema = z.string().meta({
   id: 'Material',

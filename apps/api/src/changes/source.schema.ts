@@ -1,13 +1,23 @@
 import { Injectable } from '@nestjs/common'
+import jsonld from 'jsonld'
 import { z } from 'zod/v4'
 
 import { Source, SourceType } from '@src/changes/source.entity'
 import {
   CreateSourceInput,
+  LinkSourceInput,
   Source as SourceModel,
+  UnlinkSourceInput,
   UpdateSourceInput,
 } from '@src/changes/source.model'
 import { TransformInput, ZService } from '@src/common/z.service'
+
+export const JSONLD_CONTEXT: jsonld.ContextDefinition = {
+  kg: 'http://g.co/kg',
+  wd: 'https://www.wikidata.org/entity/',
+}
+
+const JSONLD_IRI_PREFIXES = Object.values(JSONLD_CONTEXT) as string[]
 
 export const SourceIDSchema = z.string().meta({
   id: 'Source',
@@ -32,6 +42,35 @@ export const UpdateSourceInputSchema = z.object({
   metadata: z.record(z.string(), z.json()).optional(),
 })
 export const UpdateSourceInputJSONSchema = z.toJSONSchema(UpdateSourceInputSchema)
+
+const JsonLdIdSchema = z
+  .string()
+  .refine((v) => JSONLD_IRI_PREFIXES.some((prefix) => v.startsWith(prefix)), {
+    message: '@id must be a Google Knowledge Graph or Wikidata entity IRI',
+  })
+
+async function canCompactJsonLd(doc: Record<string, unknown>): Promise<boolean> {
+  try {
+    await jsonld.compact(doc as jsonld.JsonLdDocument, JSONLD_CONTEXT)
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const LinkSourceInputSchema = z.object({
+  id: z.nanoid(),
+  jsonld: z
+    .looseObject({ '@id': JsonLdIdSchema })
+    .refine(canCompactJsonLd, { message: 'jsonld must be a valid JSON-LD document' }),
+})
+
+export const UnlinkSourceInputSchema = z.object({
+  id: z.nanoid(),
+  jsonld: z
+    .looseObject({ '@id': JsonLdIdSchema })
+    .refine(canCompactJsonLd, { message: 'jsonld must be a valid JSON-LD document' }),
+})
 
 const ModelTransform = z.transform((input: TransformInput) => {
   const entity = input.input as Source
@@ -60,5 +99,13 @@ export class SourceSchemaService {
 
   async parseUpdateInput(input: UpdateSourceInput): Promise<UpdateSourceInput> {
     return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseLinkInput(input: LinkSourceInput): Promise<LinkSourceInput> {
+    return this.zService.parse(LinkSourceInputSchema, input as any) as Promise<LinkSourceInput>
+  }
+
+  async parseUnlinkInput(input: UnlinkSourceInput): Promise<UnlinkSourceInput> {
+    return this.zService.parse(UnlinkSourceInputSchema, input as any) as Promise<UnlinkSourceInput>
   }
 }
