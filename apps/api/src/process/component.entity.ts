@@ -14,6 +14,7 @@ import { z } from 'zod/v4'
 
 import { Source } from '@src/changes/source.entity'
 import type { TranslatedField } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
@@ -126,7 +127,7 @@ export class ComponentsSources extends BaseEntity {
   // This can be used to format links directly to the source.
   // If we just need external IDs, we use the ExternalSource entity.
   @Property({ type: 'json' })
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 
 @Entity({ tableName: 'components_tags', schema: 'public' })
@@ -138,7 +139,7 @@ export class ComponentsTags extends BaseEntity {
   tag!: Tag
 
   @Property({ type: 'json' })
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 
 @Entity({ tableName: 'components_materials', schema: 'public' })
@@ -167,8 +168,8 @@ export class ComponentHistory extends BaseEntity {
   user!: Ref<User>
 
   @Property({ type: 'json' })
-  original?: Record<string, any>
+  original?: JSONObject
 
   @Property({ type: 'json' })
-  changes?: Record<string, any>
+  changes?: JSONObject
 }

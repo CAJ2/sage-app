@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { ChangesPage } from '@src/changes/change.model'
-import { Source as SourceEntity, SourceType } from '@src/changes/source.entity'
+import { SourceType } from '@src/changes/source.entity'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { type JSONObject } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
@@ -19,7 +19,7 @@ registerEnumType(SourceType, {
 @ObjectType({
   description: 'A reference source used to support data changes, such as a URL, PDF, or image',
 })
-export class Source extends IDCreatedUpdated<SourceEntity> {
+export class Source extends IDCreatedUpdated {
   @Field(() => SourceType)
   type!: SourceType
 
@@ -39,7 +39,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
     nullable: true,
     description: 'Extracted or structured content from the source',
   })
-  content?: Record<string, any>
+  content?: JSONObject
 
   @Field(() => String, { nullable: true })
   contentURL?: string
@@ -54,7 +54,7 @@ export class Source extends IDCreatedUpdated<SourceEntity> {
     nullable: true,
     description: 'Additional metadata about the source (e.g. author, publication date)',
   })
-  metadata?: Record<string, any>
+  metadata?: JSONObject
 }
 
 @ObjectType()

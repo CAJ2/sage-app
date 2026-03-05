@@ -1,27 +1,17 @@
 import { ArgsType, Field, ID, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
-import { Region as RegionEntity } from '@src/geo/region.entity'
 import { CreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 
-function extractBbox(obj: RegionEntity): number[] | undefined {
-  if (obj.properties && obj.properties['geom:bbox']) {
-    return obj.properties['geom:bbox'].split(',').map(Number)
-  }
-}
-
 @ObjectType({ description: "A geographic region based on the Who's On First dataset" })
-export class Region extends CreatedUpdated<RegionEntity> {
+export class Region extends CreatedUpdated {
   @Field(() => ID)
   id!: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   name?: string
 
   @Field(() => String, {
@@ -40,13 +30,6 @@ export class Region extends CreatedUpdated<RegionEntity> {
     description: 'Minimum map zoom level at which this region should be displayed',
   })
   minZoom?: number
-
-  transform(entity: RegionEntity) {
-    this.bbox = extractBbox(entity)
-    if (entity.properties && entity.properties['lbl:minZoom']) {
-      this.minZoom = Number(entity.properties['lbl:minZoom'])
-    }
-  }
 }
 registerModel('Region', Region)
 

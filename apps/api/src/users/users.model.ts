@@ -4,7 +4,6 @@ import { IsEmail, IsOptional, IsUrl, MaxLength } from 'class-validator'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Org } from '@src/users/org.model'
-import { User as UserEntity } from '@src/users/users.entity'
 
 @ObjectType()
 export class UserProfile {
@@ -13,7 +12,7 @@ export class UserProfile {
 }
 
 @ObjectType({ description: 'A registered user of the platform' })
-export class User extends IDCreatedUpdated<UserEntity> {
+export class User extends IDCreatedUpdated {
   @Field({ nullable: true })
   name?: string
 

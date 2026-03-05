@@ -196,12 +196,19 @@ export class CategoryService {
     return deleted
   }
 
-  async history(categoryID: string) {
-    return this.em.find(
+  async history(categoryID: string, opts: CursorOptions<CategoryHistory>) {
+    const items = await this.em.find(
       CategoryHistory,
       { category: categoryID },
-      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+      {
+        populate: ['user'],
+        orderBy: { datetime: 'ASC' },
+        limit: opts.options.limit,
+        offset: opts.options.offset,
+      },
     )
+    const count = await this.em.count(CategoryHistory, { category: categoryID })
+    return { items, count }
   }
 
   async setFields(

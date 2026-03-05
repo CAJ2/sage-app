@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { HTTPS_OR_ICON } from '@src/common/z.schema'
-import { ZService } from '@src/common/z.service'
-import { TagType } from '@src/process/tag.entity'
-import { CreateTagDefinitionInput, UpdateTagDefinitionInput } from '@src/process/tag.model'
+import { TransformInput, ZService } from '@src/common/z.service'
+import { Tag as TagEntity, TagType } from '@src/process/tag.entity'
+import {
+  CreateTagDefinitionInput,
+  Tag,
+  TagDefinition,
+  UpdateTagDefinitionInput,
+} from '@src/process/tag.model'
 
 export const CreateTagDefinitionInputSchema = z.object({
   name: z.string().max(100),
@@ -30,13 +36,46 @@ export class TagSchemaService {
   CreateSchema = CreateTagDefinitionInputSchema
   UpdateSchema = UpdateTagDefinitionInputSchema
 
-  constructor(private readonly z: ZService) {}
+  constructor(private readonly zService: ZService) {
+    const TagDefinitionTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as TagEntity
+      const model = new TagDefinition()
+      model.id = entity.id
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+      model.name = input.i18n.tr(entity.name) as string
+      model.type = entity.type
+      model.desc = input.i18n.tr(entity.desc)
+      model.metaTemplate = entity.metaTemplate as unknown as typeof model.metaTemplate
+      model.bgColor = entity.bgColor
+      model.image = entity.image
+      return model
+    })
+    this.zService.registerTransform(TagEntity, TagDefinition, TagDefinitionTransform)
+
+    const TagTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as TagEntity
+      const model = new Tag()
+      model.id = entity.id
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+      model.name = input.i18n.tr(entity.name) as string
+      model.type = entity.type
+      model.desc = input.i18n.tr(entity.desc)
+      model.metaTemplate = entity.metaTemplate as unknown as typeof model.metaTemplate
+      model.bgColor = entity.bgColor
+      model.image = entity.image
+      model.meta = (entity as any).meta
+      return model
+    })
+    this.zService.registerTransform(TagEntity, Tag, TagTransform)
+  }
 
   async parseCreateInput(input: CreateTagDefinitionInput): Promise<CreateTagDefinitionInput> {
-    return this.z.parse(this.CreateSchema, input)
+    return this.zService.parse(this.CreateSchema, input)
   }
 
   async parseUpdateInput(input: UpdateTagDefinitionInput): Promise<UpdateTagDefinitionInput> {
-    return this.z.parse(this.UpdateSchema, input)
+    return this.zService.parse(this.UpdateSchema, input)
   }
 }

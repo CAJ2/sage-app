@@ -1,5 +1,4 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform, Type } from 'class-transformer'
 import { IsOptional, IsUrl, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -7,14 +6,14 @@ import { z } from 'zod'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { SourcesPage } from '@src/changes/source.model'
+import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject } from '@src/common/z.schema'
 import {
   BaseModel,
   IDCreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
 } from '@src/graphql/base.model'
@@ -24,28 +23,22 @@ import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
 import { ItemsPage } from '@src/product/item.model'
-import {
-  VariantComponentUnitSchema,
-  Variant as VariantEntity,
-  VariantsComponents,
-  VariantsOrgs,
-} from '@src/product/variant.entity'
+import { VariantComponentUnitSchema } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'A specific variant or SKU of a product item, composed of physical components',
 })
-export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
+export class Variant extends IDCreatedUpdated implements Named {
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @IsOptional()
   desc?: string
 
@@ -85,7 +78,7 @@ export class Variant extends IDCreatedUpdated<VariantEntity> implements Named {
 registerModel('Variant', Variant)
 
 @ObjectType()
-export class VariantHistory extends BaseModel<any> {
+export class VariantHistory extends BaseModel {
   @Field(() => Variant)
   variant!: Variant
 
@@ -93,7 +86,7 @@ export class VariantHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Variant, { nullable: true })
   original?: Variant
@@ -106,9 +99,8 @@ export class VariantHistory extends BaseModel<any> {
   description:
     'An organization associated with a variant and its role (e.g. manufacturer, importer)',
 })
-export class VariantOrg extends BaseModel<VariantsOrgs> {
+export class VariantOrg extends BaseModel {
   @Field(() => Org)
-  @Type(() => Org)
   org!: Org & {}
 
   @Field(() => String, {
@@ -119,9 +111,8 @@ export class VariantOrg extends BaseModel<VariantsOrgs> {
 }
 
 @ObjectType({ description: 'A physical component within a variant, with its quantity' })
-export class VariantComponent extends BaseModel<VariantsComponents> {
+export class VariantComponent extends BaseModel {
   @Field(() => Component)
-  @Type(() => Component)
   component!: Component & {}
 
   @Field(() => Number, { nullable: true, description: 'Quantity of this component in the variant' })
@@ -135,7 +126,16 @@ export class VariantComponent extends BaseModel<VariantsComponents> {
 }
 
 @ObjectType()
-export class VariantSourcesPage extends SourcesPage {}
+export class VariantSource extends BaseModel {
+  @Field(() => Source)
+  source!: Source & {}
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: JSONObject
+}
+
+@ObjectType()
+export class VariantSourcesPage extends Paginated(VariantSource) {}
 
 @ObjectType()
 export class VariantHistoryPage extends Paginated(VariantHistory) {}

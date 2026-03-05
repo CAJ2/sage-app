@@ -17,6 +17,7 @@ import {
 import { CreateComponentInput, UpdateComponentInput } from '@src/process/component.model'
 import { Material } from '@src/process/material.entity'
 import { StreamService } from '@src/process/stream.service'
+import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 
 @Injectable()
@@ -55,11 +56,12 @@ export class ComponentService {
     )
   }
 
-  async primaryMaterial(id: string, component?: Component) {
-    if (component) {
-      return component.primaryMaterial.load()
+  async primaryMaterial(id: string) {
+    const component = await this.em.findOne(Component, { id }, { populate: ['primaryMaterial'] })
+    if (!component) {
+      return null
     }
-    return null
+    return component.primaryMaterial.load()
   }
 
   async materials(componentId: string) {
@@ -74,22 +76,24 @@ export class ComponentService {
     return component.materials.getItems()
   }
 
-  async tags(componentId: string) {
-    const component = await this.em.findOne(
-      Component,
-      { id: componentId },
-      { populate: ['componentTags', 'componentTags.tag'] },
+  async tags(componentId: string, opts: CursorOptions<Tag>) {
+    opts.where.components = this.em.getReference(Component, componentId)
+    const tagDefs = await this.em.find(Tag, opts.where, opts.options)
+    const componentTags = await this.em.find(
+      ComponentsTags,
+      { component: componentId },
+      { limit: opts.options.limit },
     )
-    if (!component) {
-      throw new Error(`Component with ID "${componentId}" not found`)
-    }
-    return component.componentTags.getItems().map((tag) => {
-      const tagObj = tag.tag.toObject()
-      return {
-        ...tagObj,
-        meta: tag.meta,
+    const combinedTags = []
+    for (const ct of componentTags) {
+      const tagDef = tagDefs.find((t) => t.id === ct.tag.id)
+      if (tagDef) {
+        tagDef.meta = ct.meta
+        combinedTags.push(tagDef)
       }
-    })
+    }
+    const count = await this.em.count(ComponentsTags, { component: opts.where.components })
+    return { items: combinedTags, count }
   }
 
   async recycle(componentId: string, regionId?: string) {

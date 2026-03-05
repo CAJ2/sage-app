@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { z } from 'zod/v4'
 
-import { SourceType } from '@src/changes/source.entity'
-import { CreateSourceInput, UpdateSourceInput } from '@src/changes/source.model'
-import { ZService } from '@src/common/z.service'
+import { Source, SourceType } from '@src/changes/source.entity'
+import {
+  CreateSourceInput,
+  Source as SourceModel,
+  UpdateSourceInput,
+} from '@src/changes/source.model'
+import { TransformInput, ZService } from '@src/common/z.service'
 
 export const SourceIDSchema = z.string().meta({
   id: 'Source',
@@ -29,18 +33,32 @@ export const UpdateSourceInputSchema = z.object({
 })
 export const UpdateSourceInputJSONSchema = z.toJSONSchema(UpdateSourceInputSchema)
 
+const ModelTransform = z.transform((input: TransformInput) => {
+  const entity = input.input as Source
+  const model = new SourceModel()
+  model.id = entity.id
+  model.type = entity.type
+  model.location = entity.location
+  model.content = entity.content
+  model.contentURL = entity.contentURL
+  model.metadata = entity.metadata
+  return model
+})
+
 @Injectable()
 export class SourceSchemaService {
   CreateSchema = CreateSourceInputSchema
   UpdateSchema = UpdateSourceInputSchema
 
-  constructor(private readonly z: ZService) {}
+  constructor(private readonly zService: ZService) {
+    this.zService.registerTransform(Source, SourceModel, ModelTransform)
+  }
 
   async parseCreateInput(input: CreateSourceInput): Promise<CreateSourceInput> {
-    return this.z.parse(this.CreateSchema, input)
+    return this.zService.parse(this.CreateSchema, input)
   }
 
   async parseUpdateInput(input: UpdateSourceInput): Promise<UpdateSourceInput> {
-    return this.z.parse(this.UpdateSchema, input)
+    return this.zService.parse(this.UpdateSchema, input)
   }
 }

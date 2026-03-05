@@ -39,7 +39,7 @@ type Category implements Named {
   descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
 
   """Audit history of changes to this category"""
-  history: [CategoryHistory!]!
+  history(after: String, before: String, first: Int, last: Int): CategoryHistoryPage!
   id: ID!
   imageURL: String
 
@@ -68,6 +68,18 @@ type CategoryHistory {
   user: User!
 }
 
+type CategoryHistoryEdge {
+  cursor: String!
+  node: CategoryHistory!
+}
+
+type CategoryHistoryPage {
+  edges: [CategoryHistoryEdge!]
+  nodes: [CategoryHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 """A proposed or merged set of edits to one or more data models"""
 type Change {
   createdAt: DateTime!
@@ -78,7 +90,7 @@ type Change {
   id: ID!
 
   """Source references supporting this change"""
-  sources(after: String, before: String, first: Int, last: Int): SourcesPage!
+  sources(after: String, before: String, first: Int, last: Int): ChangeSourcesPage!
   status: ChangeStatus!
   title: String
   updatedAt: DateTime!
@@ -95,6 +107,22 @@ type ChangeEdge {
 type ChangeEditsPage {
   edges: [EditEdge!]
   nodes: [Edit!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ChangeSource {
+  source: Source!
+}
+
+type ChangeSourceEdge {
+  cursor: String!
+  node: ChangeSource!
+}
+
+type ChangeSourcesPage {
+  edges: [ChangeSourceEdge!]
+  nodes: [ChangeSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -145,7 +173,7 @@ type Component implements Named {
   """The geographic region this component's recycling data applies to"""
   region: Region
   sources(after: String, before: String, first: Int, last: Int): ComponentSourcesPage!
-  tags: [Tag!]!
+  tags(after: String, before: String, first: Int, last: Int): TagPage!
   updatedAt: DateTime!
 }
 
@@ -199,9 +227,19 @@ input ComponentRegionInput {
   id: ID!
 }
 
+type ComponentSource {
+  meta: JSONObject
+  source: Source!
+}
+
+type ComponentSourceEdge {
+  cursor: String!
+  node: ComponentSource!
+}
+
 type ComponentSourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+  edges: [ComponentSourceEdge!]
+  nodes: [ComponentSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -581,7 +619,7 @@ type Item implements Named {
   desc: String
 
   """Audit history of changes to this item"""
-  history: [ItemHistory!]!
+  history(after: String, before: String, first: Int, last: Int): ItemHistoryPage!
 
   """The ID of the model"""
   id: ID!
@@ -611,6 +649,18 @@ type ItemHistory {
   item: Item!
   original: Item
   user: User!
+}
+
+type ItemHistoryEdge {
+  cursor: String!
+  node: ItemHistory!
+}
+
+type ItemHistoryPage {
+  edges: [ItemHistoryEdge!]
+  nodes: [ItemHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 input ItemTagsInput {
@@ -745,7 +795,7 @@ type Org implements Named {
   avatarURL: String
   createdAt: DateTime!
   desc: String
-  history: [OrgHistory!]!
+  history(after: String, before: String, first: Int, last: Int): OrgHistoryPage!
 
   """The ID of the model"""
   id: ID!
@@ -773,6 +823,18 @@ type OrgHistory {
   org: Org!
   original: Org
   user: User!
+}
+
+type OrgHistoryEdge {
+  cursor: String!
+  node: OrgHistory!
+}
+
+type OrgHistoryPage {
+  edges: [OrgHistoryEdge!]
+  nodes: [OrgHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type PageInfo {
@@ -928,9 +990,19 @@ input ProcessRegionInput {
   id: ID!
 }
 
+type ProcessSource {
+  meta: JSONObject
+  source: Source!
+}
+
+type ProcessSourceEdge {
+  cursor: String!
+  node: ProcessSource!
+}
+
 type ProcessSourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+  edges: [ProcessSourceEdge!]
+  nodes: [ProcessSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1695,9 +1767,19 @@ input VariantRegionsInput {
   id: ID!
 }
 
+type VariantSource {
+  meta: JSONObject
+  source: Source!
+}
+
+type VariantSourceEdge {
+  cursor: String!
+  node: VariantSource!
+}
+
 type VariantSourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+  edges: [VariantSourceEdge!]
+  nodes: [VariantSource!]
   pageInfo: PageInfo!
   totalCount: Int!
 }

@@ -1,10 +1,148 @@
+import { BaseEntity, Loaded, Ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
-import { ClsService } from 'nestjs-cls'
+import _ from 'lodash'
 import { z, ZodObject } from 'zod/v4'
+
+import { I18nService } from '@src/common/i18n.service'
+import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
+
+type TransformMeta = { entity?: string; model: string }
+
+type ZTransformInput = { input: z.ZodUnknown; i18n: z.ZodUnknown }
+type TransformSchema<M> = z.ZodPipe<z.ZodObject<ZTransformInput>, z.ZodTransform<M, TransformInput>>
+
+function transformKey(entity: string | undefined, model: string): string {
+  return `${entity ?? ''}:${model}`
+}
+
+export type TransformInput = {
+  input: unknown
+  i18n: I18nService
+}
 
 @Injectable()
 export class ZService {
-  constructor(private readonly cls: ClsService) {}
+  private transformRegistry
+  private transformMap: Map<string, TransformSchema<any>>
+  private transformInputSchema: z.ZodObject<ZTransformInput>
+
+  constructor(private readonly i18n: I18nService) {
+    this.transformRegistry = z.registry<TransformMeta, TransformSchema<any>>()
+    this.transformMap = new Map()
+    this.transformInputSchema = z.object({
+      input: z.unknown(),
+      i18n: z.unknown(),
+    })
+  }
+
+  registerTransform<M extends BaseModel>(
+    entity: undefined,
+    model: new () => M,
+    transform: z.ZodTransform<M, TransformInput>,
+  ): void
+  registerTransform<E extends BaseEntity, M extends BaseModel>(
+    entity: (new () => E) | string,
+    model: new () => M | string,
+    transform: z.ZodTransform<M, TransformInput>,
+  ): void
+  registerTransform<E extends BaseEntity, M extends BaseModel>(
+    entity: (new () => E) | string | undefined,
+    model: new () => M | string,
+    transform: z.ZodTransform<M, TransformInput>,
+  ) {
+    const [entityKey, modelKey] = [
+      typeof entity === 'string' ? entity : entity ? entity.prototype.constructor.name : undefined,
+      typeof model === 'string' ? model : model.prototype.constructor.name,
+    ]
+    const tr = this.transformInputSchema.pipe(transform as unknown as z.ZodTransform<any, any>)
+    this.transformRegistry.add(tr, { entity: entityKey, model: modelKey })
+    this.transformMap.set(transformKey(entityKey, modelKey), tr)
+    // Also register with model-only key for objectToModel lookups
+    if (entityKey !== undefined) {
+      this.transformMap.set(transformKey(undefined, modelKey), tr)
+    }
+  }
+
+  private async transformToModel<M extends BaseModel>(
+    Model: new () => M,
+    input: Loaded<any, never> | object,
+    transform: TransformSchema<any>,
+  ): Promise<M> {
+    const result = await transform.safeParseAsync({ input, i18n: this.i18n }, { reportInput: true })
+    if (!result.success) {
+      result.error.cause = new Error(
+        input.constructor
+          ? `Failed to parse entity ${input.constructor.name} to model ${Model.prototype.constructor.name}`
+          : `Failed to parse object to model ${Model.prototype.constructor.name}`,
+      )
+      throw result.error
+    }
+    const modelInstance = new Model()
+    // Copy source properties first (passthrough for POJO inputs like directEdit flow),
+    // preserving extra fields (e.g. componentMaterials, variantComponents pivot data).
+    if (input && typeof input === 'object') {
+      Object.assign(modelInstance, input)
+    }
+    // Then overlay transform's explicit mappings (only own properties set by the transform).
+    Object.assign(modelInstance, result.data)
+    return modelInstance
+  }
+
+  async entityToModel<E extends BaseEntity, M extends BaseModel>(
+    Model: (new () => M) | string,
+    entity: Loaded<E, never> | Ref<E>,
+  ): Promise<M> {
+    const model: (new () => M) | undefined =
+      typeof Model === 'string' ? (ModelRegistry[Model] as (new () => M) | undefined) : Model
+    if (!model) {
+      throw new Error(`No model registered for ${Model}`)
+    }
+    if (_.isPlainObject(entity)) {
+      throw new Error(
+        `Called entityToModel with plain object value: ${typeof entity}. You should probably call objectToModel instead`,
+      )
+    }
+    if (!entity.isInitialized()) {
+      throw new Error(`Entity is not initialized: ${entity.constructor.name}`)
+    }
+    const transform = this.transformMap.get(
+      transformKey(entity.constructor.name, model.prototype.constructor.name),
+    )
+    if (!transform) {
+      throw new Error(
+        `No transform registered for entity ${entity.constructor.name} and model ${model.prototype.constructor.name}`,
+      )
+    }
+    const result = await this.transformToModel(model, entity, transform)
+    // Preserve reference to original entity (used by field resolvers that need the entity)
+    // ;(result as BaseModel).entity = entity
+    return result
+  }
+
+  async objectToModel<T, S extends BaseModel>(
+    Model: (new () => S) | string,
+    object: T,
+  ): Promise<S> {
+    const model: (new () => S) | undefined =
+      typeof Model === 'string' ? (ModelRegistry[Model] as (new () => S) | undefined) : Model
+    if (!model) {
+      throw new Error(`No model registered for ${Model}`)
+    }
+    if (!_.isPlainObject(object)) {
+      throw new Error(
+        `Called objectToModel with non-object value: ${typeof object}. You should probably call entityToModel instead`,
+      )
+    }
+    const transform = this.transformMap.get(
+      transformKey(undefined, model.prototype.constructor.name),
+    )
+    if (!transform) {
+      throw new Error(
+        `No object transform registered for model ${model.prototype.constructor.name}`,
+      )
+    }
+    return this.transformToModel(model, object, transform)
+  }
 
   async parse<S extends z.ZodObject>(schema: S, input: z.input<S>): Promise<z.output<S>> {
     if (schema instanceof ZodObject) {

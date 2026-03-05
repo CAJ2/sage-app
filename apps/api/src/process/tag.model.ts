@@ -1,14 +1,12 @@
 import { ArgsType, Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
-import { translate } from '@src/common/i18n'
-import { type JSONType } from '@src/common/z.schema'
+import { type JSONObject, type JSONType } from '@src/common/z.schema'
 import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Tag as TagEntity, TagType } from '@src/process/tag.entity'
+import { TagType } from '@src/process/tag.entity'
 
 registerEnumType(TagType, {
   name: 'TagType',
@@ -19,16 +17,14 @@ registerEnumType(TagType, {
   implements: () => [Named],
   description: 'A reusable tag definition for classifying models with custom metadata',
 })
-export class TagDefinition extends IDCreatedUpdated<TagEntity> implements Named {
+export class TagDefinition extends IDCreatedUpdated implements Named {
   @Field(() => String)
-  @Transform(translate)
   name!: string
 
   @Field(() => TagType, { description: 'The type of model this tag can be applied to' })
   type!: TagType
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => JSONObjectResolver, {
@@ -56,7 +52,7 @@ export class Tag extends TagDefinition {
     nullable: true,
     description: "Instance metadata conforming to the tag definition's metaTemplate",
   })
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 registerModel('Tag', Tag)
 

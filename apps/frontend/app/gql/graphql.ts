@@ -53,7 +53,7 @@ export type Category = Named & {
   /** All descendant categories down the hierarchy tree */
   descendants: CategoriesPage;
   /** Audit history of changes to this category */
-  history: Array<CategoryHistory>;
+  history: CategoryHistoryPage;
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   /** Items classified under this category */
@@ -95,6 +95,15 @@ export type CategoryDescendantsArgs = {
 
 
 /** A hierarchical category for classifying product items */
+export type CategoryHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A hierarchical category for classifying product items */
 export type CategoryItemsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -126,6 +135,20 @@ export type CategoryHistory = {
   user: User;
 };
 
+export type CategoryHistoryEdge = {
+  __typename?: 'CategoryHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: CategoryHistory;
+};
+
+export type CategoryHistoryPage = {
+  __typename?: 'CategoryHistoryPage';
+  edges?: Maybe<Array<CategoryHistoryEdge>>;
+  nodes?: Maybe<Array<CategoryHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** A proposed or merged set of edits to one or more data models */
 export type Change = {
   __typename?: 'Change';
@@ -135,7 +158,7 @@ export type Change = {
   edits: ChangeEditsPage;
   id: Scalars['ID']['output'];
   /** Source references supporting this change */
-  sources: SourcesPage;
+  sources: ChangeSourcesPage;
   status: ChangeStatus;
   title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
@@ -173,6 +196,25 @@ export type ChangeEditsPage = {
   __typename?: 'ChangeEditsPage';
   edges?: Maybe<Array<EditEdge>>;
   nodes?: Maybe<Array<Edit>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChangeSource = {
+  __typename?: 'ChangeSource';
+  source: Source;
+};
+
+export type ChangeSourceEdge = {
+  __typename?: 'ChangeSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: ChangeSource;
+};
+
+export type ChangeSourcesPage = {
+  __typename?: 'ChangeSourcesPage';
+  edges?: Maybe<Array<ChangeSourceEdge>>;
+  nodes?: Maybe<Array<ChangeSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -216,7 +258,7 @@ export type Component = Named & {
   /** The geographic region this component's recycling data applies to */
   region?: Maybe<Region>;
   sources: ComponentSourcesPage;
-  tags: Array<Tag>;
+  tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -244,6 +286,15 @@ export type ComponentRecycleScoreArgs = {
 
 /** A physical component of a product variant, made of one or more materials */
 export type ComponentSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentTagsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -304,10 +355,22 @@ export type ComponentRegionInput = {
   id: Scalars['ID']['input'];
 };
 
+export type ComponentSource = {
+  __typename?: 'ComponentSource';
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  source: Source;
+};
+
+export type ComponentSourceEdge = {
+  __typename?: 'ComponentSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: ComponentSource;
+};
+
 export type ComponentSourcesPage = {
   __typename?: 'ComponentSourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+  edges?: Maybe<Array<ComponentSourceEdge>>;
+  nodes?: Maybe<Array<ComponentSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -660,7 +723,7 @@ export type Item = Named & {
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this item */
-  history: Array<ItemHistory>;
+  history: ItemHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
@@ -675,6 +738,15 @@ export type Item = Named & {
 
 /** A product or consumable item that can be categorized and have multiple variants */
 export type ItemCategoriesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A product or consumable item that can be categorized and have multiple variants */
+export type ItemHistoryArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -716,6 +788,20 @@ export type ItemHistory = {
   item: Item;
   original?: Maybe<Item>;
   user: User;
+};
+
+export type ItemHistoryEdge = {
+  __typename?: 'ItemHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: ItemHistory;
+};
+
+export type ItemHistoryPage = {
+  __typename?: 'ItemHistoryPage';
+  edges?: Maybe<Array<ItemHistoryEdge>>;
+  nodes?: Maybe<Array<ItemHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type ItemTagsInput = {
@@ -1047,7 +1133,7 @@ export type Org = Named & {
   avatarURL?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
-  history: Array<OrgHistory>;
+  history: OrgHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -1058,6 +1144,15 @@ export type Org = Named & {
   users: UserPage;
   /** URL of the organization's website */
   websiteURL?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** An organization or company on the platform */
+export type OrgHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1082,6 +1177,20 @@ export type OrgHistory = {
   org: Org;
   original?: Maybe<Org>;
   user: User;
+};
+
+export type OrgHistoryEdge = {
+  __typename?: 'OrgHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: OrgHistory;
+};
+
+export type OrgHistoryPage = {
+  __typename?: 'OrgHistoryPage';
+  edges?: Maybe<Array<OrgHistoryEdge>>;
+  nodes?: Maybe<Array<OrgHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type PageInfo = {
@@ -1252,10 +1361,22 @@ export type ProcessRegionInput = {
   id: Scalars['ID']['input'];
 };
 
+export type ProcessSource = {
+  __typename?: 'ProcessSource';
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  source: Source;
+};
+
+export type ProcessSourceEdge = {
+  __typename?: 'ProcessSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: ProcessSource;
+};
+
 export type ProcessSourcesPage = {
   __typename?: 'ProcessSourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+  edges?: Maybe<Array<ProcessSourceEdge>>;
+  nodes?: Maybe<Array<ProcessSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -2232,10 +2353,22 @@ export type VariantRegionsInput = {
   id: Scalars['ID']['input'];
 };
 
+export type VariantSource = {
+  __typename?: 'VariantSource';
+  meta?: Maybe<Scalars['JSONObject']['output']>;
+  source: Source;
+};
+
+export type VariantSourceEdge = {
+  __typename?: 'VariantSourceEdge';
+  cursor: Scalars['String']['output'];
+  node: VariantSource;
+};
+
 export type VariantSourcesPage = {
   __typename?: 'VariantSourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+  edges?: Maybe<Array<VariantSourceEdge>>;
+  nodes?: Maybe<Array<VariantSource>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };

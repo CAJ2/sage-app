@@ -92,12 +92,19 @@ export class OrgService {
     return { org, change }
   }
 
-  async history(orgID: string) {
-    return this.em.find(
+  async history(orgID: string, opts: CursorOptions<OrgHistory>) {
+    const items = await this.em.find(
       OrgHistory,
       { org: orgID },
-      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+      {
+        populate: ['user'],
+        orderBy: { datetime: 'ASC' },
+        limit: opts.options.limit,
+        offset: opts.options.offset,
+      },
     )
+    const count = await this.em.count(OrgHistory, { org: orgID })
+    return { items, count }
   }
 
   async setFields(org: Org, input: Partial<CreateOrgInput & UpdateOrgInput>, change?: Change) {

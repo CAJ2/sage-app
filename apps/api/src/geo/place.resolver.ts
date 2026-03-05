@@ -41,7 +41,7 @@ export class PlaceResolver {
 
   @ResolveField()
   async org(@Parent() place: Place) {
-    const org = await this.placeService.org(place.id, place.entity)
+    const org = await this.placeService.org(place.id)
     if (!org) {
       return null
     }

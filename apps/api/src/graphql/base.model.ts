@@ -1,4 +1,4 @@
-import type { Loaded } from '@mikro-orm/core'
+import type { BaseEntity, Loaded, Ref } from '@mikro-orm/core'
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
@@ -6,22 +6,23 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { type UISchemaElement } from '@src/common/ui.schema'
 import { IsNanoID } from '@src/common/validator.model'
 
-export const ModelRegistry: Record<string, new () => BaseModel<any>> = {}
-export function registerModel<T extends BaseModel<any>>(name: string, model: new () => T): void {
+export const ModelRegistry: Record<string, new () => BaseModel> = {}
+export function registerModel<T extends BaseModel>(name: string, model: new () => T): void {
   if (ModelRegistry[name]) {
     throw new Error(`Model ${name} is already registered.`)
   }
   ModelRegistry[name] = model
 }
 
-export class BaseModel<T> {
-  entity?: Loaded<T, never>
-}
+export class BaseModel {}
+
+export type ModelRef<M extends BaseModel, E extends BaseEntity> = M | Loaded<E, any> | Ref<E>
 
 @ObjectType()
-export class IDCreatedUpdated<T> extends BaseModel<T> {
+export class IDCreatedUpdated extends BaseModel {
   @Field(() => ID)
   @Validate(IsNanoID)
   id!: string
@@ -34,7 +35,7 @@ export class IDCreatedUpdated<T> extends BaseModel<T> {
 }
 
 @ObjectType()
-export class CreatedUpdated<T> extends BaseModel<T> {
+export class CreatedUpdated extends BaseModel {
   @Field(() => LuxonDateTimeResolver)
   createdAt!: DateTime
 
@@ -45,10 +46,10 @@ export class CreatedUpdated<T> extends BaseModel<T> {
 @ObjectType()
 export class ModelSchema {
   @Field(() => JSONObjectResolver, { nullable: true })
-  schema?: Record<string, any>
+  schema?: z.core.JSONSchema.BaseSchema
 
   @Field(() => JSONObjectResolver, { nullable: true })
-  uischema?: Record<string, any>
+  uischema?: UISchemaElement
 }
 
 @ObjectType()

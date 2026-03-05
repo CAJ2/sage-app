@@ -1,10 +1,10 @@
+import { Reference } from '@mikro-orm/core'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -14,9 +14,11 @@ import {
   ComponentHistoryArgs,
   ComponentHistoryPage,
   ComponentRecycleArgs,
+  ComponentSource,
   ComponentSourcesArgs,
   ComponentSourcesPage,
   ComponentsPage,
+  ComponentTagsArgs,
   CreateComponentInput,
   CreateComponentOutput,
   UpdateComponentInput,
@@ -25,7 +27,7 @@ import {
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { ComponentsArgs, Material } from '@src/process/material.model'
-import { Tag } from '@src/process/tag.model'
+import { Tag, TagPage } from '@src/process/tag.model'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Component)
@@ -75,7 +77,7 @@ export class ComponentResolver {
 
   @ResolveField()
   async primaryMaterial(@Parent() component: Component) {
-    const material = await this.componentService.primaryMaterial(component.id, component.entity)
+    const material = await this.componentService.primaryMaterial(component.id)
     if (!material) {
       return null
     }
@@ -88,10 +90,11 @@ export class ComponentResolver {
     return this.transform.entitiesToModels(Material, materials)
   }
 
-  @ResolveField()
-  async tags(@Parent() component: Component) {
-    const tags = await this.componentService.tags(component.id)
-    return this.transform.objectsToModels(Tag, tags)
+  @ResolveField(() => TagPage)
+  async tags(@Parent() component: Component, @Args() args: ComponentTagsArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentTagsArgs, args)
+    const cursor = await this.componentService.tags(component.id, filter)
+    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }
 
   @ResolveField()
@@ -159,7 +162,12 @@ export class ComponentResolver {
   async sources(@Parent() component: Component, @Args() args: ComponentSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentSourcesArgs, args)
     const cursor = await this.componentService.sources(component.id, filter)
-    return this.transform.entityToPaginated(Source, ComponentSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(
+      ComponentSource,
+      ComponentSourcesPage,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @ResolveField(() => ComponentHistoryPage)
@@ -183,7 +191,13 @@ export class ComponentHistoryResolver {
 
   @ResolveField('user', () => User)
   async user(@Parent() history: ComponentHistory) {
-    return this.transform.objectToModel(User, history.user)
+    if (history.user instanceof User) {
+      return history.user
+    }
+    if (Reference.isReference(history.user)) {
+      history.user = await history.user.loadOrFail()
+    }
+    return this.transform.entityToModel(User, history.user)
   }
 
   @ResolveField('original', () => Component, { nullable: true })

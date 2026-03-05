@@ -1,3 +1,4 @@
+import { Reference } from '@mikro-orm/core'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
@@ -12,6 +13,8 @@ import {
   CategoriesPage,
   Category,
   CategoryHistory,
+  CategoryHistoryArgs,
+  CategoryHistoryPage,
   CategoryItemsArgs,
   CreateCategoryInput,
   CreateCategoryOutput,
@@ -157,10 +160,18 @@ export class CategoryResolver {
     return { success: true, id: deleted.id }
   }
 
-  @ResolveField(() => [CategoryHistory])
-  async history(@Parent() category: Category) {
-    const history = await this.categoryService.history(category.id)
-    return Promise.all(history.map((h) => this.transform.entityToModel(CategoryHistory, h)))
+  @ResolveField(() => CategoryHistoryPage)
+  async history(@Parent() category: Category, @Args() args: CategoryHistoryArgs) {
+    const [, filter] = await this.transform.paginationArgs(CategoryHistoryArgs, args)
+    const cursor = await this.categoryService.history(category.id, filter)
+    const items = await Promise.all(
+      cursor.items.map((h) => this.transform.entityToModel(CategoryHistory, h)),
+    )
+    return this.transform.objectsToPaginated(
+      CategoryHistoryPage,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 
@@ -170,7 +181,13 @@ export class CategoryHistoryResolver {
 
   @ResolveField('user', () => User)
   async user(@Parent() history: CategoryHistory) {
-    return this.transform.objectToModel(User, history.user)
+    if (history.user instanceof User) {
+      return history.user
+    }
+    if (Reference.isReference(history.user)) {
+      history.user = await history.user.loadOrFail()
+    }
+    return this.transform.entityToModel(User, history.user)
   }
 
   @ResolveField('original', () => Category, { nullable: true })

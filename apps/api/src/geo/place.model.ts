@@ -1,5 +1,4 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsLatitude, IsLongitude, IsNumber, IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -7,9 +6,8 @@ import { DateTime } from 'luxon'
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { IsNanoID } from '@src/common/validator.model'
-import { Place as PlaceEntity } from '@src/geo/place.entity'
+import { type JSONObject } from '@src/common/z.schema'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
@@ -54,23 +52,20 @@ export class PlaceAddress {
   implements: () => [Named],
   description: 'A specific physical location, such as a business or recycling facility',
 })
-export class Place extends CreatedUpdated<PlaceEntity> implements Named {
+export class Place extends CreatedUpdated implements Named {
   @Field(() => ID)
   id!: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   name?: string
 
   @Field(() => PlaceAddress, {
     nullable: true,
     description: 'Structured postal address of this place',
   })
-  @Transform(translate)
   address?: PlaceAddress
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => PlaceLocation, {
@@ -119,7 +114,7 @@ export class PlaceTagsInput {
 
   @Field(() => JSONObjectResolver, { nullable: true })
   @IsOptional()
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 
 @InputType()

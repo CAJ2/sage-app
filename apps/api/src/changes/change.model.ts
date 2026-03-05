@@ -1,19 +1,17 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
-import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/change.entity'
+import { ChangeStatus } from '@src/changes/change.entity'
 import { EditModel, EditModelType } from '@src/changes/change.enum'
-import { SourcesPage } from '@src/changes/source.model'
-import { transformUnion } from '@src/common/transform'
+import { Source } from '@src/changes/source.model'
 import { type JSONObject } from '@src/common/z.schema'
 import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
 import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'A tracked edit to a single entity within a change' })
-export class Edit extends BaseModel<ChangeEdits> {
+export class Edit extends BaseModel {
   @Field(() => String, {
     description: 'The type name of the entity being edited (e.g. Item, Component)',
   })
@@ -26,14 +24,12 @@ export class Edit extends BaseModel<ChangeEdits> {
     nullable: true,
     description: 'The state of the entity before this edit',
   })
-  @Transform(transformUnion('entityName'))
   original?: typeof EditModel
 
   @Field(() => EditModel, {
     nullable: true,
     description: 'The proposed state of the entity after this edit',
   })
-  @Transform(transformUnion('entityName'))
   changes?: typeof EditModel
 
   @Field(() => JSONObjectResolver, {
@@ -47,10 +43,6 @@ export class Edit extends BaseModel<ChangeEdits> {
     description: 'Current input values for updating an existing entity',
   })
   updateInput?: JSONObject
-
-  transform(entity: ChangeEdits) {
-    this.id = entity.entityID
-  }
 }
 
 @ObjectType()
@@ -70,17 +62,13 @@ export class DirectEdit {
   // Not exposed in GraphQL
   original?: typeof EditModel
   changes?: typeof EditModel
-
-  transform(entity: any) {
-    this.id = entity.id
-  }
 }
 
 @ObjectType()
 export class ChangeEditsPage extends Paginated(Edit) {}
 
 @ObjectType({ description: 'A proposed or merged set of edits to one or more data models' })
-export class Change extends IDCreatedUpdated<ChangeEntity> {
+export class Change extends IDCreatedUpdated {
   @Field(() => String, { nullable: true })
   title?: string
 
@@ -98,9 +86,18 @@ export class Change extends IDCreatedUpdated<ChangeEntity> {
   })
   edits!: ChangeEditsPage
 
-  @Field(() => SourcesPage, { description: 'Source references supporting this change' })
-  sources!: SourcesPage & {}
+  @Field(() => ChangeSourcesPage, { description: 'Source references supporting this change' })
+  sources!: ChangeSourcesPage & {}
 }
+
+@ObjectType()
+export class ChangeSource {
+  @Field(() => Source)
+  source!: Source & {}
+}
+
+@ObjectType()
+export class ChangeSourcesPage extends Paginated(ChangeSource) {}
 
 @ObjectType()
 export class ChangesPage extends Paginated(Change) {}

@@ -1,5 +1,4 @@
 import { ArgsType, Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
@@ -7,27 +6,24 @@ import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { SourcesPage } from '@src/changes/source.model'
+import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import { type JSONObject } from '@src/common/z.schema'
 import { Region } from '@src/geo/region.model'
 import {
   BaseModel,
   IDCreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import {
-  Component as ComponentEntity,
-  type ComponentPhysical,
-  type ComponentVisual,
-} from '@src/process/component.entity'
+import { type ComponentPhysical, type ComponentVisual } from '@src/process/component.entity'
 import { Material } from '@src/process/material.model'
 import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
-import { Tag } from '@src/process/tag.model'
+import { TagPage } from '@src/process/tag.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({ description: 'The fraction of a specific material within a component' })
@@ -55,18 +51,15 @@ export class ComponentRecycle {
   implements: () => [Named],
   description: 'A physical component of a product variant, made of one or more materials',
 })
-export class Component extends IDCreatedUpdated<ComponentEntity> implements Named {
+export class Component extends IDCreatedUpdated implements Named {
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   @MaxLength(1024)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(({ value }) => value.image)
   imageURL?: string
 
   @Field(() => Material, { description: 'The primary material this component is made of' })
@@ -77,8 +70,8 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
   })
   materials: ComponentMaterial[] = []
 
-  @Field(() => [Tag])
-  tags!: Tag[]
+  @Field(() => TagPage)
+  tags!: TagPage & {}
 
   @Field(() => Region, {
     nullable: true,
@@ -103,15 +96,11 @@ export class Component extends IDCreatedUpdated<ComponentEntity> implements Name
 
   @Field(() => ComponentHistoryPage, { description: 'Audit history of changes to this component' })
   history!: ComponentHistoryPage & {}
-
-  transform(entity: ComponentEntity) {
-    this.imageURL = entity.visual?.image
-  }
 }
 registerModel('Component', Component)
 
 @ObjectType()
-export class ComponentHistory extends BaseModel<any> {
+export class ComponentHistory extends BaseModel {
   @Field(() => Component)
   component!: Component
 
@@ -119,7 +108,7 @@ export class ComponentHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Component, { nullable: true })
   original?: Component
@@ -129,7 +118,16 @@ export class ComponentHistory extends BaseModel<any> {
 }
 
 @ObjectType()
-export class ComponentSourcesPage extends SourcesPage {}
+export class ComponentSource {
+  @Field(() => Source)
+  source!: Source & {}
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: JSONObject
+}
+
+@ObjectType()
+export class ComponentSourcesPage extends Paginated(ComponentSource) {}
 
 @ObjectType()
 export class ComponentHistoryPage extends Paginated(ComponentHistory) {}
@@ -139,6 +137,9 @@ export class ComponentsPage extends Paginated(Component) {}
 
 @ArgsType()
 export class ComponentHistoryArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class ComponentTagsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class ComponentSourcesArgs extends PaginationBasicArgs {}

@@ -1,10 +1,10 @@
+import { Reference } from '@mikro-orm/core'
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
-import { Source } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
@@ -17,6 +17,7 @@ import {
   ProcessHistoryArgs,
   ProcessHistoryPage,
   ProcessPage,
+  ProcessSource,
   ProcessSourcesArgs,
   ProcessSourcesPage,
   UpdateProcessInput,
@@ -114,7 +115,7 @@ export class ProcessResolver {
   async sources(@Parent() process: Process, @Args() args: ProcessSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessSourcesArgs, args)
     const cursor = await this.processService.sources(process.id, filter)
-    return this.transform.entityToPaginated(Source, ProcessSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(ProcessSource, ProcessSourcesPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => ProcessHistoryPage)
@@ -138,7 +139,13 @@ export class ProcessHistoryResolver {
 
   @ResolveField('user', () => User)
   async user(@Parent() history: ProcessHistory) {
-    return this.transform.objectToModel(User, history.user)
+    if (history.user instanceof User) {
+      return history.user
+    }
+    if (Reference.isReference(history.user)) {
+      history.user = await history.user.loadOrFail()
+    }
+    return this.transform.entityToModel(User, history.user)
   }
 
   @ResolveField('original', () => Process, { nullable: true })

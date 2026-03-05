@@ -348,10 +348,12 @@ describe('OrgResolver (integration)', () => {
               org {
                 id
                 history {
-                  datetime
-                  user { id }
-                  original { id }
-                  changes { id }
+                  nodes {
+                    datetime
+                    user { id }
+                    original { id }
+                    changes { id }
+                  }
                 }
               }
             }
@@ -361,7 +363,7 @@ describe('OrgResolver (integration)', () => {
       )
       expect(res.errors).toBeUndefined()
       historyOrgID = res.data!.createOrg!.org!.id
-      const history = res.data?.createOrg?.org?.history
+      const history = res.data?.createOrg?.org?.history.nodes
       expect(history).toHaveLength(1)
       expect(history![0].user).toBeDefined()
       expect(history![0].original).toBeNull()
@@ -376,15 +378,17 @@ describe('OrgResolver (integration)', () => {
               org {
                 id
                 history {
-                  datetime
-                  user { id }
-                  original {
-                    id
-                    name
-                  }
-                  changes {
-                    id
-                    name
+                  nodes {
+                    datetime
+                    user { id }
+                    original {
+                      id
+                      name
+                    }
+                    changes {
+                      id
+                      name
+                    }
                   }
                 }
               }
@@ -394,7 +398,7 @@ describe('OrgResolver (integration)', () => {
         { input: { id: historyOrgID, name: 'History Org Updated' } },
       )
       expect(res.errors).toBeUndefined()
-      const history = res.data?.updateOrg?.org?.history
+      const history = res.data?.updateOrg?.org?.history.nodes
       expect(history).toHaveLength(2)
       const latest = history!.at(-1)!
       expect(latest.user).toBeDefined()

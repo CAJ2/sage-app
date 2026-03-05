@@ -13,6 +13,7 @@ import {
 import type { Ref } from '@mikro-orm/core'
 
 import type { TranslatedField } from '@src/common/i18n'
+import { type JSONObject } from '@src/common/z.schema'
 import { CreatedUpdated } from '@src/db/base.entity'
 import { Point, PointType } from '@src/db/custom.types'
 import { Process } from '@src/process/process.entity'
@@ -70,7 +71,7 @@ export class PlacesTag extends BaseEntity {
   tag!: Tag & {}
 
   @Property({ type: 'json' })
-  meta?: Record<string, any>
+  meta?: JSONObject
 }
 
 @Entity({ tableName: 'place_history', schema: 'public' })
@@ -87,8 +88,8 @@ export class PlaceHistory extends BaseEntity {
   user!: Ref<User>
 
   @Property({ type: 'json' })
-  original?: Record<string, any>
+  original?: JSONObject
 
   @Property({ type: 'json' })
-  changes?: Record<string, any>
+  changes?: JSONObject
 }

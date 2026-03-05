@@ -1,35 +1,33 @@
 import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 import { IsOptional, MaxLength } from 'class-validator'
 import { DateTime } from 'luxon'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
-import { translate } from '@src/common/i18n'
 import {
   BaseModel,
   CreatedUpdated,
+  type ModelRef,
   registerModel,
   TranslatedInput,
   TranslatedOutput,
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { Category as CategoryEntity } from '@src/product/category.entity'
 import { ItemsPage } from '@src/product/item.model'
+import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
   description: 'A hierarchical category for classifying product items',
 })
-export class Category extends CreatedUpdated<CategoryEntity> implements Named {
+export class Category extends CreatedUpdated implements Named {
   @Field(() => ID)
   id!: string
 
   @Field(() => String)
-  @Transform(translate)
   @MaxLength(1024)
   name!: string
 
@@ -40,7 +38,6 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   nameTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true, description: 'A short summary description' })
-  @Transform(translate)
   @IsOptional()
   @MaxLength(1024)
   descShort?: string
@@ -52,7 +49,6 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   descShortTr?: TranslatedOutput[]
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => [TranslatedOutput], {
@@ -80,13 +76,13 @@ export class Category extends CreatedUpdated<CategoryEntity> implements Named {
   @Field(() => ItemsPage, { description: 'Items classified under this category' })
   items!: ItemsPage & {}
 
-  @Field(() => [CategoryHistory], { description: 'Audit history of changes to this category' })
-  history: CategoryHistory[] = []
+  @Field(() => CategoryHistoryPage, { description: 'Audit history of changes to this category' })
+  history!: CategoryHistoryPage & {}
 }
 registerModel('Category', Category)
 
 @ObjectType()
-export class CategoryHistory extends BaseModel<any> {
+export class CategoryHistory extends BaseModel {
   @Field(() => Category)
   category!: Category
 
@@ -94,7 +90,7 @@ export class CategoryHistory extends BaseModel<any> {
   datetime!: DateTime
 
   @Field(() => User)
-  user!: User & {}
+  user!: ModelRef<User, UserEntity>
 
   @Field(() => Category, { nullable: true })
   original?: Category
@@ -104,7 +100,13 @@ export class CategoryHistory extends BaseModel<any> {
 }
 
 @ObjectType()
+export class CategoryHistoryPage extends Paginated(CategoryHistory) {}
+
+@ObjectType()
 export class CategoriesPage extends Paginated(Category) {}
+
+@ArgsType()
+export class CategoryHistoryArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class CategoriesArgs extends PaginationBasicArgs {}

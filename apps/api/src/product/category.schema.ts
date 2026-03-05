@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -16,8 +17,18 @@ import {
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ZService } from '@src/common/z.service'
-import { CreateCategoryInput, UpdateCategoryInput } from '@src/product/category.model'
+import { TransformInput, ZService } from '@src/common/z.service'
+import {
+  Category as CategoryEntity,
+  CategoryHistory as CategoryHistoryEntity,
+} from '@src/product/category.entity'
+import {
+  Category,
+  CategoryHistory,
+  CreateCategoryInput,
+  UpdateCategoryInput,
+} from '@src/product/category.model'
+import { User } from '@src/users/users.model'
 
 export const CategoryIDSchema = z.string().meta({
   id: 'Category',
@@ -40,6 +51,56 @@ export class CategorySchemaService {
     private readonly baseSchema: BaseSchemaService,
     private readonly zService: ZService,
   ) {
+    const CategoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as CategoryEntity
+      const model = new Category()
+      model.id = entity.id
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+      model.name = input.i18n.tr(entity.name) as string
+      model.nameTr = entity.name
+        ? Object.entries(entity.name).map(([key, text]) => ({
+            lang: key.split(';')[0],
+            text: text as string,
+            auto: key.endsWith(';a'),
+          }))
+        : undefined
+      model.descShort = input.i18n.tr(entity.descShort)
+      model.descShortTr = entity.descShort
+        ? Object.entries(entity.descShort).map(([key, text]) => ({
+            lang: key.split(';')[0],
+            text: text as string,
+            auto: key.endsWith(';a'),
+          }))
+        : undefined
+      model.desc = input.i18n.tr(entity.desc)
+      model.descTr = entity.desc
+        ? Object.entries(entity.desc).map(([key, text]) => ({
+            lang: key.split(';')[0],
+            text: text as string,
+            auto: key.endsWith(';a'),
+          }))
+        : undefined
+      model.imageURL = entity.imageURL
+      return model
+    })
+    this.zService.registerTransform(CategoryEntity, Category, CategoryTransform)
+
+    const CategoryHistoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as CategoryHistoryEntity
+      const model = new CategoryHistory()
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Category | undefined
+      model.changes = entity.changes as Category | undefined
+      return model
+    })
+    this.zService.registerTransform(
+      CategoryHistoryEntity,
+      CategoryHistory,
+      CategoryHistoryTransform,
+    )
+
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
       nameTr: TrArraySchema,

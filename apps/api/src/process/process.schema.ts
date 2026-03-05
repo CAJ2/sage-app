@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -10,19 +11,29 @@ import { BaseSchemaService, runAjvValidator, stripNulls, zToSchema } from '@src/
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ZService } from '@src/common/z.service'
+import { TransformInput, ZService } from '@src/common/z.service'
 import { PlaceIDSchema } from '@src/geo/place.schema'
 import { RegionIDSchema } from '@src/geo/region.model'
 import { MaterialIDSchema } from '@src/process/material.model'
 import {
   ProcessEfficiencySchema,
+  Process as ProcessEntity,
+  ProcessHistory as ProcessHistoryEntity,
   ProcessInstructionsSchema,
   ProcessIntent,
   ProcessRulesSchema,
 } from '@src/process/process.entity'
-import { CreateProcessInput, UpdateProcessInput } from '@src/process/process.model'
+import {
+  CreateProcessInput,
+  Process,
+  ProcessEfficiency,
+  ProcessHistory,
+  UpdateProcessInput,
+} from '@src/process/process.model'
+import { RecyclingStream, StreamScore } from '@src/process/stream.model'
 import { VariantIDSchema } from '@src/product/variant.schema'
 import { OrgIDSchema } from '@src/users/org.schema'
+import { User } from '@src/users/users.model'
 
 export const ProcessIDSchema = z.string().meta({
   id: 'Process',
@@ -53,6 +64,70 @@ export class ProcessSchemaService {
     private readonly baseSchema: BaseSchemaService,
     private readonly zService: ZService,
   ) {
+    const ProcessTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ProcessEntity
+      const model = new Process()
+      model.id = entity.id
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+      model.intent = entity.intent
+      model.name = input.i18n.tr(entity.name)
+      model.desc = input.i18n.tr(entity.desc)
+      if (entity.efficiency) {
+        const eff = new ProcessEfficiency()
+        eff.efficiency = entity.efficiency.efficiency
+        eff.equivalency = entity.efficiency.equivalency
+        eff.valueRatio = entity.efficiency.valueRatio
+        model.efficiency = eff
+      }
+      return model
+    })
+    this.zService.registerTransform(ProcessEntity, Process, ProcessTransform)
+
+    const StreamScoreTransform = z.transform((input: TransformInput) => {
+      const obj = input.input as any
+      const model = new StreamScore()
+      model.score = obj.score
+      model.minScore = obj.minScore
+      model.maxScore = obj.maxScore
+      model.rating = obj.rating
+      model.ratingF = obj.ratingF
+      model.dataQuality = obj.dataQuality
+      model.dataQualityF = obj.dataQualityF
+      model.name = input.i18n.tr(obj.name)
+      return model
+    })
+    this.zService.registerTransform(undefined, StreamScore, StreamScoreTransform)
+
+    const RecyclingStreamTransform = z.transform(async (input: TransformInput) => {
+      const obj = input.input as any
+      const model = new RecyclingStream()
+      model.name = input.i18n.tr(obj.name)
+      model.desc = input.i18n.tr(obj.desc)
+      if (obj.score) {
+        model.score = await this.zService.objectToModel(StreamScore, obj.score)
+      }
+      if (obj.scores) {
+        model.scores = await Promise.all(
+          obj.scores.map((s: any) => this.zService.objectToModel(StreamScore, s)),
+        )
+      }
+      model.container = obj.container
+      return model
+    })
+    this.zService.registerTransform(undefined, RecyclingStream, RecyclingStreamTransform)
+
+    const ProcessHistoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ProcessHistoryEntity
+      const model = new ProcessHistory()
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Process | undefined
+      model.changes = entity.changes as Process | undefined
+      return model
+    })
+    this.zService.registerTransform(ProcessHistoryEntity, ProcessHistory, ProcessHistoryTransform)
+
     this.ProcessMaterialInputSchema = z.strictObject({
       id: MaterialIDSchema,
     })

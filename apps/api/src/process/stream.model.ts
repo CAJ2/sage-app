@@ -1,7 +1,5 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { Transform } from 'class-transformer'
 
-import { translate } from '@src/common/i18n'
 import {
   ProcessInstructionsAccess,
   ProcessInstructionsContainerType,
@@ -56,7 +54,6 @@ export class StreamScore {
   dataQualityF?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   name?: string
 }
 
@@ -119,11 +116,9 @@ export class Container {
 })
 export class RecyclingStream {
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   name?: string
 
   @Field(() => String, { nullable: true })
-  @Transform(translate)
   desc?: string
 
   @Field(() => StreamScore, {

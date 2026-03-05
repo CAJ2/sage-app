@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
 import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
@@ -17,14 +18,30 @@ import {
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
 import { UISchemaElement } from '@src/common/ui.schema'
-import { ZService } from '@src/common/z.service'
+import { TransformInput, ZService } from '@src/common/z.service'
 import { RegionIDSchema } from '@src/geo/region.model'
+import { Component } from '@src/process/component.model'
 import { ComponentIDSchema } from '@src/process/component.schema'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { ItemIDSchema } from '@src/product/item.schema'
-import { VariantComponentUnitSchema } from '@src/product/variant.entity'
-import { CreateVariantInput, UpdateVariantInput } from '@src/product/variant.model'
+import {
+  VariantComponentUnitSchema,
+  Variant as VariantEntity,
+  VariantHistory as VariantHistoryEntity,
+  VariantsComponents,
+  VariantsOrgs,
+} from '@src/product/variant.entity'
+import {
+  CreateVariantInput,
+  UpdateVariantInput,
+  Variant,
+  VariantComponent,
+  VariantHistory,
+  VariantOrg,
+} from '@src/product/variant.model'
+import { Org } from '@src/users/org.model'
 import { OrgIDSchema } from '@src/users/org.schema'
+import { User } from '@src/users/users.model'
 
 export const VariantIDSchema = z.string().meta({
   id: 'Variant',
@@ -70,6 +87,52 @@ export class VariantSchemaService {
     private readonly baseSchema: BaseSchemaService,
     private readonly zService: ZService,
   ) {
+    const VariantTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as VariantEntity
+      const model = new Variant()
+      model.id = entity.id
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+      model.name = input.i18n.tr(entity.name)
+      model.desc = input.i18n.tr(entity.desc)
+      return model
+    })
+    this.zService.registerTransform(VariantEntity, Variant, VariantTransform)
+
+    const VariantOrgTransform = z.transform(async (input: TransformInput) => {
+      const entity = input.input as VariantsOrgs
+      const model = new VariantOrg()
+      model.role = entity.role
+      if (entity.org) {
+        model.org = await this.zService.entityToModel(Org, entity.org)
+      }
+      return model
+    })
+    this.zService.registerTransform(VariantsOrgs, VariantOrg, VariantOrgTransform)
+
+    const VariantComponentTransform = z.transform(async (input: TransformInput) => {
+      const entity = input.input as VariantsComponents
+      const model = new VariantComponent()
+      model.quantity = entity.quantity
+      model.unit = entity.unit
+      if (entity.component) {
+        model.component = await this.zService.entityToModel(Component, entity.component)
+      }
+      return model
+    })
+    this.zService.registerTransform(VariantsComponents, VariantComponent, VariantComponentTransform)
+
+    const VariantHistoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as VariantHistoryEntity
+      const model = new VariantHistory()
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Variant | undefined
+      model.changes = entity.changes as Variant | undefined
+      return model
+    })
+    this.zService.registerTransform(VariantHistoryEntity, VariantHistory, VariantHistoryTransform)
+
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
       nameTr: TrArraySchema,

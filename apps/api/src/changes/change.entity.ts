@@ -12,6 +12,7 @@ import {
 import type { Ref } from '@mikro-orm/core'
 
 import { Source } from '@src/changes/source.entity'
+import { type JSONObject } from '@src/common/z.schema'
 import { CreatedUpdated, generateID, IDCreatedUpdated } from '@src/db/base.entity'
 import { User } from '@src/users/users.entity'
 
@@ -25,7 +26,7 @@ export enum ChangeStatus {
 
 export interface Suggestion {
   // Suggested changes for the entity
-  changes?: Record<string, any>
+  changes?: JSONObject
   // The user making the suggestion
   userID: string
   // Description of the suggestion
@@ -92,11 +93,11 @@ export class ChangeEdits extends CreatedUpdated {
 
   // The current state of the entity
   @Property({ type: 'json' })
-  original?: Record<string, any>
+  original?: JSONObject
 
   // The new state of the entity
   @Property({ type: 'json' })
-  changes?: Record<string, any>
+  changes?: JSONObject
 
   // The user making the change
   @Property()
