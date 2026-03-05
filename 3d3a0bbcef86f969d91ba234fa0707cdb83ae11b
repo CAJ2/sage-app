@@ -1,0 +1,35 @@
+apps/api/src/auth/utils.test.ts
+  d7d924fe0429bae7 1-41
+apps/api/src/users/users.service.spec.ts
+  d7d924fe0429bae7 4,6,8,10,13,16,18,25-47,50-64,67-81,83-94
+apps/api/src/users/users.resolver.spec.ts
+  d7d924fe0429bae7 60-61,107,138
+apps/api/src/auth/auth.service.spec.ts
+  d7d924fe0429bae7 30-41
+apps/api/src/changes/change.resolver.spec.ts
+  d7d924fe0429bae7 80-81,99
+apps/api/src/process/process.resolver.spec.ts
+  d7d924fe0429bae7 61-62,127,166
+apps/api/src/common/exceptions.test.ts
+  d7d924fe0429bae7 1-7,9-167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "3d3a0bbcef86f969d91ba234fa0707cdb83ae11b",
+  "prompts": {
+    "d7d924fe0429bae7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ee69181-d628-4464-ae6b-3811bf28b4ac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 345,
+      "total_deletions": 47,
+      "accepted_lines": 303,
+      "overriden_lines": 1
+    }
+  }
+}
