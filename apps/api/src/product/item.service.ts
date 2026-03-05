@@ -168,12 +168,19 @@ export class ItemService {
     return deleted
   }
 
-  async history(itemID: string) {
-    return this.em.find(
+  async history(itemID: string, opts: CursorOptions<ItemHistory>) {
+    const items = await this.em.find(
       ItemHistory,
       { item: itemID },
-      { populate: ['user'], orderBy: { datetime: 'ASC' } },
+      {
+        populate: ['user'],
+        orderBy: { datetime: 'ASC' },
+        limit: opts.options.limit,
+        offset: opts.options.offset,
+      },
     )
+    const count = await this.em.count(ItemHistory, { item: itemID })
+    return { items, count }
   }
 
   async setFields(item: Item, input: Partial<CreateItemInput & UpdateItemInput>, change?: Change) {

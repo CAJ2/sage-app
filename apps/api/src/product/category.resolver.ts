@@ -13,6 +13,8 @@ import {
   CategoriesPage,
   Category,
   CategoryHistory,
+  CategoryHistoryArgs,
+  CategoryHistoryPage,
   CategoryItemsArgs,
   CreateCategoryInput,
   CreateCategoryOutput,
@@ -158,10 +160,18 @@ export class CategoryResolver {
     return { success: true, id: deleted.id }
   }
 
-  @ResolveField(() => [CategoryHistory])
-  async history(@Parent() category: Category) {
-    const history = await this.categoryService.history(category.id)
-    return Promise.all(history.map((h) => this.transform.entityToModel(CategoryHistory, h)))
+  @ResolveField(() => CategoryHistoryPage)
+  async history(@Parent() category: Category, @Args() args: CategoryHistoryArgs) {
+    const [, filter] = await this.transform.paginationArgs(CategoryHistoryArgs, args)
+    const cursor = await this.categoryService.history(category.id, filter)
+    const items = await Promise.all(
+      cursor.items.map((h) => this.transform.entityToModel(CategoryHistory, h)),
+    )
+    return this.transform.objectsToPaginated(
+      CategoryHistoryPage,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 

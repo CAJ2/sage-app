@@ -215,15 +215,17 @@ describe('History via Change/Merge flow (integration)', () => {
             item(id: $id) {
               id
               history {
-                datetime
-                user {
-                  id
-                }
-                original {
-                  name
-                }
-                changes {
-                  name
+                nodes {
+                  datetime
+                  user {
+                    id
+                  }
+                  original {
+                    name
+                  }
+                  changes {
+                    name
+                  }
                 }
               }
             }
@@ -232,7 +234,7 @@ describe('History via Change/Merge flow (integration)', () => {
         { id: existingItemID },
       )
       expect(res.errors).toBeUndefined()
-      const history = res.data?.item?.history
+      const history = res.data?.item?.history.nodes
       expect(history!.length).toBeGreaterThanOrEqual(1)
       const latest = history!.at(-1)!
       expect(latest.user).toBeDefined()

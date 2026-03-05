@@ -34,8 +34,9 @@ export class Org extends IDCreatedUpdated implements Named {
 
   @Field(() => UserPage, { description: 'Users that are members of this organization' })
   users!: UserPage & {}
-  @Field(() => [OrgHistory])
-  history: OrgHistory[] = []
+
+  @Field(() => OrgHistoryPage)
+  history!: OrgHistoryPage & {}
 }
 registerModel('Org', Org)
 
@@ -58,7 +59,13 @@ export class OrgHistory extends BaseModel {
 }
 
 @ObjectType()
+export class OrgHistoryPage extends Paginated(OrgHistory) {}
+
+@ObjectType()
 export class OrgsPage extends Paginated(Org) {}
+
+@ArgsType()
+export class OrgHistoryArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class OrgUsersArgs extends PaginationBasicArgs {}

@@ -49,7 +49,7 @@ export type Category = Named & {
   /** All descendant categories down the hierarchy tree */
   descendants: CategoriesPage;
   /** Audit history of changes to this category */
-  history: Array<CategoryHistory>;
+  history: CategoryHistoryPage;
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   /** Items classified under this category */
@@ -91,6 +91,15 @@ export type CategoryDescendantsArgs = {
 
 
 /** A hierarchical category for classifying product items */
+export type CategoryHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A hierarchical category for classifying product items */
 export type CategoryItemsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -120,6 +129,20 @@ export type CategoryHistory = {
   datetime: Scalars['DateTime']['output'];
   original?: Maybe<Category>;
   user: User;
+};
+
+export type CategoryHistoryEdge = {
+  __typename?: 'CategoryHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: CategoryHistory;
+};
+
+export type CategoryHistoryPage = {
+  __typename?: 'CategoryHistoryPage';
+  edges?: Maybe<Array<CategoryHistoryEdge>>;
+  nodes?: Maybe<Array<CategoryHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** A proposed or merged set of edits to one or more data models */
@@ -231,7 +254,7 @@ export type Component = Named & {
   /** The geographic region this component's recycling data applies to */
   region?: Maybe<Region>;
   sources: ComponentSourcesPage;
-  tags: Array<Tag>;
+  tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -259,6 +282,15 @@ export type ComponentRecycleScoreArgs = {
 
 /** A physical component of a product variant, made of one or more materials */
 export type ComponentSourcesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentTagsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -687,7 +719,7 @@ export type Item = Named & {
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this item */
-  history: Array<ItemHistory>;
+  history: ItemHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
@@ -702,6 +734,15 @@ export type Item = Named & {
 
 /** A product or consumable item that can be categorized and have multiple variants */
 export type ItemCategoriesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A product or consumable item that can be categorized and have multiple variants */
+export type ItemHistoryArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -743,6 +784,20 @@ export type ItemHistory = {
   item: Item;
   original?: Maybe<Item>;
   user: User;
+};
+
+export type ItemHistoryEdge = {
+  __typename?: 'ItemHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: ItemHistory;
+};
+
+export type ItemHistoryPage = {
+  __typename?: 'ItemHistoryPage';
+  edges?: Maybe<Array<ItemHistoryEdge>>;
+  nodes?: Maybe<Array<ItemHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type ItemTagsInput = {
@@ -1074,7 +1129,7 @@ export type Org = Named & {
   avatarURL?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
-  history: Array<OrgHistory>;
+  history: OrgHistoryPage;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -1085,6 +1140,15 @@ export type Org = Named & {
   users: UserPage;
   /** URL of the organization's website */
   websiteURL?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** An organization or company on the platform */
+export type OrgHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1109,6 +1173,20 @@ export type OrgHistory = {
   org: Org;
   original?: Maybe<Org>;
   user: User;
+};
+
+export type OrgHistoryEdge = {
+  __typename?: 'OrgHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: OrgHistory;
+};
+
+export type OrgHistoryPage = {
+  __typename?: 'OrgHistoryPage';
+  edges?: Maybe<Array<OrgHistoryEdge>>;
+  nodes?: Maybe<Array<OrgHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type PageInfo = {

@@ -18,6 +18,7 @@ import {
   ComponentSourcesArgs,
   ComponentSourcesPage,
   ComponentsPage,
+  ComponentTagsArgs,
   CreateComponentInput,
   CreateComponentOutput,
   UpdateComponentInput,
@@ -26,7 +27,7 @@ import {
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { ComponentsArgs, Material } from '@src/process/material.model'
-import { Tag } from '@src/process/tag.model'
+import { Tag, TagPage } from '@src/process/tag.model'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Component)
@@ -89,10 +90,11 @@ export class ComponentResolver {
     return this.transform.entitiesToModels(Material, materials)
   }
 
-  @ResolveField()
-  async tags(@Parent() component: Component) {
-    const tags = await this.componentService.tags(component.id)
-    return this.transform.objectsToModels(Tag, tags)
+  @ResolveField(() => TagPage)
+  async tags(@Parent() component: Component, @Args() args: ComponentTagsArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentTagsArgs, args)
+    const cursor = await this.componentService.tags(component.id, filter)
+    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
   }
 
   @ResolveField()

@@ -689,15 +689,17 @@ describe('ItemResolver (integration)', () => {
               item {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -710,10 +712,10 @@ describe('ItemResolver (integration)', () => {
       const item = createRes.data?.createItem?.item
       expect(item).toBeDefined()
       historyItemID = item!.id
-      expect(item!.history).toHaveLength(1)
-      expect(item!.history[0].user).toBeDefined()
-      expect(item!.history[0].original).toBeNull()
-      expect(item!.history[0].changes).toBeTruthy()
+      expect(item!.history.nodes).toHaveLength(1)
+      expect(item!.history.nodes![0].user).toBeDefined()
+      expect(item!.history.nodes![0].original).toBeNull()
+      expect(item!.history.nodes![0].changes).toBeTruthy()
     })
 
     test('should record history on direct update', async () => {
@@ -724,15 +726,17 @@ describe('ItemResolver (integration)', () => {
               item {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -744,8 +748,8 @@ describe('ItemResolver (integration)', () => {
       expect(updateRes.errors).toBeUndefined()
       const item = updateRes.data?.updateItem?.item
       expect(item).toBeDefined()
-      expect(item!.history).toHaveLength(2)
-      const latest = item!.history.at(-1)!
+      expect(item!.history.nodes).toHaveLength(2)
+      const latest = item!.history.nodes!.at(-1)!
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
     })

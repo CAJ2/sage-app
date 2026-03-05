@@ -16,6 +16,8 @@ import {
   Item,
   ItemCategoriesArgs,
   ItemHistory,
+  ItemHistoryArgs,
+  ItemHistoryPage,
   ItemsArgs,
   ItemsPage,
   ItemTagsArgs,
@@ -131,10 +133,14 @@ export class ItemResolver {
     return { success: true, id: item.id }
   }
 
-  @ResolveField(() => [ItemHistory])
-  async history(@Parent() item: Item) {
-    const history = await this.itemService.history(item.id)
-    return Promise.all(history.map((h) => this.transform.entityToModel(ItemHistory, h)))
+  @ResolveField(() => ItemHistoryPage)
+  async history(@Parent() item: Item, @Args() args: ItemHistoryArgs) {
+    const [, filter] = await this.transform.paginationArgs(ItemHistoryArgs, args)
+    const cursor = await this.itemService.history(item.id, filter)
+    const items = await Promise.all(
+      cursor.items.map((h) => this.transform.entityToModel(ItemHistory, h)),
+    )
+    return this.transform.objectsToPaginated(ItemHistoryPage, { items, count: cursor.count }, true)
   }
 }
 

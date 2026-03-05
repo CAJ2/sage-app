@@ -50,8 +50,8 @@ export class Item extends IDCreatedUpdated implements Named {
   })
   variants!: VariantsPage & {}
 
-  @Field(() => [ItemHistory], { description: 'Audit history of changes to this item' })
-  history: ItemHistory[] = []
+  @Field(() => ItemHistoryPage, { description: 'Audit history of changes to this item' })
+  history!: ItemHistoryPage & {}
 }
 registerModel('Item', Item)
 
@@ -74,7 +74,13 @@ export class ItemHistory extends BaseModel {
 }
 
 @ObjectType()
+export class ItemHistoryPage extends Paginated(ItemHistory) {}
+
+@ObjectType()
 export class ItemsPage extends Paginated(Item) {}
+
+@ArgsType()
+export class ItemHistoryArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class ItemsArgs extends PaginationBasicArgs {}

@@ -450,15 +450,17 @@ describe('CategoryResolver (integration)', () => {
               category {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -471,10 +473,10 @@ describe('CategoryResolver (integration)', () => {
       const category = createRes.data?.createCategory?.category
       expect(category).toBeDefined()
       historyCategoryID = category!.id
-      expect(category!.history).toHaveLength(1)
-      expect(category!.history[0].user).toBeDefined()
-      expect(category!.history[0].original).toBeNull()
-      expect(category!.history[0].changes).toBeTruthy()
+      expect(category!.history.nodes).toHaveLength(1)
+      expect(category!.history.nodes![0].user).toBeDefined()
+      expect(category!.history.nodes![0].original).toBeNull()
+      expect(category!.history.nodes![0].changes).toBeTruthy()
     })
 
     test('should record history on direct update', async () => {
@@ -485,15 +487,17 @@ describe('CategoryResolver (integration)', () => {
               category {
                 id
                 history {
-                  datetime
-                  user {
-                    id
-                  }
-                  original {
-                    id
-                  }
-                  changes {
-                    id
+                  nodes {
+                    datetime
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -505,8 +509,8 @@ describe('CategoryResolver (integration)', () => {
       expect(updateRes.errors).toBeUndefined()
       const category = updateRes.data?.updateCategory?.category
       expect(category).toBeDefined()
-      expect(category!.history).toHaveLength(2)
-      const latest = category!.history.at(-1)!
+      expect(category!.history.nodes).toHaveLength(2)
+      const latest = category!.history.nodes!.at(-1)!
       expect(latest.original).toBeTruthy()
       expect(latest.changes).toBeTruthy()
     })

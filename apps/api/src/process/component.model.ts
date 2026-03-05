@@ -22,7 +22,7 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { type ComponentPhysical, type ComponentVisual } from '@src/process/component.entity'
 import { Material } from '@src/process/material.model'
 import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
-import { Tag } from '@src/process/tag.model'
+import { TagPage } from '@src/process/tag.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -70,8 +70,8 @@ export class Component extends IDCreatedUpdated implements Named {
   })
   materials: ComponentMaterial[] = []
 
-  @Field(() => [Tag])
-  tags!: Tag[]
+  @Field(() => TagPage)
+  tags!: TagPage & {}
 
   @Field(() => Region, {
     nullable: true,
@@ -137,6 +137,9 @@ export class ComponentsPage extends Paginated(Component) {}
 
 @ArgsType()
 export class ComponentHistoryArgs extends PaginationBasicArgs {}
+
+@ArgsType()
+export class ComponentTagsArgs extends PaginationBasicArgs {}
 
 @ArgsType()
 export class ComponentSourcesArgs extends PaginationBasicArgs {}

@@ -143,8 +143,10 @@ describe('ComponentResolver (integration)', () => {
           component(id: $id) {
             id
             tags {
-              id
-              name
+              nodes {
+                id
+                name
+              }
             }
           }
         }
@@ -153,7 +155,7 @@ describe('ComponentResolver (integration)', () => {
     )
     expect(res.errors).toBeUndefined()
     expect(res.data?.component).toBeDefined()
-    expect(Array.isArray(res.data?.component?.tags)).toBe(true)
+    expect(Array.isArray(res.data?.component?.tags?.nodes)).toBe(true)
   })
 
   test('should create a component', async () => {
@@ -332,7 +334,9 @@ describe('ComponentResolver (integration)', () => {
               component {
                 id
                 tags {
-                  id
+                  nodes {
+                    id
+                  }
                 }
               }
             }
@@ -351,11 +355,11 @@ describe('ComponentResolver (integration)', () => {
       )
       expect(res.errors).toBeUndefined()
       expect(res.data?.createComponent?.component).toBeDefined()
-      expect(res.data?.createComponent?.component?.tags).toHaveLength(2)
-      expect(res.data?.createComponent?.component?.tags?.map((t: any) => t.id)).toContain(
+      expect(res.data?.createComponent?.component?.tags?.nodes).toHaveLength(2)
+      expect(res.data?.createComponent?.component?.tags?.nodes?.map((t: any) => t.id)).toContain(
         TAG_IDS[0],
       )
-      expect(res.data?.createComponent?.component?.tags?.map((t: any) => t.id)).toContain(
+      expect(res.data?.createComponent?.component?.tags?.nodes?.map((t: any) => t.id)).toContain(
         TAG_IDS[3],
       )
     })
@@ -510,7 +514,9 @@ describe('ComponentResolver (integration)', () => {
               component {
                 id
                 tags {
-                  id
+                  nodes {
+                    id
+                  }
                 }
               }
             }
@@ -525,8 +531,8 @@ describe('ComponentResolver (integration)', () => {
       )
       expect(addRes.errors).toBeUndefined()
       expect(addRes.data?.updateComponent?.component).toBeDefined()
-      expect(addRes.data?.updateComponent?.component?.tags).toHaveLength(1)
-      expect(addRes.data?.updateComponent?.component?.tags?.map((t: any) => t.id)).toContain(
+      expect(addRes.data?.updateComponent?.component?.tags?.nodes).toHaveLength(1)
+      expect(addRes.data?.updateComponent?.component?.tags?.nodes?.map((t: any) => t.id)).toContain(
         TAG_IDS[0],
       )
 
