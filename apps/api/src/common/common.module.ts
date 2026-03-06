@@ -1,6 +1,7 @@
 import { join } from 'path'
 
 import { Global, Module } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { ClsModule } from 'nestjs-cls'
 import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n'
 
@@ -30,6 +31,7 @@ import { ZService } from '@src/common/z.service'
     }),
   ],
   providers: [
+    ConfigService,
     TransformService,
     MeiliService,
     BaseSchemaService,

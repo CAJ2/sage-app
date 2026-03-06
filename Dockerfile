@@ -1,4 +1,6 @@
 FROM node:25-slim AS base
+ARG APP_VERSION
+ARG APP_SHA
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
@@ -23,6 +25,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=
 FROM base AS api
 COPY --from=api-build /prod/api /prod/api
 ENV NODE_ENV=production
+ENV APP_VERSION=$APP_VERSION
+ENV APP_SHA=$APP_SHA
 WORKDIR /prod/api
 EXPOSE 4444
 CMD [ "node", "dist/main" ]

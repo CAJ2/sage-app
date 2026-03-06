@@ -4,19 +4,19 @@ on:
   workflow_call:
     inputs:
       runs-on:
-        type: "string"
+        type: 'string'
         required: false
         default: '["ubuntu-latest"]'
         description: string of a JSON array describing the run target.
       context:
         type: string
         required: false
-        default: "."
-        description: "The image build context path"
+        default: '.'
+        description: 'The image build context path'
       target:
         type: string
         required: false
-        default: ""
+        default: ''
         description: |
           The target stage to build
       codeql_enabled:
@@ -29,7 +29,7 @@ on:
       download_artifact:
         type: string
         required: false
-        default: ""
+        default: ''
         description: |
           If provided, the name of a artifact that will be downloaded prior to building the dockerfile
       download_artifact_path:
@@ -44,19 +44,24 @@ on:
       registry:
         type: string
         required: false
-        default: "ghcr.io/caj2"
+        default: 'ghcr.io/caj2'
       push_in_pr:
         type: boolean
         required: false
         default: false
         description: |
           If true, images will be pushed in PRs
+      version:
+        type: string
+        required: false
+        description: |
+          If provided, the version of the image to build
     outputs:
       sha_tag:
-        description: "SHA tag for the image built, this includes the registry and image repository"
+        description: 'SHA tag for the image built, this includes the registry and image repository'
         value: ${{ jobs.build-image.outputs.sha_tag }}
       build_tag:
-        description: "Build tag, this is unique tag for this build, it does not include the registry and image repository"
+        description: 'Build tag, this is unique tag for this build, it does not include the registry and image repository'
         value: ${{ jobs.build-image.outputs.build_tag }}
     secrets:
       clone_token:
@@ -134,6 +139,14 @@ jobs:
           path: ${{ inputs.download_artifact_path }}
       - name: Display structure before build
         run: ls -R
+      - name: Get Short SHA
+        id: short-sha
+        run: |
+          export SHORT_SHA=$(git rev-parse --short HEAD)
+          export SHORT_SHA_TAG_ONLY=sha-$SHORT_SHA
+          echo "sha_short=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "build_tag=$SHORT_SHA_TAG_ONLY" >> $GITHUB_OUTPUT
+          echo "sha_tag=${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}:sha-$SHORT_SHA" >> $GITHUB_OUTPUT
       - name: Build Docker image
         id: build
         timeout-minutes: 25
@@ -144,13 +157,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ inputs.version }}
+            APP_SHA=${{ steps.short-sha.outputs.sha_short }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Get Short SHA
-        id: short-sha
-        run: |
-          export SHORT_SHA=$(git rev-parse --short HEAD)
-          export SHORT_SHA_TAG_ONLY=sha-$SHORT_SHA
-          echo "sha_short=$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "build_tag=$SHORT_SHA_TAG_ONLY" >> $GITHUB_OUTPUT
-          echo "sha_tag=${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}:sha-$SHORT_SHA" >> $GITHUB_OUTPUT

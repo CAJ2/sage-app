@@ -1,4 +1,8 @@
 export default (): Record<string, unknown> => ({
+  app: {
+    version: process.env.APP_VERSION ?? process.env.npm_package_version ?? '0.0.0',
+    sha: process.env.APP_SHA ?? 'unknown',
+  },
   auth: {
     jwt: {
       secret: process.env.JWT_SECRET,
