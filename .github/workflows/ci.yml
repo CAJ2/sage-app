@@ -106,11 +106,12 @@ jobs:
 
       # Upload API source maps to PostHog
       - name: Inject & upload source maps to PostHog
-        uses: PostHog/upload-source-maps@v2
+        uses: PostHog/upload-source-maps@991172e085213c222c61d2ba6a0b9e57c81e5066
         with:
           directory: apps/api/dist
           project-id: ${{ secrets.POSTHOG_PROJECT_ID }}
           api-key: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          host: https://eu.posthog.com
 
   test-frontend:
     name: 'Build & Test Frontend'

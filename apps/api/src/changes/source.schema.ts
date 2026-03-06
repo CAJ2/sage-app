@@ -14,7 +14,8 @@ import { TransformInput, ZService } from '@src/common/z.service'
 
 export const JSONLD_CONTEXT: jsonld.ContextDefinition = {
   kg: 'http://g.co/kg',
-  wd: 'https://www.wikidata.org/entity/',
+  wd: 'http://www.wikidata.org/entity/',
+  wdt: 'http://www.wikidata.org/prop/direct/',
 }
 
 const JSONLD_IRI_PREFIXES = Object.values(JSONLD_CONTEXT) as string[]
