@@ -40,6 +40,7 @@ jobs:
         run: |
           echo "affected=$(pnpm exec nx show projects --affected --with-target build --sep ',')" >> $GITHUB_OUTPUT
           echo "e2e-affected=$(pnpm exec nx show projects --affected --with-target e2e:ci --sep ',')" >> $GITHUB_OUTPUT
+          echo "version=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
 
   test:
     name: 'Build & Test API + Frontend'
@@ -103,6 +104,14 @@ jobs:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_WRITE }}
           NODE_ENV: test
 
+      # Upload API source maps to PostHog
+      - name: Inject & upload source maps to PostHog
+        uses: PostHog/upload-source-maps@v2
+        with:
+          directory: apps/api/dist
+          project-id: ${{ secrets.POSTHOG_PROJECT_ID }}
+          api-key: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+
   test-frontend:
     name: 'Build & Test Frontend'
     runs-on: ubuntu-latest
@@ -163,6 +172,7 @@ jobs:
       registry: ghcr.io/caj2
       image_name: sageleaf-api
       target: api
+      version: ${{ needs.nx-affected.outputs.version }}
 
   build-image-frontend:
     name: 'Build frontend images'
@@ -178,6 +188,7 @@ jobs:
       registry: ghcr.io/caj2
       image_name: sageleaf-frontend
       target: frontend
+      version: ${{ needs.nx-affected.outputs.version }}
 
   build-image-science:
     name: 'Build science images'
