@@ -1,5 +1,3 @@
-import path from 'path'
-
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
@@ -8,12 +6,12 @@ import dotenv from 'dotenv-flow'
 import { Request } from 'express'
 import { nanoid } from 'nanoid'
 import { ClsModule, ClsService } from 'nestjs-cls'
-import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n'
 
 import { AppController } from '@src/app.controller'
 import { AppService } from '@src/app.service'
 import { AuthModule } from '@src/auth/auth.module'
 import { ChangesModule } from '@src/changes/changes.module'
+import { CommonModule } from '@src/common/common.module'
 import { HttpExceptionFilter } from '@src/common/http-exception.filter'
 import { parseLanguageHeader } from '@src/common/i18n'
 import config from '@src/config/config'
@@ -62,19 +60,7 @@ if (dotenv) {
         },
       },
     }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      loaderOptions: {
-        path: path.join(__dirname, '../src/i18n/'),
-        watch: true,
-      },
-      typesOutputPath: path.join(__dirname, '../src/i18n/i18n.generated.ts'),
-      resolvers: [
-        new QueryResolver(['lang', 'locale']),
-        new HeaderResolver(['x-lang', 'x-locale']),
-        AcceptLanguageResolver,
-      ],
-    }),
+    CommonModule,
     MikroOrmModule.forRoot(MIKRO_TEST_CONFIG),
     GraphQLModule.register(),
     HealthModule,

@@ -1,4 +1,4 @@
-import { join } from 'path'
+import path from 'path'
 
 import { Global, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
@@ -6,6 +6,7 @@ import { ClsModule } from 'nestjs-cls'
 import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n'
 
 import { BaseSchemaService } from '@src/common/base.schema'
+import { isProd } from '@src/common/common.utils'
 import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { PosthogService } from '@src/common/posthog.service'
@@ -19,10 +20,10 @@ import { ZService } from '@src/common/z.service'
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
-        path: join(__dirname, '../i18n/'),
-        watch: true,
+        path: path.join(__dirname, '../i18n/'),
+        watch: !isProd(),
       },
-      typesOutputPath: join(__dirname, '../i18n/i18n.generated.ts'),
+      typesOutputPath: isProd() ? undefined : path.join(__dirname, '../i18n/i18n.generated.ts'),
       resolvers: [
         new QueryResolver(['lang', 'locale']),
         new HeaderResolver(['x-lang', 'x-locale']),
