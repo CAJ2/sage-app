@@ -409,7 +409,7 @@ describe('SourceResolver (integration)', () => {
           input: {
             id: sourceID,
             jsonld: {
-              '@id': 'https://www.wikidata.org/entity/Q11469',
+              '@id': 'http://www.wikidata.org/entity/Q11469',
               '@type': 'Material',
             },
           },
