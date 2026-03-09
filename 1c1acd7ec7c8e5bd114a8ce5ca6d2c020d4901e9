@@ -1,0 +1,29 @@
+apps/api/src/common/cdn.ts
+  55658cfa9cce2161 1-8,10-34
+apps/api/src/common/cdn.test.ts
+  55658cfa9cce2161 1-7,9-34,36-39
+apps/api/src/changes/source.schema.ts
+  55658cfa9cce2161 13,30-35,40,50,91
+apps/api/src/changes/source.schema.test.ts
+  55658cfa9cce2161 60-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "1c1acd7ec7c8e5bd114a8ce5ca6d2c020d4901e9",
+  "prompts": {
+    "55658cfa9cce2161": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "1beb187b-fa52-41a7-8722-08684d213bc8",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 103,
+      "total_deletions": 3,
+      "accepted_lines": 102,
+      "overriden_lines": 3
+    }
+  }
+}
