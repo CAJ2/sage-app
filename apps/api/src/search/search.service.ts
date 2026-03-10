@@ -52,8 +52,10 @@ export class SearchService {
     return this.indexEntityClassMap[base]
   }
 
-  private indexWithLang(index: SearchIndex, lang: string): string {
-    return `${index}_${lang}`
+  private resolveIndex(index: SearchIndex, lang: string, available: string[]): string {
+    const candidate = `${index}_${lang}`
+    if (lang === 'en') return candidate
+    return available.includes(candidate) ? candidate : `${index}_en`
   }
 
   private async hydrateHits(hits: any[], defaultEntityClass?: any) {
@@ -129,8 +131,9 @@ export class SearchService {
       filters.push(geoFilter)
     }
     const lang = this.i18n.getLang()
+    const available = lang !== 'en' ? await this.meili.getAvailableIndexes() : []
     if (idxs.length === 1) {
-      const results = await this.meili.search(this.indexWithLang(idxs[0], lang), query, {
+      const results = await this.meili.search(this.resolveIndex(idxs[0], lang, available), query, {
         filter: filters.length > 0 ? filters : undefined,
         limit: limit ? limit + 1 : 11,
         offset,
@@ -144,7 +147,7 @@ export class SearchService {
     }
     const results = await this.meili.federatedSearch(
       idxs.map((idx) => ({
-        index: this.indexWithLang(idx, lang),
+        index: this.resolveIndex(idx, lang, available),
         query,
       })),
       limit ? limit + 1 : 11,

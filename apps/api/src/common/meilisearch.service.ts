@@ -16,11 +16,30 @@ export enum SearchIndex {
 export class MeiliService {
   client: MeiliSearch
 
+  private availableIndexesPromise: Promise<string[]> | null = null
+  private indexCacheExpiry = 0
+
   constructor() {
     this.client = new MeiliSearch({
       host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
       apiKey: process.env.MEILISEARCH_API_KEY,
     })
+  }
+
+  async getAvailableIndexes(): Promise<string[]> {
+    if (this.availableIndexesPromise && Date.now() < this.indexCacheExpiry) {
+      return this.availableIndexesPromise
+    }
+    this.indexCacheExpiry = Date.now() + 5 * 60 * 1000
+    this.availableIndexesPromise = this.client
+      .getIndexes({ limit: 200 })
+      .then((result) => result.results.map((idx) => idx.uid))
+      .catch((err) => {
+        this.availableIndexesPromise = null
+        this.indexCacheExpiry = 0
+        throw err
+      })
+    return this.availableIndexesPromise
   }
 
   async search(index: string, query: string, options: any) {

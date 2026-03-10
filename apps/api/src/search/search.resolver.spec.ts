@@ -7,6 +7,7 @@ import { SearchType } from '@test/gql/graphql'
 import { GraphQLTestClient } from '@test/graphql.utils'
 import { type Mock } from 'vitest'
 
+import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
@@ -20,6 +21,8 @@ describe('SearchResolver (integration)', () => {
   let gql: GraphQLTestClient
   let searchMock: Mock<any>
   let federatedSearchMock: Mock<any>
+  let getAvailableIndexesMock: Mock<any>
+  let i18nService: I18nService
 
   const emptySearchResult = {
     hits: [],
@@ -41,10 +44,12 @@ describe('SearchResolver (integration)', () => {
   beforeAll(async () => {
     searchMock = vi.fn().mockResolvedValue(emptySearchResult)
     federatedSearchMock = vi.fn().mockResolvedValue(emptyFederatedResult)
+    getAvailableIndexesMock = vi.fn().mockResolvedValue([])
 
     const meiliService = {
       search: searchMock,
       federatedSearch: federatedSearchMock,
+      getAvailableIndexes: getAvailableIndexesMock,
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -58,6 +63,7 @@ describe('SearchResolver (integration)', () => {
     await app.init()
 
     gql = new GraphQLTestClient(app)
+    i18nService = module.get(I18nService)
 
     const orm = module.get<MikroORM>(MikroORM)
 
@@ -249,6 +255,50 @@ describe('SearchResolver (integration)', () => {
     expect(res.data?.search).toBeTruthy()
     expect(res.data?.search.totalCount).toBe(0)
     expect(res.data?.search.nodes?.length).toBe(0)
+  })
+
+  test('should fall back to _en index when lang-specific index is unavailable (single-index)', async () => {
+    vi.spyOn(i18nService, 'getLang').mockReturnValueOnce('de')
+    getAvailableIndexesMock.mockResolvedValueOnce(['categories_en', 'categories_fr'])
+
+    await gql.send(
+      graphql(`
+        query SearchResolverLangFallbackSingle($query: String!, $types: [SearchType!]) {
+          search(query: $query, types: $types) {
+            nodes {
+              __typename
+            }
+            totalCount
+          }
+        }
+      `),
+      { query: 'test', types: [SearchType.Category] },
+    )
+
+    expect(searchMock).toHaveBeenCalledWith('categories_en', expect.anything(), expect.anything())
+  })
+
+  test('should fall back to _en index when lang-specific index is unavailable (federated)', async () => {
+    vi.spyOn(i18nService, 'getLang').mockReturnValueOnce('de')
+    getAvailableIndexesMock.mockResolvedValueOnce(['categories_en', 'items_en', 'items_de'])
+
+    await gql.send(
+      graphql(`
+        query SearchResolverLangFallbackFederated($query: String!, $types: [SearchType!]) {
+          search(query: $query, types: $types) {
+            nodes {
+              __typename
+            }
+            totalCount
+          }
+        }
+      `),
+      { query: 'test', types: [SearchType.Category, SearchType.Item] },
+    )
+
+    const calledIndexes = federatedSearchMock.mock.calls.at(-1)[0].map((q: any) => q.index)
+    expect(calledIndexes).toContain('categories_en') // fallback: de not available
+    expect(calledIndexes).toContain('items_de') // no fallback: de is available
   })
 
   test('should search with pagination', async () => {
