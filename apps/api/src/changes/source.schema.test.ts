@@ -57,6 +57,28 @@ describe('SourceSchemaService', () => {
       })
     })
 
+    it('accepts contentURL with cdn:// protocol', async () => {
+      await expect(
+        service.parseCreateInput({
+          type: SourceType.URL,
+          contentURL: 'cdn://sources/test.jpg',
+        }),
+      ).resolves.toMatchObject({
+        contentURL: 'cdn://sources/test.jpg',
+      })
+    })
+
+    it('shrinks full CDN contentURL to cdn:// protocol', async () => {
+      await expect(
+        service.parseCreateInput({
+          type: SourceType.URL,
+          contentURL: 'https://sage-leaf-sources.fra1.cdn.digitaloceanspaces.com/test.jpg',
+        }),
+      ).resolves.toMatchObject({
+        contentURL: 'cdn://sources/test.jpg',
+      })
+    })
+
     it('rejects contentURL with http:// instead of https://', async () => {
       await expect(
         service.parseCreateInput({

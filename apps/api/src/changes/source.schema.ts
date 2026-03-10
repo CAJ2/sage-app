@@ -10,9 +10,11 @@ import {
   UnlinkSourceInput,
   UpdateSourceInput,
 } from '@src/changes/source.model'
+import { expandCdnUrl, shrinkCdnUrl } from '@src/common/cdn'
 import { TransformInput, ZService } from '@src/common/z.service'
 
 export const JSONLD_CONTEXT: jsonld.ContextDefinition = {
+  '@vocab': 'http://schema.org/',
   kg: 'http://g.co/kg',
   wd: 'http://www.wikidata.org/entity/',
   wdt: 'http://www.wikidata.org/prop/direct/',
@@ -25,11 +27,17 @@ export const SourceIDSchema = z.string().meta({
   title: 'Source ID',
 })
 
+const ContentUrlSchema = z
+  .string()
+  .transform((v) => shrinkCdnUrl(v))
+  .pipe(z.string().regex(/^(https:\/\/|cdn:\/\/)/))
+  .optional()
+
 export const CreateSourceInputSchema = z.object({
   type: z.enum(SourceType),
   location: z.string().max(2048).optional(),
   content: z.record(z.string(), z.json()).optional(),
-  contentURL: z.url({ protocol: /^https$/ }).optional(),
+  contentURL: ContentUrlSchema,
   metadata: z.record(z.string(), z.json()).optional(),
 })
 export const CreateSourceInputJSONSchema = z.toJSONSchema(CreateSourceInputSchema)
@@ -39,7 +47,7 @@ export const UpdateSourceInputSchema = z.object({
   type: z.enum(SourceType).optional(),
   location: z.string().max(2048).optional(),
   content: z.record(z.string(), z.json()).optional(),
-  contentURL: z.url({ protocol: /^https$/ }).optional(),
+  contentURL: ContentUrlSchema,
   metadata: z.record(z.string(), z.json()).optional(),
 })
 export const UpdateSourceInputJSONSchema = z.toJSONSchema(UpdateSourceInputSchema)
@@ -80,7 +88,7 @@ const ModelTransform = z.transform((input: TransformInput) => {
   model.type = entity.type
   model.location = entity.location
   model.content = entity.content
-  model.contentURL = entity.contentURL
+  model.contentURL = expandCdnUrl(entity.contentURL)
   model.metadata = entity.metadata
   return model
 })
