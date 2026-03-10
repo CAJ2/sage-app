@@ -9,6 +9,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Category } from '@src/product/category.entity'
@@ -17,7 +18,8 @@ import { CreateItemInput, UpdateItemInput } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.entity'
 
 @Injectable()
-export class ItemService {
+@IsEntityService(Item)
+export class ItemService implements IEntityService<Item> {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
@@ -28,6 +30,10 @@ export class ItemService {
 
   async findOneByID(id: string) {
     return await this.em.findOne(Item, { id }, { populate: ['categories', 'itemTags'] })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Item, { id: { $in: ids } }, { populate: ['categories', 'itemTags'] })
   }
 
   async find(opts: CursorOptions<Item>) {

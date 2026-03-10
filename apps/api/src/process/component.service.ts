@@ -7,6 +7,7 @@ import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import {
   Component,
@@ -22,7 +23,8 @@ import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 
 @Injectable()
-export class ComponentService {
+@IsEntityService(Component)
+export class ComponentService implements IEntityService<Component> {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
@@ -38,6 +40,10 @@ export class ComponentService {
       items: components,
       count,
     }
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Component, { id: { $in: ids } })
   }
 
   async findOneByID(id: string, withChange?: string) {

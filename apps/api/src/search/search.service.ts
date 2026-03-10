@@ -1,19 +1,25 @@
 import { Injectable } from '@nestjs/common'
 
+import { I18nService } from '@src/common/i18n.service'
 import { MeiliService, SearchIndex } from '@src/common/meilisearch.service'
-import { Place } from '@src/geo/place.model'
-import { Region } from '@src/geo/region.model'
-import { Component } from '@src/process/component.model'
-import { Material } from '@src/process/material.model'
-import { Category } from '@src/product/category.model'
-import { Item } from '@src/product/item.model'
-import { Variant } from '@src/product/variant.model'
+import { MetaService } from '@src/common/meta.service'
+import { Place } from '@src/geo/place.entity'
+import { Region } from '@src/geo/region.entity'
+import { Component } from '@src/process/component.entity'
+import { Material } from '@src/process/material.entity'
+import { Category } from '@src/product/category.entity'
+import { Item } from '@src/product/item.entity'
+import { Variant } from '@src/product/variant.entity'
 import { SearchType } from '@src/search/search.model'
-import { Org } from '@src/users/org.model'
+import { Org } from '@src/users/org.entity'
 
 @Injectable()
 export class SearchService {
-  constructor(private readonly meili: MeiliService) {}
+  constructor(
+    private readonly meili: MeiliService,
+    private readonly i18n: I18nService,
+    private readonly metaService: MetaService,
+  ) {}
 
   typeIndexMap: Record<SearchType, SearchIndex> = {
     [SearchType.CATEGORY]: SearchIndex.CATEGORIES,
@@ -26,7 +32,7 @@ export class SearchService {
     [SearchType.MATERIAL]: SearchIndex.MATERIALS,
   }
 
-  indexModelMap: Record<SearchIndex, any> = {
+  indexEntityClassMap: Record<SearchIndex, any> = {
     [SearchIndex.CATEGORIES]: Category,
     [SearchIndex.ITEMS]: Item,
     [SearchIndex.VARIANTS]: Variant,
@@ -41,8 +47,57 @@ export class SearchService {
     return this.typeIndexMap[type]
   }
 
-  mapIndexToModel(index: string): string {
-    return this.indexModelMap[index as SearchIndex]
+  mapIndexToEntityClass(indexUid: string): any {
+    const base = indexUid.replace(/_[a-z]{2,3}$/, '') as SearchIndex
+    return this.indexEntityClassMap[base]
+  }
+
+  private resolveIndex(index: SearchIndex, lang: string, available: string[]): string {
+    const candidate = `${index}_${lang}`
+    if (lang === 'en') return candidate
+    return available.includes(candidate) ? candidate : `${index}_en`
+  }
+
+  private async hydrateHits(hits: any[], defaultEntityClass?: any) {
+    const classByHit = hits.map((h) => {
+      const entityClass =
+        defaultEntityClass ??
+        (h._federation ? this.mapIndexToEntityClass(h._federation.indexUid) : null)
+      return { hit: h, entityClass }
+    })
+
+    const idsByClass = new Map<any, string[]>()
+    for (const { hit, entityClass } of classByHit) {
+      if (!entityClass) continue
+      if (!idsByClass.has(entityClass)) {
+        idsByClass.set(entityClass, [])
+      }
+      idsByClass.get(entityClass)!.push(hit.id)
+    }
+
+    const entityByClassById = new Map<any, Map<string, any>>()
+    for (const [entityClass, ids] of idsByClass.entries()) {
+      const service = await this.metaService.findEntityService(entityClass)
+      if (!service) continue
+      const entities = await service.findManyByID(ids)
+      entityByClassById.set(entityClass, new Map(entities.map((e: any) => [e.id, e])))
+    }
+
+    const result = []
+    for (const { hit, entityClass } of classByHit) {
+      if (!entityClass) continue
+      const entity = entityByClassById.get(entityClass)?.get(hit.id)
+      if (!entity) continue
+      entity._type = entityClass.name
+      if (hit._geo) {
+        entity.location = {
+          latitude: hit._geo.lat,
+          longitude: hit._geo.lng,
+        }
+      }
+      result.push(entity)
+    }
+    return result
   }
 
   async searchAll(
@@ -75,22 +130,16 @@ export class SearchService {
       const geoFilter = `_geoBoundingBox([${latLong[0]}, ${latLong[1]}], [${latLong[2]}, ${latLong[3]}])`
       filters.push(geoFilter)
     }
+    const lang = this.i18n.getLang()
+    const available = lang !== 'en' ? await this.meili.getAvailableIndexes() : []
     if (idxs.length === 1) {
-      const results = await this.meili.search(idxs[0], query, {
+      const results = await this.meili.search(this.resolveIndex(idxs[0], lang, available), query, {
         filter: filters.length > 0 ? filters : undefined,
         limit: limit ? limit + 1 : 11,
         offset,
       })
-      const items = results.hits.map((h) => {
-        h._type = this.mapIndexToModel(idxs[0])
-        if (h._geo) {
-          h.location = {
-            latitude: h._geo.lat,
-            longitude: h._geo.lng,
-          }
-        }
-        return h
-      })
+      const entityClass = this.mapIndexToEntityClass(idxs[0])
+      const items = await this.hydrateHits(results.hits, entityClass)
       return {
         items,
         count: results.totalHits || results.estimatedTotalHits || 0,
@@ -98,25 +147,13 @@ export class SearchService {
     }
     const results = await this.meili.federatedSearch(
       idxs.map((idx) => ({
-        index: idx,
+        index: this.resolveIndex(idx, lang, available),
         query,
       })),
       limit ? limit + 1 : 11,
       offset,
     )
-    const items = results.hits.map((h) => {
-      if (!h._federation) {
-        return null
-      }
-      h._type = this.mapIndexToModel(h._federation.indexUid)
-      if (h._geo) {
-        h.location = {
-          latitude: h._geo.lat,
-          longitude: h._geo.lng,
-        }
-      }
-      return h
-    })
+    const items = await this.hydrateHits(results.hits.filter((h) => h._federation))
     return {
       items,
       count: results.totalHits || results.estimatedTotalHits || 0,

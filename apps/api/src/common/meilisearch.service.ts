@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import _ from 'lodash'
-import { MeiliSearch, RecordAny } from 'meilisearch'
-
-import { Searchable } from '@src/db/base.entity'
+import { MeiliSearch } from 'meilisearch'
 
 export enum SearchIndex {
   CATEGORIES = 'categories',
@@ -19,6 +16,9 @@ export enum SearchIndex {
 export class MeiliService {
   client: MeiliSearch
 
+  private availableIndexesPromise: Promise<string[]> | null = null
+  private indexCacheExpiry = 0
+
   constructor() {
     this.client = new MeiliSearch({
       host: process.env.MEILISEARCH_HOST || 'http://localhost:7700',
@@ -26,21 +26,20 @@ export class MeiliService {
     })
   }
 
-  async addDocs(docs: Searchable | Searchable[], wait = false) {
-    let addDocs: RecordAny[] = []
-    let index = ''
-    if (!Array.isArray(docs)) {
-      addDocs = [await docs.toSearchDoc()]
-      index = docs.searchIndex()
-    } else {
-      addDocs = await Promise.all(docs.map((doc) => doc.toSearchDoc()))
-      index = docs[0].searchIndex()
+  async getAvailableIndexes(): Promise<string[]> {
+    if (this.availableIndexesPromise && Date.now() < this.indexCacheExpiry) {
+      return this.availableIndexesPromise
     }
-    const res = this.client.index(index).addDocuments(addDocs)
-    if (wait) {
-      return res.waitTask()
-    }
-    return res
+    this.indexCacheExpiry = Date.now() + 5 * 60 * 1000
+    this.availableIndexesPromise = this.client
+      .getIndexes({ limit: 200 })
+      .then((result) => result.results.map((idx) => idx.uid))
+      .catch((err) => {
+        this.availableIndexesPromise = null
+        this.indexCacheExpiry = 0
+        throw err
+      })
+    return this.availableIndexesPromise
   }
 
   async search(index: string, query: string, options: any) {
@@ -49,7 +48,7 @@ export class MeiliService {
   }
 
   async federatedSearch(
-    queries: { index: SearchIndex; query: string; options?: any }[],
+    queries: { index: string; query: string; options?: any }[],
     limit?: number,
     offset?: number,
   ) {
@@ -64,29 +63,6 @@ export class MeiliService {
         offset: offset || 0,
       },
     })
-    return { ...results, hits: this.transformResults(results.hits) }
-  }
-
-  transformResults(results: any[]) {
-    return results.map((r) => {
-      for (const key in r) {
-        if (key.startsWith('name_')) {
-          r.name = _.set(r.name || {}, key.replace('name_', ''), r[key])
-          delete r[key]
-        }
-        if (key.startsWith('desc_short_')) {
-          r.desc_short = _.set(r.desc_short || {}, key.replace('desc_short_', ''), r[key])
-          delete r[key]
-        } else if (key.startsWith('desc_')) {
-          r.desc = _.set(r.desc || {}, key.replace('desc_', ''), r[key])
-          delete r[key]
-        }
-        if (key.startsWith('address_')) {
-          r.address = _.set(r.address || {}, key.replace('address_', ''), r[key])
-          delete r[key]
-        }
-      }
-      return r
-    })
+    return results
   }
 }

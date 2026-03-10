@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/postgresql'
+import { EntityManager } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 
 import { isUsingChange } from '@src/changes/change-ext.model'
@@ -6,23 +6,27 @@ import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
-import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Org, OrgHistory } from '@src/users/org.entity'
 import { CreateOrgInput, UpdateOrgInput } from '@src/users/org.model'
 import { User } from '@src/users/users.entity'
 
 @Injectable()
-export class OrgService {
+@IsEntityService(Org)
+export class OrgService implements IEntityService<Org> {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
-    private readonly searchService: MeiliService,
     private readonly i18n: I18nService,
   ) {}
 
   async findOneByID(id: string) {
     return await this.em.findOne(Org, { id })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Org, { id: { $in: ids } })
   }
 
   async users(orgID: string, opts: CursorOptions<User>) {

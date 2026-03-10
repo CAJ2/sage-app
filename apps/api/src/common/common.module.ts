@@ -2,6 +2,7 @@ import path from 'path'
 
 import { Global, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { DiscoveryModule } from '@nestjs/core'
 import { ClsModule } from 'nestjs-cls'
 import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n'
 
@@ -9,6 +10,7 @@ import { BaseSchemaService } from '@src/common/base.schema'
 import { isProd } from '@src/common/common.utils'
 import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
+import { MetaService } from '@src/common/meta.service'
 import { PosthogService } from '@src/common/posthog.service'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
@@ -30,22 +32,25 @@ import { ZService } from '@src/common/z.service'
         AcceptLanguageResolver,
       ],
     }),
+    DiscoveryModule,
   ],
   providers: [
     ConfigService,
     TransformService,
-    MeiliService,
+    MetaService,
     BaseSchemaService,
     ZService,
     I18nService,
+    MeiliService,
     PosthogService,
   ],
   exports: [
     TransformService,
-    MeiliService,
+    MetaService,
     BaseSchemaService,
     ZService,
     I18nService,
+    MeiliService,
     PosthogService,
   ],
 })

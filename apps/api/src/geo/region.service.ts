@@ -2,10 +2,12 @@ import { EntityManager, raw } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 
 @Injectable()
-export class RegionService {
+@IsEntityService(Region)
+export class RegionService implements IEntityService<Region> {
   constructor(private readonly em: EntityManager) {}
 
   async find(opts: CursorOptions<Region>) {
@@ -19,6 +21,10 @@ export class RegionService {
 
   async findOneByID(id: string) {
     return this.em.findOne(Region, { id })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Region, { id: { $in: ids } })
   }
 
   async searchByPoint(args: { latitude: number; longitude: number }, opts: CursorOptions<Region>) {
