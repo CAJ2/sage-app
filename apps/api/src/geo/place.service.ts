@@ -3,11 +3,13 @@ import { Injectable } from '@nestjs/common'
 
 import { mapOrderBy } from '@src/common/db.utils'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Place, PlacesTag } from '@src/geo/place.entity'
 import { Tag } from '@src/process/tag.entity'
 
 @Injectable()
-export class PlaceService {
+@IsEntityService(Place)
+export class PlaceService implements IEntityService<Place> {
   constructor(private readonly em: EntityManager) {}
 
   async find(opts: CursorOptions<Place>) {
@@ -21,6 +23,10 @@ export class PlaceService {
 
   async findOneByID(id: string) {
     return await this.em.findOne(Place, { id }, { populate: ['org', 'place_tags'] })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Place, { id: { $in: ids } })
   }
 
   async tags(placeID: string) {

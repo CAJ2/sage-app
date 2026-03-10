@@ -1,11 +1,7 @@
-import { BaseEntity, PrimaryKey, Property } from '@mikro-orm/core'
+import { BaseEntity, Loaded, PrimaryKey, Property } from '@mikro-orm/core'
+import { DiscoveryService } from '@nestjs/core'
 import { nanoid } from 'nanoid'
 import { ClsServiceManager } from 'nestjs-cls'
-
-export interface Searchable {
-  searchIndex(): string
-  toSearchDoc(): Promise<Record<string, any>>
-}
 
 function isTestRequest() {
   if (process.env.NODE_ENV === 'production' && !process.env.IS_DEV) return false
@@ -23,6 +19,29 @@ export function generateID() {
     return `__test_${nanoid(14)}`
   }
   return nanoid()
+}
+
+/**
+ * Marks a class as an entity service.
+ * Used to dynamically discover entity services at runtime,
+ * for example, to hydrate entities returned from a search index.
+ */
+export const IsEntityService = DiscoveryService.createDecorator()
+
+export interface IEntityService<E extends BaseEntity> {
+  /**
+   * Finds an entity by its ID.
+   * @param id The entity ID.
+   * @returns The entity, or null if not found.
+   */
+  findOneByID(id: string): Promise<Loaded<E> | null>
+
+  /**
+   * Finds entities by their IDs.
+   * @param ids The entity IDs.
+   * @returns The entities.
+   */
+  findManyByID(ids: string[]): Promise<Loaded<E>[]>
 }
 
 export abstract class IDCreatedUpdated extends BaseEntity {

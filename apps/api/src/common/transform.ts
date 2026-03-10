@@ -217,7 +217,9 @@ export class TransformService {
         if (!(obj as any)._type) {
           continue
         }
-        const inst = await this.zService.objectToModel((obj as any)._type, obj)
+        const inst = _.isPlainObject(obj)
+          ? await this.zService.objectToModel((obj as any)._type, obj)
+          : await this.zService.entityToModel((obj as any)._type, obj as any)
         entities.push(inst)
       }
     }

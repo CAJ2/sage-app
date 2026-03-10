@@ -12,8 +12,8 @@ import {
 } from '@mikro-orm/core'
 import { z } from 'zod/v4'
 
-import { flattenTr, type TranslatedField } from '@src/common/i18n'
-import { IDCreatedUpdated, Searchable } from '@src/db/base.entity'
+import { type TranslatedField } from '@src/common/i18n'
+import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Category } from '@src/product/category.entity'
 import { Variant } from '@src/product/variant.entity'
@@ -33,7 +33,7 @@ export const ItemFilesSchema = z.object({
 export type ItemFiles = z.infer<typeof ItemFilesSchema>
 
 @Entity({ tableName: 'items', schema: 'public' })
-export class Item extends IDCreatedUpdated implements Searchable {
+export class Item extends IDCreatedUpdated {
   @Property({ type: 'json' })
   name!: TranslatedField
 
@@ -74,20 +74,6 @@ export class Item extends IDCreatedUpdated implements Searchable {
 
   @OneToMany({ mappedBy: 'item' })
   history = new Collection<ItemHistory>(this)
-
-  searchIndex() {
-    return 'items'
-  }
-
-  async toSearchDoc() {
-    await this.itemTags.load()
-    return {
-      id: this.id,
-      ...flattenTr('name', this.name),
-      ...flattenTr('desc', this.desc || {}),
-      tags: this.itemTags.getItems().map((it) => ({ name: it.tag.name, meta: it.meta })),
-    }
-  }
 }
 
 @Entity({ tableName: 'items_categories', schema: 'public' })

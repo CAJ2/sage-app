@@ -23,8 +23,17 @@ export class I18nService {
     return this.i18n.t(key, options)
   }
 
-  // Non class-transformer version of the translate function.
-  tr(field: TranslatedField | undefined): string | undefined {
+  // Returns the 2-3 letter lang code for the current request (e.g. 'en', 'sv')
+  getLang(): string {
+    const langs: string[] = this.cls.get('lang') || []
+    return langs[0]?.split('-')[0] ?? 'en'
+  }
+
+  // Picks the appropriate translation for the current request language.
+  tr(field: TranslatedField | string | undefined): string | undefined {
+    if (typeof field === 'string') {
+      return field
+    }
     const lang: string[] = this.cls.get('lang') || []
     return translate({
       value: field,

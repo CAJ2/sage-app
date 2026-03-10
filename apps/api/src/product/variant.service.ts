@@ -9,6 +9,7 @@ import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
@@ -26,7 +27,8 @@ import {
 import { CreateVariantInput, UpdateVariantInput } from '@src/product/variant.model'
 
 @Injectable()
-export class VariantService {
+@IsEntityService(Variant)
+export class VariantService implements IEntityService<Variant> {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
@@ -43,6 +45,10 @@ export class VariantService {
         populate: ['variantSources', 'variantItems', 'variantTags', 'variantComponents', 'orgs'],
       },
     )
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Variant, { id: { $in: ids } })
   }
 
   async find(opts: CursorOptions<Variant>) {

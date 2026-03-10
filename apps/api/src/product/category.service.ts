@@ -7,6 +7,7 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import {
   Category,
   CATEGORY_ROOT,
@@ -18,7 +19,8 @@ import { CreateCategoryInput, UpdateCategoryInput } from '@src/product/category.
 import { Item } from '@src/product/item.entity'
 
 @Injectable()
-export class CategoryService {
+@IsEntityService(Category)
+export class CategoryService implements IEntityService<Category> {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
@@ -36,6 +38,10 @@ export class CategoryService {
 
   async findOneByID(id: string) {
     return await this.em.findOne(Category, { id }, { populate: ['parents', 'children'] })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Category, { id: { $in: ids } })
   }
 
   async findRoot() {

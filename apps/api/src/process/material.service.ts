@@ -2,12 +2,14 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Component } from '@src/process/component.entity'
 import { Material, MATERIAL_ROOT, MaterialEdge, MaterialTree } from '@src/process/material.entity'
 import { Process } from '@src/process/process.entity'
 
 @Injectable()
-export class MaterialService {
+@IsEntityService(Material)
+export class MaterialService implements IEntityService<Material> {
   constructor(private readonly em: EntityManager) {}
 
   async find(opts: CursorOptions<Material>) {
@@ -21,6 +23,10 @@ export class MaterialService {
 
   async findOneByID(id: string) {
     return await this.em.findOne(Material, { id }, { populate: ['parents', 'children'] })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(Material, { id: { $in: ids } })
   }
 
   async findRoot() {
