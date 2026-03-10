@@ -1,0 +1,27 @@
+apps/api/src/search/search.service.ts
+  08e29fe5126fd00c 55-58,134,136,150
+apps/api/src/common/meilisearch.service.ts
+  08e29fe5126fd00c 19-21,29-42
+apps/api/src/search/search.resolver.spec.ts
+  08e29fe5126fd00c 10,24-25,47,52,66,260-303
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "548742a85c583acc8fa848bfde86aa29417b3eee",
+  "prompts": {
+    "08e29fe5126fd00c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19ee4bd1-ffc2-4e38-a5cd-37d88fcde768",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 91,
+      "total_deletions": 19,
+      "accepted_lines": 77,
+      "overriden_lines": 0
+    }
+  }
+}
