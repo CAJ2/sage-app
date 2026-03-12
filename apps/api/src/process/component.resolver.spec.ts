@@ -591,6 +591,56 @@ describe('ComponentResolver (integration)', () => {
       expect(res.data?.updateComponent?.change).toBeDefined()
       expect(res.data?.updateComponent?.change?.status).toBe('PROPOSED')
     })
+
+    test('should return currentComponent with DB state when using change tracking', async () => {
+      // First set a known name directly in the DB
+      const directRes = await gql.send(
+        graphql(`
+          mutation ComponentSetCurrentName($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                name
+              }
+            }
+          }
+        `),
+        { input: { id: testComponentID, name: 'Current DB Name' } },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      // Now update via change — component should show proposed, currentComponent the DB value
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateComponentWithChangeCurrentComponent($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                name
+              }
+              currentComponent {
+                id
+                name
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            name: 'Proposed Name',
+            change: { title: 'current component test' },
+          },
+        },
+      )
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateComponent?.component?.name).toBe('Proposed Name')
+      expect(changeRes.data?.updateComponent?.currentComponent?.name).toBe('Current DB Name')
+      expect(changeRes.data?.updateComponent?.currentComponent?.id).toBe(testComponentID)
+    })
   })
 
   describe('history tracking', () => {

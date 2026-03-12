@@ -300,9 +300,22 @@ export class CreateProcessOutput {
 
 @ObjectType()
 export class UpdateProcessOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if the update was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Process, { nullable: true })
+  @Field(() => Process, {
+    nullable: true,
+    description: 'The process including the proposed changes',
+  })
   process?: Process
+
+  @Field(() => Process, {
+    nullable: true,
+    description:
+      'The process as currently persisted in the database, before any pending change is merged',
+  })
+  currentProcess?: Process & {}
 }

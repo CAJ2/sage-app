@@ -125,9 +125,22 @@ export class CreateOrgOutput {
 
 @ObjectType()
 export class UpdateOrgOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if the update was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Org, { nullable: true })
+  @Field(() => Org, {
+    nullable: true,
+    description: 'The org including the proposed changes',
+  })
   org?: Org
+
+  @Field(() => Org, {
+    nullable: true,
+    description:
+      'The org as currently persisted in the database, before any pending change is merged',
+  })
+  currentOrg?: Org & {}
 }

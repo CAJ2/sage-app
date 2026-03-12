@@ -193,9 +193,22 @@ export class CreateItemOutput {
 
 @ObjectType()
 export class UpdateItemOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if the update was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Item, { nullable: true })
+  @Field(() => Item, {
+    nullable: true,
+    description: 'The item including the proposed changes',
+  })
   item?: Item
+
+  @Field(() => Item, {
+    nullable: true,
+    description:
+      'The item as currently persisted in the database, before any pending change is merged',
+  })
+  currentItem?: Item & {}
 }

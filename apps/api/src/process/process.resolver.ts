@@ -99,7 +99,10 @@ export class ProcessResolver {
     const model = await this.transform.entityToModel(Process, updated.process)
     if (updated.change) {
       const change = await this.transform.entityToModel(Change, updated.change)
-      return { process: model, change }
+      const currentProcess = updated.currentProcess
+        ? await this.transform.entityToModel(Process, updated.currentProcess)
+        : undefined
+      return { process: model, change, currentProcess }
     }
     return { process: model }
   }

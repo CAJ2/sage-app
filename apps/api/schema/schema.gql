@@ -528,7 +528,10 @@ input CreateVariantInput {
 }
 
 type CreateVariantOutput {
+  """The change tracking record, if creation was submitted via a change"""
   change: Change
+
+  """The newly created variant, reflecting the proposed state"""
   variant: Variant
 }
 
@@ -1372,8 +1375,16 @@ input UpdateCategoryInput {
 }
 
 type UpdateCategoryOutput {
+  """The category including the proposed changes"""
   category: Category
+
+  """The change tracking record, if the update was submitted via a change"""
   change: Change
+
+  """
+  The category as currently persisted in the database, before any pending change is merged
+  """
+  currentCategory: Category
 }
 
 input UpdateChangeInput {
@@ -1423,8 +1434,16 @@ input UpdateComponentInput {
 }
 
 type UpdateComponentOutput {
+  """The change tracking record, if the update was submitted via a change"""
   change: Change
+
+  """The component including the proposed changes"""
   component: Component
+
+  """
+  The component as currently persisted in the database, before any pending change is merged
+  """
+  currentComponent: Component
 }
 
 input UpdateItemInput {
@@ -1461,7 +1480,15 @@ input UpdateItemInput {
 }
 
 type UpdateItemOutput {
+  """The change tracking record, if the update was submitted via a change"""
   change: Change
+
+  """
+  The item as currently persisted in the database, before any pending change is merged
+  """
+  currentItem: Item
+
+  """The item including the proposed changes"""
   item: Item
 }
 
@@ -1492,7 +1519,15 @@ input UpdateOrgInput {
 }
 
 type UpdateOrgOutput {
+  """The change tracking record, if the update was submitted via a change"""
   change: Change
+
+  """
+  The org as currently persisted in the database, before any pending change is merged
+  """
+  currentOrg: Org
+
+  """The org including the proposed changes"""
   org: Org
 }
 
@@ -1531,7 +1566,15 @@ input UpdateProcessInput {
 }
 
 type UpdateProcessOutput {
+  """The change tracking record, if the update was submitted via a change"""
   change: Change
+
+  """
+  The process as currently persisted in the database, before any pending change is merged
+  """
+  currentProcess: Process
+
+  """The process including the proposed changes"""
   process: Process
 }
 
@@ -1606,7 +1649,15 @@ input UpdateVariantInput {
 }
 
 type UpdateVariantOutput {
+  """The change tracking record, if the update was submitted via a change"""
   change: Change
+
+  """
+  The variant as currently persisted in the database, before any pending change is merged
+  """
+  currentVariant: Variant
+
+  """The variant including the proposed changes"""
   variant: Variant
 }
 
@@ -1692,6 +1743,9 @@ type Variant implements Named {
 
   """Aggregated recyclability score for this variant"""
   recycleScore(regionID: ID): StreamScore
+
+  """Geographic regions associated with this variant"""
+  regions(after: String, before: String, first: Int, last: Int): RegionsPage!
   sources(after: String, before: String, first: Int, last: Int): VariantSourcesPage!
 
   """Metadata tags applied to this variant"""

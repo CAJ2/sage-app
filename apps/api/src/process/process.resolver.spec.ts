@@ -150,6 +150,56 @@ describe('ProcessResolver (integration)', () => {
     expect(res.data?.updateProcess?.process?.name).toBe('Updated Process Name')
   })
 
+  test('should return currentProcess with DB state when using change tracking', async () => {
+    // First set a known name directly in the DB
+    const directRes = await gql.send(
+      graphql(`
+        mutation ProcessSetCurrentName($input: UpdateProcessInput!) {
+          updateProcess(input: $input) {
+            process {
+              id
+              name
+            }
+          }
+        }
+      `),
+      { input: { id: processID, name: 'Current DB Name' } },
+    )
+    expect(directRes.errors).toBeUndefined()
+
+    // Now update via change — process should show proposed, currentProcess the DB value
+    const changeRes = await gql.send(
+      graphql(`
+        mutation UpdateProcessWithChangeCurrentProcess($input: UpdateProcessInput!) {
+          updateProcess(input: $input) {
+            process {
+              id
+              name
+            }
+            currentProcess {
+              id
+              name
+            }
+            change {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: processID,
+          name: 'Proposed Name',
+          change: { title: 'current process test' },
+        },
+      },
+    )
+    expect(changeRes.errors).toBeUndefined()
+    expect(changeRes.data?.updateProcess?.process?.name).toBe('Proposed Name')
+    expect(changeRes.data?.updateProcess?.currentProcess?.name).toBe('Current DB Name')
+    expect(changeRes.data?.updateProcess?.currentProcess?.id).toBe(processID)
+  })
+
   test('should return error for non-existent process', async () => {
     const res = await gql.send(
       graphql(`

@@ -146,7 +146,10 @@ export class ComponentResolver {
     const model = await this.transform.entityToModel(Component, updated.component)
     if (updated.change) {
       const change = await this.transform.entityToModel(Change, updated.change)
-      return { component: model, change }
+      const currentComponent = updated.currentComponent
+        ? await this.transform.entityToModel(Component, updated.currentComponent)
+        : undefined
+      return { component: model, change, currentComponent }
     }
     return { component: model }
   }

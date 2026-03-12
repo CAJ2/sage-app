@@ -182,9 +182,22 @@ export class CreateCategoryOutput {
 
 @ObjectType()
 export class UpdateCategoryOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if the update was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Category, { nullable: true })
+  @Field(() => Category, {
+    nullable: true,
+    description: 'The category including the proposed changes',
+  })
   category?: Category
+
+  @Field(() => Category, {
+    nullable: true,
+    description:
+      'The category as currently persisted in the database, before any pending change is merged',
+  })
+  currentCategory?: Category & {}
 }

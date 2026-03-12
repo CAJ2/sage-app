@@ -303,9 +303,22 @@ export class CreateComponentOutput {
 
 @ObjectType()
 export class UpdateComponentOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if the update was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Component, { nullable: true })
+  @Field(() => Component, {
+    nullable: true,
+    description: 'The component including the proposed changes',
+  })
   component?: Component
+
+  @Field(() => Component, {
+    nullable: true,
+    description:
+      'The component as currently persisted in the database, before any pending change is merged',
+  })
+  currentComponent?: Component & {}
 }

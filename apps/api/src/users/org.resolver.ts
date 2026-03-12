@@ -70,7 +70,10 @@ export class OrgResolver {
       return { org: result }
     }
     const change = await this.transform.entityToModel(Change, updated.change)
-    return { org: result, change }
+    const currentOrg = updated.currentOrg
+      ? await this.transform.entityToModel(Org, updated.currentOrg)
+      : undefined
+    return { org: result, change, currentOrg }
   }
 
   @ResolveField(() => OrgHistoryPage)

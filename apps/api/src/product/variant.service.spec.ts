@@ -3,10 +3,13 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { Test, TestingModule } from '@nestjs/testing'
 
 import { AuthModule } from '@src/auth/auth.module'
+import { AuthUserService } from '@src/auth/authuser.service'
+import { AUTH_USER_SERVICE_MOCK } from '@src/auth/authuser.service.mock'
 import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { ORG_IDS, REGION_IDS, TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
 import {
   COMPONENT_IDS,
   ITEM_IDS,
@@ -34,13 +37,18 @@ describe('VariantService', () => {
         ProcessModule,
       ],
       providers: [VariantService],
-    }).compile()
+    })
+      .overrideProvider(AuthUserService)
+      .useValue(AUTH_USER_SERVICE_MOCK)
+      .compile()
 
     service = module.get<VariantService>(VariantService)
     orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.getSeeder().seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
+    await orm
+      .getSeeder()
+      .seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestProcessSeeder, TestVariantSeeder)
   }, 60000)
 
   afterAll(async () => {
@@ -101,5 +109,139 @@ describe('VariantService', () => {
     expect(result).toBeDefined()
     expect(result.variant.name).toStrictEqual({ en: 'New Variant' })
     expect(result.variant.desc).toStrictEqual({ en: 'Description for new variant' })
+  })
+
+  test('should create a variant with an org, then update it with the same org in addOrgs without error', async () => {
+    const createResult = await service.create(
+      {
+        nameTr: [{ lang: 'en', text: 'Org Variant', auto: false }],
+        orgs: [{ id: ORG_IDS[0] }],
+      },
+      ADMIN_USER_ID!,
+    )
+    expect(createResult.variant).toBeDefined()
+    const variantId = createResult.variant.id
+
+    const updateResult = await service.update(
+      {
+        id: variantId,
+        addOrgs: [{ id: ORG_IDS[0] }],
+      },
+      ADMIN_USER_ID!,
+    )
+    expect(updateResult.variant).toBeDefined()
+    expect(updateResult.variant!.id).toBe(variantId)
+
+    const found = await service.orgs(variantId, { where: {}, options: {} })
+    expect(found.count).toBe(1)
+  })
+
+  test('should set region on a variant', async () => {
+    const createResult = await service.create(
+      { nameTr: [{ lang: 'en', text: 'Region Variant', auto: false }] },
+      ADMIN_USER_ID!,
+    )
+    const variantId = createResult.variant.id
+
+    const updateResult = await service.update(
+      { id: variantId, region: { id: REGION_IDS[0] } },
+      ADMIN_USER_ID!,
+    )
+    expect(updateResult.variant).toBeDefined()
+    expect(updateResult.variant!.region?.id).toBe(REGION_IDS[0])
+  })
+
+  test('addRegions with change syncs variant.region to first item', async () => {
+    const { variant } = await service.create(
+      { nameTr: [{ lang: 'en', text: 'Change Sync Variant', auto: false }] },
+      ADMIN_USER_ID!,
+    )
+
+    const { variant: updated } = await service.update(
+      {
+        id: variant.id,
+        addRegions: [{ id: REGION_IDS[0] }, { id: REGION_IDS[1] }],
+        change: { title: 'test change' },
+      },
+      ADMIN_USER_ID!,
+    )
+
+    expect(updated!.region?.id).toBe(REGION_IDS[0])
+    expect(updated!.regions).toContain(REGION_IDS[0])
+    expect(updated!.regions).toContain(REGION_IDS[1])
+  })
+
+  test('singular region with change also updates regions array', async () => {
+    const { variant } = await service.create(
+      { nameTr: [{ lang: 'en', text: 'Change Region Variant', auto: false }] },
+      ADMIN_USER_ID!,
+    )
+
+    const { variant: updated } = await service.update(
+      {
+        id: variant.id,
+        region: { id: REGION_IDS[0] },
+        change: { title: 'test change' },
+      },
+      ADMIN_USER_ID!,
+    )
+
+    expect(updated!.region?.id).toBe(REGION_IDS[0])
+    expect(updated!.regions![0]).toBe(REGION_IDS[0])
+  })
+
+  test('addRegions syncs region (FK) to first item and regions contains all', async () => {
+    const { variant } = await service.create(
+      { nameTr: [{ lang: 'en', text: 'Sync Regions Variant', auto: false }] },
+      ADMIN_USER_ID!,
+    )
+
+    const { variant: updated } = await service.update(
+      { id: variant.id, addRegions: [{ id: REGION_IDS[0] }, { id: REGION_IDS[1] }] },
+      ADMIN_USER_ID!,
+    )
+
+    expect(updated!.region?.id).toBe(REGION_IDS[0])
+    expect(updated!.regions).toContain(REGION_IDS[0])
+    expect(updated!.regions).toContain(REGION_IDS[1])
+    expect(updated!.regions).toHaveLength(2)
+  })
+
+  test('setting singular region prepends it as primary in regions array', async () => {
+    const { variant } = await service.create(
+      {
+        nameTr: [{ lang: 'en', text: 'Primary Region Variant', auto: false }],
+        regions: [{ id: REGION_IDS[1] }],
+      },
+      ADMIN_USER_ID!,
+    )
+
+    const { variant: updated } = await service.update(
+      { id: variant.id, region: { id: REGION_IDS[0] } },
+      ADMIN_USER_ID!,
+    )
+
+    expect(updated!.region?.id).toBe(REGION_IDS[0])
+    expect(updated!.regions![0]).toBe(REGION_IDS[0])
+    expect(updated!.regions).toContain(REGION_IDS[1])
+  })
+
+  test('removeRegions updates region (FK) to new first item', async () => {
+    const { variant } = await service.create(
+      {
+        nameTr: [{ lang: 'en', text: 'Remove Region Variant', auto: false }],
+        regions: [{ id: REGION_IDS[0] }, { id: REGION_IDS[1] }],
+      },
+      ADMIN_USER_ID!,
+    )
+
+    const { variant: updated } = await service.update(
+      { id: variant.id, removeRegions: [REGION_IDS[0]] },
+      ADMIN_USER_ID!,
+    )
+
+    expect(updated!.region?.id).toBe(REGION_IDS[1])
+    expect(updated!.regions).not.toContain(REGION_IDS[0])
+    expect(updated!.regions).toHaveLength(1)
   })
 })
