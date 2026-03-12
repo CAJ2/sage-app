@@ -7,6 +7,7 @@ import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { Region, RegionsPage } from '@src/geo/region.model'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Item, ItemsPage } from '@src/product/item.model'
@@ -27,6 +28,7 @@ import {
   VariantOrgsArgs,
   VariantOrgsPage,
   VariantRecycleArgs,
+  VariantRegionsArgs,
   VariantsArgs,
   VariantSource,
   VariantSourcesArgs,
@@ -155,7 +157,10 @@ export class VariantResolver {
       return { variant: result }
     }
     const change = await this.transform.entityToModel(Change, updated.change)
-    return { change, variant: result }
+    const currentVariant = updated.currentVariant
+      ? await this.transform.entityToModel(Variant, updated.currentVariant)
+      : undefined
+    return { change, variant: result, currentVariant }
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteVariant', nullable: true })
@@ -166,6 +171,13 @@ export class VariantResolver {
       throw NotFoundErr(`Variant with ID "${input.id}" not found`)
     }
     return { success: true, id: variant.id }
+  }
+
+  @ResolveField(() => RegionsPage)
+  async regions(@Parent() variant: Variant, @Args() args: VariantRegionsArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(VariantRegionsArgs, args)
+    const cursor = await this.variantService.regions(variant.id, filter)
+    return this.transform.entityToPaginated(Region, RegionsPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => VariantSourcesPage)

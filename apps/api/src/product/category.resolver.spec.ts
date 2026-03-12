@@ -437,6 +437,56 @@ describe('CategoryResolver (integration)', () => {
       expect(res.data?.updateCategory?.change).toBeDefined()
       expect(res.data?.updateCategory?.change?.status).toBe('PROPOSED')
     })
+
+    test('should return currentCategory with DB state when using change tracking', async () => {
+      // First set a known name directly in the DB
+      const directRes = await gql.send(
+        graphql(`
+          mutation CategorySetCurrentName($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                name
+              }
+            }
+          }
+        `),
+        { input: { id: testCategoryID, name: 'Current DB Name' } },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      // Now update via change — category should show proposed, currentCategory the DB value
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateCategoryWithChangeCurrentCategory($input: UpdateCategoryInput!) {
+            updateCategory(input: $input) {
+              category {
+                id
+                name
+              }
+              currentCategory {
+                id
+                name
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testCategoryID,
+            name: 'Proposed Name',
+            change: { title: 'current category test' },
+          },
+        },
+      )
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateCategory?.category?.name).toBe('Proposed Name')
+      expect(changeRes.data?.updateCategory?.currentCategory?.name).toBe('Current DB Name')
+      expect(changeRes.data?.updateCategory?.currentCategory?.id).toBe(testCategoryID)
+    })
   })
 
   describe('history tracking', () => {

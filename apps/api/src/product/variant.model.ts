@@ -10,6 +10,7 @@ import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject } from '@src/common/z.schema'
+import { RegionsPage } from '@src/geo/region.model'
 import {
   BaseModel,
   IDCreatedUpdated,
@@ -63,6 +64,11 @@ export class Variant extends IDCreatedUpdated implements Named {
     description: 'Aggregated recyclability score for this variant',
   })
   recycleScore?: StreamScore
+
+  @Field(() => RegionsPage, {
+    description: 'Geographic regions associated with this variant',
+  })
+  regions!: RegionsPage & {}
 
   @Field(() => VariantComponentsPage, {
     description: 'Physical components that make up this variant',
@@ -161,6 +167,11 @@ export class VariantSourcesArgs extends PaginationBasicArgs {
   orderBy(): string[] {
     return ['source']
   }
+}
+
+@ArgsType()
+export class VariantRegionsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
 }
 
 @ArgsType()
@@ -362,18 +373,37 @@ export class UpdateVariantInput extends ChangeInputWithLang {
 
 @ObjectType()
 export class CreateVariantOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if creation was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Variant, { nullable: true })
+  @Field(() => Variant, {
+    nullable: true,
+    description: 'The newly created variant, reflecting the proposed state',
+  })
   variant?: Variant & {}
 }
 
 @ObjectType()
 export class UpdateVariantOutput {
-  @Field(() => Change, { nullable: true })
+  @Field(() => Change, {
+    nullable: true,
+    description: 'The change tracking record, if the update was submitted via a change',
+  })
   change?: Change & {}
 
-  @Field(() => Variant, { nullable: true })
+  @Field(() => Variant, {
+    nullable: true,
+    description: 'The variant including the proposed changes',
+  })
   variant?: Variant & {}
+
+  @Field(() => Variant, {
+    nullable: true,
+    description:
+      'The variant as currently persisted in the database, before any pending change is merged',
+  })
+  currentVariant?: Variant & {}
 }

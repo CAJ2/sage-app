@@ -91,9 +91,10 @@ export class OrgService implements IEntityService<Org> {
     await this.editService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
     await this.editService.updateEntityEdit(change, org)
+    const currentOrg = await this.em.findOne(Org, { id: input.id }, { disableIdentityMap: true })
     await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
-    return { org, change }
+    return { org, change, currentOrg: currentOrg ?? undefined }
   }
 
   async history(orgID: string, opts: CursorOptions<OrgHistory>) {

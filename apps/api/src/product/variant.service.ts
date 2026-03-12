@@ -213,9 +213,14 @@ export class VariantService implements IEntityService<Variant> {
     await this.editService.beginUpdateEntityEdit(change, variant)
     await this.setFields(variant, input, change)
     await this.editService.updateEntityEdit(change, variant)
+    const currentVariant = await this.em.findOne(
+      Variant,
+      { id: input.id },
+      { disableIdentityMap: true },
+    )
     await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
-    return { variant, change }
+    return { variant, change, currentVariant: currentVariant ?? undefined }
   }
 
   async delete(input: DeleteInput) {
@@ -231,6 +236,18 @@ export class VariantService implements IEntityService<Variant> {
     opts.options.populate = ['source']
     const items = await this.em.find(VariantsSources, opts.where, opts.options)
     const count = await this.em.count(VariantsSources, { variant: opts.where.variant })
+    return { items, count }
+  }
+
+  async regions(variantID: string, opts: CursorOptions<Region>) {
+    const variant = await this.em.findOne(Variant, { id: variantID }, { populate: ['region'] })
+    if (!variant) return { items: [], count: 0 }
+    const ids = new Set<string>(variant.regions ?? [])
+    if (variant.region?.id) ids.add(String(variant.region.id))
+    if (ids.size === 0) return { items: [], count: 0 }
+    Object.assign(opts.where, { id: { $in: [...ids] } })
+    const items = await this.em.find(Region, opts.where, opts.options)
+    const count = await this.em.count(Region, { id: { $in: [...ids] } })
     return { items, count }
   }
 
@@ -325,40 +342,62 @@ export class VariantService implements IEntityService<Variant> {
         }
       }
     }
+    if (input.regions) {
+      variant.regions = []
+      for (const region of input.regions) {
+        const regionEntity = await this.em.findOneOrFail(Region, { id: region.id })
+        if (!variant.regions.includes(regionEntity.id)) {
+          variant.regions.push(regionEntity.id)
+        }
+      }
+    }
+    if (input.addRegions) {
+      if (!variant.regions) variant.regions = []
+      for (const region of input.addRegions) {
+        const regionEntity = await this.em.findOneOrFail(Region, { id: region.id })
+        if (!variant.regions.includes(regionEntity.id)) {
+          variant.regions.push(regionEntity.id)
+        }
+      }
+    }
+    if (input.removeRegions) {
+      variant.regions = (variant.regions ?? []).filter((id) => !input.removeRegions!.includes(id))
+    }
+    if (input.regions || input.addRegions || input.removeRegions) {
+      if (variant.regions && variant.regions.length > 0) {
+        if (!change) {
+          const primaryRegion = await this.em.findOneOrFail(Region, { id: variant.regions[0] })
+          variant.region = ref(primaryRegion)
+        } else {
+          variant.region = await this.editService.findRefWithChange(change, Region, {
+            id: variant.regions[0],
+          })
+        }
+      } else {
+        variant.region = undefined
+      }
+    }
     if (input.region) {
       if (!change) {
         const region = await this.em.findOneOrFail(Region, {
           id: input.region.id,
         })
         variant.region = ref(region)
+        if (!variant.regions) variant.regions = []
+        if (!variant.regions.includes(region.id)) {
+          variant.regions.unshift(region.id)
+        } else if (variant.regions[0] !== region.id) {
+          variant.regions = [region.id, ...variant.regions.filter((r) => r !== region.id)]
+        }
       } else {
-        const region = await this.editService.findRefWithChange(change, Region, {
-          id: input.region.id,
-        })
+        const regionId = input.region.id
+        const region = await this.editService.findRefWithChange(change, Region, { id: regionId })
         variant.region = region
-      }
-    }
-    if (input.regions || input.addRegions) {
-      for (const region of input.regions || input.addRegions || []) {
-        const regionEntity = await this.em.findOneOrFail(Region, {
-          id: region.id,
-        })
-        if (variant.regions && variant.regions.includes(regionEntity.id)) {
-          variant.regions.push(regionEntity.id)
-        }
-        if (!variant.regions) {
-          variant.regions = []
-        }
-        variant.regions.push(regionEntity.id)
-      }
-    }
-    if (input.removeRegions) {
-      for (const region of input.removeRegions) {
-        const regionEntity = await this.em.findOneOrFail(Region, {
-          id: region,
-        })
-        if (variant.regions && variant.regions.includes(regionEntity.id)) {
-          variant.regions = variant.regions.filter((r) => r !== regionEntity.id)
+        if (!variant.regions) variant.regions = []
+        if (!variant.regions.includes(regionId)) {
+          variant.regions.unshift(regionId)
+        } else if (variant.regions[0] !== regionId) {
+          variant.regions = [regionId, ...variant.regions.filter((r) => r !== regionId)]
         }
       }
     }

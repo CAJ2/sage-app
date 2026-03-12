@@ -147,7 +147,10 @@ export class CategoryResolver {
       return { category: model }
     }
     const change = await this.transform.entityToModel(Change, updated.change)
-    return { category: model, change }
+    const currentCategory = updated.currentCategory
+      ? await this.transform.entityToModel(Category, updated.currentCategory)
+      : undefined
+    return { category: model, change, currentCategory }
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteCategory', nullable: true })

@@ -788,6 +788,49 @@ describe('VariantResolver (integration)', () => {
       expect(res.data?.updateVariant?.variant?.components?.nodes).toHaveLength(0)
     })
 
+    test('should set region via mutation and query it back as paginated regions', async () => {
+      const mutRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantSetRegion($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+                regions {
+                  nodes {
+                    id
+                  }
+                  totalCount
+                }
+              }
+            }
+          }
+        `),
+        { input: { id: testVariantID, region: { id: REGION_IDS[0] } } },
+      )
+      expect(mutRes.errors).toBeUndefined()
+      expect(mutRes.data?.updateVariant?.variant?.regions?.totalCount).toBe(1)
+
+      const queryRes = await gql.send(
+        graphql(`
+          query GetVariantRegions($id: ID!) {
+            variant(id: $id) {
+              id
+              regions {
+                nodes {
+                  id
+                }
+                totalCount
+              }
+            }
+          }
+        `),
+        { id: testVariantID },
+      )
+      expect(queryRes.errors).toBeUndefined()
+      expect(queryRes.data?.variant?.regions?.totalCount).toBe(1)
+      expect(queryRes.data?.variant?.regions?.nodes?.[0]?.id).toBe(REGION_IDS[0])
+    })
+
     test('should update variant with change tracking', async () => {
       const res = await gql.send(
         graphql(`
@@ -822,6 +865,56 @@ describe('VariantResolver (integration)', () => {
       expect(res.data?.updateVariant?.change).toBeDefined()
       expect(res.data?.updateVariant?.change?.title).toBe('Update variant test')
       expect(res.data?.updateVariant?.change?.status).toBe('DRAFT')
+    })
+
+    test('should return currentVariant with DB state when using change tracking', async () => {
+      // First set a known name directly in the DB
+      const directRes = await gql.send(
+        graphql(`
+          mutation SetCurrentName($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+                name
+              }
+            }
+          }
+        `),
+        { input: { id: testVariantID, name: 'Current DB Name' } },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      // Now update via change — variant should show proposed, currentVariant the DB value
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateWithChangeCurrentVariant($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+                name
+              }
+              currentVariant {
+                id
+                name
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testVariantID,
+            name: 'Proposed Name',
+            change: { title: 'current variant test' },
+          },
+        },
+      )
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateVariant?.variant?.name).toBe('Proposed Name')
+      expect(changeRes.data?.updateVariant?.currentVariant?.name).toBe('Current DB Name')
+      expect(changeRes.data?.updateVariant?.currentVariant?.id).toBe(testVariantID)
     })
 
     test('should add and remove tags', async () => {

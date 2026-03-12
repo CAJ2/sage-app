@@ -161,9 +161,10 @@ export class ItemService implements IEntityService<Item> {
     await this.editService.beginUpdateEntityEdit(change, item)
     await this.setFields(item, input, change)
     await this.editService.updateEntityEdit(change, item)
+    const currentItem = await this.em.findOne(Item, { id: input.id }, { disableIdentityMap: true })
     await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
-    return { item, change }
+    return { item, change, currentItem: currentItem ?? undefined }
   }
 
   async delete(input: DeleteInput) {

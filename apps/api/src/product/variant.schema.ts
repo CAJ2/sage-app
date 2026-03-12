@@ -154,7 +154,7 @@ export class VariantSchemaService {
       descTr: TrArraySchema,
       imageURL: ImageOrIconSchema,
       items: z.array(VariantItemsInputSchema).optional(),
-      regionID: RegionIDSchema.optional(),
+      region: VariantRegionsInputSchema.optional(),
       regions: z.array(VariantRegionsInputSchema).optional(),
       code: z.string().max(1024).optional(),
       orgs: z.array(VariantOrgsInputSchema).optional(),
@@ -188,7 +188,7 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/regionID',
+          scope: '#/properties/region',
         },
         {
           type: 'Control',
@@ -223,7 +223,7 @@ export class VariantSchemaService {
       items: z.array(VariantItemsInputSchema).optional(),
       addItems: z.array(VariantItemsInputSchema).optional(),
       removeItems: z.array(ItemIDSchema).optional(),
-      regionID: RegionIDSchema.optional(),
+      region: VariantRegionsInputSchema.optional(),
       regions: z.array(VariantRegionsInputSchema).optional(),
       addRegions: z.array(VariantRegionsInputSchema).optional(),
       removeRegions: z.array(RegionIDSchema).optional(),
@@ -265,7 +265,7 @@ export class VariantSchemaService {
         },
         {
           type: 'Control',
-          scope: '#/properties/regionID',
+          scope: '#/properties/region',
         },
         {
           type: 'Control',

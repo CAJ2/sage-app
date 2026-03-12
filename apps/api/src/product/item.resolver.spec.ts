@@ -640,6 +640,56 @@ describe('ItemResolver (integration)', () => {
       expect(res.data?.updateItem?.change?.title).toBe('Update item test')
       expect(res.data?.updateItem?.change?.status).toBe('PROPOSED')
     })
+
+    test('should return currentItem with DB state when using change tracking', async () => {
+      // First set a known name directly in the DB
+      const directRes = await gql.send(
+        graphql(`
+          mutation ItemSetCurrentName($input: UpdateItemInput!) {
+            updateItem(input: $input) {
+              item {
+                id
+                name
+              }
+            }
+          }
+        `),
+        { input: { id: testItemID, name: 'Current DB Name' } },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      // Now update via change — item should show proposed, currentItem the DB value
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateItemWithChangeCurrentItem($input: UpdateItemInput!) {
+            updateItem(input: $input) {
+              item {
+                id
+                name
+              }
+              currentItem {
+                id
+                name
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testItemID,
+            name: 'Proposed Name',
+            change: { title: 'current item test' },
+          },
+        },
+      )
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateItem?.item?.name).toBe('Proposed Name')
+      expect(changeRes.data?.updateItem?.currentItem?.name).toBe('Current DB Name')
+      expect(changeRes.data?.updateItem?.currentItem?.id).toBe(testItemID)
+    })
   })
 
   // Batch mutation tests

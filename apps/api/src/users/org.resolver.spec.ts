@@ -335,6 +335,56 @@ describe('OrgResolver (integration)', () => {
       expect(res.data?.updateOrg?.change).toBeDefined()
       expect(res.data?.updateOrg?.change?.status).toBe('PROPOSED')
     })
+
+    test('should return currentOrg with DB state when using change tracking', async () => {
+      // First set a known name directly in the DB
+      const directRes = await gql.send(
+        graphql(`
+          mutation OrgSetCurrentName($input: UpdateOrgInput!) {
+            updateOrg(input: $input) {
+              org {
+                id
+                name
+              }
+            }
+          }
+        `),
+        { input: { id: testOrgID, name: 'Current DB Name' } },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      // Now update via change — org should show proposed, currentOrg the DB value
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateOrgWithChangeCurrentOrg($input: UpdateOrgInput!) {
+            updateOrg(input: $input) {
+              org {
+                id
+                name
+              }
+              currentOrg {
+                id
+                name
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testOrgID,
+            name: 'Proposed Name',
+            change: { title: 'current org test' },
+          },
+        },
+      )
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateOrg?.org?.name).toBe('Proposed Name')
+      expect(changeRes.data?.updateOrg?.currentOrg?.name).toBe('Current DB Name')
+      expect(changeRes.data?.updateOrg?.currentOrg?.id).toBe(testOrgID)
+    })
   })
 
   describe('history tracking', () => {

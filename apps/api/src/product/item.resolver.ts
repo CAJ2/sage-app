@@ -120,7 +120,10 @@ export class ItemResolver {
       return { item: result }
     }
     const change = await this.transform.entityToModel(Change, updated.change)
-    return { change, item: result }
+    const currentItem = updated.currentItem
+      ? await this.transform.entityToModel(Item, updated.currentItem)
+      : undefined
+    return { change, item: result, currentItem }
   }
 
   @Mutation(() => DeleteOutput, { name: 'deleteItem', nullable: true })

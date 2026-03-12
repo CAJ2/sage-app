@@ -633,7 +633,9 @@ export type CreateVariantInput = {
 
 export type CreateVariantOutput = {
   __typename?: 'CreateVariantOutput';
+  /** The change tracking record, if creation was submitted via a change */
   change?: Maybe<Change>;
+  /** The newly created variant, reflecting the proposed state */
   variant?: Maybe<Variant>;
 };
 
@@ -1917,8 +1919,12 @@ export type UpdateCategoryInput = {
 
 export type UpdateCategoryOutput = {
   __typename?: 'UpdateCategoryOutput';
+  /** The category including the proposed changes */
   category?: Maybe<Category>;
+  /** The change tracking record, if the update was submitted via a change */
   change?: Maybe<Change>;
+  /** The category as currently persisted in the database, before any pending change is merged */
+  currentCategory?: Maybe<Category>;
 };
 
 export type UpdateChangeInput = {
@@ -1965,8 +1971,12 @@ export type UpdateComponentInput = {
 
 export type UpdateComponentOutput = {
   __typename?: 'UpdateComponentOutput';
+  /** The change tracking record, if the update was submitted via a change */
   change?: Maybe<Change>;
+  /** The component including the proposed changes */
   component?: Maybe<Component>;
+  /** The component as currently persisted in the database, before any pending change is merged */
+  currentComponent?: Maybe<Component>;
 };
 
 export type UpdateItemInput = {
@@ -1998,7 +2008,11 @@ export type UpdateItemInput = {
 
 export type UpdateItemOutput = {
   __typename?: 'UpdateItemOutput';
+  /** The change tracking record, if the update was submitted via a change */
   change?: Maybe<Change>;
+  /** The item as currently persisted in the database, before any pending change is merged */
+  currentItem?: Maybe<Item>;
+  /** The item including the proposed changes */
   item?: Maybe<Item>;
 };
 
@@ -2025,7 +2039,11 @@ export type UpdateOrgInput = {
 
 export type UpdateOrgOutput = {
   __typename?: 'UpdateOrgOutput';
+  /** The change tracking record, if the update was submitted via a change */
   change?: Maybe<Change>;
+  /** The org as currently persisted in the database, before any pending change is merged */
+  currentOrg?: Maybe<Org>;
+  /** The org including the proposed changes */
   org?: Maybe<Org>;
 };
 
@@ -2060,7 +2078,11 @@ export type UpdateProcessInput = {
 
 export type UpdateProcessOutput = {
   __typename?: 'UpdateProcessOutput';
+  /** The change tracking record, if the update was submitted via a change */
   change?: Maybe<Change>;
+  /** The process as currently persisted in the database, before any pending change is merged */
+  currentProcess?: Maybe<Process>;
+  /** The process including the proposed changes */
   process?: Maybe<Process>;
 };
 
@@ -2132,7 +2154,11 @@ export type UpdateVariantInput = {
 
 export type UpdateVariantOutput = {
   __typename?: 'UpdateVariantOutput';
+  /** The change tracking record, if the update was submitted via a change */
   change?: Maybe<Change>;
+  /** The variant as currently persisted in the database, before any pending change is merged */
+  currentVariant?: Maybe<Variant>;
+  /** The variant including the proposed changes */
   variant?: Maybe<Variant>;
 };
 
@@ -2223,6 +2249,8 @@ export type Variant = Named & {
   orgs: VariantOrgsPage;
   /** Aggregated recyclability score for this variant */
   recycleScore?: Maybe<StreamScore>;
+  /** Geographic regions associated with this variant */
+  regions: RegionsPage;
   sources: VariantSourcesPage;
   /** Metadata tags applied to this variant */
   tags: TagPage;
@@ -2269,6 +2297,15 @@ export type VariantOrgsArgs = {
 /** A specific variant or SKU of a product item, composed of physical components */
 export type VariantRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+/** A specific variant or SKU of a product item, composed of physical components */
+export type VariantRegionsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

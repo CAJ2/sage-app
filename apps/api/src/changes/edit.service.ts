@@ -344,7 +344,20 @@ export class EditService {
               .join(', ')}`,
           )
         }
-        const toAddEntities = toAdd.map((item) => {
+        const toAddEntities: T[] = []
+        for (const item of toAdd) {
+          const existing = id
+            ? await this.em.findOne(pivotEntity, { [collField]: id, [relField]: item.id } as any, {
+                populate: false,
+              })
+            : null
+          if (existing) {
+            const extraFields = _.omit(item, 'id')
+            if (Object.keys(extraFields).length > 0) {
+              this.em.assign(existing, extraFields as any)
+            }
+            continue
+          }
           const newEntity = this.em.create(
             pivotEntity,
             {
@@ -360,9 +373,11 @@ export class EditService {
           if (!changeID) {
             this.em.persist(newEntity)
           }
-          return newEntity
-        })
-        collection.add(toAddEntities)
+          toAddEntities.push(newEntity)
+        }
+        if (toAddEntities.length > 0) {
+          collection.add(toAddEntities)
+        }
       } else if (!Array.isArray(toAdd) && toAdd.id) {
         const foundItem = await this.em.findOne(relEntity, { id: toAdd.id } as any, {
           populate: false,
@@ -370,22 +385,34 @@ export class EditService {
         if (!foundItem) {
           throw NotFoundErr(`No ${relEntity} found for ID: ${toAdd.id}`)
         }
-        const toAddEntity = this.em.create(
-          pivotEntity,
-          {
-            [collField]: id,
-            [relField]: foundItem.id,
-            ..._.omit(toAdd, 'id'),
-          } as any,
-          {
-            managed: !!changeID,
-            persist: !changeID,
-          },
-        )
-        if (!changeID) {
-          this.em.persist(toAddEntity)
+        const existing = id
+          ? await this.em.findOne(pivotEntity, { [collField]: id, [relField]: toAdd.id } as any, {
+              populate: false,
+            })
+          : null
+        if (existing) {
+          const extraFields = _.omit(toAdd, 'id')
+          if (Object.keys(extraFields).length > 0) {
+            this.em.assign(existing, extraFields as any)
+          }
+        } else {
+          const toAddEntity = this.em.create(
+            pivotEntity,
+            {
+              [collField]: id,
+              [relField]: foundItem.id,
+              ..._.omit(toAdd, 'id'),
+            } as any,
+            {
+              managed: !!changeID,
+              persist: !changeID,
+            },
+          )
+          if (!changeID) {
+            this.em.persist(toAddEntity)
+          }
+          collection.add([toAddEntity])
         }
-        collection.add([toAddEntity])
       }
     }
     return collection
@@ -713,6 +740,9 @@ export class EditService {
   ) {
     const historyMeta = this.em.getMetadata().get(name + 'History')
     if (!historyMeta) {
+      return
+    }
+    if (original && changes && _.isEqual(original, changes)) {
       return
     }
     const id = (changes as any).id || (original as any).id
