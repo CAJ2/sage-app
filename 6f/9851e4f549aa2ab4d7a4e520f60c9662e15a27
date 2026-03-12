@@ -1,0 +1,155 @@
+apps/api/src/product/variant.resolver.ts
+  093dfc1366ad7c54 31,160-163,176-182
+apps/api/src/users/org.resolver.ts
+  64b80284ab42695a 73-76
+apps/api/src/product/variant.schema.ts
+  093dfc1366ad7c54 157,191,226,268
+apps/api/src/product/variant.resolver.spec.ts
+  093dfc1366ad7c54 791-833,870-919
+apps/api/src/process/process.model.ts
+  64b80284ab42695a 304-305,310-311,314-320
+apps/api/src/process/component.resolver.spec.ts
+  64b80284ab42695a 594-643
+apps/api/src/users/org.model.ts
+  64b80284ab42695a 129-130,135-136,139-145
+apps/api/src/process/component.resolver.ts
+  64b80284ab42695a 149-152
+apps/api/src/users/org.service.ts
+  64b80284ab42695a 94,97
+apps/api/src/users/org.resolver.spec.ts
+  64b80284ab42695a 338-387
+apps/api/src/product/category.resolver.spec.ts
+  64b80284ab42695a 440-489
+apps/api/src/product/item.service.ts
+  64b80284ab42695a 164,167
+apps/api/src/product/variant.service.ts
+  093dfc1366ad7c54 216-218,220,223,242-253,345-349,354-358,364-379,386-391,393-394,396-400
+apps/api/src/product/category.model.ts
+  64b80284ab42695a 186-187,192-193,196-202
+apps/api/src/process/component.model.ts
+  64b80284ab42695a 307-308,313-314,317-323
+apps/api/src/product/category.resolver.ts
+  64b80284ab42695a 150-153
+apps/api/src/product/category.service.ts
+  64b80284ab42695a 189-193,199
+apps/api/src/product/item.model.ts
+  64b80284ab42695a 197-198,203-204,207-213
+apps/api/src/product/variant.model.ts
+  093dfc1366ad7c54 68-72,173-176,402-403,407-408
+  36d1a4e4d8bc1efe 377,383,392,398,404-405
+apps/api/src/product/item.resolver.spec.ts
+  64b80284ab42695a 643-692
+apps/api/src/product/variant.service.spec.ts
+  64b80284ab42695a 7
+  36d1a4e4d8bc1efe 214,233
+  e3157a8edfbef9a0 6,41,43,51,113-137
+  093dfc1366ad7c54 12,42,138-213,215-232,234-246
+apps/api/src/process/process.resolver.ts
+  64b80284ab42695a 102-105
+apps/api/src/process/component.service.ts
+  64b80284ab42695a 174-178,184
+apps/api/src/product/item.resolver.ts
+  64b80284ab42695a 123-126
+apps/api/src/changes/edit.service.ts
+  e3157a8edfbef9a0 348-352,354-361,377,379,381,389-391,393-400,413-415
+  64b80284ab42695a 748-750
+  baa0c18fd1ee0177 5,661,701-703,707-708,710-711,713,769-780,782,784-785,788-798,800-806,809-810,812-816,819-826,829,832-850
+  4b37609ee8dd8f79 817-818
+apps/api/src/changes/edit.service.test.ts
+  baa0c18fd1ee0177 1-26,28-39,41-155,157-218
+apps/api/src/process/process.resolver.spec.ts
+  64b80284ab42695a 154-203
+  baa0c18fd1ee0177 6,10,300-557
+apps/api/src/process/process.service.ts
+  64b80284ab42695a 115-119,125
+  baa0c18fd1ee0177 228,232,234
+apps/api/src/changes/history.spec.ts
+  baa0c18fd1ee0177 10,12,17-19,24,287-466
+apps/api/src/process/process.schema.ts
+  baa0c18fd1ee0177 71,86-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "6f9851e4f549aa2ab4d7a4e520f60c9662e15a27",
+  "prompts": {
+    "093dfc1366ad7c54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6bc295f1-24f7-47f9-ae9b-3ce70e0940c6",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 354,
+      "total_deletions": 87,
+      "accepted_lines": 287,
+      "overriden_lines": 0
+    },
+    "36d1a4e4d8bc1efe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6dd74035-ea5d-4524-9608-b4fb449d099e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 7,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    },
+    "4b37609ee8dd8f79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "86cc866f-36dc-40e2-a780-55378acb0b04",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    },
+    "64b80284ab42695a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f71b0c7c-07e6-4a59-be8a-e63b67b7dad0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 371,
+      "total_deletions": 18,
+      "accepted_lines": 351,
+      "overriden_lines": 0
+    },
+    "baa0c18fd1ee0177": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f7d8f39a-0b23-4361-9fda-637e5a8c5f3f",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 934,
+      "total_deletions": 244,
+      "accepted_lines": 753,
+      "overriden_lines": 0
+    },
+    "e3157a8edfbef9a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5739a336-501e-46c0-b064-037de7b00b2f",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 88,
+      "total_deletions": 21,
+      "accepted_lines": 59,
+      "overriden_lines": 0
+    }
+  }
+}
