@@ -51,16 +51,16 @@ export class Source extends IDCreatedUpdated {
   @ManyToOne(() => User)
   user!: Ref<User>
 
-  @ManyToMany(() => Change, (change) => change.sources)
+  @ManyToMany({ entity: () => Change, mappedBy: 'sources' })
   changes = new Collection<Change>(this)
 
-  @ManyToMany(() => Component, (c) => c.sources)
+  @ManyToMany({ entity: () => Component, mappedBy: 'sources' })
   components = new Collection<Component>(this)
 
-  @ManyToMany(() => Process, (p) => p.sources)
+  @ManyToMany({ entity: () => Process, mappedBy: 'sources' })
   processes = new Collection<Process>(this)
 
-  @ManyToMany(() => Variant, (v) => v.sources)
+  @ManyToMany({ entity: () => Variant, mappedBy: 'sources' })
   variants = new Collection<Variant>(this)
 
   @Property({ type: 'json', nullable: true })

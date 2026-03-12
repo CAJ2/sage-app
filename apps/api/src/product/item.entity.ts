@@ -69,7 +69,7 @@ export class Item extends IDCreatedUpdated {
   })
   itemTags = new Collection<ItemsTags>(this)
 
-  @ManyToMany(() => Variant, (iv) => iv.items)
+  @ManyToMany({ entity: () => Variant, mappedBy: 'items' })
   variants = new Collection<Variant>(this)
 
   @OneToMany({ mappedBy: 'item' })

@@ -2,6 +2,7 @@ import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
 import type {
   Collection,
   EntityDTO,
+  EntityMetadata,
   EntityName,
   FilterQuery,
   FindOneOptions,
@@ -657,7 +658,7 @@ export class EditService {
     edit.entityName = entityName
     edit.entityID = entity.id
     edit.userID = this.authUser.userID()!
-    edit.changes = _.omit(entity.toPOJO(), ['history'])
+    edit.changes = this.entityToChangePOJO(entityName, entity)
     change.edits.add(edit)
   }
 
@@ -697,17 +698,19 @@ export class EditService {
             // This is a delete
             this.em.remove(entity)
           } else if (entity && edit.original && edit.changes) {
-            // This is an update — only apply scalar changes to avoid re-inserting existing relations
-            const relationNames = new Set(
+            // This is an update — skip collection-based relations (1:m, m:n) to avoid
+            // re-inserting existing rows, but apply M:1/1:1 refs (stored as string IDs)
+            const collectionRelNames = new Set(
               this.em
                 .getMetadata()
                 .get(edit.entityName)
-                .relations.map((r) => r.name),
+                .relations.filter((r) => r.kind === '1:m' || r.kind === 'm:n')
+                .map((r) => r.name),
             )
-            const scalarChanges = Object.fromEntries(
-              Object.entries(edit.changes).filter(([k]) => !relationNames.has(k)),
+            const applyChanges = Object.fromEntries(
+              Object.entries(edit.changes).filter(([k]) => !collectionRelNames.has(k)),
             )
-            this.em.assign(entity, scalarChanges as any)
+            this.em.assign(entity, applyChanges as any)
           } else {
             throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
           }
@@ -763,56 +766,87 @@ export class EditService {
     if (!meta) {
       throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
     }
-    const flattenRefs: { ref: string; fieldKey: string; foreignKey: string }[] = []
-    const changeOmit: string[] = []
+
+    // Step 1: Collect pivot entity class names referenced by owning M:N relations
+    const pivotEntityNames = new Set<string>()
     meta.relations.forEach((rel) => {
-      // Skip history and tree relations
-      if (rel.name.startsWith('history') || ['ancestors', 'descendants'].includes(rel.name)) {
+      if (rel.kind === 'm:n' && rel.pivotEntity && !rel.mappedBy) {
+        pivotEntityNames.add(rel.pivotEntity as string)
+      }
+    })
+
+    // Step 2: Categorize all relations
+    const flattenArrayRefs: string[] = [] // 1:M to pivot/tree targets
+    const flattenToId: string[] = [] // m:1 (non-primary), 1:1
+    const changeOmit: string[] = []
+
+    meta.relations.forEach((rel) => {
+      if (rel.name.startsWith('history')) {
+        changeOmit.push(rel.name)
         return
       }
-      // Populate 1:m relations
-      if (!rel.pivotEntity && rel.kind === '1:m') {
-        const refMeta = rel.targetMeta
-        if (!refMeta) {
-          throw NotFoundErr(`Target meta for relation "${rel.name}" not found`)
+      switch (rel.kind) {
+        case 'm:n':
+          changeOmit.push(rel.name)
+          break
+        case '1:m': {
+          const targetName = rel.targetMeta?.className
+          const isPivot = !!targetName && pivotEntityNames.has(targetName)
+          const isTree = !!rel.targetMeta && this.isTreeEntity(rel.targetMeta)
+          if (isPivot || isTree) flattenArrayRefs.push(rel.name)
+          else changeOmit.push(rel.name)
+          break
         }
-        flattenRefs.push({
-          ref: rel.name,
-          fieldKey: refMeta.primaryKeys[0],
-          foreignKey: refMeta.primaryKeys[1],
-        })
-      }
-      // Do not store m:n relations with pivot entities
-      // Instead the 1:m relation with pivot entity data is stored
-      if (rel.pivotEntity && rel.kind === 'm:n') {
-        changeOmit.push(rel.name)
+        case 'm:1':
+          if (rel.primary) changeOmit.push(rel.name)
+          else flattenToId.push(rel.name)
+          break
+        case '1:1':
+          flattenToId.push(rel.name)
+          break
       }
     })
+
+    // Step 3: Build and post-process the POJO
     const pojo: any = _.cloneDeep(entity.toPOJO())
-    flattenRefs.forEach((ref) => {
-      if (pojo[ref.ref] && Array.isArray(pojo[ref.ref])) {
-        pojo[ref.ref] = pojo[ref.ref].map((item: any) => {
-          if (!item) return item
-          if (!_.isString(item[ref.fieldKey]) && _.has(item[ref.fieldKey], 'id')) {
-            item[ref.fieldKey] = item[ref.fieldKey].id
-          }
-          if (!_.isString(item[ref.foreignKey]) && _.has(item[ref.foreignKey], 'id')) {
-            item[ref.foreignKey] = item[ref.foreignKey].id
-          }
-          return item
-        })
-      } else if (pojo[ref.ref] && pojo[ref.ref][ref.fieldKey]) {
-        pojo[ref.ref] = {
-          [ref.fieldKey]: _.isString(pojo[ref.ref][ref.fieldKey])
-            ? pojo[ref.ref][ref.fieldKey]
-            : pojo[ref.ref][ref.fieldKey].id,
-          [ref.foreignKey]: _.isString(pojo[ref.ref][ref.foreignKey])
-            ? pojo[ref.ref][ref.foreignKey]
-            : pojo[ref.ref][ref.foreignKey].id,
-          ..._.omit(pojo[ref.ref], [ref.fieldKey, ref.foreignKey]),
-        }
+
+    // Flatten m:1 / 1:1 to ID string
+    flattenToId.forEach((name) => {
+      if (pojo[name] && _.isObject(pojo[name]) && _.has(pojo[name], 'id')) {
+        pojo[name] = (pojo[name] as any).id
       }
     })
+
+    // Flatten 1:M arrays: replace ALL nested {id:...} objects with just the ID
+    flattenArrayRefs.forEach((name) => {
+      if (!pojo[name]) return
+      if (Array.isArray(pojo[name])) {
+        pojo[name] = pojo[name].map((item: any) => (item ? this.flattenNestedRefs(item) : item))
+      } else if (_.isObject(pojo[name])) {
+        pojo[name] = this.flattenNestedRefs(pojo[name] as Record<string, any>)
+      }
+    })
+
     return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
+  }
+
+  /** Returns true if every primary M:1 on this entity points to the same entity type
+   *  (closure table / edge table pattern: CategoryTree, CategoryEdge, etc.) */
+  private isTreeEntity(meta: EntityMetadata): boolean {
+    const primaryM1s = meta.relations.filter((r) => r.kind === 'm:1' && r.primary)
+    if (primaryM1s.length < 2) return false
+    const targets = new Set(primaryM1s.map((r) => r.targetMeta?.className))
+    return targets.size === 1
+  }
+
+  /** Shallow-clones an object, replacing any value of the form {id: '...'} with just the ID string.
+   *  Handles M:1 refs inside pivot/tree entity rows (e.g. VariantsOrgs.region). */
+  private flattenNestedRefs(item: Record<string, any>): Record<string, any> {
+    const result: Record<string, any> = {}
+    for (const [key, val] of Object.entries(item)) {
+      result[key] =
+        val && _.isObject(val) && !Array.isArray(val) && _.has(val, 'id') ? (val as any).id : val
+    }
+    return result
   }
 }

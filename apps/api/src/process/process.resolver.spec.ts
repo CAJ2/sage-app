@@ -3,10 +3,11 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
-import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 
@@ -294,6 +295,264 @@ describe('ProcessResolver (integration)', () => {
       expect(latest.changes).toBeTruthy()
       expect(latest.original?.name).toBe('History Test Process')
       expect(latest.changes?.name).toBe('Updated History Process')
+    })
+  })
+
+  describe('multi-entity change flow (process + org + material)', () => {
+    let changeID: string
+    let flowProcessID: string
+    let flowOrgID: string
+
+    test('step 1: create a process with a new change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation FlowCreateProcess($input: CreateProcessInput!) {
+            createProcess(input: $input) {
+              process {
+                id
+              }
+              change {
+                id
+                status
+                edits {
+                  nodes {
+                    entityName
+                    id
+                    createInput
+                    changes {
+                      ... on Process {
+                        __typename
+                        id
+                        name
+                        material {
+                          id
+                        }
+                        org {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Flow Process',
+            intent: 'RECYCLE',
+            change: { title: 'Multi-entity flow change', status: ChangeStatus.Draft },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      flowProcessID = res.data!.createProcess!.process!.id
+      changeID = res.data!.createProcess!.change!.id
+      expect(res.data!.createProcess!.change!.status).toBe('DRAFT')
+
+      const edits = res.data!.createProcess!.change!.edits.nodes
+      expect(edits).toHaveLength(1)
+      expect(edits[0].entityName).toBe('Process')
+      expect(edits[0].id).toBe(flowProcessID)
+      expect(edits[0].createInput).toBeTruthy()
+      const changes = edits[0].changes
+      expect(changes?.__typename).toBe('Process')
+      if (changes?.__typename === 'Process') {
+        expect(changes.name).toBe('Flow Process')
+        expect(changes.material).toBeNull()
+        expect(changes.org).toBeNull()
+      }
+    })
+
+    test('step 2: update the process adding a material reference on the same change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation FlowUpdateProcessMaterial($input: UpdateProcessInput!) {
+            updateProcess(input: $input) {
+              process {
+                id
+              }
+              change {
+                id
+                edits {
+                  nodes {
+                    entityName
+                    id
+                    updateInput
+                    changes {
+                      ... on Process {
+                        __typename
+                        id
+                        name
+                        material {
+                          id
+                        }
+                        org {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: flowProcessID,
+            material: { id: MATERIAL_IDS[0] },
+            changeID,
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data!.updateProcess!.change!.id).toBe(changeID)
+
+      const edits = res.data!.updateProcess!.change!.edits.nodes
+      const processEdit = edits.find((e) => e.entityName === 'Process' && e.id === flowProcessID)
+      expect(processEdit).toBeDefined()
+      expect(processEdit!.updateInput).toBeTruthy()
+      const changes = processEdit!.changes
+      expect(changes?.__typename).toBe('Process')
+      if (changes?.__typename === 'Process') {
+        expect(changes.material?.id).toBe(MATERIAL_IDS[0])
+        expect(changes.org).toBeNull()
+      }
+    })
+
+    test('step 3: create an org on the same change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation FlowCreateOrg($input: CreateOrgInput!) {
+            createOrg(input: $input) {
+              org {
+                id
+                name
+                slug
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Flow Org',
+            slug: 'flow-org',
+            changeID,
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      flowOrgID = res.data!.createOrg!.org!.id
+      expect(res.data!.createOrg!.org!.name).toBe('Flow Org')
+      expect(res.data!.createOrg!.change!.id).toBe(changeID)
+    })
+
+    test('step 4: update the process adding the new org on the same change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation FlowUpdateProcessOrg($input: UpdateProcessInput!) {
+            updateProcess(input: $input) {
+              process {
+                id
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: flowProcessID,
+            org: { id: flowOrgID },
+            changeID,
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data!.updateProcess!.change!.id).toBe(changeID)
+    })
+
+    test('step 5: approve and merge the change', async () => {
+      const approveRes = await gql.send(
+        graphql(`
+          mutation FlowApproveChange($input: UpdateChangeInput!) {
+            updateChange(input: $input) {
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        { input: { id: changeID, status: ChangeStatus.Approved } },
+      )
+      expect(approveRes.errors).toBeUndefined()
+      expect(approveRes.data?.updateChange?.change?.status).toBe('APPROVED')
+
+      const mergeRes = await gql.send(
+        graphql(`
+          mutation FlowMergeChange($id: ID!) {
+            mergeChange(id: $id) {
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        { id: changeID },
+      )
+      expect(mergeRes.errors).toBeUndefined()
+      expect(mergeRes.data?.mergeChange?.change).toBeDefined()
+    })
+
+    test('after merge: process is linked to material and org', async () => {
+      const res = await gql.send(
+        graphql(`
+          query FlowGetProcess($id: ID!) {
+            process(id: $id) {
+              id
+              name
+              material {
+                id
+              }
+              org {
+                id
+              }
+            }
+          }
+        `),
+        { id: flowProcessID },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.process?.name).toBe('Flow Process')
+      expect(res.data?.process?.material?.id).toBe(MATERIAL_IDS[0])
+      expect(res.data?.process?.org?.id).toBe(flowOrgID)
+    })
+
+    test('after merge: org exists and is queryable', async () => {
+      const res = await gql.send(
+        graphql(`
+          query FlowGetOrg($id: ID!) {
+            org(id: $id) {
+              id
+              name
+              slug
+            }
+          }
+        `),
+        { id: flowOrgID },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.org?.id).toBe(flowOrgID)
+      expect(res.data?.org?.name).toBe('Flow Org')
+      expect(res.data?.org?.slug).toBe('flow-org')
     })
   })
 })

@@ -225,11 +225,13 @@ export class ProcessService {
       process.variant = ref(Variant, variant.id)
     }
     if (input.org) {
-      const org = await this.em.findOne(Org, { id: input.org.id })
-      if (!org) {
-        throw NotFoundErr(`Org with ID "${input.org.id}" not found`)
+      if (!change) {
+        const org = await this.em.findOne(Org, { id: input.org.id })
+        if (!org) {
+          throw NotFoundErr(`Org with ID "${input.org.id}" not found`)
+        }
       }
-      process.org = ref(Org, org.id)
+      process.org = ref(Org, input.org.id)
     }
     if (input.region) {
       const region = await this.em.findOne(Region, { id: input.region.id })

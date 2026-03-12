@@ -68,7 +68,7 @@ export class ProcessSchemaService {
     private readonly zService: ZService,
   ) {
     const ProcessTransform = z.transform((input: TransformInput) => {
-      const entity = input.input as ProcessEntity
+      const entity = input.input as ProcessEntity & Record<string, any>
       const model = new Process()
       model.id = entity.id
       model.createdAt = DateTime.fromJSDate(entity.createdAt)
@@ -82,6 +82,17 @@ export class ProcessSchemaService {
         eff.equivalency = entity.efficiency.equivalency
         eff.valueRatio = entity.efficiency.valueRatio
         model.efficiency = eff
+      }
+      // Handle M:1 refs that may be stored as string IDs (from POJO) or entity/Ref objects
+      const materialRaw = entity.material as any
+      if (materialRaw) {
+        const materialId = typeof materialRaw === 'string' ? materialRaw : materialRaw?.id
+        if (materialId) model.material = { id: materialId } as any
+      }
+      const orgRaw = entity.org as any
+      if (orgRaw) {
+        const orgId = typeof orgRaw === 'string' ? orgRaw : orgRaw?.id
+        if (orgId) model.org = { id: orgId } as any
       }
       return model
     })

@@ -106,7 +106,7 @@ export class Component extends IDCreatedUpdated {
   @OneToMany(() => ComponentsMaterials, (cm) => cm.component)
   componentMaterials = new Collection<ComponentsMaterials>(this)
 
-  @ManyToMany(() => Variant, (variant) => variant.components)
+  @ManyToMany({ entity: () => Variant, mappedBy: 'components' })
   variants = new Collection<Variant>(this)
 
   @OneToMany(() => ComponentHistory, (history) => history.component)
