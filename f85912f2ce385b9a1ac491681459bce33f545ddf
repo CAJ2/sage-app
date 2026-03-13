@@ -1,0 +1,38 @@
+apps/api/src/changes/edit.service.test.ts
+  90216252242ebdd2 222-235,239,421-423
+apps/api/src/common/transform.ts
+  fc303da08893411b 226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "f85912f2ce385b9a1ac491681459bce33f545ddf",
+  "prompts": {
+    "90216252242ebdd2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed346d55-4f9b-4b39-bf1b-dbbe4766566e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 20,
+      "total_deletions": 0,
+      "accepted_lines": 18,
+      "overriden_lines": 2
+    },
+    "fc303da08893411b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea44d9a1-276c-4a69-8d73-96fe525414bc",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
