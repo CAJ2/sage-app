@@ -1,13 +1,11 @@
+import { BaseEntity } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
-import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
-import { EditService } from '@src/changes/edit.service'
 import {
   BaseSchemaService,
   ImageOrIconSchema,
@@ -18,6 +16,7 @@ import {
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
+import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
@@ -32,7 +31,12 @@ export const ItemIDSchema = z.string().meta({
 })
 
 @Injectable()
-export class ItemSchemaService {
+@IsSchemaService(ItemEntity)
+export class ItemSchemaService implements ISchemaService {
+  OutputModel = Item
+  CreateInputModel = CreateItemInput
+  UpdateInputModel = UpdateItemInput
+
   ItemCategoriesInputSchema
   ItemTagsInputSchema
   CreateSchema
@@ -47,7 +51,6 @@ export class ItemSchemaService {
   constructor(
     private readonly i18n: I18nService,
     private readonly baseSchema: BaseSchemaService,
-    private readonly editService: EditService,
     private readonly zService: ZService,
   ) {
     const ItemTransform = z.transform((input: TransformInput) => {
@@ -61,7 +64,7 @@ export class ItemSchemaService {
       model.imageURL = entity.files?.thumbnail
       return model
     })
-    this.zService.registerTransform(ItemEntity, Item, ItemTransform)
+    this.zService.registerEntityTransform(ItemEntity, Item, ItemTransform)
 
     const ItemHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as ItemHistoryEntity
@@ -72,7 +75,7 @@ export class ItemSchemaService {
       model.changes = entity.changes as Item | undefined
       return model
     })
-    this.zService.registerTransform(ItemHistoryEntity, ItemHistory, ItemHistoryTransform)
+    this.zService.registerEntityTransform(ItemHistoryEntity, ItemHistory, ItemHistoryTransform)
 
     this.ItemCategoriesInputSchema = z.strictObject({
       id: CategoryIDSchema,
@@ -177,17 +180,24 @@ export class ItemSchemaService {
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
-  async itemCreateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async createInputModel<E extends BaseEntity>(_entity: E) {
+    const data = {}
     runAjvValidator(this.CreateValidator, data)
-    return this.parseCreateInput(data as CreateItemInput)
+    return this.zService.parse(this.CreateSchema, data)
   }
 
-  async itemUpdateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    data.tags = this.baseSchema.collectionToInput(data.itemTags || [], 'item', 'tag')
+  async updateInputModel<E extends BaseEntity>(entity: E) {
+    const e = entity as any
+    const data: Record<string, any> = stripNulls({ id: e.id, imageURL: e.imageURL })
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
+    data.tags = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.itemTags),
+      'item',
+      'tag',
+    )
     runAjvValidator(this.UpdateValidator, data)
-    return this.parseUpdateInput(data as UpdateItemInput)
+    return this.zService.parse(this.UpdateSchema, data as any)
   }
 
   async parseCreateInput(input: CreateItemInput): Promise<CreateItemInput> {

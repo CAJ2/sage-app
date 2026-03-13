@@ -11,7 +11,7 @@ describe('ItemSchemaService', () => {
     const mockI18n = { t: () => '' } as any
     const baseSchema = new BaseSchemaService(mockI18n)
     const zService = new ZService({ get: () => undefined } as any)
-    service = new ItemSchemaService(mockI18n, baseSchema, null as any, zService)
+    service = new ItemSchemaService(mockI18n, baseSchema, zService)
   })
 
   describe('parseCreateInput', () => {

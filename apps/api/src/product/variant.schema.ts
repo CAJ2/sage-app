@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
-import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import { Source as SourceModel } from '@src/changes/source.model'
 import {
@@ -18,6 +16,7 @@ import {
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
+import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { RegionIDSchema } from '@src/geo/region.model'
@@ -75,7 +74,12 @@ export const VariantComponentsInputSchema = z.strictObject({
 })
 
 @Injectable()
-export class VariantSchemaService {
+@IsSchemaService(VariantEntity)
+export class VariantSchemaService implements ISchemaService {
+  OutputModel = Variant
+  CreateInputModel = CreateVariantInput
+  UpdateInputModel = UpdateVariantInput
+
   CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
@@ -100,7 +104,7 @@ export class VariantSchemaService {
       model.desc = input.i18n.tr(entity.desc)
       return model
     })
-    this.zService.registerTransform(VariantEntity, Variant, VariantTransform)
+    this.zService.registerEntityTransform(VariantEntity, Variant, VariantTransform)
 
     const VariantOrgTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as VariantsOrgs
@@ -111,7 +115,7 @@ export class VariantSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(VariantsOrgs, VariantOrg, VariantOrgTransform)
+    this.zService.registerEntityTransform(VariantsOrgs, VariantOrg, VariantOrgTransform)
 
     const VariantComponentTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as VariantsComponents
@@ -123,7 +127,11 @@ export class VariantSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(VariantsComponents, VariantComponent, VariantComponentTransform)
+    this.zService.registerEntityTransform(
+      VariantsComponents,
+      VariantComponent,
+      VariantComponentTransform,
+    )
 
     const VariantHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as VariantHistoryEntity
@@ -134,18 +142,22 @@ export class VariantSchemaService {
       model.changes = entity.changes as Variant | undefined
       return model
     })
-    this.zService.registerTransform(VariantHistoryEntity, VariantHistory, VariantHistoryTransform)
+    this.zService.registerEntityTransform(
+      VariantHistoryEntity,
+      VariantHistory,
+      VariantHistoryTransform,
+    )
 
     const VariantSourceTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as VariantsSources
       const model = new VariantSource()
       model.meta = entity.meta
       if (entity.source) {
-        model.source = await this.zService.entityToModel(SourceModel, entity.source as any)
+        model.source = await this.zService.entityToModel(SourceModel, entity.source)
       }
       return model
     })
-    this.zService.registerTransform(VariantsSources, VariantSource, VariantSourceTransform)
+    this.zService.registerEntityTransform(VariantsSources, VariantSource, VariantSourceTransform)
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),
@@ -293,24 +305,39 @@ export class VariantSchemaService {
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
-  async variantCreateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async createInputModel<VariantEntity>(entity: VariantEntity) {
+    const data = {}
     runAjvValidator(this.CreateValidator, data)
-    return this.parseCreateInput(data as CreateVariantInput)
+    return this.zService.parse(this.CreateSchema, data)
   }
 
-  async variantUpdateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
-    data.items = this.baseSchema.collectionToInput(data.variantItems || [], 'variant', 'item')
-    data.orgs = this.baseSchema.collectionToInput(data.variantOrgs || [], 'variant', 'org')
-    data.tags = this.baseSchema.collectionToInput(data.variantTags || [], 'variant', 'tag')
+  async updateInputModel<VariantEntity>(entity: VariantEntity) {
+    const e = entity as any
+    const data: Record<string, any> = stripNulls({ id: e.id, imageURL: e.imageURL, code: e.code })
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
+    data.items = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.variantItems),
+      'variant',
+      'item',
+    )
+    data.orgs = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.variantOrgs),
+      'variant',
+      'org',
+    )
+    data.tags = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.variantTags),
+      'variant',
+      'tag',
+    )
     data.components = this.baseSchema.collectionToInput(
-      data.variantComponents || [],
+      this.baseSchema.safeCollectionItems(e.variantComponents),
       'variant',
       'component',
     )
     runAjvValidator(this.UpdateValidator, data)
-    return this.parseUpdateInput(data as UpdateVariantInput)
+    return this.zService.parse(this.UpdateSchema, data as any)
   }
 
   async parseCreateInput(input: CreateVariantInput): Promise<CreateVariantInput> {

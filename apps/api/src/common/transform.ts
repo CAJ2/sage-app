@@ -46,13 +46,16 @@ export class TransformService {
   constructor(private readonly zService: ZService) {}
 
   async entityToModel<T extends BaseEntity, S extends BaseModel>(
-    model: new () => S,
+    model: (new () => S) | string,
     entity: Loaded<T, never> | Ref<T>,
   ): Promise<S> {
     return this.zService.entityToModel(model, entity)
   }
 
-  async objectToModel<T, S extends BaseModel>(model: new () => S, object: T): Promise<S> {
+  async objectToModel<T, S extends BaseModel>(
+    model: (new () => S) | string,
+    object: T,
+  ): Promise<S> {
     return this.zService.objectToModel(model, object)
   }
 
@@ -220,6 +223,7 @@ export class TransformService {
         const inst = _.isPlainObject(obj)
           ? await this.zService.objectToModel((obj as any)._type, obj)
           : await this.zService.entityToModel((obj as any)._type, obj as any)
+        ;(inst as any)._type = (obj as any)._type
         entities.push(inst)
       }
     }

@@ -5,12 +5,14 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { Region, RegionsPage } from '@src/geo/region.model'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Item, ItemsPage } from '@src/product/item.model'
+import { Variant as VariantEntity } from '@src/product/variant.entity'
 import {
   CreateVariantInput,
   CreateVariantOutput,
@@ -204,7 +206,10 @@ export class VariantResolver {
 
 @Resolver(() => VariantHistory)
 export class VariantHistoryResolver {
-  constructor(private readonly transform: TransformService) {}
+  constructor(
+    private readonly transform: TransformService,
+    private readonly editService: EditService,
+  ) {}
 
   @ResolveField('user', () => User)
   async user(@Parent() history: VariantHistory) {
@@ -223,7 +228,8 @@ export class VariantHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Variant, original)
+    const entity = await this.editService.changePOJOToEntity(VariantEntity, original)
+    return this.transform.entityToModel(Variant, entity)
   }
 
   @ResolveField('changes', () => Variant, { nullable: true })
@@ -232,6 +238,7 @@ export class VariantHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Variant, changes)
+    const entity = await this.editService.changePOJOToEntity(VariantEntity, changes)
+    return this.transform.entityToModel(Variant, entity)
   }
 }

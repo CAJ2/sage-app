@@ -51,7 +51,7 @@ export class TagSchemaService {
       model.image = entity.image
       return model
     })
-    this.zService.registerTransform(TagEntity, TagDefinition, TagDefinitionTransform)
+    this.zService.registerEntityTransform(TagEntity, TagDefinition, TagDefinitionTransform)
 
     const TagTransform = z.transform((input: TransformInput) => {
       const entity = input.input as TagEntity
@@ -68,7 +68,7 @@ export class TagSchemaService {
       model.meta = (entity as any).meta
       return model
     })
-    this.zService.registerTransform(TagEntity, Tag, TagTransform)
+    this.zService.registerEntityTransform(TagEntity, Tag, TagTransform)
   }
 
   async parseCreateInput(input: CreateTagDefinitionInput): Promise<CreateTagDefinitionInput> {

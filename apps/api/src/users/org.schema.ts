@@ -29,7 +29,7 @@ export class OrgSchemaService {
       model.websiteURL = entity.websiteURL
       return model
     })
-    this.zService.registerTransform(OrgEntity, Org, OrgTransform)
+    this.zService.registerEntityTransform(OrgEntity, Org, OrgTransform)
 
     const UserTransform = z.transform((input: TransformInput) => {
       const entity = input.input as UserEntity
@@ -45,7 +45,7 @@ export class OrgSchemaService {
       model.lang = entity.lang
       return model
     })
-    this.zService.registerTransform('User', User, UserTransform)
+    this.zService.registerEntityTransform('User', User, UserTransform)
 
     const OrgHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as OrgHistoryEntity
@@ -56,6 +56,6 @@ export class OrgSchemaService {
       model.changes = entity.changes as Org | undefined
       return model
     })
-    this.zService.registerTransform(OrgHistoryEntity, OrgHistory, OrgHistoryTransform)
+    this.zService.registerEntityTransform(OrgHistoryEntity, OrgHistory, OrgHistoryTransform)
   }
 }

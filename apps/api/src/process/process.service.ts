@@ -8,6 +8,7 @@ import { Source } from '@src/changes/source.entity'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
@@ -22,7 +23,8 @@ export interface FindProcessFilter {
 }
 
 @Injectable()
-export class ProcessService {
+@IsEntityService(Process)
+export class ProcessService implements IEntityService<Process> {
   constructor(
     private readonly em: EntityManager,
     private readonly editService: EditService,
@@ -54,6 +56,9 @@ export class ProcessService {
     )
   }
 
+  async findManyByID(ids: string[]) {
+    return this.em.find(Process, { id: { $in: ids } })
+  }
   async create(input: CreateProcessInput, userID: string) {
     const process = new Process()
     if (!isUsingChange(input)) {

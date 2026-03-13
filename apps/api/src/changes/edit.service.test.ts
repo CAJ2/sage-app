@@ -7,7 +7,7 @@ function makeService(metaMap: Record<string, any>) {
   const em = {
     getMetadata: () => ({ get: (name: string) => metaMap[name] }),
   } as any
-  return new EditService(em, {} as any)
+  return new EditService(em, {} as any, {} as any)
 }
 
 // Minimal entity stub
@@ -214,5 +214,242 @@ describe('EditService.entityToChangePOJO', () => {
     expect(result).not.toHaveProperty('createdAt')
     expect(result).not.toHaveProperty('updatedAt')
     expect((result as any).name).toBe('X')
+  })
+})
+
+describe('EditService.changePOJOToEntity', () => {
+  function makeServiceWithMeta(metaMap: Record<string, any>, entityID: string, dbEntity: any) {
+    const forkedEm = {
+      create: (_entityName: any, data: any) => {
+        const merged = { ...dbEntity, ...data }
+        // Attach a mock __helper so wrap(merged) short-circuits to this object
+        // instead of calling EntityHelper.decorate which requires real MikroORM internals.
+        Object.defineProperty(merged, '__helper', {
+          value: { assign: (d: any) => Object.assign(merged, d) },
+          enumerable: false,
+          configurable: true,
+        })
+        return merged
+      },
+      clear: () => {},
+    }
+    const em = {
+      getMetadata: () => ({ get: (name: string) => metaMap[name] }),
+      assign: (entity: any, data: any) => Object.assign(entity, data),
+      fork: () => forkedEm,
+    } as any
+    const metaService = {
+      findEntityService: () => [
+        null,
+        {
+          findOneByID: async (id: string) => (id === entityID ? dbEntity : null),
+        },
+      ],
+    } as any
+    return new EditService(em, {} as any, metaService)
+  }
+
+  test('m:1 non-primary string ID → restored to {id: string}', async () => {
+    const dbEntity = { id: 'v1', material: null, isInitialized: () => true } as any
+    const svc = makeServiceWithMeta(
+      {
+        Variant: {
+          relations: [{ name: 'material', kind: 'm:1', primary: false }],
+        },
+      },
+      'v1',
+      dbEntity,
+    )
+    const result = (await svc.changePOJOToEntity('Variant', { id: 'v1', material: 'mat-1' })) as any
+    expect(result.material).toEqual({ id: 'mat-1' })
+  })
+
+  test('m:1 non-primary already an object → left as-is', async () => {
+    const dbEntity = { id: 'v1', material: null, isInitialized: () => true } as any
+    const svc = makeServiceWithMeta(
+      {
+        Variant: {
+          relations: [{ name: 'material', kind: 'm:1', primary: false }],
+        },
+      },
+      'v1',
+      dbEntity,
+    )
+    const result = (await svc.changePOJOToEntity('Variant', {
+      id: 'v1',
+      material: { id: 'mat-1' },
+    })) as any
+    expect(result.material).toEqual({ id: 'mat-1' })
+  })
+
+  test('1:m to pivot: item relation fields as strings → restored to {id: string}', async () => {
+    const dbEntity = { id: 'v1', variantOrgs: [], isInitialized: () => true } as any
+    const svc = makeServiceWithMeta(
+      {
+        Variant: {
+          relations: [
+            { name: 'orgs', kind: 'm:n', pivotEntity: 'VariantsOrgs' },
+            {
+              name: 'variantOrgs',
+              kind: '1:m',
+              targetMeta: {
+                className: 'VariantsOrgs',
+                relations: [
+                  {
+                    name: 'variant',
+                    kind: 'm:1',
+                    primary: true,
+                    targetMeta: { className: 'Variant' },
+                  },
+                  { name: 'org', kind: 'm:1', primary: true, targetMeta: { className: 'Org' } },
+                  {
+                    name: 'region',
+                    kind: 'm:1',
+                    primary: false,
+                    targetMeta: { className: 'Region' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      'v1',
+      dbEntity,
+    )
+    const pojo = {
+      id: 'v1',
+      variantOrgs: [{ variant: 'v1', org: 'o1', region: 'r1', note: 'hello' }],
+    }
+    const result = (await svc.changePOJOToEntity('Variant', pojo)) as any
+    expect(result.variantOrgs).toEqual([
+      { variant: { id: 'v1' }, org: { id: 'o1' }, region: { id: 'r1' }, note: 'hello' },
+    ])
+  })
+
+  test('1:m to tree entity: item relation fields as strings → restored', async () => {
+    const dbEntity = { id: 'c1', ancestors: [], isInitialized: () => true } as any
+    const svc = makeServiceWithMeta(
+      {
+        Category: {
+          relations: [
+            {
+              name: 'ancestors',
+              kind: '1:m',
+              targetMeta: {
+                className: 'CategoryTree',
+                relations: [
+                  {
+                    name: 'ancestor',
+                    kind: 'm:1',
+                    primary: true,
+                    targetMeta: { className: 'Category' },
+                  },
+                  {
+                    name: 'descendant',
+                    kind: 'm:1',
+                    primary: true,
+                    targetMeta: { className: 'Category' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      'c1',
+      dbEntity,
+    )
+    const pojo = {
+      id: 'c1',
+      ancestors: [{ ancestor: 'a1', descendant: 'd1', depth: '1' }],
+    }
+    const result = (await svc.changePOJOToEntity('Category', pojo)) as any
+    expect(result.ancestors).toEqual([
+      { ancestor: { id: 'a1' }, descendant: { id: 'd1' }, depth: '1' },
+    ])
+  })
+
+  test('non-relation string values in items → left as-is', async () => {
+    const dbEntity = { id: 'v1', variantOrgs: [], isInitialized: () => true } as any
+    const svc = makeServiceWithMeta(
+      {
+        Variant: {
+          relations: [
+            { name: 'orgs', kind: 'm:n', pivotEntity: 'VariantsOrgs' },
+            {
+              name: 'variantOrgs',
+              kind: '1:m',
+              targetMeta: {
+                className: 'VariantsOrgs',
+                relations: [
+                  { name: 'org', kind: 'm:1', primary: true, targetMeta: { className: 'Org' } },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      'v1',
+      dbEntity,
+    )
+    const pojo = {
+      id: 'v1',
+      variantOrgs: [{ org: 'o1', customNote: 'some-text', count: 42 }],
+    }
+    const result = (await svc.changePOJOToEntity('Variant', pojo)) as any
+    expect(result.variantOrgs).toEqual([{ org: { id: 'o1' }, customNote: 'some-text', count: 42 }])
+  })
+
+  test('entity fetched from DB and POJO fields applied', async () => {
+    const dbEntity = { id: 'v1', name: 'old-name', score: 10, isInitialized: () => true } as any
+    const svc = makeServiceWithMeta({ Variant: { relations: [] } }, 'v1', dbEntity)
+    const result = (await svc.changePOJOToEntity('Variant', { id: 'v1', name: 'new-name' })) as any
+    expect(result.name).toBe('new-name')
+    expect(result.score).toBe(10) // DB value preserved for fields not in POJO
+  })
+
+  test('entity not found in DB → creates in-memory entity from POJO', async () => {
+    class MockVariant {
+      id?: string
+      name?: string
+    }
+    const em = {
+      getMetadata: () => ({ get: () => ({ relations: [], class: MockVariant }) }),
+      create: (EntityClass: any, data: any, _opts: any) => {
+        const entity = new EntityClass()
+        Object.assign(entity, data)
+        return entity
+      },
+    } as any
+    const metaService = {
+      findEntityService: () => [null, { findOneByID: async () => null }],
+    } as any
+    const svc = new EditService(em, {} as any, metaService)
+    const result = (await svc.changePOJOToEntity('Variant', {
+      id: 'draft-id',
+      name: 'Draft',
+    })) as any
+    expect(result.id).toBe('draft-id')
+    expect(result.name).toBe('Draft')
+    expect(result).toBeInstanceOf(MockVariant)
+  })
+
+  test('no entityID provided → throws NotFoundErr', async () => {
+    const em = {
+      getMetadata: () => ({ get: () => ({ relations: [] }) }),
+    } as any
+    const metaService = { findEntityService: () => null } as any
+    const svc = new EditService(em, {} as any, metaService)
+    await expect(svc.changePOJOToEntity('Variant', { id: 'v1' })).rejects.toThrow()
+  })
+
+  test('no entity service found → throws NotFoundErr', async () => {
+    const em = {
+      getMetadata: () => ({ get: () => ({ relations: [], class: class Variant {} }) }),
+    } as any
+    const metaService = { findEntityService: () => null } as any
+    const svc = new EditService(em, {} as any, metaService)
+    await expect(svc.changePOJOToEntity('Variant', { id: 'v1' })).rejects.toThrow()
   })
 })

@@ -353,10 +353,10 @@ describe('ProcessResolver (integration)', () => {
 
       const edits = res.data!.createProcess!.change!.edits.nodes
       expect(edits).toHaveLength(1)
-      expect(edits[0].entityName).toBe('Process')
-      expect(edits[0].id).toBe(flowProcessID)
-      expect(edits[0].createInput).toBeTruthy()
-      const changes = edits[0].changes
+      expect(edits![0].entityName).toBe('Process')
+      expect(edits![0].id).toBe(flowProcessID)
+      expect(edits![0].createInput).toBeTruthy()
+      const changes = edits![0].changes
       expect(changes?.__typename).toBe('Process')
       if (changes?.__typename === 'Process') {
         expect(changes.name).toBe('Flow Process')
@@ -411,7 +411,9 @@ describe('ProcessResolver (integration)', () => {
       expect(res.data!.updateProcess!.change!.id).toBe(changeID)
 
       const edits = res.data!.updateProcess!.change!.edits.nodes
-      const processEdit = edits.find((e) => e.entityName === 'Process' && e.id === flowProcessID)
+      expect(edits).toBeDefined()
+      expect(edits).toHaveLength(1)
+      const processEdit = edits!.find((e) => e.entityName === 'Process' && e.id === flowProcessID)
       expect(processEdit).toBeDefined()
       expect(processEdit!.updateInput).toBeTruthy()
       const changes = processEdit!.changes

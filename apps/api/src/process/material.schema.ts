@@ -21,6 +21,6 @@ export class MaterialSchemaService {
       model.shape = entity.shape
       return model
     })
-    this.zService.registerTransform(MaterialEntity, Material, MaterialTransform)
+    this.zService.registerEntityTransform(MaterialEntity, Material, MaterialTransform)
   }
 }

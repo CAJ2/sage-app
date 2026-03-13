@@ -5,11 +5,13 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { CategoriesPage, Category } from '@src/product/category.model'
+import { Item as ItemEntity } from '@src/product/item.entity'
 import {
   CreateItemInput,
   CreateItemOutput,
@@ -149,7 +151,10 @@ export class ItemResolver {
 
 @Resolver(() => ItemHistory)
 export class ItemHistoryResolver {
-  constructor(private readonly transform: TransformService) {}
+  constructor(
+    private readonly transform: TransformService,
+    private readonly editService: EditService,
+  ) {}
 
   @ResolveField('user', () => User)
   async user(@Parent() history: ItemHistory) {
@@ -168,7 +173,8 @@ export class ItemHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Item, original)
+    const entity = await this.editService.changePOJOToEntity(ItemEntity, original)
+    return this.transform.entityToModel(Item, entity)
   }
 
   @ResolveField('changes', () => Item, { nullable: true })
@@ -177,6 +183,7 @@ export class ItemHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Item, changes)
+    const entity = await this.editService.changePOJOToEntity(ItemEntity, changes)
+    return this.transform.entityToModel(Item, entity)
   }
 }

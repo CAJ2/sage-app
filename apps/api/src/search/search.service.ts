@@ -77,8 +77,9 @@ export class SearchService {
 
     const entityByClassById = new Map<any, Map<string, any>>()
     for (const [entityClass, ids] of idsByClass.entries()) {
-      const service = await this.metaService.findEntityService(entityClass)
-      if (!service) continue
+      const svcResult = this.metaService.findEntityService(entityClass)
+      if (!svcResult) continue
+      const [, service] = svcResult
       const entities = await service.findManyByID(ids)
       entityByClassById.set(entityClass, new Map(entities.map((e: any) => [e.id, e])))
     }
