@@ -84,7 +84,7 @@ export class PlaceSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(PlaceEntity, Place, PlaceTransform)
+    this.zService.registerEntityTransform(PlaceEntity, Place, PlaceTransform)
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().max(1024).optional(),

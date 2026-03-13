@@ -70,7 +70,7 @@ export class ChangeSchemaService {
       model.status = entity.status
       return model
     })
-    this.zService.registerTransform(ChangeEntity, Change, ChangeTransform)
+    this.zService.registerEntityTransform(ChangeEntity, Change, ChangeTransform)
 
     const EditTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as ChangeEdits
@@ -91,7 +91,7 @@ export class ChangeSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(ChangeEdits, Edit, EditTransform)
+    this.zService.registerEntityTransform(ChangeEdits, Edit, EditTransform)
   }
 
   async parseCreateInput(input: CreateChangeInput): Promise<CreateChangeInput> {

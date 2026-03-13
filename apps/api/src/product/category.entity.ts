@@ -33,7 +33,7 @@ export class Category extends IDCreatedUpdated {
   @Property({ nullable: true })
   imageURL?: string
 
-  @OneToMany(() => CategoryTree, (tree) => tree.ancestor)
+  @OneToMany({ entity: () => CategoryTree, mappedBy: 'ancestor' })
   ancestors = new Collection<CategoryTree>(this)
 
   @OneToMany(() => CategoryTree, (tree) => tree.descendant)

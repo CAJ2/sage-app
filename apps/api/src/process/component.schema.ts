@@ -1,11 +1,10 @@
+import { BaseEntity } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
-import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import { Source as SourceModel } from '@src/changes/source.model'
 import {
@@ -18,6 +17,7 @@ import {
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
+import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { RegionIDSchema, Region as RegionModel } from '@src/geo/region.model'
@@ -45,7 +45,12 @@ export const ComponentIDSchema = z.string().meta({
 })
 
 @Injectable()
-export class ComponentSchemaService {
+@IsSchemaService(ComponentEntity)
+export class ComponentSchemaService implements ISchemaService {
+  OutputModel = Component
+  CreateInputModel = CreateComponentInput
+  UpdateInputModel = UpdateComponentInput
+
   ComponentMaterialInputSchema
   ComponentTagsInputSchema
   ComponentRegionInputSchema
@@ -83,7 +88,7 @@ export class ComponentSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(ComponentEntity, Component, ComponentTransform)
+    this.zService.registerEntityTransform(ComponentEntity, Component, ComponentTransform)
 
     const ComponentHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as ComponentHistoryEntity
@@ -94,7 +99,7 @@ export class ComponentSchemaService {
       model.changes = entity.changes as Component | undefined
       return model
     })
-    this.zService.registerTransform(
+    this.zService.registerEntityTransform(
       ComponentHistoryEntity,
       ComponentHistory,
       ComponentHistoryTransform,
@@ -109,7 +114,11 @@ export class ComponentSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(ComponentsSources, ComponentSource, ComponentSourceTransform)
+    this.zService.registerEntityTransform(
+      ComponentsSources,
+      ComponentSource,
+      ComponentSourceTransform,
+    )
 
     this.ComponentMaterialInputSchema = z
       .strictObject({
@@ -274,23 +283,36 @@ export class ComponentSchemaService {
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
-  async componentCreateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async createInputModel<E extends BaseEntity>(_entity: E) {
+    const data = {}
     runAjvValidator(this.CreateValidator, data)
-    return this.parseCreateInput(data as CreateComponentInput)
+    return this.zService.parse(this.CreateSchema, data)
   }
 
-  async componentUpdateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async updateInputModel<E extends BaseEntity>(entity: E) {
+    const e = entity as any
+    const data: Record<string, any> = stripNulls({
+      id: e.id,
+      imageURL: e.imageURL,
+      visual: e.visual,
+      physical: e.physical,
+    })
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
     data.materials = this.baseSchema.collectionToInput(
-      data.componentMaterials || [],
+      this.baseSchema.safeCollectionItems(e.componentMaterials),
       'component',
       'material',
     )
-    data.tags = this.baseSchema.collectionToInput(data.componentTags || [], 'component', 'tag')
+    data.tags = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.componentTags),
+      'component',
+      'tag',
+    )
+    if (e.primaryMaterial?.id) data.primaryMaterial = { id: e.primaryMaterial.id }
     runAjvValidator(this.UpdateValidator, data)
     this.baseSchema.relToInput(data, 'primaryMaterial', ['materialFraction'])
-    return this.parseUpdateInput(data as UpdateComponentInput)
+    return this.zService.parse(this.UpdateSchema, data as any)
   }
 
   async parseCreateInput(input: CreateComponentInput): Promise<CreateComponentInput> {

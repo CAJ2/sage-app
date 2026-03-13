@@ -1,11 +1,10 @@
+import { BaseEntity } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
-import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import {
   BaseSchemaService,
@@ -16,6 +15,7 @@ import {
 } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
+import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import {
@@ -36,7 +36,12 @@ export const CategoryIDSchema = z.string().meta({
 })
 
 @Injectable()
-export class CategorySchemaService {
+@IsSchemaService(CategoryEntity)
+export class CategorySchemaService implements ISchemaService {
+  OutputModel = Category
+  CreateInputModel = CreateCategoryInput
+  UpdateInputModel = UpdateCategoryInput
+
   CreateSchema
   CreateJSONSchema: z.core.JSONSchema.BaseSchema
   CreateValidator: ValidateFunction
@@ -84,7 +89,7 @@ export class CategorySchemaService {
       model.imageURL = entity.imageURL
       return model
     })
-    this.zService.registerTransform(CategoryEntity, Category, CategoryTransform)
+    this.zService.registerEntityTransform(CategoryEntity, Category, CategoryTransform)
 
     const CategoryHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as CategoryHistoryEntity
@@ -95,7 +100,7 @@ export class CategorySchemaService {
       model.changes = entity.changes as Category | undefined
       return model
     })
-    this.zService.registerTransform(
+    this.zService.registerEntityTransform(
       CategoryHistoryEntity,
       CategoryHistory,
       CategoryHistoryTransform,
@@ -185,16 +190,20 @@ export class CategorySchemaService {
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
-  async categoryCreateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async createInputModel<E extends BaseEntity>(_entity: E) {
+    const data = {}
     runAjvValidator(this.CreateValidator, data)
-    return this.parseCreateInput(data as CreateCategoryInput)
+    return this.zService.parse(this.CreateSchema, data)
   }
 
-  async categoryUpdateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async updateInputModel<E extends BaseEntity>(entity: E) {
+    const e = entity as any
+    const data: Record<string, any> = stripNulls({ id: e.id, imageURL: e.imageURL })
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.descShort, 'descShort', 'descShortTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
     runAjvValidator(this.UpdateValidator, data)
-    return this.parseUpdateInput(data as UpdateCategoryInput)
+    return this.zService.parse(this.UpdateSchema, data as any)
   }
 
   async parseCreateInput(input: CreateCategoryInput): Promise<CreateCategoryInput> {

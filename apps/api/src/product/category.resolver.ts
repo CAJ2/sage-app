@@ -5,9 +5,11 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { Category as CategoryEntity } from '@src/product/category.entity'
 import {
   CategoriesArgs,
   CategoriesPage,
@@ -180,7 +182,10 @@ export class CategoryResolver {
 
 @Resolver(() => CategoryHistory)
 export class CategoryHistoryResolver {
-  constructor(private readonly transform: TransformService) {}
+  constructor(
+    private readonly transform: TransformService,
+    private readonly editService: EditService,
+  ) {}
 
   @ResolveField('user', () => User)
   async user(@Parent() history: CategoryHistory) {
@@ -199,7 +204,8 @@ export class CategoryHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Category, original)
+    const entity = await this.editService.changePOJOToEntity(CategoryEntity, original)
+    return this.transform.entityToModel(Category, entity)
   }
 
   @ResolveField('changes', () => Category, { nullable: true })
@@ -208,6 +214,7 @@ export class CategoryHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Category, changes)
+    const entity = await this.editService.changePOJOToEntity(CategoryEntity, changes)
+    return this.transform.entityToModel(Category, entity)
   }
 }

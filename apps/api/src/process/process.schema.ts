@@ -1,16 +1,16 @@
+import { BaseEntity } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 import { ValidateFunction } from 'ajv'
-import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { DeleteInput } from '@src/changes/change-ext.model'
-import type { Edit } from '@src/changes/change.model'
 import { ChangeInputWithLangSchema, DeleteInputSchema } from '@src/changes/change.schema'
 import { Source as SourceModel } from '@src/changes/source.model'
 import { BaseSchemaService, runAjvValidator, stripNulls, zToSchema } from '@src/common/base.schema'
 import { TrArraySchema } from '@src/common/i18n'
 import { I18nService } from '@src/common/i18n.service'
+import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { PlaceIDSchema } from '@src/geo/place.schema'
@@ -44,7 +44,12 @@ export const ProcessIDSchema = z.string().meta({
 })
 
 @Injectable()
-export class ProcessSchemaService {
+@IsSchemaService(ProcessEntity)
+export class ProcessSchemaService implements ISchemaService {
+  OutputModel = Process
+  CreateInputModel = CreateProcessInput
+  UpdateInputModel = UpdateProcessInput
+
   ProcessMaterialInputSchema
   ProcessVariantInputSchema
   ProcessOrgInputSchema
@@ -68,7 +73,7 @@ export class ProcessSchemaService {
     private readonly zService: ZService,
   ) {
     const ProcessTransform = z.transform((input: TransformInput) => {
-      const entity = input.input as ProcessEntity
+      const entity = input.input as ProcessEntity & Record<string, any>
       const model = new Process()
       model.id = entity.id
       model.createdAt = DateTime.fromJSDate(entity.createdAt)
@@ -83,9 +88,17 @@ export class ProcessSchemaService {
         eff.valueRatio = entity.efficiency.valueRatio
         model.efficiency = eff
       }
+      // Handle M:1 refs stored as string IDs (from POJO) or entity/Ref objects (from DB)
+      for (const field of ['material', 'variant', 'org', 'region', 'place'] as const) {
+        const raw = (entity as any)[field]
+        if (raw) {
+          const id = typeof raw === 'string' ? raw : raw?.id
+          if (id) (model as any)[field] = { id }
+        }
+      }
       return model
     })
-    this.zService.registerTransform(ProcessEntity, Process, ProcessTransform)
+    this.zService.registerEntityTransform(ProcessEntity, Process, ProcessTransform)
 
     const StreamScoreTransform = z.transform((input: TransformInput) => {
       const obj = input.input as any
@@ -100,7 +113,7 @@ export class ProcessSchemaService {
       model.name = input.i18n.tr(obj.name)
       return model
     })
-    this.zService.registerTransform(undefined, StreamScore, StreamScoreTransform)
+    this.zService.registerObjectTransform(StreamScore, StreamScoreTransform)
 
     const RecyclingStreamTransform = z.transform(async (input: TransformInput) => {
       const obj = input.input as any
@@ -118,7 +131,7 @@ export class ProcessSchemaService {
       model.container = obj.container
       return model
     })
-    this.zService.registerTransform(undefined, RecyclingStream, RecyclingStreamTransform)
+    this.zService.registerObjectTransform(RecyclingStream, RecyclingStreamTransform)
 
     const ProcessHistoryTransform = z.transform((input: TransformInput) => {
       const entity = input.input as ProcessHistoryEntity
@@ -129,7 +142,11 @@ export class ProcessSchemaService {
       model.changes = entity.changes as Process | undefined
       return model
     })
-    this.zService.registerTransform(ProcessHistoryEntity, ProcessHistory, ProcessHistoryTransform)
+    this.zService.registerEntityTransform(
+      ProcessHistoryEntity,
+      ProcessHistory,
+      ProcessHistoryTransform,
+    )
 
     const ProcessSourceTransform = z.transform(async (input: TransformInput) => {
       const entity = input.input as ProcessSources
@@ -140,7 +157,7 @@ export class ProcessSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(ProcessSources, ProcessSource, ProcessSourceTransform)
+    this.zService.registerEntityTransform(ProcessSources, ProcessSource, ProcessSourceTransform)
 
     this.ProcessMaterialInputSchema = z.strictObject({
       id: MaterialIDSchema,
@@ -303,19 +320,28 @@ export class ProcessSchemaService {
     this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
   }
 
-  async processCreateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async createInputModel<E extends BaseEntity>(_entity: E) {
+    const data = {}
     runAjvValidator(this.CreateEditValidator, data)
     return this.zService.parse(this.CreateEditSchema, data)
   }
 
-  async processUpdateEdit(edit: Edit) {
-    const data: Record<string, any> = stripNulls(_.cloneDeep(edit.changes) ?? {})
+  async updateInputModel<E extends BaseEntity>(entity: E) {
+    const e = entity as any
+    const data: Record<string, any> = stripNulls({
+      id: e.id,
+      intent: e.intent,
+      instructions: e.instructions,
+      efficiency: e.efficiency,
+      rules: e.rules,
+    })
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
     for (const field of ['material', 'variant', 'org', 'region', 'place']) {
-      this.baseSchema.relToInput(data, field)
+      if (e[field]?.id) data[field] = { id: e[field].id }
     }
     runAjvValidator(this.UpdateValidator, data)
-    return this.parseUpdateInput(data as UpdateProcessInput)
+    return this.zService.parse(this.UpdateSchema, data as any)
   }
 
   async parseCreateInput(input: CreateProcessInput): Promise<CreateProcessInput> {

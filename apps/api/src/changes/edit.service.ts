@@ -1,7 +1,8 @@
-import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
+import { BaseEntity, EntityManager, ref, wrap } from '@mikro-orm/postgresql'
 import type {
   Collection,
   EntityDTO,
+  EntityMetadata,
   EntityName,
   FilterQuery,
   FindOneOptions,
@@ -23,6 +24,7 @@ import { Change, ChangeEdits, ChangeStatus } from '@src/changes/change.entity'
 import { MergeInput, UpdateChangeInput } from '@src/changes/change.model'
 import { Source } from '@src/changes/source.entity'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
+import { MetaService } from '@src/common/meta.service'
 import { User } from '@src/users/users.entity'
 
 export interface IEntityService {
@@ -36,6 +38,7 @@ export class EditService {
   constructor(
     private readonly em: EntityManager,
     private readonly authUser: AuthUserService,
+    private readonly metaService: MetaService,
   ) {}
 
   async findOne(id: string) {
@@ -657,7 +660,7 @@ export class EditService {
     edit.entityName = entityName
     edit.entityID = entity.id
     edit.userID = this.authUser.userID()!
-    edit.changes = _.omit(entity.toPOJO(), ['history'])
+    edit.changes = this.entityToChangePOJO(entityName, entity)
     change.edits.add(edit)
   }
 
@@ -683,7 +686,7 @@ export class EditService {
     try {
       for (const edit of change.edits) {
         if (edit.entityID) {
-          const entity = await this.em.findOne(edit.entityName, {
+          let entity = await this.em.findOne(edit.entityName, {
             id: edit.entityID,
           })
           if (!entity && edit.original) {
@@ -697,17 +700,8 @@ export class EditService {
             // This is a delete
             this.em.remove(entity)
           } else if (entity && edit.original && edit.changes) {
-            // This is an update — only apply scalar changes to avoid re-inserting existing relations
-            const relationNames = new Set(
-              this.em
-                .getMetadata()
-                .get(edit.entityName)
-                .relations.map((r) => r.name),
-            )
-            const scalarChanges = Object.fromEntries(
-              Object.entries(edit.changes).filter(([k]) => !relationNames.has(k)),
-            )
-            this.em.assign(entity, scalarChanges as any)
+            // This is an update
+            entity = this.changePOJOToEntity(edit.entityName, edit.changes)
           } else {
             throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
           }
@@ -746,8 +740,10 @@ export class EditService {
       return
     }
     const id = (changes as any).id || (original as any).id
+    const pk0 = historyMeta.primaryKeys[0]
+    const parentEntityClass = historyMeta.properties[pk0].type
     this.em.create(historyMeta.className, {
-      [historyMeta.primaryKeys[0]]: id,
+      [pk0]: ref(this.em.getMetadata().get(parentEntityClass).class, id),
       datetime: new Date(),
       user: ref(User, userID),
       original,
@@ -763,56 +759,195 @@ export class EditService {
     if (!meta) {
       throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
     }
-    const flattenRefs: { ref: string; fieldKey: string; foreignKey: string }[] = []
-    const changeOmit: string[] = []
+
+    // Step 1: Collect pivot entity class names referenced by owning M:N relations
+    const pivotEntityNames = new Set<string>()
     meta.relations.forEach((rel) => {
-      // Skip history and tree relations
-      if (rel.name.startsWith('history') || ['ancestors', 'descendants'].includes(rel.name)) {
+      if (rel.kind === 'm:n' && rel.pivotEntity && !rel.mappedBy) {
+        pivotEntityNames.add(rel.pivotEntity as string)
+      }
+    })
+
+    // Step 2: Categorize all relations
+    const flattenArrayRefs: string[] = [] // 1:M to pivot/tree targets
+    const flattenToId: string[] = [] // m:1 (non-primary), 1:1
+    const changeOmit: string[] = []
+
+    meta.relations.forEach((rel) => {
+      if (rel.name.startsWith('history')) {
+        changeOmit.push(rel.name)
         return
       }
-      // Populate 1:m relations
-      if (!rel.pivotEntity && rel.kind === '1:m') {
-        const refMeta = rel.targetMeta
-        if (!refMeta) {
-          throw NotFoundErr(`Target meta for relation "${rel.name}" not found`)
+      switch (rel.kind) {
+        case 'm:n':
+          changeOmit.push(rel.name)
+          break
+        case '1:m': {
+          const targetName = rel.targetMeta?.className
+          const isPivot = !!targetName && pivotEntityNames.has(targetName)
+          const isTree = !!rel.targetMeta && this.isTreeEntity(rel.targetMeta)
+          if (isPivot || isTree) flattenArrayRefs.push(rel.name)
+          else changeOmit.push(rel.name)
+          break
         }
-        flattenRefs.push({
-          ref: rel.name,
-          fieldKey: refMeta.primaryKeys[0],
-          foreignKey: refMeta.primaryKeys[1],
-        })
-      }
-      // Do not store m:n relations with pivot entities
-      // Instead the 1:m relation with pivot entity data is stored
-      if (rel.pivotEntity && rel.kind === 'm:n') {
-        changeOmit.push(rel.name)
+        case 'm:1':
+          if (rel.primary) changeOmit.push(rel.name)
+          else flattenToId.push(rel.name)
+          break
+        case '1:1':
+          flattenToId.push(rel.name)
+          break
       }
     })
+
+    // Step 3: Build and post-process the POJO
     const pojo: any = _.cloneDeep(entity.toPOJO())
-    flattenRefs.forEach((ref) => {
-      if (pojo[ref.ref] && Array.isArray(pojo[ref.ref])) {
-        pojo[ref.ref] = pojo[ref.ref].map((item: any) => {
-          if (!item) return item
-          if (!_.isString(item[ref.fieldKey]) && _.has(item[ref.fieldKey], 'id')) {
-            item[ref.fieldKey] = item[ref.fieldKey].id
-          }
-          if (!_.isString(item[ref.foreignKey]) && _.has(item[ref.foreignKey], 'id')) {
-            item[ref.foreignKey] = item[ref.foreignKey].id
-          }
-          return item
-        })
-      } else if (pojo[ref.ref] && pojo[ref.ref][ref.fieldKey]) {
-        pojo[ref.ref] = {
-          [ref.fieldKey]: _.isString(pojo[ref.ref][ref.fieldKey])
-            ? pojo[ref.ref][ref.fieldKey]
-            : pojo[ref.ref][ref.fieldKey].id,
-          [ref.foreignKey]: _.isString(pojo[ref.ref][ref.foreignKey])
-            ? pojo[ref.ref][ref.foreignKey]
-            : pojo[ref.ref][ref.foreignKey].id,
-          ..._.omit(pojo[ref.ref], [ref.fieldKey, ref.foreignKey]),
-        }
+
+    // Flatten m:1 / 1:1 to ID string
+    flattenToId.forEach((name) => {
+      if (pojo[name] && _.isObject(pojo[name]) && _.has(pojo[name], 'id')) {
+        pojo[name] = (pojo[name] as any).id
       }
     })
+
+    // Flatten 1:M arrays: replace ALL nested {id:...} objects with just the ID
+    flattenArrayRefs.forEach((name) => {
+      if (!pojo[name]) return
+      if (Array.isArray(pojo[name])) {
+        pojo[name] = pojo[name].map((item: any) => (item ? this.flattenNestedRefs(item) : item))
+      } else if (_.isObject(pojo[name])) {
+        pojo[name] = this.flattenNestedRefs(pojo[name] as Record<string, any>)
+      }
+    })
+
     return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
+  }
+
+  /** Returns true if every primary M:1 on this entity points to the same entity type
+   *  (closure table / edge table pattern: CategoryTree, CategoryEdge, etc.) */
+  private isTreeEntity(meta: EntityMetadata): boolean {
+    const primaryM1s = meta.relations.filter((r) => r.kind === 'm:1' && r.primary)
+    if (primaryM1s.length < 2) return false
+    const targets = new Set(primaryM1s.map((r) => r.targetMeta?.className))
+    return targets.size === 1
+  }
+
+  /** Shallow-clones an object, replacing any value of the form {id: '...'} with just the ID string.
+   *  Handles M:1 refs inside pivot/tree entity rows (e.g. VariantsOrgs.region). */
+  private flattenNestedRefs(item: Record<string, any>): Record<string, any> {
+    const result: Record<string, any> = {}
+    for (const [key, val] of Object.entries(item)) {
+      result[key] =
+        val && _.isObject(val) && !Array.isArray(val) && _.has(val, 'id') ? (val as any).id : val
+    }
+    return result
+  }
+
+  /** Reverse of flattenNestedRefs: shallow-clones an object, converting any string value back to
+   *  {id: value} when the field name corresponds to a relation in the target entity's metadata. */
+  private unflattenNestedRefs(
+    item: Record<string, any>,
+    targetMeta: EntityMetadata,
+  ): Record<string, any> {
+    const relFields = new Set(targetMeta.relations.map((r) => r.name))
+    const result: Record<string, any> = {}
+    for (const [key, val] of Object.entries(item)) {
+      result[key] = typeof val === 'string' && relFields.has(key) ? { id: val } : val
+    }
+    return result
+  }
+
+  /**
+   * Reverse of entityToChangePOJO: takes a stored POJO from a ChangeEdit, restores the
+   * flattened relation fields to {id: string} ref objects, and returns the initialized entity.
+   *
+   * The returned entity is suitable for passing directly to ZService.entityToModel.
+   */
+  async changePOJOToEntity(
+    entityName: EntityName<any>,
+    pojo: Record<string, any>,
+  ): Promise<BaseEntity> {
+    const meta = this.em.getMetadata().get(entityName)
+    if (!meta) {
+      throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
+    }
+
+    // Categorize relations — mirrors entityToChangePOJO exactly
+    const pivotEntityNames = new Set<string>()
+    meta.relations.forEach((rel) => {
+      if (rel.kind === 'm:n' && rel.pivotEntity && !rel.mappedBy) {
+        pivotEntityNames.add(rel.pivotEntity as string)
+      }
+    })
+
+    const flattenArrayRefs: Array<{ name: string; targetMeta: EntityMetadata }> = []
+    const flattenToId: string[] = []
+
+    meta.relations.forEach((rel) => {
+      if (rel.name.startsWith('history')) return
+      switch (rel.kind) {
+        case '1:m': {
+          const targetName = rel.targetMeta?.className
+          const isPivot = !!targetName && pivotEntityNames.has(targetName)
+          const isTree = !!rel.targetMeta && this.isTreeEntity(rel.targetMeta)
+          if ((isPivot || isTree) && rel.targetMeta) {
+            flattenArrayRefs.push({ name: rel.name, targetMeta: rel.targetMeta })
+          }
+          break
+        }
+        case 'm:1':
+          if (!rel.primary) flattenToId.push(rel.name)
+          break
+        case '1:1':
+          flattenToId.push(rel.name)
+          break
+      }
+    })
+
+    // Build restored POJO from the plain JSON (avoid cloneDeep on MikroORM entities)
+    const restored: Record<string, any> = { ...pojo }
+
+    // Restore m:1/1:1 string IDs → {id: string}
+    flattenToId.forEach((name) => {
+      if (typeof restored[name] === 'string') {
+        restored[name] = { id: restored[name] }
+      }
+    })
+
+    // Restore 1:M array items: string relation values → {id: string}
+    flattenArrayRefs.forEach(({ name, targetMeta }) => {
+      if (!restored[name]) return
+      if (Array.isArray(restored[name])) {
+        restored[name] = restored[name].map((item: any) =>
+          item ? this.unflattenNestedRefs(item, targetMeta) : item,
+        )
+      } else if (_.isObject(restored[name])) {
+        restored[name] = this.unflattenNestedRefs(restored[name] as Record<string, any>, targetMeta)
+      }
+    })
+
+    // Fetch entity from DB so we get a properly typed, initialized entity
+    const strEntityName = typeof entityName === 'string' ? entityName : entityName.name
+    const entityServiceResult = this.metaService.findEntityService(strEntityName)
+    if (!entityServiceResult) {
+      throw NotFoundErr(`No entity service found for "${entityName}"`)
+    }
+    const [, entityService] = entityServiceResult
+    const id = typeof pojo.id === 'string' ? pojo.id : undefined
+    const dbEntity = id ? await entityService.findOneByID(id) : null
+
+    if (dbEntity) {
+      // Create a disconnected entity from the POJO to avoid modifying the current identity map
+      const forked = this.em.fork()
+      const createdEntity = forked.create(entityName, restored)
+      const assignedEntity = wrap(createdEntity).assign(restored, { em: forked }) as BaseEntity
+      forked.clear()
+      return assignedEntity
+    }
+
+    // Entity not yet persisted (draft create) — create an in-memory instance from the POJO,
+    // bypassing the EM to avoid identity map conflicts with the constructor-generated PK.
+    const entity = this.em.create(meta.class, restored, { persist: false, managed: false })
+    return entity
   }
 }

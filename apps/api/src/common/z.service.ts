@@ -8,7 +8,7 @@ import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 
 type TransformMeta = { entity?: string; model: string }
 
-type ZTransformInput = { input: z.ZodUnknown; i18n: z.ZodUnknown }
+type ZTransformInput = { input: z.ZodUnknown; i18n: z.ZodCustom<I18nService, I18nService> }
 type TransformSchema<M> = z.ZodPipe<z.ZodObject<ZTransformInput>, z.ZodTransform<M, TransformInput>>
 
 function transformKey(entity: string | undefined, model: string): string {
@@ -31,22 +31,22 @@ export class ZService {
     this.transformMap = new Map()
     this.transformInputSchema = z.object({
       input: z.unknown(),
-      i18n: z.unknown(),
+      i18n: z.instanceof(I18nService),
     })
   }
 
-  registerTransform<M extends BaseModel>(
-    entity: undefined,
+  registerObjectTransform<M extends BaseModel>(
     model: new () => M,
     transform: z.ZodTransform<M, TransformInput>,
-  ): void
-  registerTransform<E extends BaseEntity, M extends BaseModel>(
+  ) {
+    const modelKey = model.prototype.constructor.name
+    const tr = this.transformInputSchema.pipe(transform as unknown as z.ZodTransform<any, any>)
+    this.transformRegistry.add(tr, { entity: undefined, model: modelKey })
+    this.transformMap.set(transformKey(undefined, modelKey), tr)
+  }
+
+  registerEntityTransform<E extends BaseEntity, M extends BaseModel>(
     entity: (new () => E) | string,
-    model: new () => M | string,
-    transform: z.ZodTransform<M, TransformInput>,
-  ): void
-  registerTransform<E extends BaseEntity, M extends BaseModel>(
-    entity: (new () => E) | string | undefined,
     model: new () => M | string,
     transform: z.ZodTransform<M, TransformInput>,
   ) {
@@ -77,15 +77,7 @@ export class ZService {
       )
       throw result.error
     }
-    const modelInstance = new Model()
-    // Copy source properties first (passthrough for POJO inputs like directEdit flow),
-    // preserving extra fields (e.g. componentMaterials, variantComponents pivot data).
-    if (input && typeof input === 'object') {
-      Object.assign(modelInstance, input)
-    }
-    // Then overlay transform's explicit mappings (only own properties set by the transform).
-    Object.assign(modelInstance, result.data)
-    return modelInstance
+    return result.data
   }
 
   async entityToModel<E extends BaseEntity, M extends BaseModel>(
@@ -113,7 +105,7 @@ export class ZService {
         `No transform registered for entity ${entity.constructor.name} and model ${model.prototype.constructor.name}`,
       )
     }
-    const result = await this.transformToModel(model, entity, transform)
+    const result = await this.transformToModel<M>(model, entity, transform)
     // Preserve reference to original entity (used by field resolvers that need the entity)
     // ;(result as BaseModel).entity = entity
     return result

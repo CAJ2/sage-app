@@ -25,6 +25,6 @@ export class RegionSchemaService {
       }
       return model
     })
-    this.zService.registerTransform(RegionEntity, Region, RegionTransform)
+    this.zService.registerEntityTransform(RegionEntity, Region, RegionTransform)
   }
 }

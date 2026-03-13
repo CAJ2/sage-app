@@ -63,22 +63,22 @@ export class Material extends IDCreatedUpdated {
   @Property({ type: 'string' })
   shape?: MaterialShape
 
-  @OneToMany(() => MaterialTree, (tree) => tree.ancestor)
+  @OneToMany({ entity: () => MaterialTree, mappedBy: 'ancestor' })
   ancestors = new Collection<MaterialTree>(this)
 
-  @OneToMany(() => MaterialTree, (tree) => tree.descendant)
+  @OneToMany({ entity: () => MaterialTree, mappedBy: 'descendant' })
   descendants = new Collection<MaterialTree>(this)
 
-  @OneToMany(() => MaterialEdge, (edge) => edge.parent)
+  @OneToMany({ entity: () => MaterialEdge, mappedBy: 'parent' })
   parents = new Collection<MaterialEdge>(this)
 
-  @OneToMany(() => MaterialEdge, (edge) => edge.child)
+  @OneToMany({ entity: () => MaterialEdge, mappedBy: 'child' })
   children = new Collection<MaterialEdge>(this)
 
   @OneToMany({ mappedBy: 'primaryMaterial' })
   primaryComponents = new Collection<Component>(this)
 
-  @ManyToMany({ entity: () => Component, mappedBy: (c) => c.materials })
+  @ManyToMany({ entity: () => Component, mappedBy: 'materials' })
   components = new Collection<Component>(this)
 
   @OneToMany({ mappedBy: 'material' })

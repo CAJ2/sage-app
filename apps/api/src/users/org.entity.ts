@@ -42,13 +42,13 @@ export class Org extends IDCreatedUpdated {
   @Property({ fieldName: 'name_translations', type: 'json' })
   nameTr: TranslatedField = defaultTranslatedField()
 
-  @ManyToMany(() => User, (user) => user.orgs)
+  @ManyToMany({ entity: () => User, mappedBy: 'orgs' })
   users = new Collection<User>(this)
 
   @OneToMany(() => Invitation, (invitation) => invitation.org)
   invitations = new Collection<Invitation>(this)
 
-  @ManyToMany(() => Variant, (variant) => variant.orgs)
+  @ManyToMany({ entity: () => Variant, mappedBy: 'orgs' })
   variants = new Collection<Variant>(this)
 
   @OneToMany({ mappedBy: 'org' })

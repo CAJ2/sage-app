@@ -99,7 +99,7 @@ export class SourceSchemaService {
   UpdateSchema = UpdateSourceInputSchema
 
   constructor(private readonly zService: ZService) {
-    this.zService.registerTransform(Source, SourceModel, ModelTransform)
+    this.zService.registerEntityTransform(Source, SourceModel, ModelTransform)
   }
 
   async parseCreateInput(input: CreateSourceInput): Promise<CreateSourceInput> {

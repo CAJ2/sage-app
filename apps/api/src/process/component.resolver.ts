@@ -5,9 +5,11 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { Component as ComponentEntity } from '@src/process/component.entity'
 import {
   Component,
   ComponentHistory,
@@ -190,7 +192,10 @@ export class ComponentResolver {
 
 @Resolver(() => ComponentHistory)
 export class ComponentHistoryResolver {
-  constructor(private readonly transform: TransformService) {}
+  constructor(
+    private readonly transform: TransformService,
+    private readonly editService: EditService,
+  ) {}
 
   @ResolveField('user', () => User)
   async user(@Parent() history: ComponentHistory) {
@@ -209,7 +214,8 @@ export class ComponentHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Component, original)
+    const entity = await this.editService.changePOJOToEntity(ComponentEntity, original)
+    return this.transform.entityToModel(Component, entity)
   }
 
   @ResolveField('changes', () => Component, { nullable: true })
@@ -218,6 +224,7 @@ export class ComponentHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Component, changes)
+    const entity = await this.editService.changePOJOToEntity(ComponentEntity, changes)
+    return this.transform.entityToModel(Component, entity)
   }
 }

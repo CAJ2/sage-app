@@ -5,9 +5,11 @@ import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { Process as ProcessEntity } from '@src/process/process.entity'
 import {
   CreateProcessInput,
   CreateProcessOutput,
@@ -138,7 +140,10 @@ export class ProcessResolver {
 
 @Resolver(() => ProcessHistory)
 export class ProcessHistoryResolver {
-  constructor(private readonly transform: TransformService) {}
+  constructor(
+    private readonly transform: TransformService,
+    private readonly editService: EditService,
+  ) {}
 
   @ResolveField('user', () => User)
   async user(@Parent() history: ProcessHistory) {
@@ -157,7 +162,8 @@ export class ProcessHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Process, original)
+    const entity = await this.editService.changePOJOToEntity(ProcessEntity, original)
+    return this.transform.entityToModel(Process, entity)
   }
 
   @ResolveField('changes', () => Process, { nullable: true })
@@ -166,6 +172,7 @@ export class ProcessHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Process, changes)
+    const entity = await this.editService.changePOJOToEntity(ProcessEntity, changes)
+    return this.transform.entityToModel(Process, entity)
   }
 }

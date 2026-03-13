@@ -74,6 +74,42 @@ export class BaseSchemaService {
     })
   }
 
+  /**
+   * Safely extracts items from a MikroORM Collection or plain array.
+   * Returns [] if the collection is uninitialized, avoiding "Collection not initialized" errors.
+   */
+  safeCollectionItems(collection: any): Record<string, any>[] {
+    if (!collection) return []
+    if (Array.isArray(collection)) return collection
+    if (typeof collection.isInitialized === 'function' && collection.isInitialized()) {
+      return collection.getItems()
+    }
+    return []
+  }
+
+  /**
+   * Applies a TranslatedField (or plain string) value to `data`.
+   * - Plain string → `data[plainKey] = value` (from ChangeEdit POJOs)
+   * - TranslatedField `{lang: text}` → sets both:
+   *   - `data[plainKey]` = current-request-lang string via `i18n.tr()`
+   *   - `data[trKey]` = `[{lang, text}]` array (full translations for the form)
+   */
+  applyTranslatedField(
+    data: Record<string, any>,
+    value: string | Record<string, string> | undefined | null,
+    plainKey: string,
+    trKey: string,
+  ): void {
+    if (!value) return
+    if (typeof value === 'string') {
+      data[plainKey] = value
+    } else {
+      const tr = this.i18n.tr(value)
+      if (tr) data[plainKey] = tr
+      data[trKey] = Object.entries(value).map(([lang, text]) => ({ lang, text }))
+    }
+  }
+
   /** Reduce a loaded relation object on `data[field]` to only `id` plus any specified `extraFields`. */
   relToInput(data: Record<string, any>, field: string, extraFields: string[] = []): void {
     if (data[field]?.id) {

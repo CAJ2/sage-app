@@ -4,8 +4,10 @@ import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nest
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { Change } from '@src/changes/change.model'
+import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { Org as OrgEntity } from '@src/users/org.entity'
 import {
   CreateOrgInput,
   CreateOrgOutput,
@@ -89,7 +91,10 @@ export class OrgResolver {
 
 @Resolver(() => OrgHistory)
 export class OrgHistoryResolver {
-  constructor(private readonly transform: TransformService) {}
+  constructor(
+    private readonly transform: TransformService,
+    private readonly editService: EditService,
+  ) {}
 
   @ResolveField('user', () => User)
   async user(@Parent() history: OrgHistory) {
@@ -108,7 +113,8 @@ export class OrgHistoryResolver {
     if (!original) {
       return null
     }
-    return this.transform.objectToModel(Org, original)
+    const entity = await this.editService.changePOJOToEntity(OrgEntity, original)
+    return this.transform.entityToModel(Org, entity)
   }
 
   @ResolveField('changes', () => Org, { nullable: true })
@@ -117,6 +123,7 @@ export class OrgHistoryResolver {
     if (!changes) {
       return null
     }
-    return this.transform.objectToModel(Org, changes)
+    const entity = await this.editService.changePOJOToEntity(OrgEntity, changes)
+    return this.transform.entityToModel(Org, entity)
   }
 }

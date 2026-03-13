@@ -64,16 +64,16 @@ export class Tag extends IDCreatedUpdated {
   @Property()
   tag_id?: string
 
-  @ManyToMany(() => Place, (place) => place.tags)
+  @ManyToMany({ entity: () => Place, mappedBy: 'tags' })
   places = new Collection<Place>(this)
 
-  @ManyToMany(() => Item, (item) => item.tags)
+  @ManyToMany({ entity: () => Item, mappedBy: 'tags' })
   items = new Collection<Item>(this)
 
-  @ManyToMany(() => Variant, (variant) => variant.tags)
+  @ManyToMany({ entity: () => Variant, mappedBy: 'tags' })
   variants = new Collection<Variant>(this)
 
-  @ManyToMany(() => Component, (component) => component.tags)
+  @ManyToMany({ entity: () => Component, mappedBy: 'tags' })
   components = new Collection<Component>(this)
 
   meta?: Record<string, any>
