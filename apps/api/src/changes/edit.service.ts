@@ -740,8 +740,10 @@ export class EditService {
       return
     }
     const id = (changes as any).id || (original as any).id
+    const pk0 = historyMeta.primaryKeys[0]
+    const parentEntityClass = historyMeta.properties[pk0].type
     this.em.create(historyMeta.className, {
-      [historyMeta.primaryKeys[0]]: id,
+      [pk0]: ref(this.em.getMetadata().get(parentEntityClass).class, id),
       datetime: new Date(),
       user: ref(User, userID),
       original,
