@@ -8,6 +8,7 @@ import { ProcessModule } from '@src/process/process.module'
 import { CategoryHistoryResolver, CategoryResolver } from '@src/product/category.resolver'
 import { CategorySchemaService } from '@src/product/category.schema'
 import { CategoryService } from '@src/product/category.service'
+import { ImageSchemaService } from '@src/product/image.schema'
 import { ItemHistoryResolver, ItemResolver } from '@src/product/item.resolver'
 import { ItemSchemaService } from '@src/product/item.schema'
 import { ItemService } from '@src/product/item.service'
@@ -30,6 +31,7 @@ import { VariantService } from '@src/product/variant.service'
     VariantService,
     VariantSchemaService,
     VariantHistoryResolver,
+    ImageSchemaService,
   ],
   exports: [
     CategoryService,

@@ -13,6 +13,7 @@ import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import {
   COMPONENT_IDS,
   ITEM_IDS,
+  SOURCE_IDS,
   TestVariantSeeder,
   VARIANT_IDS,
 } from '@src/db/seeds/TestVariantSeeder'
@@ -1049,6 +1050,75 @@ describe('VariantResolver (integration)', () => {
       expect(res.data?.variant1?.variant?.name).toBe('Batch Variant 1')
       expect(res.data?.variant2?.variant).toBeDefined()
       expect(res.data?.variant2?.variant?.name).toBe('Batch Variant 2')
+    })
+  })
+
+  describe('images', () => {
+    test('should query images with url and id', async () => {
+      const res = await gql.send(
+        graphql(`
+          query VariantResolverGetVariantImages($id: ID!, $first: Int) {
+            variant(id: $id) {
+              id
+              images(first: $first) {
+                nodes {
+                  id
+                  url
+                  size
+                }
+                totalCount
+              }
+            }
+          }
+        `),
+        { id: variantID, first: 10 },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.variant?.images).toBeDefined()
+      expect(res.data?.variant?.images.totalCount).toBe(SOURCE_IDS.length)
+      expect(res.data?.variant?.images.nodes).toHaveLength(SOURCE_IDS.length)
+      expect(res.data?.variant?.images.nodes?.[0]?.id).toBeDefined()
+      expect(res.data?.variant?.images.nodes?.[0]?.url).toBeDefined()
+      expect(res.data?.variant?.images.nodes?.[0]?.url).toContain('sageleaf.app')
+    })
+
+    test('imageURL returns the first image url', async () => {
+      const res = await gql.send(
+        graphql(`
+          query VariantResolverGetVariantImageURL($id: ID!) {
+            variant(id: $id) {
+              id
+              imageURL
+            }
+          }
+        `),
+        { id: variantID },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.variant?.imageURL).toBeTruthy()
+      expect(res.data?.variant?.imageURL).toContain('sageleaf.app')
+    })
+
+    test('imageURL is null and images is empty for variant without image sources', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation VariantImagesCreateEmpty($input: CreateVariantInput!) {
+            createVariant(input: $input) {
+              variant {
+                id
+                imageURL
+                images {
+                  totalCount
+                }
+              }
+            }
+          }
+        `),
+        { input: { name: 'No Images Variant' } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      expect(createRes.data?.createVariant?.variant?.imageURL).toBeNull()
+      expect(createRes.data?.createVariant?.variant?.images.totalCount).toBe(0)
     })
   })
 

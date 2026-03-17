@@ -10,6 +10,7 @@ import {
   UpdateSourceInput,
 } from '@src/changes/source.model'
 import { JSONLD_CONTEXT } from '@src/changes/source.schema'
+import { shrinkCdnUrl } from '@src/common/cdn'
 import { NotFoundErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { type JSONObject } from '@src/common/z.schema'
@@ -110,7 +111,9 @@ export class SourceService {
 
   async setFields(source: Source, input: Partial<CreateSourceInput & UpdateSourceInput>) {
     if (input.type) source.type = input.type
-    if (input.location) source.location = input.location
+    if (input.location) {
+      source.location = shrinkCdnUrl(input.location)
+    }
     if (input.content) {
       source.content = input.content
     }

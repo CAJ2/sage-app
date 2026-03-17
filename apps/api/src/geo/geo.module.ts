@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 
 import { CommonModule } from '@src/common/common.module'
+import { LocationService } from '@src/geo/location.service'
 import { PlaceResolver } from '@src/geo/place.resolver'
 import { PlaceSchemaService } from '@src/geo/place.schema'
 import { PlaceService } from '@src/geo/place.service'
@@ -17,7 +18,8 @@ import { RegionService } from '@src/geo/region.service'
     PlaceResolver,
     PlaceService,
     PlaceSchemaService,
+    LocationService,
   ],
-  exports: [RegionService, RegionSchemaService, PlaceService, PlaceSchemaService],
+  exports: [RegionService, RegionSchemaService, PlaceService, PlaceSchemaService, LocationService],
 })
 export class GeoModule {}

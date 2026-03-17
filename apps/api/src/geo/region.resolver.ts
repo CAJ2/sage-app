@@ -3,13 +3,21 @@ import { Args, ID, Query, Resolver } from '@nestjs/graphql'
 import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { Region, RegionsArgs, RegionsPage, RegionsSearchByPointArgs } from '@src/geo/region.model'
+import { LocationService } from '@src/geo/location.service'
+import {
+  CurrentRegion,
+  Region,
+  RegionsArgs,
+  RegionsPage,
+  RegionsSearchByPointArgs,
+} from '@src/geo/region.model'
 import { RegionService } from '@src/geo/region.service'
 
 @Resolver(() => Region)
 export class RegionResolver {
   constructor(
     private readonly regionService: RegionService,
+    private readonly locationService: LocationService,
     private readonly transform: TransformService,
   ) {}
 
@@ -29,6 +37,29 @@ export class RegionResolver {
       throw NotFoundErr('Region not found')
     }
     return this.transform.entityToModel(Region, region)
+  }
+
+  @Query(() => CurrentRegion, { name: 'currentRegion', nullable: true })
+  @OptionalAuth()
+  async currentRegion(): Promise<CurrentRegion | null> {
+    const ids = await this.locationService.resolveLocation()
+    if (!ids || ids.length === 0) return null
+
+    const [region, allRegions] = await Promise.all([
+      this.regionService.findOneByID(ids[0]),
+      this.regionService.findManyByID(ids),
+    ])
+
+    const sorted = allRegions.sort((a, b) => (b.adminLevel ?? 0) - (a.adminLevel ?? 0))
+    const [regionModel, ...hierarchyModels] = await Promise.all([
+      region ? this.transform.entityToModel(Region, region) : Promise.resolve(undefined),
+      ...sorted.map((r) => this.transform.entityToModel(Region, r)),
+    ])
+
+    return {
+      region: regionModel,
+      regionHierarchy: hierarchyModels,
+    }
   }
 
   @Query(() => RegionsPage, { name: 'searchRegionsByPoint' })

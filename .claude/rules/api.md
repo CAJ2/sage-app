@@ -1,6 +1,6 @@
 ---
 paths:
-  - "apps/api/**"
+  - 'apps/api/**'
 ---
 
 # API App (`apps/api/`) — Agent Rules
@@ -42,6 +42,7 @@ The API is organized into domain-focused modules in `src/`:
 ```
 
 Current domain modules in `src/`:
+
 - **`auth/`** — Authentication and authorization
 - **`users/`** — Users and Orgs
 - **`product/`** — Product-related entities (items, variants, categories)
@@ -62,8 +63,10 @@ Current domain modules in `src/`:
 nx build api               # Builds + generates DB types
 
 # Testing
-nx test api                # Run unit tests with Vitest
-nx test:cov api            # Run with coverage
+nx test api --reporter=agent                                  # Run all unit tests
+nx test api src/path/to/file.spec.ts --reporter=agent         # Run a specific test file
+nx test api src/foo.spec.ts src/bar.spec.ts --reporter=agent  # Run multiple test files
+nx test:cov api                                               # Run with coverage
 
 # Code Generation
 nx codegen api             # Generate GraphQL typed document nodes
@@ -90,11 +93,13 @@ nx fmt:ci api              # Check formatting for CI
 ## NestJS Patterns
 
 **Dependency Injection:**
+
 - Use constructor injection: `constructor(private readonly service: MyService) {}`
 - Services are `@Injectable()`
 - Modules use `@Module()` with providers/imports/exports
 
 **GraphQL Decorators:**
+
 - `@Query()` — Read operations
 - `@Mutation()` — Write operations
 - `@ResolveField()` — Field resolvers for computed/relational data
@@ -121,6 +126,7 @@ nx fmt:ci api              # Check formatting for CI
 - Unit tests: `*.test.ts` files alongside source
 - Integration tests: `*.spec.ts` files alongside source
 - Test utilities in `src/db/test.utils.ts`
+- **Always pass `--reporter=agent`** to reduce output noise when running tests
 
 ## Code Style
 

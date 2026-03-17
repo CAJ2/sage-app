@@ -20,4 +20,7 @@ export default (): Record<string, unknown> => ({
     token: process.env.WINDMILL_TOKEN,
     workspace: process.env.WINDMILL_WORKSPACE,
   },
+  dragonfly: {
+    url: process.env.DRAGONFLY_URL,
+  },
 })

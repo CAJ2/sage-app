@@ -21,7 +21,7 @@ export function expandCdnUrl(url?: string): string | undefined {
 /**
  * Shrinks a full CDN URL to its internal format (e.g., cdn://sources/...).
  */
-export function shrinkCdnUrl(url: string | undefined | null): string | undefined | null {
+export function shrinkCdnUrl(url?: string): string | undefined {
   if (!url) return url
 
   for (const [prefix, replacement] of Object.entries(CDN_PREFIXES)) {

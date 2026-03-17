@@ -1,10 +1,10 @@
-import { EntityManager, ref } from '@mikro-orm/postgresql'
+import { EntityManager, raw, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
-import { Source } from '@src/changes/source.entity'
+import { Source, SourceType } from '@src/changes/source.entity'
 import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
@@ -229,6 +229,19 @@ export class VariantService implements IEntityService<Variant> {
       throw NotFoundErr(`Variant with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async images(variantID: string, opts: CursorOptions<VariantsSources>) {
+    opts.where.variant = this.em.getReference(Variant, variantID)
+    opts.where.source = { type: SourceType.IMAGE }
+    opts.options.populate = ['source']
+    opts.options.orderBy = [{ [raw("(meta->>'order')::int")]: 'ASC NULLS LAST' }]
+    const variantSources = await this.em.find(VariantsSources, opts.where, opts.options)
+    const count = await this.em.count(VariantsSources, {
+      variant: opts.where.variant,
+      source: { type: SourceType.IMAGE },
+    })
+    return { items: variantSources.map((vs) => vs.source), count }
   }
 
   async sources(variantID: string, opts: CursorOptions<VariantsSources>) {
