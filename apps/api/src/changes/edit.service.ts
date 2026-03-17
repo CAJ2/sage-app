@@ -684,6 +684,13 @@ export class EditService {
   async merge(change: Change) {
     await this.em.begin()
     try {
+      const historyItems: Array<{
+        name: string
+        userID: string
+        original: EntityDTO<BaseEntity> | undefined
+        changes: EntityDTO<BaseEntity> | undefined
+      }> = []
+
       for (const edit of change.edits) {
         if (edit.entityID) {
           let entity = await this.em.findOne(edit.entityName, {
@@ -705,16 +712,26 @@ export class EditService {
           } else {
             throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
           }
-          this.createHistory<BaseEntity>(
-            edit.entityName,
-            change.user.id,
-            edit.original,
-            edit.changes,
-          )
+          historyItems.push({
+            name: edit.entityName,
+            userID: change.user.id,
+            original: edit.original,
+            changes: edit.changes,
+          })
         } else {
           throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
         }
       }
+
+      // Flush entity creates/updates/deletes before writing history records.
+      // This guarantees parent rows exist in the DB before history FK references
+      // them, avoiding intermittent FK violations when both entity and history are new.
+      await this.em.flush()
+
+      for (const { name, userID, original, changes } of historyItems) {
+        this.createHistory<BaseEntity>(name, userID, original, changes)
+      }
+
       change.status = ChangeStatus.MERGED
       await this.em.commit()
       return { change }
