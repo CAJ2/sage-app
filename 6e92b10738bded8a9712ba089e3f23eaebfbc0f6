@@ -1,0 +1,23 @@
+apps/api/src/changes/edit.service.ts
+  8e48802bb362d758 687-693,715-720,725-732,734
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "6e92b10738bded8a9712ba089e3f23eaebfbc0f6",
+  "prompts": {
+    "8e48802bb362d758": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6257e5c8-efe0-4c38-b925-6898f996c054",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 23,
+      "total_deletions": 6,
+      "accepted_lines": 23,
+      "overriden_lines": 0
+    }
+  }
+}
