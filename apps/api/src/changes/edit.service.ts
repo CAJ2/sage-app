@@ -691,43 +691,70 @@ export class EditService {
         changes: EntityDTO<BaseEntity> | undefined
       }> = []
 
-      for (const edit of change.edits) {
-        if (edit.entityID) {
-          let entity = await this.em.findOne(edit.entityName, {
-            id: edit.entityID,
-          })
-          if (!entity && edit.original) {
-            // TODO: Entity could have been deleted, handle stale edits
-            throw NotFoundErr(`Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`)
+      // Split creates from updates/deletes
+      const createEdits = change.edits.filter((e) => !!e.entityID && !e.original && !!e.changes)
+      const otherEdits = change.edits.filter((e) => !!e.entityID && (!!e.original || !e.changes))
+
+      // Topological sort: visit FK string values that match another pending create's
+      // entityID and schedule the dependency before the dependent.
+      const pendingIds = new Set(createEdits.map((e) => e.entityID!))
+      const visited = new Set<string>()
+      const sortedCreates: ChangeEdits[] = []
+      const visitCreate = (edit: ChangeEdits) => {
+        if (visited.has(edit.entityID!)) return
+        visited.add(edit.entityID!)
+        for (const val of Object.values(edit.changes as Record<string, unknown>)) {
+          if (typeof val === 'string' && pendingIds.has(val)) {
+            const dep = createEdits.find((e) => e.entityID === val)
+            if (dep) visitCreate(dep)
           }
-          if (!entity && !edit.original && edit.changes) {
-            // This is a create
-            this.em.create(edit.entityName, edit.changes)
-          } else if (entity && edit.original && !edit.changes) {
-            // This is a delete
-            this.em.remove(entity)
-          } else if (entity && edit.original && edit.changes) {
-            // This is an update
-            entity = this.changePOJOToEntity(edit.entityName, edit.changes)
-          } else {
-            throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
-          }
-          historyItems.push({
-            name: edit.entityName,
-            userID: change.user.id,
-            original: edit.original,
-            changes: edit.changes,
-          })
+        }
+        sortedCreates.push(edit)
+      }
+      for (const edit of createEdits) visitCreate(edit)
+
+      // Flush each create individually in dependency order so that when entity B
+      // references entity A, A is already committed and its FK constraint is satisfied.
+      for (const edit of sortedCreates) {
+        this.em.create(edit.entityName, edit.changes!)
+        await this.em.flush()
+        historyItems.push({
+          name: edit.entityName,
+          userID: change.user.id,
+          original: edit.original,
+          changes: edit.changes,
+        })
+      }
+
+      // Process updates and deletes
+      for (const edit of otherEdits) {
+        let entity = await this.em.findOne(edit.entityName, { id: edit.entityID })
+        if (!entity && edit.original) {
+          // TODO: Entity could have been deleted, handle stale edits
+          throw NotFoundErr(`Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`)
+        }
+        if (entity && edit.original && !edit.changes) {
+          // This is a delete
+          this.em.remove(entity)
+        } else if (entity && edit.original && edit.changes) {
+          // This is an update
+          entity = this.changePOJOToEntity(edit.entityName, edit.changes)
         } else {
           throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
         }
+        historyItems.push({
+          name: edit.entityName,
+          userID: change.user.id,
+          original: edit.original,
+          changes: edit.changes,
+        })
       }
 
-      // Flush entity creates/updates/deletes before writing history records.
-      // This guarantees parent rows exist in the DB before history FK references
-      // them, avoiding intermittent FK violations when both entity and history are new.
+      // Flush updates/deletes before writing history records.
       await this.em.flush()
 
+      // Create history records after all entities are committed so FK references
+      // to parent rows are always satisfied.
       for (const { name, userID, original, changes } of historyItems) {
         this.createHistory<BaseEntity>(name, userID, original, changes)
       }
