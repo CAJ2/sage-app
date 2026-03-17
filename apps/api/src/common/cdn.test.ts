@@ -15,7 +15,7 @@ describe('CDN utils', () => {
     })
 
     it('handles null/undefined', () => {
-      expect(shrinkCdnUrl(null)).toBe(null)
+      expect(shrinkCdnUrl(null as any)).toBe(null)
       expect(shrinkCdnUrl(undefined)).toBe(undefined)
     })
   })

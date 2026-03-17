@@ -23,6 +23,7 @@ import { type ComponentPhysical, type ComponentVisual } from '@src/process/compo
 import { Material } from '@src/process/material.model'
 import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
+import { ImagesPage } from '@src/product/image.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -90,6 +91,9 @@ export class Component extends IDCreatedUpdated implements Named {
     description: 'Aggregated recyclability score for this component',
   })
   recycleScore?: StreamScore
+
+  @Field(() => ImagesPage, { description: 'Images associated with this component' })
+  images!: ImagesPage
 
   @Field(() => ComponentSourcesPage)
   sources!: ComponentSourcesPage & {}

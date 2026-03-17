@@ -12,6 +12,7 @@ import { I18nService } from '@src/common/i18n.service'
 import { MeiliService } from '@src/common/meilisearch.service'
 import { MetaService } from '@src/common/meta.service'
 import { PosthogService } from '@src/common/posthog.service'
+import { RedisService } from '@src/common/redis.service'
 import { TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 
@@ -43,6 +44,7 @@ import { ZService } from '@src/common/z.service'
     I18nService,
     MeiliService,
     PosthogService,
+    RedisService,
   ],
   exports: [
     TransformService,
@@ -52,6 +54,7 @@ import { ZService } from '@src/common/z.service'
     I18nService,
     MeiliService,
     PosthogService,
+    RedisService,
   ],
 })
 export class CommonModule {}

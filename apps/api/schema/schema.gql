@@ -157,6 +157,9 @@ type Component implements Named {
   id: ID!
   imageURL: String
 
+  """Images associated with this component"""
+  images(after: String, before: String, first: Int, last: Int): ImagesPage!
+
   """All materials in this component with their fractions"""
   materials: [ComponentMaterial!]!
   name: String
@@ -535,6 +538,11 @@ type CreateVariantOutput {
   variant: Variant
 }
 
+type CurrentRegion {
+  region: Region
+  regionHierarchy: [Region!]!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with RFC 3339.
 """
@@ -610,6 +618,31 @@ enum EditModelType {
   Process
   Region
   Variant
+}
+
+"""An image source"""
+type Image {
+  createdAt: DateTime!
+  id: ID!
+
+  """Size of the image"""
+  size: String
+  updatedAt: DateTime!
+
+  """Public URL of the image"""
+  url: String!
+}
+
+type ImageEdge {
+  cursor: String!
+  node: Image!
+}
+
+type ImagesPage {
+  edges: [ImageEdge!]
+  nodes: [Image!]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 """
@@ -1037,6 +1070,7 @@ type Query {
   component(id: ID!, withChange: ID): Component
   componentSchema: ModelEditSchema
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
   item(id: ID!): Item
   itemSchema: ModelEditSchema
@@ -1731,6 +1765,9 @@ type Variant implements Named {
   """The ID of the model"""
   id: ID!
   imageURL: String
+
+  """Images associated with this variant"""
+  images(after: String, before: String, first: Int, last: Int): ImagesPage!
 
   """Product items this variant belongs to"""
   items(after: String, before: String, first: Int, last: Int): ItemsPage!

@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { I18nService } from '@src/common/i18n.service'
+import { LocationService } from '@src/geo/location.service'
 import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { ComponentRecycle } from '@src/process/component.model'
@@ -13,6 +14,7 @@ export class StreamService {
   constructor(
     private readonly em: EntityManager,
     private readonly i18n: I18nService,
+    private readonly locationService: LocationService,
   ) {}
 
   async recycleComponent(componentId: string, regionId?: string) {
@@ -24,11 +26,21 @@ export class StreamService {
     if (!component) {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
-    const region = await this.em.findOne(Region, { id: regionId })
-    if (!region) {
-      throw new Error(`Region with ID "${regionId}" not found`)
+
+    let regionSearch: string[]
+    if (regionId) {
+      const region = await this.em.findOne(Region, { id: regionId })
+      if (!region) {
+        throw new Error(`Region with ID "${regionId}" not found`)
+      }
+      regionSearch = region.hierarchyIDs()
+    } else {
+      const ids = await this.locationService.resolveLocation()
+      if (!ids || ids.length === 0) {
+        throw new Error('No region specified and no location resolved')
+      }
+      regionSearch = ids
     }
-    const regionSearch = region.hierarchyIDs()
 
     const materialSearch: string[] = []
     materialSearch.push(component.primaryMaterial.id)

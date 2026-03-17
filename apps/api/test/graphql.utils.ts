@@ -68,6 +68,17 @@ export class GraphQLTestClient {
   }
 
   /**
+   * Set an arbitrary request header. Pass undefined to remove the header.
+   */
+  setHeader(key: string, value: string | undefined): void {
+    if (value === undefined) {
+      delete this.headers![key]
+    } else {
+      this.headers![key] = value
+    }
+  }
+
+  /**
    * Send a GraphQL query or mutation.
    * @param query GraphQL query string
    * @param variables Variables object (optional)

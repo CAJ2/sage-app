@@ -23,6 +23,7 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
 import { TagPage } from '@src/process/tag.model'
+import { ImagesPage } from '@src/product/image.model'
 import { ItemsPage } from '@src/product/item.model'
 import { VariantComponentUnitSchema } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.model'
@@ -47,6 +48,9 @@ export class Variant extends IDCreatedUpdated implements Named {
   @IsOptional()
   @IsUrl({ protocols: ['https'] })
   imageURL?: string
+
+  @Field(() => ImagesPage, { description: 'Images associated with this variant' })
+  images!: ImagesPage
 
   @Field(() => ItemsPage, { description: 'Product items this variant belongs to' })
   items!: ItemsPage

@@ -11,6 +11,7 @@ import { TransformService } from '@src/common/transform'
 import { Region, RegionsPage } from '@src/geo/region.model'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Tag, TagPage } from '@src/process/tag.model'
+import { Image, ImagesArgs, ImagesPage } from '@src/product/image.model'
 import { Item, ItemsPage } from '@src/product/item.model'
 import { Variant as VariantEntity } from '@src/product/variant.entity'
 import {
@@ -180,6 +181,24 @@ export class VariantResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantRegionsArgs, args)
     const cursor = await this.variantService.regions(variant.id, filter)
     return this.transform.entityToPaginated(Region, RegionsPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => ImagesPage)
+  async images(@Parent() variant: Variant, @Args() args: ImagesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ImagesArgs, args)
+    const cursor = await this.variantService.images(variant.id, filter)
+    return this.transform.entityToPaginated(Image, ImagesPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => String, { nullable: true })
+  async imageURL(@Parent() variant: Variant) {
+    const cursor = await this.variantService.images(variant.id, {
+      where: {},
+      options: { limit: 1 },
+    })
+    if (!cursor.items[0]) return null
+    const image = await this.transform.entityToModel(Image, cursor.items[0])
+    return image.url
   }
 
   @ResolveField(() => VariantSourcesPage)

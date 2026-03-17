@@ -1,10 +1,10 @@
-import { EntityManager, ref } from '@mikro-orm/postgresql'
+import { EntityManager, raw, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
-import { Source } from '@src/changes/source.entity'
+import { Source, SourceType } from '@src/changes/source.entity'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService } from '@src/db/base.entity'
@@ -191,6 +191,19 @@ export class ComponentService implements IEntityService<Component> {
       throw new Error(`Component with ID "${input.id}" not found`)
     }
     return deleted
+  }
+
+  async images(componentID: string, opts: CursorOptions<ComponentsSources>) {
+    opts.where.component = this.em.getReference(Component, componentID)
+    opts.where.source = { type: SourceType.IMAGE }
+    opts.options.populate = ['source']
+    opts.options.orderBy = [{ [raw("(meta->>'order')::int")]: 'ASC NULLS LAST' }]
+    const componentSources = await this.em.find(ComponentsSources, opts.where, opts.options)
+    const count = await this.em.count(ComponentsSources, {
+      component: opts.where.component,
+      source: { type: SourceType.IMAGE },
+    })
+    return { items: componentSources.map((cs) => cs.source), count }
   }
 
   async sources(componentID: string, opts: CursorOptions<ComponentsSources>) {

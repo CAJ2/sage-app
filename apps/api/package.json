@@ -68,7 +68,9 @@
     "nanoid": "^3.0.0",
     "nestjs-cls": "^6.2.0",
     "nestjs-i18n": "^10.5.1",
+    "node-ipinfo": "^4.3.0",
     "posthog-node": "^5.26.0",
+    "redis": "^5.11.0",
     "reflect-metadata": "^0.2.2",
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.1",
@@ -103,7 +105,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "unplugin-swc": "^1.5.9",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.0"
   },
   "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a",
   "nx": {

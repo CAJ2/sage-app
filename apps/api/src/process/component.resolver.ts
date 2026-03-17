@@ -30,6 +30,7 @@ import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { ComponentsArgs, Material } from '@src/process/material.model'
 import { Tag, TagPage } from '@src/process/tag.model'
+import { Image, ImagesArgs, ImagesPage } from '@src/product/image.model'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Component)
@@ -161,6 +162,13 @@ export class ComponentResolver {
     input = await this.componentSchemaService.parseDeleteInput(input)
     const component = await this.componentService.delete(input)
     return { success: true, id: component.id }
+  }
+
+  @ResolveField(() => ImagesPage)
+  async images(@Parent() component: Component, @Args() args: ImagesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ImagesArgs, args)
+    const cursor = await this.componentService.images(component.id, filter)
+    return this.transform.entityToPaginated(Image, ImagesPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => ComponentSourcesPage)

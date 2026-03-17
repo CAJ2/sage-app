@@ -49,6 +49,9 @@ if (dotenv) {
           if (req.headers['x-env']) {
             cls.set('x-env', req.headers['x-env'])
           }
+          if (req.headers['x-location']) {
+            cls.set('x-location', req.headers['x-location'])
+          }
         },
         generateId: true,
         idGenerator: (req: Request) => {

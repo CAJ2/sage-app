@@ -242,6 +242,8 @@ export type Component = Named & {
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
+  /** Images associated with this component */
+  images: ImagesPage;
   /** All materials in this component with their fractions */
   materials: Array<ComponentMaterial>;
   name?: Maybe<Scalars['String']['output']>;
@@ -261,6 +263,15 @@ export type Component = Named & {
 
 /** A physical component of a product variant, made of one or more materials */
 export type ComponentHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentImagesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -639,6 +650,12 @@ export type CreateVariantOutput = {
   variant?: Maybe<Variant>;
 };
 
+export type CurrentRegion = {
+  __typename?: 'CurrentRegion';
+  region?: Maybe<Region>;
+  regionHierarchy: Array<Region>;
+};
+
 export type DeleteChangeOutput = {
   __typename?: 'DeleteChangeOutput';
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -713,6 +730,32 @@ export enum EditModelType {
   Region = 'Region',
   Variant = 'Variant'
 }
+
+/** An image source */
+export type Image = {
+  __typename?: 'Image';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  /** Size of the image */
+  size?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  /** Public URL of the image */
+  url: Scalars['String']['output'];
+};
+
+export type ImageEdge = {
+  __typename?: 'ImageEdge';
+  cursor: Scalars['String']['output'];
+  node: Image;
+};
+
+export type ImagesPage = {
+  __typename?: 'ImagesPage';
+  edges?: Maybe<Array<ImageEdge>>;
+  nodes?: Maybe<Array<Image>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
 
 /** A product or consumable item that can be categorized and have multiple variants */
 export type Item = Named & {
@@ -1418,6 +1461,7 @@ export type Query = {
   component?: Maybe<Component>;
   componentSchema?: Maybe<ModelEditSchema>;
   components: ComponentsPage;
+  currentRegion?: Maybe<CurrentRegion>;
   directEdit?: Maybe<DirectEdit>;
   item?: Maybe<Item>;
   itemSchema?: Maybe<ModelEditSchema>;
@@ -2242,6 +2286,8 @@ export type Variant = Named & {
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
+  /** Images associated with this variant */
+  images: ImagesPage;
   /** Product items this variant belongs to */
   items: ItemsPage;
   name?: Maybe<Scalars['String']['output']>;
@@ -2269,6 +2315,15 @@ export type VariantComponentsArgs = {
 
 /** A specific variant or SKU of a product item, composed of physical components */
 export type VariantHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A specific variant or SKU of a product item, composed of physical components */
+export type VariantImagesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
