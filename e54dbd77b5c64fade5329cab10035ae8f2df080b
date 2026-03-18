@@ -1,0 +1,79 @@
+apps/api/src/common/i18n.test.ts
+  9e32a45a2a3487ca 1,3-121
+apps/api/src/feed/home-feed.service.ts
+  5804b2fa08e082c2 1-31
+apps/api/src/feed/home-feed.schema.ts
+  5804b2fa08e082c2 1-60
+apps/api/src/app.module.ts
+  5804b2fa08e082c2 78
+apps/api/src/mikro-orm-test.config.ts
+  5804b2fa08e082c2 74
+apps/api/src/process/component.resolver.spec.ts
+  5045961cb6220cf4 17-18,24,651-740
+apps/api/src/feed/home-feed.resolver.ts
+  5804b2fa08e082c2 1-23,25-27
+apps/api/src/db/seeds/TestFeedSeeder.ts
+  5804b2fa08e082c2 1-58
+apps/api/src/feed/home-feed.entity.ts
+  5804b2fa08e082c2 1-34
+apps/api/src/feed/feed.module.ts
+  5804b2fa08e082c2 1-13
+apps/api/src/feed/home-feed.model.ts
+  5804b2fa08e082c2 1-72
+apps/api/src/common/i18n.service.ts
+  9e32a45a2a3487ca 3,37-39,41-56
+apps/api/test/app-test.module.ts
+  5804b2fa08e082c2 18,78
+apps/api/src/process/stream.service.ts
+  5045961cb6220cf4 30,72-84
+apps/api/src/feed/home-feed.resolver.spec.ts
+  5804b2fa08e082c2 1-8,10-175
+apps/api/src/common/i18n.ts
+  9e32a45a2a3487ca 4,112,129-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "e54dbd77b5c64fade5329cab10035ae8f2df080b",
+  "prompts": {
+    "5045961cb6220cf4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "289f499d-f07e-41f6-beb6-5a486d18e30d",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 111,
+      "total_deletions": 4,
+      "accepted_lines": 107,
+      "overriden_lines": 2
+    },
+    "5804b2fa08e082c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a58efb2-4e18-4b58-9f00-ba592fa028f9",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 471,
+      "total_deletions": 0,
+      "accepted_lines": 472,
+      "overriden_lines": 1
+    },
+    "9e32a45a2a3487ca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d5c10bbd-2ea2-4e6f-9eba-3cbaf840ab32",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 176,
+      "total_deletions": 69,
+      "accepted_lines": 160,
+      "overriden_lines": 0
+    }
+  }
+}
