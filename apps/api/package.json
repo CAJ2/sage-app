@@ -47,6 +47,8 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/terminus": "^11.0.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.71.0",
     "ajv": "^8.17.1",
     "better-auth": "1.5.0-beta.20",
     "body-parser": "^2.2.2",
@@ -110,6 +112,15 @@
   "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a",
   "nx": {
     "targets": {
+      "codegen": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/src/**/*.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/test/gql/**/*.ts"
+        ]
+      },
       "codegen:db": {
         "cache": true,
         "inputs": [

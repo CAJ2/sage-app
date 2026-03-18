@@ -80,6 +80,13 @@ type CategoryHistoryPage {
   totalCount: Int!
 }
 
+"""The severity level of a caveat"""
+enum CaveatLevel {
+  HIGH
+  LOW
+  MEDIUM
+}
+
 """A proposed or merged set of edits to one or more data models"""
 type Change {
   createdAt: DateTime!
@@ -620,6 +627,49 @@ enum EditModelType {
   Variant
 }
 
+type FeedExternalLink {
+  url: String!
+}
+
+enum FeedFormat {
+  ANNOUNCEMENT
+  ARTICLE
+  EXTERNAL
+  FEATURE
+  UPDATE
+}
+
+type FeedItem {
+  category: String
+  createdAt: DateTime!
+  externalLink: FeedExternalLink
+  format: FeedFormat!
+  id: ID!
+  link: FeedLink
+  markdown: String
+  markdownShort: String
+  shareText: String
+  title: String!
+  updatedAt: DateTime!
+}
+
+type FeedItemEdge {
+  cursor: String!
+  node: FeedItem!
+}
+
+type FeedLink {
+  entityName: String!
+  id: ID!
+}
+
+type FeedPage {
+  edges: [FeedItemEdge!]
+  nodes: [FeedItem!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 """An image source"""
 type Image {
   createdAt: DateTime!
@@ -1072,6 +1122,7 @@ type Query {
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
+  feed(after: String, before: String, first: Int, last: Int, regionId: ID): FeedPage!
   item(id: ID!): Item
   itemSchema: ModelEditSchema
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -1103,6 +1154,9 @@ type Query {
 A recycling collection stream in a region, with score and container information
 """
 type RecyclingStream {
+  """Caveats about this stream"""
+  caveats: [StreamCaveats!]
+
   """The collection container used in this stream"""
   container: Container
   desc: String
@@ -1221,6 +1275,13 @@ type SourcesPage {
   nodes: [Source!]
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+"""Recycling stream caveats"""
+type StreamCaveats {
+  desc: String
+  level: CaveatLevel!
+  name: String
 }
 
 """Additional context about a recycling recommendation for a component"""

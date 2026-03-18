@@ -1,0 +1,31 @@
+import type { FilterQuery } from '@mikro-orm/core'
+import { EntityManager } from '@mikro-orm/postgresql'
+import { Injectable } from '@nestjs/common'
+
+import { CursorOptions } from '@src/common/transform'
+import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { HomeFeed } from '@src/feed/home-feed.entity'
+
+@Injectable()
+@IsEntityService(HomeFeed)
+export class HomeFeedService implements IEntityService<HomeFeed> {
+  constructor(private readonly em: EntityManager) {}
+
+  async find(opts: CursorOptions<HomeFeed>, regionId?: string) {
+    const where: FilterQuery<HomeFeed> = regionId ? { region: regionId } : {}
+    const [items, count] = await this.em.findAndCount(HomeFeed, where, {
+      orderBy: { rank: 'ASC' },
+      limit: opts.options.limit,
+      offset: opts.options.offset,
+    })
+    return { items, count }
+  }
+
+  async findOneByID(id: string) {
+    return this.em.findOne(HomeFeed, { id })
+  }
+
+  async findManyByID(ids: string[]) {
+    return this.em.find(HomeFeed, { id: { $in: ids } })
+  }
+}

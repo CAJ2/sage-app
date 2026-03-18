@@ -12,6 +12,7 @@ export const AjvTemplateSchema = new Ajv2020({
 export type JSONType = util.JSONType
 export type JSONObject = { [key: string]: JSONType }
 export const ZJSONObject = z.record(z.string(), z.json())
+export const ZTranslatedField = z.record(z.string(), z.string())
 
 export const HTTPS_OR_ICON: core.$ZodURLParams = {
   protocol: /^https|icon$/,
