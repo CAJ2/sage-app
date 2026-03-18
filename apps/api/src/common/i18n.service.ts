@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { type TransformFnParams } from 'class-transformer'
 import { GraphQLError } from 'graphql'
+import _ from 'lodash'
 import { ClsService } from 'nestjs-cls'
 import { I18nService as I18nBaseService, Path, PathValue, TranslateOptions } from 'nestjs-i18n'
 import { IfAnyOrNever } from 'nestjs-i18n/dist/types'
 import { z } from 'zod/v4'
 
-import { LANG_REGEX, translate, TranslatedField, TrArray, TrArraySchema } from '@src/common/i18n'
+import { LANG_REGEX, TranslatedField, TrArray, TrArraySchema } from '@src/common/i18n'
 import { I18nTranslations } from '@src/i18n/i18n.generated'
 
 @Injectable()
@@ -34,13 +34,26 @@ export class I18nService {
     if (typeof field === 'string') {
       return field
     }
+    if (!field) {
+      return undefined
+    }
     const lang: string[] = this.cls.get('lang') || []
-    return translate({
-      value: field,
-      obj: {
-        _lang: lang,
-      },
-    } as TransformFnParams)
+    for (const l of lang) {
+      const exactKey = _.findKey(field, (_value: any, key: string) => {
+        return l === key.split(';')[0]
+      })
+      if (exactKey) {
+        return (field as any)[exactKey]
+      }
+      const inexactKey = _.findKey(field, (_value: any, key: string) => {
+        const bits = key.split(';')
+        return l === bits[0].split('-')[0] || bits[0].startsWith(l)
+      })
+      if (inexactKey) {
+        return (field as any)[inexactKey]
+      }
+    }
+    return field.en || field.xx
   }
 
   // Modifies a TranslatedField JSON object to add a new translation.

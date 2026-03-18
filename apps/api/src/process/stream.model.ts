@@ -111,6 +111,29 @@ export class Container {
   imageEntryPoint?: ContainerImageEntryPoint
 }
 
+export enum CaveatLevel {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}
+
+registerEnumType(CaveatLevel, {
+  name: 'CaveatLevel',
+  description: 'The severity level of a caveat',
+})
+
+@ObjectType({ description: 'Recycling stream caveats' })
+export class StreamCaveats {
+  @Field(() => CaveatLevel)
+  level!: CaveatLevel
+
+  @Field(() => String, { nullable: true })
+  name?: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+}
+
 @ObjectType({
   description: 'A recycling collection stream in a region, with score and container information',
 })
@@ -138,6 +161,12 @@ export class RecyclingStream {
     description: 'The collection container used in this stream',
   })
   container?: Container
+
+  @Field(() => [StreamCaveats], {
+    nullable: true,
+    description: 'Caveats about this stream',
+  })
+  caveats?: StreamCaveats[]
 }
 
 @ObjectType({ description: 'Additional context about a recycling recommendation for a component' })

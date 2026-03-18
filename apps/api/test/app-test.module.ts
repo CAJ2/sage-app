@@ -15,6 +15,7 @@ import { CommonModule } from '@src/common/common.module'
 import { HttpExceptionFilter } from '@src/common/http-exception.filter'
 import { parseLanguageHeader } from '@src/common/i18n'
 import config from '@src/config/config'
+import { FeedModule } from '@src/feed/feed.module'
 import { GeoModule } from '@src/geo/geo.module'
 import { GraphQLModule } from '@src/graphql/graphql.module'
 import { HealthModule } from '@src/health/health.module'
@@ -74,6 +75,7 @@ if (dotenv) {
     ProcessModule,
     ChangesModule,
     SearchModule,
+    FeedModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }, AppService],
 })

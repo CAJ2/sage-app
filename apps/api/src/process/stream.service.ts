@@ -7,7 +7,13 @@ import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { ComponentRecycle } from '@src/process/component.model'
 import { Process } from '@src/process/process.entity'
-import { RecyclingStream, StreamScore, StreamScoreRating } from '@src/process/stream.model'
+import {
+  CaveatLevel,
+  RecyclingStream,
+  StreamCaveats,
+  StreamScore,
+  StreamScoreRating,
+} from '@src/process/stream.model'
 
 @Injectable()
 export class StreamService {
@@ -21,7 +27,7 @@ export class StreamService {
     const component = await this.em.findOne(
       Component,
       { id: componentId },
-      { populate: ['primaryMaterial', 'materials'] },
+      { populate: ['primaryMaterial', 'materials', 'tags'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${componentId}" not found`)
@@ -63,6 +69,19 @@ export class StreamService {
       r.stream.desc = this.i18n.tr(processMatch.desc)
       r.stream.score = this.calculateScore(processMatch)
       r.stream.container = processMatch.instructions.container
+      const caveats: StreamCaveats[] = []
+      for (const tag of component.tags) {
+        for (const rule of tag.rules?.recycle ?? []) {
+          if (rule.caveat) {
+            const c = new StreamCaveats()
+            c.level = rule.caveat.level as unknown as CaveatLevel
+            c.name = this.i18n.tr(rule.caveat.name)
+            c.desc = this.i18n.tr(rule.caveat.desc)
+            caveats.push(c)
+          }
+        }
+      }
+      r.stream.caveats = caveats
       recycle.push(r)
     }
     return recycle

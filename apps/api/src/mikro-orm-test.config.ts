@@ -13,6 +13,7 @@ import { Verification } from '@src/auth/verification.entity'
 import { Change, ChangeEdits, ChangesSources } from '@src/changes/change.entity'
 import { ExternalSource, Source } from '@src/changes/source.entity'
 import { CustomMigrationGenerator } from '@src/db/migration.gen'
+import { HomeFeed } from '@src/feed/home-feed.entity'
 import { Place, PlaceHistory, PlacesTag } from '@src/geo/place.entity'
 import { Region, RegionHistory } from '@src/geo/region.entity'
 import {
@@ -70,6 +71,7 @@ export const MIKRO_TEST_CONFIG = defineConfig({
     ComponentsSources,
     ComponentsTags,
     ExternalSource,
+    HomeFeed,
     Invitation,
     Item,
     ItemHistory,

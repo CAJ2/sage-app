@@ -3,7 +3,7 @@ import { JSONSchemaType } from 'ajv/dist/2020'
 import { z } from 'zod/v4'
 
 import { type TranslatedField } from '@src/common/i18n'
-import { AjvTemplateSchema, JSONType } from '@src/common/z.schema'
+import { AjvTemplateSchema, JSONType, ZTranslatedField } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Component } from '@src/process/component.entity'
@@ -40,6 +40,32 @@ export const TagMetaTemplateSchema = z
     { error: 'Invalid JSON Schema in meta template' },
   )
 
+export enum TagCaveatLevel {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}
+
+export const TagCaveatSchema = z.object({
+  level: z.enum(TagCaveatLevel),
+  name: ZTranslatedField.optional(),
+  desc: ZTranslatedField.optional(),
+})
+
+export const TagRulesSchema = z
+  .object({
+    recycle: z
+      .array(
+        z.object({
+          caveat: TagCaveatSchema.optional(),
+        }),
+      )
+      .optional(),
+  })
+  .optional()
+
+export type TagRules = z.infer<typeof TagRulesSchema>
+
 @Entity({ tableName: 'tags', schema: 'public' })
 @Unique({ properties: ['type', 'tag_id'] })
 export class Tag extends IDCreatedUpdated {
@@ -63,6 +89,9 @@ export class Tag extends IDCreatedUpdated {
 
   @Property()
   tag_id?: string
+
+  @Property({ type: 'json' })
+  rules?: TagRules
 
   @ManyToMany({ entity: () => Place, mappedBy: 'tags' })
   places = new Collection<Place>(this)

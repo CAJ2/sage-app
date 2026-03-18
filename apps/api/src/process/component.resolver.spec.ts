@@ -13,10 +13,15 @@ import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { COMPONENT_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { Region } from '@src/geo/region.entity'
+import { Material } from '@src/process/material.entity'
+import { Process, ProcessIntent } from '@src/process/process.entity'
+import { Tag, TagCaveatLevel, TagType } from '@src/process/tag.entity'
 
 describe('ComponentResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let orm: MikroORM
   let componentID: string
 
   beforeAll(async () => {
@@ -29,7 +34,7 @@ describe('ComponentResolver (integration)', () => {
 
     gql = new GraphQLTestClient(app)
 
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
     await orm.seeder.seed(
@@ -640,6 +645,96 @@ describe('ComponentResolver (integration)', () => {
       expect(changeRes.data?.updateComponent?.component?.name).toBe('Proposed Name')
       expect(changeRes.data?.updateComponent?.currentComponent?.name).toBe('Current DB Name')
       expect(changeRes.data?.updateComponent?.currentComponent?.id).toBe(testComponentID)
+    })
+  })
+
+  describe('recycle caveats from tag rules', () => {
+    let caveatsComponentId: string
+    const CAVEAT_TAG_ID = 'tagX_CAVEAT_TESTTAG___'
+    const CAVEAT_PROCESS_ID = 'procX_CAVEAT_PROCESS__'
+
+    beforeAll(async () => {
+      const em = orm.em.fork()
+
+      em.create(Tag, {
+        id: CAVEAT_TAG_ID,
+        name: { en: 'Caveat Tag' },
+        type: TagType.COMPONENT,
+        rules: {
+          recycle: [
+            {
+              caveat: {
+                level: TagCaveatLevel.HIGH,
+                name: { en: 'Handle with care' },
+                desc: { en: 'Requires careful handling' },
+              },
+            },
+          ],
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      em.create(Process, {
+        id: CAVEAT_PROCESS_ID,
+        name: { en: 'Caveat Process' },
+        intent: ProcessIntent.RECYCLE,
+        instructions: {},
+        material: em.getReference(Material, MATERIAL_IDS[0]),
+        region: em.getReference(Region, REGION_IDS[0]),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      await em.flush()
+
+      const res = await gql.send(
+        graphql(`
+          mutation CreateCaveatComponent($input: CreateComponentInput!) {
+            createComponent(input: $input) {
+              component { id }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Caveat Test Component',
+            primaryMaterial: { id: MATERIAL_IDS[0] },
+            tags: [{ id: CAVEAT_TAG_ID }],
+          },
+        },
+      )
+      caveatsComponentId = res.data!.createComponent!.component!.id
+    })
+
+    test('should return caveats from tag rules when recycling', async () => {
+      const res = await gql.send(
+        graphql(`
+          query ComponentRecycleCaveats($id: ID!, $regionID: ID!) {
+            component(id: $id) {
+              recycle(regionID: $regionID) {
+                stream {
+                  caveats {
+                    level
+                    name
+                    desc
+                  }
+                }
+              }
+            }
+          }
+        `),
+        { id: caveatsComponentId, regionID: REGION_IDS[0] },
+      )
+
+      expect(res.errors).toBeUndefined()
+      const recycle = res.data?.component?.recycle
+      expect(recycle).toHaveLength(1)
+      const caveats = recycle![0]?.stream?.caveats
+      expect(caveats).toHaveLength(1)
+      expect(caveats![0].level).toBe('HIGH')
+      expect(caveats![0].name).toBe('Handle with care')
+      expect(caveats![0].desc).toBe('Requires careful handling')
     })
   })
 

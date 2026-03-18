@@ -149,6 +149,13 @@ export type CategoryHistoryPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** The severity level of a caveat */
+export enum CaveatLevel {
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
 /** A proposed or merged set of edits to one or more data models */
 export type Change = {
   __typename?: 'Change';
@@ -734,6 +741,54 @@ export enum EditModelType {
   Region = 'Region',
   Variant = 'Variant'
 }
+
+export type FeedExternalLink = {
+  __typename?: 'FeedExternalLink';
+  url: Scalars['String']['output'];
+};
+
+export enum FeedFormat {
+  Announcement = 'ANNOUNCEMENT',
+  Article = 'ARTICLE',
+  External = 'EXTERNAL',
+  Feature = 'FEATURE',
+  Update = 'UPDATE'
+}
+
+export type FeedItem = {
+  __typename?: 'FeedItem';
+  category?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  externalLink?: Maybe<FeedExternalLink>;
+  format: FeedFormat;
+  id: Scalars['ID']['output'];
+  link?: Maybe<FeedLink>;
+  markdown?: Maybe<Scalars['String']['output']>;
+  markdownShort?: Maybe<Scalars['String']['output']>;
+  shareText?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type FeedItemEdge = {
+  __typename?: 'FeedItemEdge';
+  cursor: Scalars['String']['output'];
+  node: FeedItem;
+};
+
+export type FeedLink = {
+  __typename?: 'FeedLink';
+  entityName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+};
+
+export type FeedPage = {
+  __typename?: 'FeedPage';
+  edges?: Maybe<Array<FeedItemEdge>>;
+  nodes?: Maybe<Array<FeedItem>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
 
 /** An image source */
 export type Image = {
@@ -1467,6 +1522,7 @@ export type Query = {
   components: ComponentsPage;
   currentRegion?: Maybe<CurrentRegion>;
   directEdit?: Maybe<DirectEdit>;
+  feed: FeedPage;
   item?: Maybe<Item>;
   itemSchema?: Maybe<ModelEditSchema>;
   items: ItemsPage;
@@ -1541,6 +1597,15 @@ export type QueryDirectEditArgs = {
   changeID?: InputMaybe<Scalars['ID']['input']>;
   entityName?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryFeedArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  regionId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -1681,6 +1746,8 @@ export type QueryVariantsArgs = {
 /** A recycling collection stream in a region, with score and container information */
 export type RecyclingStream = {
   __typename?: 'RecyclingStream';
+  /** Caveats about this stream */
+  caveats?: Maybe<Array<StreamCaveats>>;
   /** The collection container used in this stream */
   container?: Maybe<Container>;
   desc?: Maybe<Scalars['String']['output']>;
@@ -1797,6 +1864,14 @@ export type SourcesPage = {
   nodes?: Maybe<Array<Source>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+/** Recycling stream caveats */
+export type StreamCaveats = {
+  __typename?: 'StreamCaveats';
+  desc?: Maybe<Scalars['String']['output']>;
+  level: CaveatLevel;
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 /** Additional context about a recycling recommendation for a component */

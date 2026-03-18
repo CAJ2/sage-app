@@ -1,8 +1,7 @@
-import type { TransformFnParams } from 'class-transformer'
 import _ from 'lodash'
 import { z } from 'zod/v4'
 
-import { map2to3 } from '@src/db/iso639'
+import { map2to3, map3to2 } from '@src/db/iso639'
 
 export const Locales = ['en-US', 'sv-SE'] as const
 
@@ -63,52 +62,6 @@ export function isTranslatedField(data: Record<string, any>): data is Translated
   return result.success
 }
 
-// Defines a class-transformer function to pick the appropriate language
-// string from a JSON object containing one or more translations.
-// Relies on the _lang property of the object to determine the best match.
-export function translate(params: TransformFnParams): string | undefined {
-  const value = params.value as TranslatedField | undefined
-  const obj = params.obj as Record<string, any>
-  const opts = params.options || {}
-  const lang: string[] | undefined = obj._lang || (opts as any).lang
-  if (!value) {
-    return value
-  }
-  // Set Tr property to full translation object
-  obj[params.key + 'Tr'] = _.map(value, (text, key) => {
-    return {
-      lang: key,
-      text,
-      auto: typeof key === 'string' && key.endsWith(';a'),
-    }
-  })
-  const field: TranslatedField = value
-  if (_.isArray(lang)) {
-    for (const l of lang) {
-      const iso3 = map2to3[l]
-      if (iso3) {
-        lang.push(iso3)
-      }
-    }
-    for (const l of lang) {
-      const langKey = _.findKey(field, (value: any, key: string) => {
-        return l === key.split(';')[0]
-      })
-      if (langKey) {
-        return (field as any)[langKey]
-      }
-      const inexactKey = _.findKey(field, (value: any, key: string) => {
-        const bits = key.split(';')
-        return l === bits[0].split('-')[0] || bits[0].startsWith(l)
-      })
-      if (inexactKey) {
-        return (field as any)[inexactKey]
-      }
-    }
-  }
-  return field.en || field.xx
-}
-
 const supported = Locales.map((support) => {
   const bits = support.split('-')
   const hasScript = bits.length === 3
@@ -156,6 +109,7 @@ export function parseLanguageHeader(header: string, fallback?: string): string[]
     const langCode = lang.code.toLowerCase()
     const langRegion = lang.region ? lang.region.toLowerCase() : lang.region
     const langScript = lang.script ? lang.script.toLowerCase() : lang.script
+    let matched = false
     for (let j = 0; j < supported.length; j++) {
       const supportedCode = supported[j].code.toLowerCase()
       const supportedScript = supported[j].script
@@ -172,6 +126,24 @@ export function parseLanguageHeader(header: string, fallback?: string): string[]
       ) {
         localeTypes.push(supported[j].text)
         localeTypes.push(supported[j].code)
+        const iso3 = map2to3[supported[j].code]
+        if (iso3 && !localeTypes.includes(iso3)) {
+          localeTypes.push(iso3)
+        }
+        matched = true
+      }
+    }
+    if (!matched) {
+      if (!localeTypes.includes(langCode)) {
+        localeTypes.push(langCode)
+      }
+      const iso3 = map2to3[langCode]
+      if (iso3 && !localeTypes.includes(iso3)) {
+        localeTypes.push(iso3)
+      }
+      const iso2 = map3to2[langCode]
+      if (iso2 && !localeTypes.includes(iso2)) {
+        localeTypes.push(iso2)
       }
     }
   }
