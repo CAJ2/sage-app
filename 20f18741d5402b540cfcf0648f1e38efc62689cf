@@ -1,0 +1,51 @@
+apps/frontend/i18n/locales/en.json
+  0ff5bc8db5138d2d 3
+apps/frontend/app/pages/explore/places/index.vue
+  0ff5bc8db5138d2d 1-197,199-269
+  04ca44299d20ec25 198
+apps/frontend/app/components/nav/Tabs.vue
+  0ff5bc8db5138d2d 5,9-10,13-14,19,23-24,27-28,71,85,94-97,99-100,105-108,130
+apps/frontend/app/pages/explore/index.vue
+  0ff5bc8db5138d2d 6,8-11,52
+apps/frontend/app/pages/explore/places/[id].vue
+  0ff5bc8db5138d2d 1-37
+apps/frontend/app/pages/home/index.vue
+  0ff5bc8db5138d2d 1-4,6-14,16-22,24-26,28-66
+apps/frontend/i18n/locales/sv.json
+  0ff5bc8db5138d2d 3
+apps/frontend/app/pages/main.vue
+  0ff5bc8db5138d2d 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "20f18741d5402b540cfcf0648f1e38efc62689cf",
+  "prompts": {
+    "04ca44299d20ec25": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e110b94-5e09-4307-aece-cea26aade504",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 13,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    },
+    "0ff5bc8db5138d2d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7339939f-366c-43c9-834a-979e08675580",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 407,
+      "total_deletions": 54,
+      "accepted_lines": 399,
+      "overriden_lines": 6
+    }
+  }
+}
