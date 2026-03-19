@@ -68,11 +68,17 @@
     "@nuxtjs/apollo": "5.0.0-alpha.16",
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/i18n": "10.2.3",
+    "@nuxtjs/storybook": "9.0.1",
+    "@storybook/addon-a11y": "^10.3.0",
+    "@storybook/addon-docs": "^10.3.0",
+    "@storybook/addon-themes": "^10.3.0",
     "@types/lodash": "^4.17.14",
     "@types/node": "=25.3.0",
     "daisyui": "^5.0.40",
     "eslint": "^10.0.0",
     "eslint-plugin-oxlint": "^1.48.0",
+    "msw": "^2.12.13",
+    "msw-storybook-addon": "^2.0.6",
     "oxfmt": "^0.33.0",
     "oxlint": "^1.48.0",
     "typescript": "^5.8.3",
@@ -81,6 +87,11 @@
     "vue-tsc": "^2.2.10"
   },
   "packageManager": "pnpm@10.30.0+sha256.fde3cebbd4ed0d6d140b1983743bf575cdd4b15e4d5e5b257425152dce5b1b6a",
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  },
   "nx": {
     "targets": {
       "build": {

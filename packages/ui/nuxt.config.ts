@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/eslint',
     '@nuxt/image',
+    '@nuxtjs/storybook',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     'reka-ui/nuxt',
@@ -38,6 +39,14 @@ export default defineNuxtConfig({
     },
   },
 
+  runtimeConfig: {
+    public: {
+      msw: {
+        baseURL: 'http://localhost:3000',
+      },
+    },
+  },
+
   ssr: false,
 
   i18n: {
@@ -63,6 +72,11 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+
+  msw: {
+    folderPath: '~/msw',
+    includeLayer: true,
   },
 
   colorMode: {

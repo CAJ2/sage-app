@@ -35,6 +35,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+storybook-static
+*.tsbuildinfo
 
 # System Files
 .DS_Store
