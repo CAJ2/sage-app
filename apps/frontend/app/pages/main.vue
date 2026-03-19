@@ -9,5 +9,5 @@ definePageMeta({
   alias: ['/'],
 })
 
-router.replace('/explore')
+router.replace('/home')
 </script>

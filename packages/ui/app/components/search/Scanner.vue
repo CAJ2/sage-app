@@ -27,6 +27,7 @@ const props = withDefaults(
       const drawingCtx = Quagga.canvas.ctx.overlay
       const drawingCanvas = Quagga.canvas.dom.overlay
 
+      if (!drawingCtx) return
       if (result) {
         if (result.boxes) {
           drawingCtx.clearRect(

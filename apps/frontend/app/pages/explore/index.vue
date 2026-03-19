@@ -3,6 +3,12 @@
     <NavTopbar title="Explore" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
+        <NuxtLinkLocale to="/explore/places">
+          <Button variant="outline" class="mb-4 w-full">
+            <MapIcon />
+            View Map
+          </Button>
+        </NuxtLinkLocale>
         <NuxtLinkLocale to="/explore/categories">
           <div class="flex items-center">
             <h2 class="py-3 text-xl font-bold">Categories</h2>
@@ -43,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { Map as MapIcon } from 'lucide-vue-next'
 import { graphql } from '~/gql'
 
 const categoriesQuery = graphql(`
