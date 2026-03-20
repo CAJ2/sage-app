@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mb-[90px]">
+    <div class="mb-22.5">
       <slot />
     </div>
     <div class="relative">

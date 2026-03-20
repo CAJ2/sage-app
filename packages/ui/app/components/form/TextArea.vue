@@ -7,6 +7,7 @@ const props = defineProps<{
   class?: HTMLAttributes['class']
   defaultValue?: string | number
   modelValue?: string | number
+  state?: 'error' | 'success'
 }>()
 
 const emits = defineEmits<{
@@ -24,7 +25,9 @@ const modelValue = useVModel(props, 'modelValue', emits, {
     v-model="modelValue"
     :class="
       cn(
-        'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-20 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+        'block min-h-20 w-full rounded-lg border border-base-content/20 bg-base-200 px-4 py-2.5 text-base-content placeholder:text-base-content/50 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 sm:py-3 sm:text-sm [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-none [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar-track]:bg-base-200',
+        state === 'error' && 'border-error focus:border-error focus:ring-error',
+        state === 'success' && 'border-success focus:border-success focus:ring-success',
         props.class,
       )
     "

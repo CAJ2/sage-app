@@ -28,7 +28,7 @@
             placeholder="Search..."
             class="pl-10"
           />
-          <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
+          <span class="absolute inset-y-0 inset-s-0 flex items-center justify-center px-2">
             <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="text-neutral-700" />
           </span>
         </div>
@@ -53,7 +53,7 @@
                     <img v-if="res.imageURL" class="size-12 rounded-box" :src="res.imageURL" />
                     <span
                       v-else
-                      class="flex size-12 items-center justify-center rounded-box border-1 border-neutral-200"
+                      class="flex size-12 items-center justify-center rounded-box border border-neutral-200"
                     >
                       <font-awesome-icon
                         :icon="placeholderIcon(res.__typename)"
