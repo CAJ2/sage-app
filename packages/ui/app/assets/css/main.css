@@ -2,6 +2,7 @@
 @import 'tw-animate-css';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
+@plugin "@tailwindcss/forms";
 @plugin 'daisyui';
 
 @font-face {

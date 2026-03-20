@@ -40,7 +40,7 @@
     "@nuxt/kit": "^4.3.1",
     "@pinia/nuxt": "^0.11.3",
     "@posthog/nuxt": "^1.5.56",
-    "@sageleaf/ui": "workspace:^0.1.0",
+    "@sageleaf/ui": "workspace:*",
     "@tailwindcss/vite": "~4.2.0",
     "@tanstack/vue-form": "^1.11.2",
     "@tauri-apps/plugin-barcode-scanner": "~2.4.4",

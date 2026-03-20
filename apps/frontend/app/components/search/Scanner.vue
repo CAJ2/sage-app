@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, reactive, watch } from 'vue'
+import { onMounted, onBeforeUnmount, watch } from 'vue'
 import type {
-  InputStreamType,
   QuaggaJSCodeReader,
   QuaggaJSConfigObject,
   QuaggaJSResultCallbackFunction,
@@ -9,20 +8,16 @@ import type {
 } from '@ericblade/quagga2'
 import Quagga from '@ericblade/quagga2'
 
+const emit = defineEmits<{
+  detected: [result: QuaggaJSResultObject | null]
+}>()
+
 const props = withDefaults(
   defineProps<{
-    onDetected?: (result: QuaggaJSResultObject | null) => void
     onProcessed?: (data: QuaggaJSResultObject) => void
-    type?: InputStreamType
     readerTypes?: QuaggaJSCodeReader[]
-    constraints?: MediaTrackConstraintSet
-    locate?: boolean
-    numOfWorkers?: number
-    frequency?: number
-    facingMode?: string
   }>(),
   {
-    onDetected: (_result: QuaggaJSResultObject | null) => {},
     onProcessed: (result: QuaggaJSResultObject | null) => {
       const drawingCtx = Quagga.canvas.ctx.overlay
       const drawingCanvas = Quagga.canvas.dom.overlay
@@ -60,48 +55,12 @@ const props = withDefaults(
         }
       }
     },
-    type: 'LiveStream',
-    readerTypes: () => ['code_128_reader'],
-    constraints: () => ({
-      width: 640,
-      height: 480,
-      aspectRatio: {
-        min: 0,
-        max: 1,
-      },
-    }),
-    locate: true,
-    numOfWorkers: 4,
-    frequency: 10,
-    facingMode: 'environment',
+    readerTypes: () => ['ean_reader'],
   },
 )
 
-const quaggaState = reactive<QuaggaJSConfigObject>({
-  inputStream: {
-    type: props.type,
-    constraints: props.constraints,
-  },
-  locator: {
-    patchSize: 'medium',
-    halfSample: true,
-  },
-  numOfWorkers: props.numOfWorkers,
-  frequency: props.frequency,
-  decoder: {
-    readers: props.readerTypes,
-  },
-  locate: props.locate,
-})
+const container = ref<HTMLElement | null>(null)
 const quaggaError = ref<string | null>(null)
-
-watch(
-  () => props.onDetected,
-  (newValue, oldValue) => {
-    if (oldValue) Quagga.offDetected(oldValue)
-    if (newValue) Quagga.onDetected(newValue)
-  },
-)
 
 watch(
   () => props.onProcessed,
@@ -111,7 +70,40 @@ watch(
   },
 )
 
-onMounted(() => {
+const detectedHandler = (result: QuaggaJSResultObject) => {
+  const err = getMedianOfCodeErrors(result.codeResult?.decodedCodes ?? [])
+  if (err >= 0.25) return
+  const { valid } = validateBarcode(result.codeResult?.code ?? '')
+  if (!valid) return
+  emit('detected', result)
+}
+
+onMounted(async () => {
+  const { offsetHeight: h } = container.value ?? { offsetHeight: 480 }
+
+  // probe native camera resolution to compute the correct width for the given height
+  let width = Math.round(h * (4 / 3))
+  try {
+    const probe = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' },
+    })
+    const { width: nativeW = 1, height: nativeH = 1 } = probe.getVideoTracks()[0]!.getSettings()
+    width = Math.round(h * (nativeW / nativeH))
+    probe.getTracks().forEach((t) => t.stop())
+  } catch {
+    // permission denied or no camera — fall back to 4:3
+  }
+
+  const quaggaState: QuaggaJSConfigObject = {
+    inputStream: {
+      type: 'LiveStream',
+      target: container.value ?? undefined,
+      constraints: { width, height: h },
+    },
+    locator: { patchSize: 'medium', halfSample: true, willReadFrequently: true },
+    decoder: { readers: props.readerTypes ?? ['ean_reader'] },
+    locate: true,
+  }
   Quagga.init(quaggaState, (err: object | null) => {
     if (err) {
       quaggaError.value = `Failed to initialize the scanner.`
@@ -119,12 +111,12 @@ onMounted(() => {
     }
     Quagga.start()
   })
-  Quagga.onDetected(props.onDetected)
+  Quagga.onDetected(detectedHandler)
   Quagga.onProcessed(props.onProcessed as unknown as QuaggaJSResultCallbackFunction)
 })
 
 onBeforeUnmount(() => {
-  if (props.onDetected) Quagga.offDetected(props.onDetected)
+  Quagga.offDetected(detectedHandler)
   if (props.onProcessed)
     Quagga.offProcessed(props.onProcessed as unknown as QuaggaJSResultCallbackFunction)
   Quagga.stop()
@@ -132,9 +124,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div id="interactive" class="viewport scanner flex flex-col">
-    <span v-if="quaggaError" class="text-center">{{ quaggaError }}</span>
+  <div
+    id="interactive"
+    ref="container"
+    class="viewport scanner relative h-full w-full overflow-hidden"
+  >
+    <span v-if="quaggaError" class="absolute inset-0 flex items-center justify-center text-center">
+      {{ quaggaError }}
+    </span>
     <video />
     <canvas class="drawingBuffer" />
   </div>
 </template>
+
+<style scoped>
+video,
+canvas.drawingBuffer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100% !important;
+  width: auto !important;
+  transform: translateX(-50%);
+}
+</style>
