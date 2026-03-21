@@ -1,0 +1,31 @@
+apps/frontend/app/stores/region_store.ts
+  fb342910d5025011 7-9,11,15-26,29-30,33-34
+packages/ui/app/components/form/Switch.vue
+  fb342910d5025011 7-9,12,14-16
+apps/frontend/app/components/settings/RegionDisplay.vue
+  fb342910d5025011 1-6,8-9,11-65,67-72,74,76-107,109-151
+apps/frontend/app/components/settings/RegionSelect.vue
+  fb342910d5025011 2-16,19-27,30-39,41,46-47,50-52,54,64,66-68,70,81-82,91-93,95,97,103,115-116,125-126,129-140,142-152,154,183-188,193-194,206-211,225,229-266,268,270-293,308
+apps/frontend/app/plugins/apollo.ts
+  fb342910d5025011 12-13,20-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "cd9a5ee08fdfbc2ec2096804a36ec8f62c264704",
+  "prompts": {
+    "fb342910d5025011": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56a7debc-d872-437b-9ad5-42e38ba9246b",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 561,
+      "total_deletions": 231,
+      "accepted_lines": 379,
+      "overriden_lines": 8
+    }
+  }
+}
