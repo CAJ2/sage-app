@@ -17,6 +17,7 @@ log = "0.4"
 tauri = { version = "2.10.0", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-barcode-scanner = "2"
+tauri-plugin-geolocation = "2.3.2"
 
 [profile.dev]
 incremental = true

@@ -3,6 +3,8 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(mobile)]
+            app.handle().plugin(tauri_plugin_geolocation::init());
+            #[cfg(mobile)]
             let _ = app.handle().plugin(tauri_plugin_barcode_scanner::init());
             if cfg!(debug_assertions) {
                 app.handle().plugin(

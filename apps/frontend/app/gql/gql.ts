@@ -14,7 +14,8 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": typeof types.RegionSelectQueryDocument,
+    "\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n      bbox\n      minZoom\n    }\n  }\n": typeof types.RegionSelectQueryDocument,
+    "\n  query RegionSelectCurrentRegion {\n    currentRegion {\n      region {\n        id\n        name\n        placetype\n        bbox\n        minZoom\n      }\n    }\n  }\n": typeof types.RegionSelectCurrentRegionDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": typeof types.RegionSelectSearchDocument,
     "\n  query ChangesCategorySchema {\n    categorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": typeof types.ChangesCategorySchemaDocument,
     "\n  query ChangesCategoryEdit($id: ID!, $changeID: ID!) {\n    change(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          updateInput\n        }\n      }\n    }\n  }\n": typeof types.ChangesCategoryEditDocument,
@@ -72,7 +73,8 @@ type Documents = {
     "\n      query RefSearchQuery($input: String!, $type: SearchType!) {\n        search(query: $input, types: [$type]) {\n          totalCount\n          nodes {\n            ...ListCategoryFragment\n            ...ListItemFragment\n            ...ListVariantFragment\n            ...ListComponentFragment\n            ...ListOrgFragment\n            ...ListRegionFragment\n            ...ListPlaceFragment\n            ...ListMaterialFragment\n          }\n        }\n      }\n    ": typeof types.RefSearchQueryDocument,
 };
 const documents: Documents = {
-    "\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n": types.RegionSelectQueryDocument,
+    "\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n      bbox\n      minZoom\n    }\n  }\n": types.RegionSelectQueryDocument,
+    "\n  query RegionSelectCurrentRegion {\n    currentRegion {\n      region {\n        id\n        name\n        placetype\n        bbox\n        minZoom\n      }\n    }\n  }\n": types.RegionSelectCurrentRegionDocument,
     "\n  query RegionSelectSearch($query: String!) {\n    search(query: $query, types: [REGION]) {\n      nodes {\n        __typename\n        ... on Region {\n          id\n          name\n          placetype\n        }\n      }\n      totalCount\n    }\n  }\n": types.RegionSelectSearchDocument,
     "\n  query ChangesCategorySchema {\n    categorySchema {\n      create {\n        schema\n        uischema\n      }\n      update {\n        schema\n        uischema\n      }\n    }\n  }\n": types.ChangesCategorySchemaDocument,
     "\n  query ChangesCategoryEdit($id: ID!, $changeID: ID!) {\n    change(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          updateInput\n        }\n      }\n    }\n  }\n": types.ChangesCategoryEditDocument,
@@ -147,7 +149,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n"): (typeof documents)["\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n    }\n  }\n"];
+export function graphql(source: "\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n      bbox\n      minZoom\n    }\n  }\n"): (typeof documents)["\n  query RegionSelectQuery($id: ID!) {\n    region(id: $id) {\n      id\n      name\n      placetype\n      bbox\n      minZoom\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query RegionSelectCurrentRegion {\n    currentRegion {\n      region {\n        id\n        name\n        placetype\n        bbox\n        minZoom\n      }\n    }\n  }\n"): (typeof documents)["\n  query RegionSelectCurrentRegion {\n    currentRegion {\n      region {\n        id\n        name\n        placetype\n        bbox\n        minZoom\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

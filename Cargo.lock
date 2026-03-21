@@ -2905,6 +2905,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-barcode-scanner",
+ "tauri-plugin-geolocation",
  "tauri-plugin-log",
 ]
 
@@ -3587,6 +3588,20 @@ name = "tauri-plugin-barcode-scanner"
 version = "2.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "485cbcf227f04117e930be748ea71d835900466dcd1d455d5ec284d36107a305"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "tauri-plugin-geolocation"
+version = "2.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0366e51823ad001ff1a47f116cd34ddfea3d94ebeb2309caf42e290dec27e0a6"
 dependencies = [
  "log",
  "serde",

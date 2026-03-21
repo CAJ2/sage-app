@@ -389,6 +389,9 @@ importers:
       '@tauri-apps/plugin-barcode-scanner':
         specifier: ~2.4.4
         version: 2.4.4
+      '@tauri-apps/plugin-geolocation':
+        specifier: ^2.3.2
+        version: 2.3.2
       '@vue/apollo-composable':
         specifier: ^4.2.2
         version: 4.2.2(@apollo/client@3.13.8(@types/react@19.2.14)(graphql-ws@6.0.7(crossws@0.3.5)(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(ws@8.19.0))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(subscriptions-transport-ws@0.11.0(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))))(graphql@16.11.0(patch_hash=5d7b99c90cd936c0300d91b318f94e48d710b883b2639c69683463cd1f72fac8))(typescript@5.9.3)(vue@3.5.28(typescript@5.9.3))
@@ -6275,6 +6278,9 @@ packages:
 
   '@tauri-apps/plugin-barcode-scanner@2.4.4':
     resolution: {integrity: sha512-uXvyMI8UgQjSrGxzTU5isNoQarMGRxFmTmb4TsgiWZHf/g7LsIyAQCwoFShjax0fXCK5mdVKDOvlkfOr21fo6g==}
+
+  '@tauri-apps/plugin-geolocation@2.3.2':
+    resolution: {integrity: sha512-ONCwav1monafjeO8/JdXtRlbhZ3xgAdBYxo/62qgw99u9+y6xGsohy3avZgFZsBHA0JVNe1uJnMi+vfT5ZSFUA==}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -19772,6 +19778,10 @@ snapshots:
       '@tauri-apps/cli-win32-x64-msvc': 2.10.0
 
   '@tauri-apps/plugin-barcode-scanner@2.4.4':
+    dependencies:
+      '@tauri-apps/api': 2.10.1
+
+  '@tauri-apps/plugin-geolocation@2.3.2':
     dependencies:
       '@tauri-apps/api': 2.10.1
 
