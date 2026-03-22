@@ -14,7 +14,6 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/image',
     '@pinia/nuxt',
-    'pinia-plugin-persistedstate/nuxt',
     'reka-ui/nuxt',
     '@posthog/nuxt',
   ],

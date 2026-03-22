@@ -60,6 +60,7 @@ const homeFeedQuery = graphql(`
 `)
 
 const regionStore = useRegionStore()
+await regionStore.load()
 const { data } = await useLazyAsyncQuery(homeFeedQuery, {
   regionId: regionStore.selectedRegion || undefined,
 })

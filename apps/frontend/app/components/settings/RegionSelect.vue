@@ -99,6 +99,7 @@
 </template>
 
 <script setup lang="ts">
+import { isTauri } from '@tauri-apps/api/core'
 import { watchDebounced } from '@vueuse/core'
 import { GlobeIcon, LocateIcon, SearchIcon } from 'lucide-vue-next'
 
@@ -180,6 +181,7 @@ type SearchResult = {
 }
 
 const regionStore = useRegionStore()
+await regionStore.load()
 const { locationLatLon } = storeToRefs(regionStore)
 
 const usingLocation = computed({
@@ -248,8 +250,7 @@ async function requestGeolocation() {
   try {
     let lat: number, lon: number
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).__TAURI_INTERNALS__) {
+    if (isTauri()) {
       const { checkPermissions, requestPermissions, getCurrentPosition } =
         await import('@tauri-apps/plugin-geolocation')
       let permissions = await checkPermissions()

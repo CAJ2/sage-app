@@ -9,7 +9,7 @@ import type {
 import Quagga from '@ericblade/quagga2'
 
 const emit = defineEmits<{
-  detected: [result: QuaggaJSResultObject | null]
+  detected: [code: string]
 }>()
 
 const props = withDefaults(
@@ -46,7 +46,6 @@ const props = withDefaults(
             lineWidth: 2,
           })
         }
-
         if (result.codeResult && result.codeResult.code) {
           Quagga.ImageDebug.drawPath(result.line, { x: 'x', y: 'y' }, drawingCtx, {
             color: 'red',
@@ -60,7 +59,15 @@ const props = withDefaults(
 )
 
 const container = ref<HTMLElement | null>(null)
-const quaggaError = ref<string | null>(null)
+const scanError = ref<string | null>(null)
+
+const detectedHandler = (result: QuaggaJSResultObject) => {
+  const err = getMedianOfCodeErrors(result.codeResult?.decodedCodes ?? [])
+  if (err >= 0.25) return
+  const { valid, modifiedCode } = validateBarcode(result.codeResult?.code ?? '')
+  if (!valid) return
+  emit('detected', modifiedCode)
+}
 
 watch(
   () => props.onProcessed,
@@ -70,43 +77,25 @@ watch(
   },
 )
 
-const detectedHandler = (result: QuaggaJSResultObject) => {
-  const err = getMedianOfCodeErrors(result.codeResult?.decodedCodes ?? [])
-  if (err >= 0.25) return
-  const { valid } = validateBarcode(result.codeResult?.code ?? '')
-  if (!valid) return
-  emit('detected', result)
-}
-
-onMounted(async () => {
-  const { offsetHeight: h } = container.value ?? { offsetHeight: 480 }
-
-  // probe native camera resolution to compute the correct width for the given height
-  let width = Math.round(h * (4 / 3))
-  try {
-    const probe = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment' },
-    })
-    const { width: nativeW = 1, height: nativeH = 1 } = probe.getVideoTracks()[0]!.getSettings()
-    width = Math.round(h * (nativeW / nativeH))
-    probe.getTracks().forEach((t) => t.stop())
-  } catch {
-    // permission denied or no camera — fall back to 4:3
-  }
-
+onMounted(() => {
   const quaggaState: QuaggaJSConfigObject = {
     inputStream: {
       type: 'LiveStream',
       target: container.value ?? undefined,
-      constraints: { width, height: h },
+      constraints: {
+        facingMode: 'environment',
+        width: { min: 640, ideal: 1280 },
+        height: { min: 480, ideal: 720 },
+      },
     },
     locator: { patchSize: 'medium', halfSample: true, willReadFrequently: true },
     decoder: { readers: props.readerTypes ?? ['ean_reader'] },
     locate: true,
   }
+
   Quagga.init(quaggaState, (err: object | null) => {
     if (err) {
-      quaggaError.value = `Failed to initialize the scanner.`
+      scanError.value = 'Failed to initialize the scanner.'
       return
     }
     Quagga.start()
@@ -129,8 +118,8 @@ onBeforeUnmount(() => {
     ref="container"
     class="viewport scanner relative h-full w-full overflow-hidden"
   >
-    <span v-if="quaggaError" class="absolute inset-0 flex items-center justify-center text-center">
-      {{ quaggaError }}
+    <span v-if="scanError" class="absolute inset-0 flex items-center justify-center text-center">
+      {{ scanError }}
     </span>
     <video />
     <canvas class="drawingBuffer" />

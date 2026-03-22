@@ -386,10 +386,16 @@ importers:
       '@tanstack/vue-form':
         specifier: ^1.11.2
         version: 1.11.2(vue@3.5.28(typescript@5.9.3))
+      '@tauri-apps/api':
+        specifier: ^2.10.1
+        version: 2.10.1
       '@tauri-apps/plugin-barcode-scanner':
         specifier: ~2.4.4
         version: 2.4.4
       '@tauri-apps/plugin-geolocation':
+        specifier: ^2.3.2
+        version: 2.3.2
+      '@tauri-apps/plugin-sql':
         specifier: ^2.3.2
         version: 2.3.2
       '@vue/apollo-composable':
@@ -416,6 +422,9 @@ importers:
       core-js:
         specifier: ^3.42.0
         version: 3.42.0
+      dexie:
+        specifier: ^4.3.0
+        version: 4.3.0
       embla-carousel-vue:
         specifier: ^9.0.0-rc01
         version: 9.0.0-rc01(vue@3.5.28(typescript@5.9.3))
@@ -6282,6 +6291,9 @@ packages:
   '@tauri-apps/plugin-geolocation@2.3.2':
     resolution: {integrity: sha512-ONCwav1monafjeO8/JdXtRlbhZ3xgAdBYxo/62qgw99u9+y6xGsohy3avZgFZsBHA0JVNe1uJnMi+vfT5ZSFUA==}
 
+  '@tauri-apps/plugin-sql@2.3.2':
+    resolution: {integrity: sha512-4VDXhcKXVpyh5KKpnTGAn6q2DikPHH+TXGh9ZDQzULmG/JEz1RDvzQStgBJKddiukRbYEZ8CGIA2kskx+T+PpA==}
+
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
     engines: {node: '>=18'}
@@ -8404,6 +8416,9 @@ packages:
 
   devalue@5.6.3:
     resolution: {integrity: sha512-nc7XjUU/2Lb+SvEFVGcWLiKkzfw8+qHI7zn8WYXKkLMgfGSHbgCEaR6bJpev8Cm6Rmrb19Gfd/tZvGqx9is3wg==}
+
+  dexie@4.3.0:
+    resolution: {integrity: sha512-5EeoQpJvMKHe6zWt/FSIIuRa3CWlZeIl6zKXt+Lz7BU6RoRRLgX9dZEynRfXrkLcldKYCBiz7xekTEylnie1Ug==}
 
   dezalgo@1.0.4:
     resolution: {integrity: sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==}
@@ -19785,6 +19800,10 @@ snapshots:
     dependencies:
       '@tauri-apps/api': 2.10.1
 
+  '@tauri-apps/plugin-sql@2.3.2':
+    dependencies:
+      '@tauri-apps/api': 2.10.1
+
   '@testing-library/dom@10.4.1':
     dependencies:
       '@babel/code-frame': 7.29.0
@@ -22169,6 +22188,8 @@ snapshots:
       - supports-color
 
   devalue@5.6.3: {}
+
+  dexie@4.3.0: {}
 
   dezalgo@1.0.4:
     dependencies:

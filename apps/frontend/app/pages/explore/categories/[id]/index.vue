@@ -63,4 +63,9 @@ type CategoryResult = {
 }
 
 const { status, data } = await useLazyAsyncQuery<CategoryResult>(categoriesQuery, vars)
+
+const recentStore = useRecentStore()
+onMounted(() => {
+  recentStore.add({ id: vars.id as string, __typename: 'Category' })
+})
 </script>

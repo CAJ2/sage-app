@@ -61,6 +61,7 @@ const openDetails = ref(false)
 const selectedPlace = ref<Place | null>(null)
 
 const regionStore = useRegionStore()
+await regionStore.load()
 const regionQuery = graphql(`
   query PlacesIndexRegionQuery($id: ID!) {
     region(id: $id) {

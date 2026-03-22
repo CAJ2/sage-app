@@ -1,7 +1,8 @@
 <template>
   <div class="relative h-[calc(100vh-90px)]">
     <div class="absolute inset-0">
-      <SearchScanner @detected="onScanDetected" />
+      <SearchScannerNative v-if="isNative" @detected="onScanDetected" />
+      <SearchScannerQuagga v-else @detected="onScanDetected" />
     </div>
     <div class="absolute top-0 right-0 left-0 z-10 flex justify-center px-5 pt-5">
       <div class="grid w-full max-w-2xl grid-cols-2 rounded-lg bg-base-200/80 p-1 backdrop-blur-sm">
@@ -33,9 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import type { QuaggaJSResultObject } from '@ericblade/quagga2'
+import { isTauri } from '@tauri-apps/api/core'
 import { SearchIcon, ScanBarcodeIcon } from 'lucide-vue-next'
 import type { ScanVariant } from '~/components/search/ScanResults.vue'
+
+const isNative = isTauri()
 
 const scanQuery = gql`
   query ScanSearch($query: String!) {
@@ -64,8 +67,7 @@ type ScanResult = {
 const scannedCodes = ref(new Set<string>())
 const scannedVariants = ref<ScanVariant[]>([])
 
-const onScanDetected = async (result: QuaggaJSResultObject | null) => {
-  const code = result?.codeResult?.code
+const onScanDetected = async (code: string) => {
   if (!code) return
   if (scannedCodes.value.has(code)) return
   scannedCodes.value.add(code)

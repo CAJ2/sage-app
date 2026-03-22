@@ -1,38 +1,65 @@
 import { defineStore } from 'pinia'
 
-export const useRegionStore = defineStore(
-  'region',
-  () => {
-    const selectedRegion = ref('')
-    const useCurrentLocation = ref(false)
-    const locationLatLon = ref<string | null>(null)
+const STORAGE_KEY = 'region_store'
 
-    const isRegionSelected = computed(() => !!selectedRegion.value)
+export const useRegionStore = defineStore('region', () => {
+  const selectedRegion = ref('')
+  const useCurrentLocation = ref(false)
+  const locationLatLon = ref<string | null>(null)
+  const loaded = ref(false)
 
-    function setRegion(region: string) {
-      selectedRegion.value = region
+  const isRegionSelected = computed(() => !!selectedRegion.value)
+
+  async function load() {
+    if (loaded.value || !import.meta.client) return
+    const raw = await hybridStorage.getAppSetting(STORAGE_KEY)
+    if (raw) {
+      const state = JSON.parse(raw)
+      selectedRegion.value = state.selectedRegion ?? ''
+      useCurrentLocation.value = state.useCurrentLocation ?? false
+      locationLatLon.value = state.locationLatLon ?? null
     }
+    loaded.value = true
+  }
 
-    function setCurrentLocation(latLon: string) {
-      useCurrentLocation.value = true
-      locationLatLon.value = latLon
-      selectedRegion.value = ''
-    }
+  async function persist() {
+    await hybridStorage.setAppSetting(
+      STORAGE_KEY,
+      JSON.stringify({
+        selectedRegion: selectedRegion.value,
+        useCurrentLocation: useCurrentLocation.value,
+        locationLatLon: locationLatLon.value,
+      }),
+    )
+  }
 
-    function clearLocation() {
-      useCurrentLocation.value = false
-      locationLatLon.value = null
-    }
+  async function setRegion(region: string) {
+    selectedRegion.value = region
+    await persist()
+  }
 
-    return {
-      selectedRegion,
-      useCurrentLocation,
-      locationLatLon,
-      isRegionSelected,
-      setRegion,
-      setCurrentLocation,
-      clearLocation,
-    }
-  },
-  { persist: true },
-)
+  async function setCurrentLocation(latLon: string) {
+    useCurrentLocation.value = true
+    locationLatLon.value = latLon
+    selectedRegion.value = ''
+    await persist()
+  }
+
+  async function clearLocation() {
+    useCurrentLocation.value = false
+    locationLatLon.value = null
+    await persist()
+  }
+
+  return {
+    selectedRegion,
+    useCurrentLocation,
+    locationLatLon,
+    isRegionSelected,
+    load,
+    persist,
+    setRegion,
+    setCurrentLocation,
+    clearLocation,
+  }
+})

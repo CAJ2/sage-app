@@ -18,6 +18,7 @@ import {
 } from '@src/db/seeds/TestVariantSeeder'
 import { ADMIN_USER_ID, UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { GeoModule } from '@src/geo/geo.module'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { ProcessModule } from '@src/process/process.module'
 import { VariantService } from '@src/product/variant.service'
@@ -34,6 +35,7 @@ describe('VariantService', () => {
         MikroOrmModule.forRoot(MIKRO_TEST_CONFIG),
         AuthModule,
         EditsModule,
+        GeoModule,
         ProcessModule,
       ],
       providers: [VariantService],

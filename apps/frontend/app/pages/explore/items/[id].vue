@@ -35,4 +35,9 @@ const vars = {
 }
 
 const { status, data } = await useLazyAsyncQuery(itemQuery, vars)
+
+const recentStore = useRecentStore()
+onMounted(() => {
+  recentStore.add({ id: vars.id as string, __typename: 'Item' })
+})
 </script>

@@ -29,12 +29,12 @@
             class="pl-10"
           />
           <span class="absolute inset-y-0 inset-s-0 flex items-center justify-center px-2">
-            <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="text-neutral-700" />
+            <SearchIcon :size="20" class="mr-1 ml-2" />
           </span>
         </div>
-        <ul class="list mt-4 mb-6 rounded-box bg-base-100 shadow-md">
-          <li class="px-4 py-2 text-xs tracking-wide opacity-60">
-            Search Results ({{ data?.search.totalCount || 0 }})
+        <ul class="list mt-4 mb-6 rounded-box bg-base-200 shadow-md">
+          <li v-if="data?.search.totalCount" class="px-4 py-2 text-xs tracking-wide opacity-60">
+            About {{ data?.search.totalCount || 0 }} results
           </li>
           <li v-if="status === 'pending'" class="list-row">
             <div class="h-4 w-28 skeleton" />
@@ -45,36 +45,31 @@
           <div v-if="data && status !== 'pending'">
             <li v-for="res in data.search.nodes" :key="res.id">
               <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
-                <div v-if="res.id" class="list-row flex flex-col gap-0 pt-2 pb-3">
-                  <p class="pb-2 text-xs text-neutral-500 uppercase">
-                    {{ formatType(res.__typename) }}
-                  </p>
-                  <div class="flex items-center gap-2">
-                    <img v-if="res.imageURL" class="size-12 rounded-box" :src="res.imageURL" />
-                    <span
-                      v-else
-                      class="flex size-12 items-center justify-center rounded-box border border-neutral-200"
-                    >
-                      <font-awesome-icon
-                        :icon="placeholderIcon(res.__typename)"
-                        class="size-6 h-6! p-1"
-                      />
-                    </span>
-                    <div class="flex-1 px-2">
-                      <div class="text-bold">
-                        {{ res.name || res.name_null }}
-                      </div>
-                      <div class="text-xs opacity-70">
-                        {{ res.descShort }}
-                      </div>
-                      <div v-if="res.orgs?.nodes.length" class="mt-0.5 text-xs opacity-50">
-                        {{ res.orgs.nodes.map((n) => n.org.name).join(', ') }}
-                      </div>
+                <div v-if="res.id" class="list-row flex items-center gap-2 pt-2 pb-3">
+                  <img v-if="res.imageURL" class="size-20 rounded-box" :src="res.imageURL" />
+                  <span
+                    v-else
+                    class="flex size-20 items-center justify-center rounded-box border border-neutral-200"
+                  >
+                    <component :is="placeholderIcon(res.__typename)" class="size-8" />
+                  </span>
+                  <div class="flex-1 px-2">
+                    <Badge :variant="typeBadgeVariant(res.__typename)" class="mb-1">
+                      {{ formatType(res.__typename) }}
+                    </Badge>
+                    <div class="text-bold">
+                      {{ res.name || res.name_null }}
                     </div>
-                    <button class="btn btn-square btn-ghost">
-                      <font-awesome-icon icon="fa-solid fa-angle-right" class="size-[1.2em]" />
-                    </button>
+                    <div class="text-xs opacity-70">
+                      {{ res.descShort }}
+                    </div>
+                    <div v-if="res.orgs?.nodes.length" class="mt-0.5 text-xs opacity-50">
+                      {{ res.orgs.nodes.map((n) => n.org.name).join(', ') }}
+                    </div>
                   </div>
+                  <button class="btn btn-square btn-ghost">
+                    <ChevronRightIcon class="size-5" />
+                  </button>
                 </div>
               </NuxtLinkLocale>
             </li>
@@ -83,12 +78,7 @@
           <li v-if="data?.search.nodes.length === 0 && searchInput.length > 0" class="list-row">
             No results found for "{{ searchInput }}"
           </li>
-          <li
-            v-if="!data && searchInput.length === 0"
-            class="list-row flex items-center justify-center"
-          >
-            <div class="text-neutral-500">Search for anything</div>
-          </li>
+          <SearchRecentlyViewed v-if="!data && searchInput.length === 0" />
         </ul>
       </div>
     </div>
@@ -97,7 +87,18 @@
 
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
-import { SearchIcon, ScanBarcodeIcon } from 'lucide-vue-next'
+import {
+  BoxIcon,
+  Building2Icon,
+  ChevronRightIcon,
+  CircleHelpIcon,
+  MapPinIcon,
+  PackageIcon,
+  ScanBarcodeIcon,
+  SearchIcon,
+  TagsIcon,
+} from 'lucide-vue-next'
+import type { Component } from 'vue'
 
 onMounted(() => {
   ;(document.querySelector('#search') as HTMLElement)?.focus()
@@ -190,6 +191,22 @@ watchDebounced(
   { debounce: 300 },
 )
 
+const typeBadgeVariant = (type: string) => {
+  switch (type) {
+    case 'Category':
+      return 'blue'
+    case 'Variant':
+      return 'teal'
+    case 'Item':
+      return 'yellow'
+    case 'Org':
+      return 'gray'
+    case 'Place':
+      return 'red'
+    default:
+      return 'ghost'
+  }
+}
 const formatType = (type: string) => {
   switch (type) {
     case 'Category':
@@ -202,22 +219,14 @@ const formatType = (type: string) => {
       return type
   }
 }
-const placeholderIcon = (type: string) => {
-  switch (type) {
-    case 'Category':
-      return 'fa-solid fa-box'
-    case 'Item':
-      return 'fa-solid fa-cube'
-    case 'Variant':
-      return 'fa-solid fa-tags'
-    case 'Org':
-      return 'fa-solid fa-building'
-    case 'Place':
-      return 'fa-solid fa-map-marker-alt'
-    default:
-      return 'fa-solid fa-question'
-  }
+const placeholderIconMap: Record<string, Component> = {
+  Category: BoxIcon,
+  Item: PackageIcon,
+  Variant: TagsIcon,
+  Org: Building2Icon,
+  Place: MapPinIcon,
 }
+const placeholderIcon = (type: string): Component => placeholderIconMap[type] ?? CircleHelpIcon
 const exploreLink = (type: string, id: string) => {
   switch (type) {
     case 'Category':

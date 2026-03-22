@@ -156,11 +156,11 @@ const variantQuery = graphql(`
   }
 `)
 const variantRecycling = graphql(`
-  query GetVariantRecycling($id: ID!, $region: ID!) {
+  query GetVariantRecycling($id: ID!) {
     variant(id: $id) {
       id
       name
-      recycleScore(regionID: $region) {
+      recycleScore {
         score
         rating
         ratingF
@@ -172,12 +172,12 @@ const variantRecycling = graphql(`
             name
             desc
             imageURL
-            recycleScore(regionID: $region) {
+            recycleScore {
               score
               rating
               ratingF
             }
-            recycle(regionID: $region) {
+            recycle {
               context {
                 key
                 desc
@@ -215,18 +215,24 @@ const variantRecycling = graphql(`
   }
 `)
 const vars = {
-  id: route.params.id,
+  id: typeof route.params.id === 'string' ? route.params.id : route.params.id?.[0] || '',
 }
 
-const { data } = await useLazyAsyncQuery(variantQuery, vars)
+const { result: data } = useQuery(variantQuery, vars)
 
+const recentStore = useRecentStore()
+onMounted(() => {
+  recentStore.add({ id: vars.id, __typename: 'Variant' })
+})
+
+const regionStore = useRegionStore()
+regionStore.load()
 const {
   result: recyclingResult,
   load: loadRecycling,
   loading: loadingRecycling,
 } = useLazyQuery(variantRecycling, {
   id: typeof route.params.id === 'string' ? route.params.id : route.params.id?.[0] || '',
-  region: useRegionStore().selectedRegion,
 })
 watch(
   recyclingOpen,

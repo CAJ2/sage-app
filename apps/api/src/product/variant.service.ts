@@ -10,6 +10,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { LocationService } from '@src/geo/location.service'
 import { Region } from '@src/geo/region.entity'
 import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
 import { StreamService } from '@src/process/stream.service'
@@ -35,6 +36,7 @@ export class VariantService implements IEntityService<Variant> {
     private readonly tagService: TagService,
     private readonly streamService: StreamService,
     private readonly i18n: I18nService,
+    private readonly locationService: LocationService,
   ) {}
 
   async findOneByID(id: string) {
@@ -133,9 +135,16 @@ export class VariantService implements IEntityService<Variant> {
     if (!variant) {
       throw new Error(`Variant with ID "${variantID}" not found`)
     }
-    const region = await this.em.findOne(Region, { id: regionID })
-    if (!region) {
-      throw new Error(`Region with ID "${regionID}" not found`)
+    if (regionID) {
+      const region = await this.em.findOne(Region, { id: regionID })
+      if (!region) {
+        throw new Error(`Region with ID "${regionID}" not found`)
+      }
+    } else {
+      const ids = await this.locationService.resolveLocation()
+      if (!ids || ids.length === 0) {
+        return null
+      }
     }
     if (variant.components.getItems().length === 0) {
       return new StreamScore()
