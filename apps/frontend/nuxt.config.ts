@@ -100,6 +100,12 @@ export default defineNuxtConfig({
     serverBundle: {
       collections: ['material-symbols-light'],
     },
+    customCollections: [
+      {
+        prefix: 'sageleaf-app',
+        dir: './app/assets/icons',
+      },
+    ],
   },
 
   colorMode: {

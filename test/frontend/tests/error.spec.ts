@@ -18,7 +18,7 @@ test('"Go back home" navigates back to the home page', async ({ page, goto }) =>
   await goto('/does-not-exist', { waitUntil: 'hydration' })
   await page.getByRole('link', { name: 'Go back home' }).click()
   // main.vue (the canonical home route) immediately redirects to /explore
-  await expect(page).toHaveURL(/\/(explore|main)/)
+  await expect(page).toHaveURL(/\/(home)/)
 })
 
 test('deeply nested unknown route shows error page', async ({ page, goto }) => {

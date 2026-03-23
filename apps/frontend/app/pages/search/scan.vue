@@ -66,13 +66,26 @@ type ScanResult = {
 
 const scannedCodes = ref(new Set<string>())
 const scannedVariants = ref<ScanVariant[]>([])
+const scanCode = ref('')
 
-const onScanDetected = async (code: string) => {
-  if (!code) return
-  if (scannedCodes.value.has(code)) return
+const { result: scanResult } = useQuery<ScanResult>(
+  scanQuery,
+  () => ({ query: scanCode.value }),
+  () => ({ enabled: !!scanCode.value }),
+)
+
+watch(scanResult, (res) => {
+  const variants = (res?.search.nodes ?? []) as ScanVariant[]
+  for (const v of variants) {
+    if (!scannedVariants.value.some((sv) => sv.id === v.id)) {
+      scannedVariants.value.push(v)
+    }
+  }
+})
+
+const onScanDetected = (code: string) => {
+  if (!code || scannedCodes.value.has(code)) return
   scannedCodes.value.add(code)
-  const { data } = await useLazyAsyncQuery<ScanResult>(scanQuery, { query: code })
-  const variants = data.value?.search.nodes ?? []
-  scannedVariants.value.push(...variants)
+  scanCode.value = code
 }
 </script>

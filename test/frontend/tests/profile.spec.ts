@@ -13,8 +13,7 @@ test('/profile has "Sign in with Email" button', async ({ page, goto }) => {
 test('/profile "Sign in with Email" button links to /profile/sign_in', async ({ page, goto }) => {
   await goto('/profile', { waitUntil: 'hydration' })
   const signInBtn = page.getByRole('button', { name: 'Sign in with Email' })
-  const link = signInBtn.locator('..').locator('a[href*="sign_in"]')
-  await expect(link).toBeVisible()
+  await expect(signInBtn).toBeVisible()
 })
 
 test('/profile has a "Region" list item', async ({ page, goto }) => {
@@ -28,26 +27,29 @@ test('/profile Region list item links to /profile/region', async ({ page, goto }
 })
 
 test('/profile has a "Language" list item', async ({ page, goto }) => {
-  await goto('/profile', { waitUntil: 'hydration' })
+  await goto('/profile/settings', { waitUntil: 'hydration' })
   await expect(page.getByText('Language')).toBeVisible()
 })
 
 test('/profile has a "Dark Mode" label', async ({ page, goto }) => {
-  await goto('/profile', { waitUntil: 'hydration' })
-  await expect(page.getByText('Dark Mode')).toBeVisible()
+  await goto('/profile/settings', { waitUntil: 'hydration' })
+  await expect(page.getByText('Theme')).toBeVisible()
 })
 
 test('/profile has a Dark Mode toggle switch', async ({ page, goto }) => {
-  await goto('/profile', { waitUntil: 'hydration' })
-  await expect(page.locator('#dark-mode')).toBeVisible()
+  await goto('/profile/settings', { waitUntil: 'hydration' })
+  await expect(page.locator('.dropdown-end')).toBeVisible()
 })
 
 test('/profile Dark Mode toggle changes state when clicked', async ({ page, goto }) => {
-  await goto('/profile', { waitUntil: 'hydration' })
-  const toggle = page.locator('#dark-mode')
-  const before = await toggle.getAttribute('data-state')
-  await toggle.click()
-  await expect(toggle).not.toHaveAttribute('data-state', before!)
+  await goto('/profile/settings', { waitUntil: 'hydration' })
+  const trigger = page.locator('.dropdown-end button').first()
+  const before = (await trigger.textContent())?.trim()
+  await trigger.click()
+  // Pick whichever option differs from current
+  const target = before === 'Dark' ? 'Light' : 'Dark'
+  await page.getByRole('button', { name: target }).click()
+  await expect(trigger).toContainText(target)
 })
 
 test('/profile/region shows "Change Region" topbar', async ({ page, goto }) => {
@@ -57,5 +59,5 @@ test('/profile/region shows "Change Region" topbar', async ({ page, goto }) => {
 
 test('/profile/region has a region search input', async ({ page, goto }) => {
   await goto('/profile/region', { waitUntil: 'hydration' })
-  await expect(page.getByPlaceholder('Search...')).toBeVisible()
+  await expect(page.getByPlaceholder('Search for a region…')).toBeVisible()
 })

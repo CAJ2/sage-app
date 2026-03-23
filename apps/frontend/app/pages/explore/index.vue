@@ -67,9 +67,5 @@ const categoriesQuery = graphql(`
     }
   }
 `)
-const vars = {
-  limit: 6,
-}
-
-const { data } = await useLazyAsyncQuery(categoriesQuery, vars)
+const { result: data } = useQuery(categoriesQuery)
 </script>

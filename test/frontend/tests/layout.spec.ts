@@ -5,8 +5,8 @@ const mainPages = ['/explore', '/search', '/places', '/contribute', '/profile']
 for (const path of mainPages) {
   test(`NavTabs is visible on ${path}`, async ({ page, goto }) => {
     await goto(path, { waitUntil: 'hydration' })
+    await expect(page.getByRole('button', { name: 'Home' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Explore' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Places' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Contribute' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Profile' })).toBeVisible()
   })
@@ -37,12 +37,16 @@ test('NavTabs is visible on sub-page /explore/categories', async ({ page, goto }
 test('Explore tab is highlighted when on /explore', async ({ page, goto }) => {
   await goto('/explore', { waitUntil: 'hydration' })
   // The active tab uses aria-current="page" on the link
-  const exploreLink = page.locator('a[href*="/explore"]').filter({ has: page.getByRole('button', { name: 'Explore' }) })
+  const exploreLink = page
+    .locator('a[href*="/explore"]')
+    .filter({ has: page.getByRole('button', { name: 'Explore' }) })
   await expect(exploreLink).toHaveAttribute('aria-current', 'page')
 })
 
 test('Contribute tab is highlighted when on /contribute', async ({ page, goto }) => {
   await goto('/contribute', { waitUntil: 'hydration' })
-  const contributeLink = page.locator('a[href*="/contribute"]').filter({ has: page.getByRole('button', { name: 'Contribute' }) })
+  const contributeLink = page
+    .locator('a[href*="/contribute"]')
+    .filter({ has: page.getByRole('button', { name: 'Contribute' }) })
   await expect(contributeLink).toHaveAttribute('aria-current', 'page')
 })

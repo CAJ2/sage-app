@@ -33,17 +33,17 @@
           </span>
         </div>
         <ul class="list mt-4 mb-6 rounded-box bg-base-200 shadow-md">
-          <li v-if="data?.search.totalCount" class="px-4 py-2 text-xs tracking-wide opacity-60">
-            About {{ data?.search.totalCount || 0 }} results
+          <li v-if="result?.search.totalCount" class="px-4 py-2 text-xs tracking-wide opacity-60">
+            About {{ result?.search.totalCount || 0 }} results
           </li>
-          <li v-if="status === 'pending'" class="list-row">
+          <li v-if="loading" class="list-row">
             <div class="h-4 w-28 skeleton" />
             <div class="h-4 w-full skeleton" />
             <div class="h-4 w-full skeleton" />
           </li>
 
-          <div v-if="data && status !== 'pending'">
-            <li v-for="res in data.search.nodes" :key="res.id">
+          <div v-if="result && !loading">
+            <li v-for="res in result.search.nodes" :key="res.id">
               <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
                 <div v-if="res.id" class="list-row flex items-center gap-2 pt-2 pb-3">
                   <img v-if="res.imageURL" class="size-20 rounded-box" :src="res.imageURL" />
@@ -75,10 +75,10 @@
             </li>
           </div>
 
-          <li v-if="data?.search.nodes.length === 0 && searchInput.length > 0" class="list-row">
+          <li v-if="result?.search.nodes.length === 0 && searchInput.length > 0" class="list-row">
             No results found for "{{ searchInput }}"
           </li>
-          <SearchRecentlyViewed v-if="!data && searchInput.length === 0" />
+          <SearchRecentlyViewed v-if="!result && searchInput.length === 0" />
         </ul>
       </div>
     </div>
@@ -156,8 +156,15 @@ const searchQuery = gql`
   }
 `
 const searchInput = shallowRef('')
-const status = ref('idle')
-const data = ref<SearchResult | null>(null)
+const debouncedSearch = shallowRef('')
+
+watchDebounced(
+  searchInput,
+  (val) => {
+    debouncedSearch.value = val
+  },
+  { debounce: 300 },
+)
 
 type SearchResult = {
   search: {
@@ -175,20 +182,10 @@ type SearchResult = {
   }
 }
 
-watchDebounced(
-  searchInput,
-  async () => {
-    if (searchInput.value.length < 2) {
-      return
-    }
-    status.value = 'pending'
-    const results = await useLazyAsyncQuery<SearchResult>(searchQuery, {
-      query: searchInput.value,
-    })
-    status.value = results.status.value
-    data.value = results.data.value
-  },
-  { debounce: 300 },
+const { result, loading } = useQuery<SearchResult>(
+  searchQuery,
+  () => ({ query: debouncedSearch.value }),
+  () => ({ enabled: debouncedSearch.value.length >= 2 }),
 )
 
 const typeBadgeVariant = (type: string) => {
