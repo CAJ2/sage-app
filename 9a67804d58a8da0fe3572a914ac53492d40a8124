@@ -1,0 +1,27 @@
+test/frontend/package.json
+  e6ff7e5b6a7dc73a 11
+test/frontend/tests/error.snap.spec.ts
+  e6ff7e5b6a7dc73a 1-11
+test/frontend/tests/layout.snap.spec.ts
+  e6ff7e5b6a7dc73a 1-2,4-7,9-15,17-20,23-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "9a67804d58a8da0fe3572a914ac53492d40a8124",
+  "prompts": {
+    "e6ff7e5b6a7dc73a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01494311-0bf5-4040-888f-25caba190dac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 43,
+      "total_deletions": 39,
+      "accepted_lines": 31,
+      "overriden_lines": 7
+    }
+  }
+}
