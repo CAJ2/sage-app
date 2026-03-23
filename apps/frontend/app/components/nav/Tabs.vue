@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex items-center justify-around justify-items-center bg-base-200">
+  <nav class="relative flex items-center justify-around justify-items-center bg-base-200">
     <!-- Left Tabs -->
     <div class="flex flex-1 justify-center">
       <NuxtLinkLocale :to="{ path: leftTabs['home'].path }" @dragstart.prevent>
@@ -87,7 +87,7 @@
         </button>
       </NuxtLinkLocale>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script setup lang="ts">

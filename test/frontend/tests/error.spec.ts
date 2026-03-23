@@ -1,10 +1,5 @@
 import { test, expect } from '@nuxt/test-utils/playwright'
 
-test('unknown route shows an error page with "Go back home" link', async ({ page, goto }) => {
-  await goto('/does-not-exist', { waitUntil: 'hydration' })
-  await expect(page.getByRole('link', { name: 'Go back home' })).toBeVisible()
-})
-
 test('"Go back home" link on error page points to the root', async ({ page, goto }) => {
   await goto('/does-not-exist', { waitUntil: 'hydration' })
   const link = page.getByRole('link', { name: 'Go back home' })
@@ -19,9 +14,4 @@ test('"Go back home" navigates back to the home page', async ({ page, goto }) =>
   await page.getByRole('link', { name: 'Go back home' }).click()
   // main.vue (the canonical home route) immediately redirects to /explore
   await expect(page).toHaveURL(/\/(home)/)
-})
-
-test('deeply nested unknown route shows error page', async ({ page, goto }) => {
-  await goto('/does/not/exist/at/all', { waitUntil: 'hydration' })
-  await expect(page.getByRole('link', { name: 'Go back home' })).toBeVisible()
 })

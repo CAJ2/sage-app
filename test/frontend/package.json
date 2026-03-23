@@ -8,6 +8,7 @@
     "e2e": "pnpm exec playwright test",
     "e2e:ui": "pnpm exec playwright test --ui",
     "e2e:ci": "pnpm exec playwright test",
+    "e2e:update-snapshots": "pnpm exec playwright test --update-snapshots --grep '\\.snap\\.'",
     "reset": "lsof -ti:3000 | xargs kill || true"
   },
   "devDependencies": {
@@ -65,6 +66,20 @@
         ],
         "dependsOn": [
           "^build"
+        ]
+      },
+      "e2e:update-snapshots": {
+        "cache": false,
+        "inputs": [
+          "{projectRoot}/**/*",
+          "^default",
+          {
+            "env": "TEST_DEVICES"
+          }
+        ],
+        "dependsOn": [
+          "^preview",
+          "reset"
         ]
       }
     }
