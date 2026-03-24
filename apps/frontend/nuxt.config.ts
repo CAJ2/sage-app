@@ -117,6 +117,9 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    externals: {
+      inline: ['@vue/shared'],
+    },
     rollupConfig: {
       output: {
         sourcemapExcludeSources: false,

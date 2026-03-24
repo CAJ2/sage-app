@@ -96,5 +96,11 @@ export default defineNuxtConfig({
     classSuffix: '',
   },
 
+  nitro: {
+    externals: {
+      inline: ['@vue/shared'],
+    },
+  },
+
   compatibilityDate: '2026-02-12',
 })
