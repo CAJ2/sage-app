@@ -24,7 +24,7 @@
         </DrawerHeader>
         <h3 class="text-md font-semibold">{{ selectedPlace?.desc }}</h3>
         <p>{{ selectedPlace?.tags }}</p>
-        <NuxtLinkLocale :to="`/places/${selectedPlace?.id}`" class="p-4">
+        <NuxtLinkLocale :to="`/explore/places/${selectedPlace?.id}`" class="p-4">
           <Button class="w-full">View Details</Button>
         </NuxtLinkLocale>
         <a
@@ -61,6 +61,7 @@ const openDetails = ref(false)
 const selectedPlace = ref<Place | null>(null)
 
 const regionStore = useRegionStore()
+await regionStore.load()
 const regionQuery = graphql(`
   query PlacesIndexRegionQuery($id: ID!) {
     region(id: $id) {
@@ -195,7 +196,7 @@ onMounted(() => {
       : [0, 0]
   map.value = new Map({
     container: mapContainer.value,
-    style: 'map-style-light.json',
+    style: '/map-style-light.json',
     center,
     zoom: regionData.value?.region?.minZoom || 10,
     attributionControl: false,

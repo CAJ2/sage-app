@@ -14,7 +14,6 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/image',
     '@pinia/nuxt',
-    'pinia-plugin-persistedstate/nuxt',
     'reka-ui/nuxt',
     '@posthog/nuxt',
   ],
@@ -101,6 +100,12 @@ export default defineNuxtConfig({
     serverBundle: {
       collections: ['material-symbols-light'],
     },
+    customCollections: [
+      {
+        prefix: 'sageleaf-app',
+        dir: './app/assets/icons',
+      },
+    ],
   },
 
   colorMode: {

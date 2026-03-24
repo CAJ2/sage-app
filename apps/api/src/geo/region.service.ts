@@ -36,7 +36,7 @@ export class RegionService implements IEntityService<Region> {
     const results = await this.em.find(
       Region,
       {
-        [raw(`ST_Contains(geo::geometry, ST_SetSrid(ST_MakePoint(?, ?), 4326))`, [
+        [raw(`ST_CoveredBy(ST_SetSrid(ST_MakePoint(?, ?), 4326)::geography, geo)`, [
           longitude,
           latitude,
         ])]: true,
@@ -50,7 +50,7 @@ export class RegionService implements IEntityService<Region> {
     const { latitude, longitude } = args
     const where = {
       ...opts.where,
-      [raw(`ST_Contains(geo::geometry, ST_SetSrid(ST_MakePoint(?, ?), 4326))`, [
+      [raw(`ST_CoveredBy(ST_SetSrid(ST_MakePoint(?, ?), 4326)::geography, geo)`, [
         longitude,
         latitude,
       ])]: true,
@@ -61,7 +61,7 @@ export class RegionService implements IEntityService<Region> {
     })
     const count = await this.em.count(Region, {
       ...opts.where,
-      [raw(`ST_Contains(geo::geometry, ST_SetSrid(ST_MakePoint(?, ?), 4326))`, [
+      [raw(`ST_CoveredBy(ST_SetSrid(ST_MakePoint(?, ?), 4326)::geography, geo)`, [
         longitude,
         latitude,
       ])]: true,

@@ -1,14 +1,14 @@
+// Adapted from
+https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/labs/VPullToRefresh/VPullToRefresh.tsx
+// licensed under MIT
 <template>
   <div
     ref="containerRef"
     class="v-pull-to-refresh"
-    @touchstart="onTouchstart"
-    @touchmove="onTouchmove"
-    @touchend="onTouchend"
-    @mousedown="onTouchstart"
-    @mouseup="onTouchend"
-    @mouseleave="onTouchend"
-    @mousemove="onTouchmove"
+    @mousedown="onMousedown"
+    @mouseup="onMouseup"
+    @mouseleave="onMouseup"
+    @mousemove="onMousemove"
   >
     <div
       class="v-pull-to-refresh__pull-down"
@@ -26,10 +26,8 @@
       >
         <div class="v-pull-to-refresh__pull-down-default">
           <span v-if="refreshing" class="loading loading-spinner"></span>
-          <font-awesome-icon
-            v-else
-            :icon="canRefresh || goingUp ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'"
-          />
+          <ArrowDown v-if="!refreshing && !canRefresh && !goingUp" />
+          <ArrowUp v-if="!refreshing && (canRefresh || goingUp)" />
         </div>
       </slot>
     </div>
@@ -44,6 +42,8 @@
 </template>
 
 <script lang="ts" setup>
+import { ArrowDown, ArrowUp } from 'lucide-vue-next'
+
 function clamp(value: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, value))
 }
@@ -94,6 +94,8 @@ const emit = defineEmits<{
 
 let touchstartY = 0
 let scrollParents: HTMLElement[] = []
+// Plain (non-reactive) flag — avoids any Vue reactivity timing issues
+let isPulling = false
 
 const touchDiff = shallowRef(0)
 const containerRef = ref<HTMLElement>()
@@ -104,29 +106,82 @@ const touching = shallowRef(false)
 const canRefresh = computed(() => touchDiff.value >= props.pullDownThreshold && !refreshing.value)
 const topOffset = computed(() => clamp(touchDiff.value, 0, props.pullDownThreshold))
 
-function onTouchstart(e: TouchEvent | MouseEvent) {
-  if (refreshing.value || props.disabled) return
-  touching.value = true
-  touchstartY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0]!.clientY
+function getScrollTop() {
+  return scrollParents.length > 0
+    ? scrollParents[0]!.scrollTop
+    : document.documentElement.scrollTop || document.body.scrollTop
 }
-function onTouchmove(e: TouchEvent | MouseEvent) {
-  if (refreshing.value || !touching.value || props.disabled) return
-  const touchY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0]!.clientY
-  if (scrollParents.length > 0 && !scrollParents[0]!.scrollTop) {
-    touchDiff.value = touchY - touchstartY
+
+function triggerRefresh() {
+  const done = () => {
+    if (!refreshing.value) return
+    touchDiff.value = 0
+    refreshing.value = false
+  }
+  emit('load', { done })
+  refreshing.value = true
+}
+
+// ── Touch event handlers (registered manually with { passive: false }) ──────
+
+function onTouchstart(e: TouchEvent) {
+  if (refreshing.value || props.disabled || e.touches.length === 0) return
+  if (getScrollTop() > 0) return
+  isPulling = true
+  touching.value = true
+  touchstartY = e.touches[0]!.clientY
+}
+
+function onTouchmove(e: TouchEvent) {
+  if (!isPulling || refreshing.value || props.disabled || e.touches.length === 0) return
+  const diff = e.touches[0]!.clientY - touchstartY
+  if (diff > 0) {
+    e.preventDefault()
+    touchDiff.value = diff
   }
 }
-function onTouchend(_e: TouchEvent | MouseEvent) {
-  if (refreshing.value || props.disabled) return
+
+function onTouchend() {
+  if (!isPulling) return
+  isPulling = false
   touching.value = false
   if (canRefresh.value) {
-    const done = () => {
-      if (!refreshing.value) return
-      touchDiff.value = 0
-      refreshing.value = false
-    }
-    emit('load', { done })
-    refreshing.value = true
+    triggerRefresh()
+  } else {
+    touchDiff.value = 0
+  }
+}
+
+function onTouchcancel() {
+  isPulling = false
+  touching.value = false
+  touchDiff.value = 0
+}
+
+// ── Mouse event handlers (for desktop / DevTools emulation) ─────────────────
+
+function onMousedown(e: MouseEvent) {
+  if (refreshing.value || props.disabled) return
+  if (getScrollTop() > 0) return
+  isPulling = true
+  touching.value = true
+  touchstartY = e.clientY
+}
+
+function onMousemove(e: MouseEvent) {
+  if (!isPulling || refreshing.value || props.disabled) return
+  const diff = e.clientY - touchstartY
+  if (diff > 0) {
+    touchDiff.value = diff
+  }
+}
+
+function onMouseup() {
+  if (!isPulling) return
+  isPulling = false
+  touching.value = false
+  if (canRefresh.value) {
+    triggerRefresh()
   } else {
     touchDiff.value = 0
   }
@@ -134,12 +189,30 @@ function onTouchend(_e: TouchEvent | MouseEvent) {
 
 onMounted(() => {
   scrollParents = getScrollParents(containerRef.value)
+  const el = containerRef.value
+  if (!el) return
+  el.addEventListener('touchstart', onTouchstart, { passive: false })
+  el.addEventListener('touchmove', onTouchmove, { passive: false })
+  el.addEventListener('touchend', onTouchend)
+  el.addEventListener('touchcancel', onTouchcancel)
+})
+
+onUnmounted(() => {
+  const el = containerRef.value
+  if (!el) return
+  el.removeEventListener('touchstart', onTouchstart)
+  el.removeEventListener('touchmove', onTouchmove)
+  el.removeEventListener('touchend', onTouchend)
+  el.removeEventListener('touchcancel', onTouchcancel)
 })
 
 watch([topOffset, refreshing], () => {
+  const stopScrolling = topOffset.value > 0 && !refreshing.value
   if (scrollParents.length > 0) {
-    const stopScrolling = topOffset.value && !refreshing.value
     scrollParents.forEach((p) => (p.style.overflow = stopScrolling ? 'hidden' : 'auto'))
+  } else {
+    document.documentElement.style.overflow = stopScrolling ? 'hidden' : ''
+    document.body.style.overflow = stopScrolling ? 'hidden' : ''
   }
 })
 
@@ -149,5 +222,38 @@ watch(topOffset, (newVal, oldVal) => {
 </script>
 
 <style scoped>
-/* Add your styles here or copy from the original .tsx file's CSS */
+.v-pull-to-refresh {
+  overflow: hidden;
+  position: relative;
+  min-height: 100%;
+  overscroll-behavior-y: contain;
+}
+
+.v-pull-to-refresh__pull-down {
+  position: absolute;
+  width: 100%;
+  transition: top 0.3s ease-out;
+}
+
+.v-pull-to-refresh__pull-down--touching {
+  transition: none;
+}
+
+.v-pull-to-refresh__pull-down-default {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 10px;
+}
+
+.v-pull-to-refresh__scroll-container {
+  position: relative;
+  transition: top 0.3s ease-out;
+}
+
+.v-pull-to-refresh__scroll-container--touching {
+  transition: none;
+}
 </style>

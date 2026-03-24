@@ -2,17 +2,18 @@ import { test, expect } from '@nuxt/test-utils/playwright'
 
 test('/search has a "Search" tab trigger', async ({ page, goto }) => {
   await goto('/search', { waitUntil: 'hydration' })
-  await expect(page.getByRole('tab', { name: /Search/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Search/ }).first()).toBeVisible()
 })
 
 test('/search has a "Scan" tab trigger', async ({ page, goto }) => {
   await goto('/search', { waitUntil: 'hydration' })
-  await expect(page.getByRole('tab', { name: /Scan/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Scan/ })).toBeVisible()
 })
 
 test('/search Search tab is active by default', async ({ page, goto }) => {
   await goto('/search', { waitUntil: 'hydration' })
-  await expect(page.getByRole('tab', { name: /Search/ })).toHaveAttribute('data-state', 'active')
+  // Active tab has a shadow class; inactive tab does not
+  await expect(page.getByRole('button', { name: /Search/ }).first()).toHaveClass(/shadow/)
 })
 
 test('/search has a text input with placeholder "Search..."', async ({ page, goto }) => {
@@ -52,14 +53,14 @@ test('/search result count is non-zero after a successful search', async ({ page
 
 test('/search switching to Scan tab hides the search input', async ({ page, goto }) => {
   await goto('/search', { waitUntil: 'hydration' })
-  await page.getByRole('tab', { name: /Scan/ }).click()
+  await page.getByRole('button', { name: /Scan/ }).click()
   await expect(page.getByPlaceholder('Search...')).not.toBeVisible()
 })
 
 test('/search switching back to Search tab restores the search input', async ({ page, goto }) => {
   await goto('/search', { waitUntil: 'hydration' })
-  await page.getByRole('tab', { name: /Scan/ }).click()
-  await page.getByRole('tab', { name: /Search/ }).click()
+  await page.getByRole('button', { name: /Scan/ }).click()
+  await page.getByRole('button', { name: /Search/ }).first().click()
   await expect(page.getByPlaceholder('Search...')).toBeVisible()
 })
 

@@ -1,9 +1,21 @@
 {
   "files": [],
   "references": [
-    { "path": "./.nuxt/tsconfig.app.json" },
-    { "path": "./.nuxt/tsconfig.server.json" },
-    { "path": "./.nuxt/tsconfig.shared.json" },
-    { "path": "./.nuxt/tsconfig.node.json" }
-  ]
+    {
+      "path": "./.nuxt/tsconfig.app.json"
+    },
+    {
+      "path": "./.nuxt/tsconfig.server.json"
+    },
+    {
+      "path": "./.nuxt/tsconfig.shared.json"
+    },
+    {
+      "path": "./.nuxt/tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
+    }
+  ],
+  "exclude": ["**/*.stories.ts", "**/*.stories.js", "./storybook-static"]
 }

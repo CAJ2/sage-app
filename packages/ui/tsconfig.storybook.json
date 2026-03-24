@@ -1,0 +1,13 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "include": [
+    ".nuxt/nuxt.d.ts",
+    "src/**/*.stories.ts",
+    "src/**/*.stories.tsx",
+    "src/**/*.stories.mdx",
+    "stories/**/*.stories.ts",
+    "stories/**/*.stories.tsx",
+    ".storybook/*.js",
+    ".storybook/*.ts"
+  ]
+}

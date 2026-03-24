@@ -40,7 +40,7 @@ const categoriesQuery = gql`
   }
 `
 const vars = {
-  id: route.params.id,
+  id: route.params.id as string,
 }
 
 type CategoryResult = {
@@ -62,5 +62,11 @@ type CategoryResult = {
   }
 }
 
-const { status, data } = await useLazyAsyncQuery<CategoryResult>(categoriesQuery, vars)
+const { result: data, loading } = useQuery<CategoryResult>(categoriesQuery, vars)
+const status = computed(() => (loading.value ? 'pending' : 'success'))
+
+const recentStore = useRecentStore()
+onMounted(() => {
+  recentStore.add({ id: vars.id as string, __typename: 'Category' })
+})
 </script>

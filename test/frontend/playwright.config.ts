@@ -25,6 +25,8 @@ const rootDir = fileURLToPath(new URL('../../apps/frontend', import.meta.url))
  */
 export default defineConfig<ConfigOptions>({
   testDir: './tests',
+  snapshotDir: './__snapshots__',
+  snapshotPathTemplate: '{snapshotDir}/{testFilePath}/{arg}{ext}',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -37,9 +39,14 @@ export default defineConfig<ConfigOptions>({
   timeout: 120000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ...(isCI ? [['blob', { outputDir: 'blob-report' }] as const] : []),
   ],
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.02,
+    },
+  },
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */

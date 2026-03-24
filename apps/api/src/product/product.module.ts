@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common'
 import { AuthModule } from '@src/auth/auth.module'
 import { EditsModule } from '@src/changes/edits.module'
 import { CommonModule } from '@src/common/common.module'
+import { GeoModule } from '@src/geo/geo.module'
 import { ProcessModule } from '@src/process/process.module'
 import { CategoryHistoryResolver, CategoryResolver } from '@src/product/category.resolver'
 import { CategorySchemaService } from '@src/product/category.schema'
@@ -17,7 +18,14 @@ import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
 
 @Module({
-  imports: [CommonModule, MikroOrmModule.forFeature([]), AuthModule, EditsModule, ProcessModule],
+  imports: [
+    CommonModule,
+    MikroOrmModule.forFeature([]),
+    AuthModule,
+    EditsModule,
+    GeoModule,
+    ProcessModule,
+  ],
   providers: [
     CategoryResolver,
     CategoryService,

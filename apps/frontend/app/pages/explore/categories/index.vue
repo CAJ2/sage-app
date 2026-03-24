@@ -22,9 +22,7 @@ const categoriesQuery = graphql(`
     }
   }
 `)
-const vars = {
-  limit: 20,
-}
 
-const { status, data } = await useLazyAsyncQuery(categoriesQuery, vars)
+const { result: data, loading } = useQuery(categoriesQuery)
+const status = computed(() => (loading.value ? 'pending' : 'success'))
 </script>

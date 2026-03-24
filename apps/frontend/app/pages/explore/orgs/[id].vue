@@ -3,7 +3,7 @@
     <NavTopbar :title="data?.org?.name || 'Organization'" back="true" />
     <ul class="list rounded-box bg-base-100 shadow-md">
       <li class="p-4 pb-2 text-xs tracking-wide opacity-60">Organization</li>
-      <li v-if="status === 'pending'" class="list-row">
+      <li v-if="loading" class="list-row">
         <div class="h-4 w-28 skeleton" />
         <div class="h-4 w-full skeleton" />
         <div class="h-4 w-full skeleton" />
@@ -30,8 +30,13 @@ const orgQuery = graphql(`
   }
 `)
 const vars = {
-  id: route.params.id,
+  id: route.params.id as string,
 }
 
-const { status, data } = await useLazyAsyncQuery(orgQuery, vars)
+const { result: data, loading } = useQuery(orgQuery, vars)
+
+const recentStore = useRecentStore()
+onMounted(() => {
+  recentStore.add({ id: vars.id as string, __typename: 'Org' })
+})
 </script>
