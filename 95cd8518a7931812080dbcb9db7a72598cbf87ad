@@ -1,0 +1,25 @@
+apps/science/nuxt.config.ts
+  54a6d97bbe802022 99-104
+apps/frontend/nuxt.config.ts
+  54a6d97bbe802022 120-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "95cd8518a7931812080dbcb9db7a72598cbf87ad",
+  "prompts": {
+    "54a6d97bbe802022": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ad329d7b-0581-43f4-a739-3bbacf4fb8ef",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 0,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    }
+  }
+}
