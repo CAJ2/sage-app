@@ -36,7 +36,7 @@ export default defineConfig<ConfigOptions>({
   /* Opt out of parallel tests on CI. */
   workers: isCI ? 1 : undefined,
   /* Allow enough time for Nuxt builds in parallel workers */
-  timeout: 120000,
+  timeout: 60000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
