@@ -87,7 +87,7 @@ jobs:
     steps:
       - name: Checkout repository
         if: env.GH_TOKEN
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           token: ${{ secrets.clone_token }}
@@ -95,7 +95,7 @@ jobs:
           GH_TOKEN: ${{ secrets.clone_token }}
       - name: Checkout repository
         if: ${{ !env.GH_TOKEN }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
         env:
