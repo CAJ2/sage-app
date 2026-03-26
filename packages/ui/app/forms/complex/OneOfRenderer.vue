@@ -84,8 +84,9 @@ import type { RendererProps } from '@jsonforms/vue'
 import { DispatchRenderer, rendererProps, useJsonFormsOneOfControl } from '@jsonforms/vue'
 import isEmpty from 'lodash/isEmpty'
 import { defineComponent, inject, nextTick, ref } from 'vue'
-import { useVanillaControl } from '../util'
+
 import { ControlWrapper } from '../controls'
+import { useVanillaControl } from '../util'
 import CombinatorProperties from './components/CombinatorProperties.vue'
 
 const controlRenderer = defineComponent({

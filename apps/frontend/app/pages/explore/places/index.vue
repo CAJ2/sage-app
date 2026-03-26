@@ -53,6 +53,7 @@ import { watchDebounced } from '@vueuse/core'
 import maplibregl, { Map, NavigationControl, type LngLatLike } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'
+
 import { graphql } from '~/gql'
 import type { Place } from '~/gql/types.generated'
 

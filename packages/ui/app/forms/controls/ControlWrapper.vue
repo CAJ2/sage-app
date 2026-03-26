@@ -20,6 +20,7 @@
 import { isDescriptionHidden } from '@jsonforms/core'
 import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
+
 import type { Styles } from '../styles'
 import type { Options } from '../util'
 

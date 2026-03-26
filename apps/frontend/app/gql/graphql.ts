@@ -3,7 +3,7 @@
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -2608,7 +2608,16 @@ export type RegionSelectSearchQueryVariables = Exact<{
 }>;
 
 
-export type RegionSelectSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category' } | { __typename: 'Component' } | { __typename: 'Item' } | { __typename: 'Material' } | { __typename: 'Org' } | { __typename: 'Place' } | { __typename: 'Region', id: string, name?: string | null, placetype: string } | { __typename: 'Variant' }> | null } };
+export type RegionSelectSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category' }
+      | { __typename: 'Component' }
+      | { __typename: 'Item' }
+      | { __typename: 'Material' }
+      | { __typename: 'Org' }
+      | { __typename: 'Place' }
+      | { __typename: 'Region', id: string, name?: string | null, placetype: string }
+      | { __typename: 'Variant' }
+    > | null } };
 
 export type ChangesCategorySchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2669,7 +2678,25 @@ export type ChangeQueryQueryVariables = Exact<{
 }>;
 
 
-export type ChangeQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', id: string, status: ChangeStatus, title?: string | null, description?: string | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, username: string }, edits: { __typename?: 'ChangeEditsPage', totalCount: number, nodes?: Array<{ __typename?: 'Edit', id?: string | null, entityName: string, original?: { __typename?: 'Category', name_req: string } | { __typename?: 'Component', name?: string | null } | { __typename?: 'Item', name?: string | null } | { __typename?: 'Material' } | { __typename?: 'Place', name?: string | null } | { __typename?: 'Process', name?: string | null } | { __typename?: 'Region' } | { __typename?: 'Variant', name?: string | null } | null, changes?: { __typename?: 'Category', name_req: string } | { __typename?: 'Component', name?: string | null } | { __typename?: 'Item', name?: string | null } | { __typename?: 'Material' } | { __typename?: 'Place', name?: string | null } | { __typename?: 'Process', name?: string | null } | { __typename?: 'Region' } | { __typename?: 'Variant', name?: string | null } | null }> | null } } | null };
+export type ChangeQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', id: string, status: ChangeStatus, title?: string | null, description?: string | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, username: string }, edits: { __typename?: 'ChangeEditsPage', totalCount: number, nodes?: Array<{ __typename?: 'Edit', id?: string | null, entityName: string, original?:
+          | { __typename?: 'Category', name_req: string }
+          | { __typename?: 'Component', name?: string | null }
+          | { __typename?: 'Item', name?: string | null }
+          | { __typename?: 'Material' }
+          | { __typename?: 'Place', name?: string | null }
+          | { __typename?: 'Process', name?: string | null }
+          | { __typename?: 'Region' }
+          | { __typename?: 'Variant', name?: string | null }
+         | null, changes?:
+          | { __typename?: 'Category', name_req: string }
+          | { __typename?: 'Component', name?: string | null }
+          | { __typename?: 'Item', name?: string | null }
+          | { __typename?: 'Material' }
+          | { __typename?: 'Place', name?: string | null }
+          | { __typename?: 'Process', name?: string | null }
+          | { __typename?: 'Region' }
+          | { __typename?: 'Variant', name?: string | null }
+         | null }> | null } } | null };
 
 export type ChangeEditMutationMutationVariables = Exact<{
   input: UpdateChangeInput;
@@ -2791,7 +2818,16 @@ export type PlaceSearchQueryVariables = Exact<{
 }>;
 
 
-export type PlaceSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename?: 'Category' } | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Org' } | { __typename?: 'Place', id: string, name?: string | null, address?: { __typename?: 'PlaceAddress', city?: string | null } | null, location?: { __typename?: 'PlaceLocation', latitude: number, longitude: number } | null } | { __typename?: 'Region' } | { __typename?: 'Variant' }> | null } };
+export type PlaceSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename?: 'Category' }
+      | { __typename?: 'Component' }
+      | { __typename?: 'Item' }
+      | { __typename?: 'Material' }
+      | { __typename?: 'Org' }
+      | { __typename?: 'Place', id: string, name?: string | null, address?: { __typename?: 'PlaceAddress', city?: string | null } | null, location?: { __typename?: 'PlaceLocation', latitude: number, longitude: number } | null }
+      | { __typename?: 'Region' }
+      | { __typename?: 'Variant' }
+    > | null } };
 
 export type GetVariantQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2826,14 +2862,32 @@ export type SearchQueryVariables = Exact<{
 }>;
 
 
-export type SearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string, descShort?: string | null, desc?: string | null, imageURL?: string | null } | { __typename: 'Component' } | { __typename: 'Item', id: string, desc?: string | null, imageURL?: string | null, name_null?: string | null } | { __typename: 'Material' } | { __typename: 'Org', id: string, name: string, desc?: string | null } | { __typename: 'Place', id: string, name_null?: string | null, address?: { __typename?: 'PlaceAddress', street?: string | null, city?: string | null, region?: string | null, country?: string | null } | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, desc?: string | null, imageURL?: string | null, name_null?: string | null, orgs: { __typename?: 'VariantOrgsPage', nodes?: Array<{ __typename?: 'VariantOrg', org: { __typename?: 'Org', name: string } }> | null } }> | null } };
+export type SearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category', id: string, name: string, descShort?: string | null, desc?: string | null, imageURL?: string | null }
+      | { __typename: 'Component' }
+      | { __typename: 'Item', id: string, desc?: string | null, imageURL?: string | null, name_null?: string | null }
+      | { __typename: 'Material' }
+      | { __typename: 'Org', id: string, name: string, desc?: string | null }
+      | { __typename: 'Place', id: string, name_null?: string | null, address?: { __typename?: 'PlaceAddress', street?: string | null, city?: string | null, region?: string | null, country?: string | null } | null }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, desc?: string | null, imageURL?: string | null, name_null?: string | null, orgs: { __typename?: 'VariantOrgsPage', nodes?: Array<{ __typename?: 'VariantOrg', org: { __typename?: 'Org', name: string } }> | null } }
+    > | null } };
 
 export type ScanSearchQueryVariables = Exact<{
   query: Scalars['String']['input'];
 }>;
 
 
-export type ScanSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category' } | { __typename: 'Component' } | { __typename: 'Item' } | { __typename: 'Material' } | { __typename: 'Org' } | { __typename: 'Place' } | { __typename: 'Region' } | { __typename: 'Variant', id: string, name?: string | null, desc?: string | null, imageURL?: string | null }> | null } };
+export type ScanSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category' }
+      | { __typename: 'Component' }
+      | { __typename: 'Item' }
+      | { __typename: 'Material' }
+      | { __typename: 'Org' }
+      | { __typename: 'Place' }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, name?: string | null, desc?: string | null, imageURL?: string | null }
+    > | null } };
 
 export type ChangesGetEditQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2956,31 +3010,40 @@ export type RefSearchQueryQueryVariables = Exact<{
 }>;
 
 
-export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<(
-      { __typename?: 'Category' }
-      & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-    ) | (
-      { __typename?: 'Component' }
-      & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
-    ) | (
-      { __typename?: 'Item' }
-      & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
-    ) | (
-      { __typename?: 'Material' }
-      & { ' $fragmentRefs'?: { 'ListMaterialFragmentFragment': ListMaterialFragmentFragment } }
-    ) | (
-      { __typename?: 'Org' }
-      & { ' $fragmentRefs'?: { 'ListOrgFragmentFragment': ListOrgFragmentFragment } }
-    ) | (
-      { __typename?: 'Place' }
-      & { ' $fragmentRefs'?: { 'ListPlaceFragmentFragment': ListPlaceFragmentFragment } }
-    ) | (
-      { __typename?: 'Region' }
-      & { ' $fragmentRefs'?: { 'ListRegionFragmentFragment': ListRegionFragmentFragment } }
-    ) | (
-      { __typename?: 'Variant' }
-      & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
-    )> | null } };
+export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | (
+        { __typename?: 'Category' }
+        & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Component' }
+        & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Item' }
+        & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Material' }
+        & { ' $fragmentRefs'?: { 'ListMaterialFragmentFragment': ListMaterialFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Org' }
+        & { ' $fragmentRefs'?: { 'ListOrgFragmentFragment': ListOrgFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Place' }
+        & { ' $fragmentRefs'?: { 'ListPlaceFragmentFragment': ListPlaceFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Region' }
+        & { ' $fragmentRefs'?: { 'ListRegionFragmentFragment': ListRegionFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Variant' }
+        & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
+      )
+    > | null } };
 
 export const ListCategoryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListCategoryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Category"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name_req"},"name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"descShort"}},{"kind":"Field","name":{"kind":"Name","value":"imageURL"}}]}}]} as unknown as DocumentNode<ListCategoryFragmentFragment, unknown>;
 export const ListChangeFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListChangeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Change"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<ListChangeFragmentFragment, unknown>;

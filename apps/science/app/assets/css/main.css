@@ -2,7 +2,7 @@
 @import 'tw-animate-css';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
-@source "../../../../../packages/ui";
+@source '../../../../../packages/ui';
 
 @plugin 'daisyui';
 
@@ -58,11 +58,11 @@
   --font-sans: 'Inter', sans-serif;
 }
 
-@plugin "daisyui" {
+@plugin 'daisyui' {
   themes: dark, light;
 }
 
-@plugin "daisyui/theme" {
+@plugin 'daisyui/theme' {
   name: 'dark';
   default: false;
   prefersdark: true;
@@ -106,7 +106,7 @@
   --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
-@plugin "daisyui/theme" {
+@plugin 'daisyui/theme' {
   name: 'light';
   default: true;
   prefersdark: false;

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@nuxtjs/storybook'
 
-import Alert from '../app/components/alert/alert.vue'
-import AlertDescription from '../app/components/alert/alert_description.vue'
-import AlertTitle from '../app/components/alert/alert_title.vue'
+import Alert from '../app/components/alert/Alert.vue'
+import AlertDescription from '../app/components/alert/AlertDescription.vue'
+import AlertTitle from '../app/components/alert/AlertTitle.vue'
 
 const meta: Meta<typeof Alert> = {
   title: 'UI/Alert',

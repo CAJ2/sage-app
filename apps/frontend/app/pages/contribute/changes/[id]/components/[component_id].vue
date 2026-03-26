@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+
 import { graphql } from '~/gql'
 import type { CreateComponentInput, UpdateComponentInput } from '~/gql/graphql'
 import { ChangeStatus } from '~/gql/graphql'
@@ -106,13 +107,7 @@ const componentCreateMutation = graphql(`
     }
   }
 `)
-const componentCreate = useMutation(componentCreateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-    } as CreateComponentInput,
-  },
-})
+const componentCreate = useMutation(componentCreateMutation)
 const componentUpdateMutation = graphql(`
   mutation ChangeComponentUpdate($input: UpdateComponentInput!) {
     updateComponent(input: $input) {
@@ -122,15 +117,7 @@ const componentUpdateMutation = graphql(`
     }
   }
 `)
-const componentUpdate = useMutation(componentUpdateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-      id: componentID,
-      ...updateData.value,
-    },
-  },
-})
+const componentUpdate = useMutation(componentUpdateMutation)
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
 const onChange = async (event: JsonFormsChangeEvent) => {

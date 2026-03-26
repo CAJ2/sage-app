@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
 import type { JsonFormsRendererRegistryEntry, Layout } from '@jsonforms/core'
 import {
   and,
@@ -72,6 +71,8 @@ import {
   useJsonFormsCategorization,
   type RendererProps,
 } from '@jsonforms/vue'
+import { defineComponent } from 'vue'
+
 import { useVanillaLayout } from '../util'
 
 const layoutRenderer = defineComponent({

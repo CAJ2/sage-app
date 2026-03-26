@@ -62,10 +62,7 @@ describe('RegionResolver (integration)', () => {
   test('should search regions by point with pagination', async () => {
     const res = await gql.send(
       graphql(`
-        query RegionResolverSearchRegionsByPoint(
-          $latlong: [Float!]!
-          $first: Int
-        ) {
+        query RegionResolverSearchRegionsByPoint($latlong: [Float!]!, $first: Int) {
           searchRegionsByPoint(latlong: $latlong, first: $first) {
             nodes {
               id

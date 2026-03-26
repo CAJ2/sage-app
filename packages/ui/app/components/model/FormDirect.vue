@@ -15,11 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+import type { JSONSchemaType } from 'ajv'
+
 import { graphql } from '~/gql'
 import type { Exact } from '~/gql/graphql'
-import type { JSONSchemaType } from 'ajv'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SchemaQuery = any
@@ -106,21 +107,8 @@ if (modelId !== 'new') {
   )
 }
 
-const create = useMutation(createMutation, {
-  variables: {
-    input: {
-      ...createData.value,
-    },
-  },
-})
-const update = useMutation(updateMutation, {
-  variables: {
-    input: {
-      id: modelId,
-      ...updateData.value,
-    },
-  },
-})
+const create = useMutation(createMutation)
+const update = useMutation(updateMutation)
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
   modelId === 'new' ? 'not_saved' : 'saved',

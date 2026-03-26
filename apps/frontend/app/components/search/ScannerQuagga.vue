@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, watch } from 'vue'
 import type {
   QuaggaJSCodeReader,
   QuaggaJSConfigObject,
@@ -7,6 +6,7 @@ import type {
   QuaggaJSResultObject,
 } from '@ericblade/quagga2'
 import Quagga from '@ericblade/quagga2'
+import { onMounted, onBeforeUnmount, watch } from 'vue'
 
 const emit = defineEmits<{
   detected: [code: string]

@@ -22,9 +22,10 @@
 <script lang="ts">
 import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { rankWith, and, uiTypeIs, schemaTypeIs, optionIs } from '@jsonforms/core'
-import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { defineComponent } from 'vue'
+
 import { ControlWrapper } from '../controls'
 import { useVanillaControl } from '../util'
 

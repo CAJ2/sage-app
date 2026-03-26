@@ -2,7 +2,7 @@
 @import 'tw-animate-css';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
-@plugin "@tailwindcss/forms";
+@plugin '@tailwindcss/forms';
 @plugin 'daisyui';
 
 @font-face {
@@ -57,11 +57,11 @@
   --font-sans: 'Inter', sans-serif;
 }
 
-@plugin "daisyui" {
+@plugin 'daisyui' {
   themes: dark, light;
 }
 
-@plugin "daisyui/theme" {
+@plugin 'daisyui/theme' {
   name: 'dark';
   default: false;
   prefersdark: true;
@@ -96,7 +96,7 @@
   --noise: 0;
 }
 
-@plugin "daisyui/theme" {
+@plugin 'daisyui/theme' {
   name: 'light';
   default: true;
   prefersdark: false;

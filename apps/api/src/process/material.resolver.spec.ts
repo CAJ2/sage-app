@@ -196,9 +196,7 @@ describe('MaterialResolver (integration)', () => {
     // First create a component associated with the material
     await gql.send(
       graphql(`
-        mutation MaterialResolverCreateTestComponent(
-          $input: CreateComponentInput!
-        ) {
+        mutation MaterialResolverCreateTestComponent($input: CreateComponentInput!) {
           createComponent(input: $input) {
             component {
               id
@@ -250,9 +248,7 @@ describe('MaterialResolver (integration)', () => {
     // First create a process associated with the material
     await gql.send(
       graphql(`
-        mutation MaterialResolverCreateTestProcess(
-          $input: CreateProcessInput!
-        ) {
+        mutation MaterialResolverCreateTestProcess($input: CreateProcessInput!) {
           createProcess(input: $input) {
             process {
               id

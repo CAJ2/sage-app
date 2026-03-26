@@ -164,7 +164,7 @@
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
-import type { Edit, UpdateChangeInput } from '~/gql/types.generated'
+import type { Edit } from '~/gql/types.generated'
 import { ChangeStatus } from '~/gql/types.generated'
 
 const route = useRoute()
@@ -265,13 +265,7 @@ const changeEditMutation = graphql(`
     }
   }
 `)
-const changeEdit = useMutation(changeEditMutation, {
-  variables: {
-    input: {
-      id: route.params.id as string,
-    } as UpdateChangeInput,
-  },
-})
+const changeEdit = useMutation(changeEditMutation)
 const changeDeleteMutation = graphql(`
   mutation ChangeDeleteMutation($id: ID!) {
     deleteChange(id: $id) {
@@ -279,11 +273,7 @@ const changeDeleteMutation = graphql(`
     }
   }
 `)
-const changeDelete = useMutation(changeDeleteMutation, {
-  variables: {
-    id: route.params.id as string,
-  },
-})
+const changeDelete = useMutation(changeDeleteMutation)
 
 const setStatus = async (status: ChangeStatus) => {
   await changeEdit.mutate({
@@ -322,11 +312,7 @@ const changeMergeMutation = graphql(`
     }
   }
 `)
-const changeMerge = useMutation(changeMergeMutation, {
-  variables: {
-    id: route.params.id as string,
-  },
-})
+const changeMerge = useMutation(changeMergeMutation)
 const mergeChange = async () => {
   const result = await changeMerge.mutate()
   if (result?.data) {

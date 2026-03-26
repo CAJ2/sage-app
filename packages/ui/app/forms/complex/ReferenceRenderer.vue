@@ -144,14 +144,16 @@
 <script lang="ts">
 import type { ControlElement, JsonFormsRendererRegistryEntry } from '@jsonforms/core'
 import { rankWith, and, uiTypeIs, schemaMatches, schemaTypeIs } from '@jsonforms/core'
-import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
+import { watchDebounced } from '@vueuse/core'
+import { defineComponent } from 'vue'
+
+import { graphql } from '~/gql'
+import { SearchType } from '~/gql/graphql'
+
 import { ControlWrapper } from '../controls'
 import { useVanillaControl } from '../util'
-import { graphql } from '~/gql'
-import { watchDebounced } from '@vueuse/core'
-import { SearchType } from '~/gql/graphql'
 
 const supportedTypes = new Set([
   'Category',

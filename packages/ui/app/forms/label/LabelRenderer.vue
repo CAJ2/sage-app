@@ -7,9 +7,10 @@
 <script lang="ts">
 import type { JsonFormsRendererRegistryEntry, LabelElement } from '@jsonforms/core'
 import { rankWith, uiTypeIs } from '@jsonforms/core'
-import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { rendererProps, useJsonFormsLabel } from '@jsonforms/vue'
+import { defineComponent } from 'vue'
+
 import { useVanillaLabel } from '../util'
 
 const labelRenderer = defineComponent({

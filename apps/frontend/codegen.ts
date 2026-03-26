@@ -4,7 +4,6 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: '../api/schema/schema.gql',
   documents: ['./app/**/*.vue', '../../packages/ui/app/**/*.vue'],
-  emitLegacyCommonJSImports: false,
   generates: {
     'app/gql/': {
       preset: 'client',

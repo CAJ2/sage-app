@@ -68,8 +68,8 @@
 
 <script setup lang="ts">
 import { useColorMode } from '@vueuse/core'
-import { DrawerTrigger } from 'vaul-vue'
 import { ChevronDownIcon, GlobeIcon, SunMoonIcon } from 'lucide-vue-next'
+import { DrawerTrigger } from 'vaul-vue'
 import { computed } from 'vue'
 
 const { locale, locales, setLocale } = useI18n()

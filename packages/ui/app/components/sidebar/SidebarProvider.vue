@@ -2,6 +2,7 @@
 import { useEventListener, useMediaQuery, useVModel } from '@vueuse/core'
 import { TooltipProvider } from 'reka-ui'
 import { computed, type HTMLAttributes, type Ref, ref } from 'vue'
+
 import { cn } from '../lib/utils'
 import {
   provideSidebarContext,

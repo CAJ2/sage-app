@@ -79,13 +79,14 @@ import {
   getArrayTranslations,
   defaultJsonFormsI18nState,
 } from '@jsonforms/core'
-import { defineComponent, inject } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { DispatchRenderer, rendererProps, useJsonFormsArrayControl } from '@jsonforms/vue'
+import _ from 'lodash'
+import { defineComponent, inject } from 'vue'
+
 import { useVanillaArrayControl } from '../util'
 import ArrayListElement from './ArrayListElement.vue'
 import ArrayListRefElement from './ArrayListRefElement.vue'
-import _ from 'lodash'
 
 const controlRenderer = defineComponent({
   name: 'ArrayListRenderer',

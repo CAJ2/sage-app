@@ -35,7 +35,7 @@
                 <CardHeader class="p-4 pb-2">
                   <div class="flex items-center justify-between gap-2">
                     <CardTitle class="text-base">{{ item.title }}</CardTitle>
-                    <span class="badge-outline badge shrink-0 text-xs">{{ item.format }}</span>
+                    <span class="badge shrink-0 badge-outline text-xs">{{ item.format }}</span>
                   </div>
                 </CardHeader>
                 <CardContent v-if="item.markdownShort" class="px-4 pb-3">
@@ -51,9 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import { graphql } from '~/gql'
 import { NuxtLinkLocale } from '#components'
 import { MessageCircleDashed } from 'lucide-vue-next'
+
+import { graphql } from '~/gql'
 
 const homeFeedQuery = graphql(`
   query HomeFeed($regionId: ID) {

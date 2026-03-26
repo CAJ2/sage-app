@@ -25,14 +25,7 @@ const updateQuery = graphql(`
     }
   }
 `)
-const mutation = useMutation(updateQuery, {
-  variables: {
-    input: {
-      id: categoryId,
-      change: {},
-    },
-  },
-})
+const mutation = useMutation(updateQuery)
 const result = await mutation.mutate()
 if (result?.data?.updateCategory?.change?.id) {
   const changeID = result.data.updateCategory.change.id

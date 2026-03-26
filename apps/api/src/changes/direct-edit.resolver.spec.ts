@@ -169,7 +169,9 @@ describe('DirectEdit (integration)', () => {
         graphql(`
           mutation DirectEditUpdateVariantChange1($input: UpdateVariantInput!) {
             updateVariant(input: $input) {
-              variant { id }
+              variant {
+                id
+              }
             }
           }
         `),
@@ -181,7 +183,9 @@ describe('DirectEdit (integration)', () => {
         graphql(`
           mutation DirectEditUpdateVariantChange2($input: UpdateVariantInput!) {
             updateVariant(input: $input) {
-              variant { id }
+              variant {
+                id
+              }
             }
           }
         `),
@@ -193,7 +197,9 @@ describe('DirectEdit (integration)', () => {
         graphql(`
           mutation DirectEditUpdateCategoryChange1($input: UpdateCategoryInput!) {
             updateCategory(input: $input) {
-              category { id }
+              category {
+                id
+              }
             }
           }
         `),

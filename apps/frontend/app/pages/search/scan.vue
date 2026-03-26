@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { isTauri } from '@tauri-apps/api/core'
 import { SearchIcon, ScanBarcodeIcon } from 'lucide-vue-next'
+
 import type { ScanVariant } from '~/components/search/ScanResults.vue'
 
 const isNative = isTauri()

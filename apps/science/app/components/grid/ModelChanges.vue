@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+
 import { graphql } from '~/gql'
 import type { EditModelType } from '~/gql/graphql'
 

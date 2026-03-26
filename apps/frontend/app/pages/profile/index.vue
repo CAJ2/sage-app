@@ -83,7 +83,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthClient } from '~/utils'
 import {
   ChevronRight as ChevronRightIcon,
   LogOutIcon,
@@ -91,6 +90,8 @@ import {
   Settings as SettingsIcon,
   UserIcon,
 } from 'lucide-vue-next'
+
+import { useAuthClient } from '~/utils'
 
 const auth = useAuthClient()
 const session = auth.useSession()

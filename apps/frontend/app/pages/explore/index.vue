@@ -50,6 +50,7 @@
 
 <script setup lang="ts">
 import { Map as MapIcon } from 'lucide-vue-next'
+
 import { graphql } from '~/gql'
 
 const categoriesQuery = graphql(`
