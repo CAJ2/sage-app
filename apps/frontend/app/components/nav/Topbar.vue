@@ -1,7 +1,7 @@
 <template>
-  <div class="sticky top-0 z-1 flex items-center justify-between bg-base-200 p-2">
+  <div class="sticky top-0 z-1 flex items-center justify-between bg-base-200 p-2 shadow-sm">
     <button v-if="back" class="btn ml-1 btn-ghost" @click.prevent="goBack">
-      <font-awesome-icon icon="fa-solid fa-angle-left" class="min-h-5 w-5" />
+      <ArrowLeft :size="20" />
     </button>
     <div v-if="useImage" class="mx-2 flex items-center">
       <img v-if="image" :src="image" class="h-10 w-10 rounded-full bg-base-100" />
@@ -11,38 +11,47 @@
         class="h-6! w-6 pt-1 text-neutral-700 dark:text-neutral-300"
       />
     </div>
-    <div class="flex flex-1 flex-col">
-      <h2
-        class="m-3 line-clamp-1 text-xl font-bold text-base-content"
-        :class="{ 'my-1': !!subtitle }"
-      >
-        {{ title }}
-      </h2>
-      <h4
-        v-if="subtitle"
-        class="mx-3 line-clamp-1 text-xs text-base-content"
-        :class="{ 'mb-1': !!subtitle }"
-      >
-        {{ subtitle }}
-      </h4>
+    <div class="flex flex-1 flex-col" :class="{ 'items-center': !back }">
+      <template v-if="loading">
+        <div class="m-3 h-5 w-32 skeleton rounded" />
+        <div v-if="subtitle !== undefined" class="mx-3 mb-1 h-3 w-48 skeleton rounded" />
+      </template>
+      <template v-else>
+        <h2
+          class="m-3 line-clamp-1 text-xl font-light text-base-content"
+          :class="{ 'my-1': !!subtitle }"
+        >
+          {{ title }}
+        </h2>
+        <h4
+          v-if="subtitle"
+          class="mx-3 line-clamp-1 text-xs text-base-content"
+          :class="{ 'mb-1': !!subtitle }"
+        >
+          {{ subtitle }}
+        </h4>
+      </template>
     </div>
     <button v-if="context" class="btn mx-3 btn-ghost">
-      <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" class="min-h-5 w-5" />
+      <EllipsisVertical :size="20" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ArrowLeft, EllipsisVertical } from 'lucide-vue-next'
+
 const router = useRouter()
 
-const { title, subtitle, back, context, useImage, image, icon } = defineProps<{
-  title: string
+const { title, subtitle, back, context, useImage, image, icon, loading } = defineProps<{
+  title?: string
   subtitle?: string
   back?: string
   context?: boolean
   useImage?: boolean
   image?: string
   icon?: string
+  loading?: boolean
 }>()
 
 const localeRoute = useLocaleRoute()

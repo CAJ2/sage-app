@@ -7,6 +7,7 @@ import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/
 import { Change, Edit, UpdateChangeInput } from '@src/changes/change.model'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { LangSchema } from '@src/graphql/base.model'
+import { User } from '@src/users/users.model'
 
 export const ChangeIDSchema = z.string().meta({
   id: 'Change',
@@ -68,6 +69,9 @@ export class ChangeSchemaService {
       model.title = entity.title
       model.description = entity.description
       model.status = entity.status
+      const user = new User()
+      user.id = entity.user.id
+      model.user = user
       return model
     })
     this.zService.registerEntityTransform(ChangeEntity, Change, ChangeTransform)

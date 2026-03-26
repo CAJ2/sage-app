@@ -52,6 +52,24 @@
           "functions": ["clsx", "cn"]
         }
       }
+    },
+    {
+      "files": ["apps/science/**/*.vue"],
+      "options": {
+        "experimentalTailwindcss": {
+          "stylesheet": "apps/science/app/assets/css/main.css",
+          "functions": ["clsx", "cn"]
+        }
+      }
+    },
+    {
+      "files": ["packages/ui/**/*.vue"],
+      "options": {
+        "experimentalTailwindcss": {
+          "stylesheet": "packages/ui/app/assets/css/main.css",
+          "functions": ["clsx", "cn"]
+        }
+      }
     }
   ]
 }

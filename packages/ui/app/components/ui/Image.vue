@@ -1,5 +1,5 @@
 <template>
-  <div :class="cn('p-1', props.class)">
+  <div :class="cn('flex items-center justify-center p-1', props.class)">
     <NuxtPicture
       v-if="src && srcType === 'img'"
       :src="src"
@@ -8,7 +8,13 @@
       placeholder
       :img-attrs="{ class: 'object-contain', style: widthHeightStyle }"
     />
-    <Icon v-if="src && srcType === 'icon'" :name="iconName" :alt="alt" :style="iconStyle" />
+    <Icon
+      v-if="src && srcType === 'icon'"
+      :name="iconName"
+      :alt="alt"
+      :style="iconStyle"
+      :customize="iconCustomize"
+    />
     <div
       v-if="!src || srcType === 'unknown'"
       class="h-full w-full shrink-0 skeleton rounded-xl"
@@ -46,26 +52,42 @@ const srcType = computed(() => {
 
 const iconName = computed(() => {
   if (props.src && props.src.startsWith('icon://')) {
-    return props.src.replace('icon://', '').split('?')[0] ?? ''
+    const raw = props.src.replace('icon://', '').split('?')[0] ?? ''
+    return raw.replace('/', ':')
   }
   return props.src || ''
 })
 
-const iconStyle = computed(() => {
-  if (props.src && props.src.startsWith('icon://')) {
-    const style: Record<string, string | null> = {
-      width: props.width ? `${props.width * 0.25}rem` : '100%',
-      height: props.height ? `${props.height * 0.25}rem` : '100%',
+const iconStyle = computed(() => ({
+  width: props.width ? `${props.width * 0.25}rem` : '100%',
+  height: props.height ? `${props.height * 0.25}rem` : '100%',
+}))
+
+const iconCustomize = computed(() => {
+  if (!props.src?.startsWith('icon://')) return
+  const colorParam = new URLSearchParams(props.src.split('?')[1] ?? '').get('color')
+  if (!colorParam) return
+
+  const colors = colorParam.split(',').map((c) => `#${c}`)
+
+  return (content: string) => {
+    if (colors.length === 1) {
+      return content
+        .replaceAll(/fill="(?!none)[^"]*"/g, `fill="${colors[0]}"`)
+        .replaceAll(/stroke="(?!none)[^"]*"/g, `stroke="${colors[0]}"`)
     }
-    const params = new URLSearchParams(props.src.split('?')[1])
-    if (params.has('color')) {
-      style.color = '#' + params.get('color')
-    }
-    return style
-  }
-  return {
-    width: props.width ? `${props.width * 0.25}rem` : '100%',
-    height: props.height ? `${props.height * 0.25}rem` : '100%',
+    // Multi-color: map unique fill/stroke values in order of first appearance
+    const seen: string[] = []
+    content.replaceAll(/(?:fill|stroke)="([^"]+)"/g, (_, color) => {
+      if (color !== 'none' && !seen.includes(color)) seen.push(color)
+      return _
+    })
+    return seen.reduce((result, color, i) => {
+      if (i >= colors.length) return result
+      return result
+        .replaceAll(`fill="${color}"`, `fill="${colors[i]}"`)
+        .replaceAll(`stroke="${color}"`, `stroke="${colors[i]}"`)
+    }, content)
   }
 })
 

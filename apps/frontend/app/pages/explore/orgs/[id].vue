@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavTopbar :title="data?.org?.name || 'Organization'" back="true" />
+    <NavTopbar :title="data?.org?.name" :loading="loading" back="true" />
     <ul class="list rounded-box bg-base-100 shadow-md">
       <li class="p-4 pb-2 text-xs tracking-wide opacity-60">Organization</li>
       <li v-if="loading" class="list-row">

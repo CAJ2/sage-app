@@ -1,64 +1,66 @@
 <template>
   <div>
     <NavTopbar title="App Settings" back="true" />
-    <div class="grid grid-cols-4 md:grid-cols-12">
-      <div class="col-span-4 flex flex-col gap-0 py-3 md:col-span-6 md:col-start-4">
-        <div class="card bg-base-100 shadow-md">
-          <div class="card-body gap-0 p-0">
-            <!-- Language row -->
-            <Drawer>
-              <DrawerTrigger as-child>
-                <button class="flex w-full items-center gap-3 p-4">
+    <div class="flex justify-center px-4 py-4">
+      <div class="flex w-full max-w-lg flex-col gap-3">
+        <!-- Language -->
+        <Drawer>
+          <DrawerTrigger as-child>
+            <button class="w-full text-left">
+              <Card class="bg-base-200">
+                <CardContent
+                  class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
+                >
                   <div class="text-accent">
-                    <GlobeIcon class="size-6" />
+                    <GlobeIcon class="size-5" />
                   </div>
-                  <div class="flex flex-1 flex-col text-left">
+                  <div class="flex flex-1 flex-col">
                     <h2 class="font-medium">Language</h2>
-                    <p class="text-xs opacity-70">
+                    <p class="text-xs opacity-60">
                       {{ locales.find((l) => l.code === locale)?.name }}
                     </p>
                   </div>
-                </button>
-              </DrawerTrigger>
-              <DrawerContent>
-                <SettingsLocaleSelect
-                  :locales="locales"
-                  :current="locale"
-                  @select="setLocale($event as any)"
-                />
-              </DrawerContent>
-            </Drawer>
+                  <ChevronDownIcon class="size-4 opacity-40" />
+                </CardContent>
+              </Card>
+            </button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <SettingsLocaleSelect
+              :locales="locales"
+              :current="locale"
+              @select="setLocale($event as any)"
+            />
+          </DrawerContent>
+        </Drawer>
 
-            <div class="divider my-0 px-4" />
-
-            <!-- Theme row -->
-            <div class="flex items-center gap-3 p-4">
-              <div class="text-accent">
-                <SunMoonIcon class="size-6" />
-              </div>
-              <div class="flex-1 font-medium">Theme</div>
-              <div class="dropdown dropdown-end">
-                <button tabindex="0" class="btn gap-1 btn-ghost btn-sm">
+        <!-- Theme -->
+        <Card class="bg-base-200">
+          <CardContent class="flex items-center gap-4 px-5 py-4">
+            <div class="text-accent">
+              <SunMoonIcon class="size-5" />
+            </div>
+            <div class="flex-1 font-medium">Theme</div>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <button class="btn gap-1 btn-ghost btn-sm">
                   {{ themeLabel }}
                   <ChevronDownIcon class="size-3.5" />
                 </button>
-                <ul
-                  tabindex="0"
-                  class="dropdown-content menu z-10 w-36 rounded-box bg-base-100 p-1 shadow-md"
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" class="min-w-36">
+                <DropdownMenuItem
+                  v-for="option in themeOptions"
+                  :key="option.value"
+                  :class="{ 'bg-base-200': colorMode === option.value }"
+                  @click="colorMode = option.value"
                 >
-                  <li v-for="option in themeOptions" :key="option.value">
-                    <button
-                      :class="{ active: colorMode === option.value }"
-                      @click="colorMode = option.value"
-                    >
-                      {{ option.label }}
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+                  {{ option.label }}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </CardContent>
+        </Card>
       </div>
     </div>
   </div>

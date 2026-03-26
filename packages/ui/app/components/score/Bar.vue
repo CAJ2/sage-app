@@ -6,7 +6,7 @@ const { size, score, scoreSlide, rating, ratingFmt } = defineProps<{
   size: 'small' | 'medium' | 'large'
   score?: number | null
   scoreSlide?: boolean | null
-  rating?: 'POOR' | 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'UNKNOWN' | null
+  rating?: 'A_PLUS' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'UNKNOWN' | null
   ratingFmt?: string | null
 }>()
 
@@ -27,16 +27,19 @@ onBeforeUnmount(() => {
 
 const bgColor = computed(() => {
   switch (rating) {
-    case 'POOR':
-      return 'bg-error'
-    case 'FAIR':
-      return 'bg-warning'
-    case 'GOOD':
-      return 'bg-primary/60'
-    case 'VERY_GOOD':
-      return 'bg-primary/80'
-    case 'EXCELLENT':
+    case 'A_PLUS':
+    case 'A':
       return 'bg-primary'
+    case 'B':
+      return 'bg-primary/80'
+    case 'C':
+      return 'bg-primary/60'
+    case 'D':
+      return 'bg-warning'
+    case 'E':
+    case 'F':
+    case 'G':
+      return 'bg-error'
     default:
       return 'bg-primary/80'
   }

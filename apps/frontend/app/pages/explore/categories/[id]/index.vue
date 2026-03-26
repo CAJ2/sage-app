@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavTopbar :title="data?.category.name || 'Category'" back="true" />
+    <NavTopbar :title="data?.category.name" :loading="loading" back="true" />
     <ModelCategoryChildren :status="status" :data="data?.category.children" />
     <UiList
       v-if="sessionData && data"

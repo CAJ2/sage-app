@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavTopbar :title="data?.place?.name || 'Place'" back="true" />
+    <NavTopbar :title="data?.place?.name ?? undefined" :loading="loading" back="true" />
     <ul class="list rounded-box bg-base-100 shadow-md">
       <li class="p-4 pb-2 text-xs tracking-wide opacity-60">Place</li>
       <li v-if="loading" class="list-row">

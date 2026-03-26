@@ -1905,12 +1905,15 @@ export type StreamScore = {
 
 /** A rating enum used to describe scores */
 export enum StreamScoreRating {
-  Excellent = 'EXCELLENT',
-  Fair = 'FAIR',
-  Good = 'GOOD',
-  Poor = 'POOR',
-  Unknown = 'UNKNOWN',
-  VeryGood = 'VERY_GOOD'
+  A = 'A',
+  APlus = 'A_PLUS',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  E = 'E',
+  F = 'F',
+  G = 'G',
+  Unknown = 'UNKNOWN'
 }
 
 /** A tag instance applied to a model, with optional instance-specific metadata */

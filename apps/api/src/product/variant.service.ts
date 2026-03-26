@@ -158,7 +158,7 @@ export class VariantService implements IEntityService<Variant> {
     }
     const variantScore = new StreamScore()
     variantScore.score = Math.floor(totalScore / variant.components.getItems().length)
-    variantScore.rating = StreamScoreRating.VERY_GOOD
+    variantScore.rating = StreamScoreRating.A
     variantScore.ratingF = this.i18n.t(`stream.scoreRating.${variantScore.rating}`)
     return variantScore
   }

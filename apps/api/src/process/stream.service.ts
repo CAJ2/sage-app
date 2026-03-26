@@ -104,7 +104,7 @@ export class StreamService {
       }
     }
     score.score = validScores > 0 ? totalScore / validScores : undefined
-    score.rating = validScores > 0 ? StreamScoreRating.GOOD : StreamScoreRating.UNKNOWN
+    score.rating = validScores > 0 ? StreamScoreRating.B : StreamScoreRating.UNKNOWN
     score.ratingF = this.i18n.t(`stream.scoreRating.${score.rating}`)
     return score
   }
@@ -113,7 +113,7 @@ export class StreamService {
     const score = new StreamScore()
     if (process.efficiency && process.efficiency.efficiency) {
       score.score = process.efficiency.efficiency * 100
-      score.rating = StreamScoreRating.GOOD
+      score.rating = StreamScoreRating.B
     } else {
       score.rating = StreamScoreRating.UNKNOWN
     }

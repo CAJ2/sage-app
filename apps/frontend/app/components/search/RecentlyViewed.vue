@@ -4,7 +4,13 @@
     <li v-for="res in displayItems" :key="res.id">
       <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
         <div class="list-row flex items-center gap-2 pt-2 pb-3">
-          <img v-if="res.imageURL" class="size-20 rounded-box" :src="res.imageURL" />
+          <UiImage
+            v-if="res.imageURL"
+            :src="res.imageURL"
+            :width="20"
+            :height="20"
+            class="size-20 rounded-box"
+          />
           <span
             v-else
             class="flex size-20 items-center justify-center rounded-box border border-neutral-200"

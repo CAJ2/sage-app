@@ -11,7 +11,8 @@ export default defineNuxtPlugin(({ hook }) => {
 
   const regionStore = useRegionStore()
 
-  const ctxLink = setContext((_, { headers }) => {
+  const ctxLink = setContext(async (_, { headers }) => {
+    await regionStore.load()
     const locale = $i18n.locale.value
     let lang = (navigator && navigator.language) || ''
     if (locale) {

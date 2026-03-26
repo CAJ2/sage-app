@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { LocaleObject } from '@nuxtjs/i18n'
+import { Check } from 'lucide-vue-next'
 import { DrawerClose } from 'vaul-vue'
 
 const { t } = useI18n()
@@ -21,31 +22,27 @@ const emits = defineEmits<{
     <DrawerHeader>
       <DrawerTitle>{{ t('settings.language.select_title') }}</DrawerTitle>
     </DrawerHeader>
-    <div class="min-h-100 p-4 pb-0">
-      <ul class="divide-y">
+    <div class="overflow-y-auto px-4 pb-0" style="max-height: 60vh">
+      <ul class="flex flex-col gap-1">
         <li
           v-for="locale in locales"
           :key="locale.code"
-          class="list-item py-3 dark:border-neutral-400"
+          class="flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 transition-colors"
+          :class="
+            locale.code === selected
+              ? 'bg-primary/10 text-primary'
+              : 'hover:bg-base-200 active:bg-base-300'
+          "
           @click="selected = locale.code"
         >
-          <div class="flex items-center justify-between">
-            <h2>{{ locale.name }}</h2>
-            <font-awesome-icon
-              v-if="locale.code === selected"
-              icon="fa-solid fa-check"
-              class="h-4 w-4 px-2 text-neutral-500"
-            />
-          </div>
+          <span class="font-medium">{{ locale.name }}</span>
+          <Check v-if="locale.code === selected" class="size-4 text-primary" />
         </li>
       </ul>
     </div>
-    <DrawerFooter>
+    <DrawerFooter class="pb-6">
       <DrawerClose as-child>
-        <div class="flex gap-2">
-          <Button class="flex-1" variant="outline"> Cancel </Button>
-          <Button class="flex-1" @click="emits('select', selected)"> Save </Button>
-        </div>
+        <Button class="w-full" @click="emits('select', selected)"> Save </Button>
       </DrawerClose>
     </DrawerFooter>
   </div>

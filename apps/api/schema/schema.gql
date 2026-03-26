@@ -1326,12 +1326,15 @@ type StreamScore {
 
 """A rating enum used to describe scores"""
 enum StreamScoreRating {
-  EXCELLENT
-  FAIR
-  GOOD
-  POOR
+  A
+  A_PLUS
+  B
+  C
+  D
+  E
+  F
+  G
   UNKNOWN
-  VERY_GOOD
 }
 
 """

@@ -1,8 +1,9 @@
 <template>
   <div>
     <NavTopbar
-      :title="changeData?.change?.title || 'Change'"
+      :title="changeData?.change?.title || undefined"
       :subtitle="changeData?.change?.description || undefined"
+      :loading="changeLoading"
       back="true"
     />
     <div class="flex justify-center">
@@ -234,7 +235,11 @@ const changeQuery = graphql(`
     }
   }
 `)
-const { result: changeData, refetch: refetchChangeData } = useQuery(changeQuery, {
+const {
+  result: changeData,
+  loading: changeLoading,
+  refetch: refetchChangeData,
+} = useQuery(changeQuery, {
   id: route.params.id as string,
 })
 

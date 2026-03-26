@@ -60,6 +60,25 @@ const props = withDefaults(
 
 const container = ref<HTMLElement | null>(null)
 const scanError = ref<string | null>(null)
+const unmounted = ref(false)
+
+const stopCamera = () => {
+  try {
+    Quagga.stop()
+  } catch {
+    // Quagga may throw if the camera is already stopped — ignore
+  }
+  // Quagga may use a different video element than the one in the template,
+  // and Quagga.stop() may throw — so stop all video tracks in the document
+  for (const video of document.querySelectorAll('video')) {
+    if (video.srcObject instanceof MediaStream) {
+      for (const track of video.srcObject.getTracks()) {
+        track.stop()
+      }
+      video.srcObject = null
+    }
+  }
+}
 
 const detectedHandler = (result: QuaggaJSResultObject) => {
   const err = getMedianOfCodeErrors(result.codeResult?.decodedCodes ?? [])
@@ -98,6 +117,10 @@ onMounted(() => {
       scanError.value = 'Failed to initialize the scanner.'
       return
     }
+    if (unmounted.value) {
+      stopCamera()
+      return
+    }
     Quagga.start()
   })
   Quagga.onDetected(detectedHandler)
@@ -105,10 +128,11 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  unmounted.value = true
   Quagga.offDetected(detectedHandler)
   if (props.onProcessed)
     Quagga.offProcessed(props.onProcessed as unknown as QuaggaJSResultCallbackFunction)
-  Quagga.stop()
+  stopCamera()
 })
 </script>
 

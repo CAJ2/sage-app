@@ -32,11 +32,14 @@ export type I18nTranslations = {
     };
     "stream": {
         "scoreRating": {
-            "POOR": string;
-            "FAIR": string;
-            "GOOD": string;
-            "VERY_GOOD": string;
-            "EXCELLENT": string;
+            "A_PLUS": string;
+            "A": string;
+            "B": string;
+            "C": string;
+            "D": string;
+            "E": string;
+            "F": string;
+            "G": string;
             "UNKNOWN": string;
         };
     };
