@@ -1,0 +1,73 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "3eb56e81a8ea2132f349799760a0c8652d58e242",
+  "prompts": {
+    "31a5c25d1e115823": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48038420-9ebd-4b58-8dab-852e7d94c1c6",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 209,
+      "total_deletions": 212,
+      "accepted_lines": 132,
+      "overriden_lines": 2
+    },
+    "46ca8f7416a0023f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0800662f-004c-4385-92a4-18d98815f434",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 259,
+      "total_deletions": 158,
+      "accepted_lines": 205,
+      "overriden_lines": 2
+    },
+    "85317a2597e3dce0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6638bab-6de6-4371-9ad1-07e92d296aab",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 64,
+      "total_deletions": 39,
+      "accepted_lines": 64,
+      "overriden_lines": 0
+    },
+    "a100e5e1da132acb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2035f09e-4814-4343-ae0e-31f574219a78",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 187,
+      "total_deletions": 58,
+      "accepted_lines": 156,
+      "overriden_lines": 0
+    },
+    "ffb4ceec3f3d6474": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b479a101-03ac-4b86-b40b-3ad6cbf2788e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 7,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
