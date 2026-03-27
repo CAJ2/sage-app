@@ -82,7 +82,7 @@ import {
 } from '@jsonforms/core'
 import type { RendererProps } from '@jsonforms/vue'
 import { DispatchRenderer, rendererProps, useJsonFormsOneOfControl } from '@jsonforms/vue'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from 'lodash-es'
 import { defineComponent, inject, nextTick, ref } from 'vue'
 
 import { ControlWrapper } from '../controls'

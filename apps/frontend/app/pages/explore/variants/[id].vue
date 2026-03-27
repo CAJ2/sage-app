@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { CircleHelp as CircleHelpIcon, Image as ImageIcon } from 'lucide-vue-next'
+import { CircleHelp as CircleHelpIcon, Image as ImageIcon } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 

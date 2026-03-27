@@ -13,7 +13,6 @@
 import { graphql } from '~/gql'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const categoryId = route.params.id as string
 
 const updateQuery = graphql(`
@@ -29,7 +28,7 @@ const mutation = useMutation(updateQuery)
 const result = await mutation.mutate()
 if (result?.data?.updateCategory?.change?.id) {
   const changeID = result.data.updateCategory.change.id
-  navigateTo(localeRoute(`/contribute/changes/${changeID}/categories/${categoryId}`), {
+  navigateTo(`/contribute/changes/${changeID}/categories/${categoryId}`, {
     replace: true,
   })
 }

@@ -67,12 +67,19 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronDownIcon, GlobeIcon, SunMoonIcon } from '@lucide/vue'
+import { useTolgee } from '@tolgee/vue'
 import { useColorMode } from '@vueuse/core'
-import { ChevronDownIcon, GlobeIcon, SunMoonIcon } from 'lucide-vue-next'
 import { DrawerTrigger } from 'vaul-vue'
 import { computed } from 'vue'
 
-const { locale, locales, setLocale } = useI18n()
+const tolgee = useTolgee(['language'])
+const locale = computed(() => tolgee.value.getLanguage() ?? 'en')
+const locales = [
+  { code: 'en', name: 'English' },
+  { code: 'sv', name: 'Svenska' },
+]
+const setLocale = (code: string) => tolgee.value.changeLanguage(code)
 
 const colorMode = useColorMode({
   selector: 'html',

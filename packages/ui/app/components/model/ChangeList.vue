@@ -9,7 +9,7 @@
 
       <div v-if="data">
         <li v-for="change in data.nodes" :key="change.id">
-          <NuxtLinkLocale :to="`/contribute/changes/${change.id}`" class="list-row">
+          <NuxtLink :to="`/contribute/changes/${change.id}`" class="list-row">
             <div class="flex flex-col gap-1">
               <span class="text-xs opacity-70">{{
                 new Date(change.updatedAt).toLocaleDateString() +
@@ -35,7 +35,7 @@
                 >{{ change.status }}</span
               >
             </div>
-          </NuxtLinkLocale>
+          </NuxtLink>
         </li>
       </div>
 

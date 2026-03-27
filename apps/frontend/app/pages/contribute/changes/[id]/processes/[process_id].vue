@@ -27,7 +27,6 @@ import {
 } from '~/gql/types.generated'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
 const processID = route.params.process_id as string
 
@@ -145,9 +144,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           // Redirect to the new process page
           if (process?.data?.createProcess?.process?.id) {
             navigateTo(
-              localeRoute(
-                `/contribute/changes/${changeID}/processes/${process?.data?.createProcess?.process?.id}`,
-              ),
+              `/contribute/changes/${changeID}/processes/${process?.data?.createProcess?.process?.id}`,
             )
           }
         })

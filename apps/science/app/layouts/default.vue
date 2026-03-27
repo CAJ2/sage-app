@@ -4,9 +4,9 @@
       <Sidebar>
         <SidebarHeader>
           <div class="flex items-center">
-            <NuxtLinkLocale :to="'/'">
+            <NuxtLink :to="'/'">
               <div class="p-3"><img src="/favicon-32x32.png" /></div>
-            </NuxtLinkLocale>
+            </NuxtLink>
             <div class="text-bold grow px-2 text-lg text-base-content">Sage</div>
             <SidebarTrigger v-if="sidebarOpen" class="self-start text-base-content/70" />
           </div>
@@ -27,7 +27,7 @@
             <SidebarGroupLabel>Pages</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem v-for="item in menuItems" :key="item.title">
+                <SidebarMenuItem v-for="item in menuItems" :key="item.url">
                   <SidebarMenuButton
                     as-child
                     class="h-12 px-4 hover:bg-primary/30 hover:text-primary"
@@ -35,10 +35,10 @@
                       'text-primary dark:text-accent': activeTab === item.url,
                     }"
                   >
-                    <NuxtLinkLocale :to="item.url" class="flex content-center items-center">
+                    <NuxtLink :to="item.url" class="flex content-center items-center">
                       <UiImage :src="item.icon" :width="6" :height="6" class="p-0" />
                       <span class="pl-2">{{ item.title }}</span>
-                    </NuxtLinkLocale>
+                    </NuxtLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -176,52 +176,38 @@
 </template>
 
 <script setup lang="ts">
+import { useTranslate } from '@tolgee/vue'
+
+const { t } = useTranslate('science')
+
 const sidebarOpen = ref(true)
 const showSignIn = ref(false)
 
-const menuItems = [
-  { title: 'Dashboard', url: '/dashboard', icon: 'icon://mdi:home' },
+const menuItems = computed(() => [
+  { title: t.value('nav.dashboard'), url: '/dashboard', icon: 'icon://mdi:home' },
   {
-    title: 'Categories',
+    title: t.value('nav.categories'),
     url: '/categories',
     icon: 'icon://material-symbols:category',
   },
+  { title: t.value('nav.items'), url: '/items', icon: 'icon://material-symbols:list-rounded' },
   {
-    title: 'Items',
-    url: '/items',
-    icon: 'icon://material-symbols:list-rounded',
-  },
-  {
-    title: 'Variants',
+    title: t.value('nav.variants'),
     url: '/variants',
     icon: 'icon://qlementine-icons:items-grid-16',
   },
-  {
-    title: 'Components',
-    url: '/components',
-    icon: 'icon://uiw:component',
-  },
-  {
-    title: 'Processes',
-    url: '/processes',
-    icon: 'icon://clarity:process-on-vm-line',
-  },
-  {
-    title: 'Sources',
-    url: '/sources',
-    icon: 'icon://ic:outline-source',
-  },
-]
+  { title: t.value('nav.components'), url: '/components', icon: 'icon://uiw:component' },
+  { title: t.value('nav.processes'), url: '/processes', icon: 'icon://clarity:process-on-vm-line' },
+  { title: t.value('nav.sources'), url: '/sources', icon: 'icon://ic:outline-source' },
+])
 
 const router = useRouter()
 const auth = useAuthClient()
 const session = useAuthSession()
 const route = useRoute()
-const localePath = useLocalePath()
-
 const activeTab = computed(() => {
-  const currentPath = localePath(route.path, 'en')
-  const currentTab = menuItems.find((tab) => {
+  const currentPath = route.path
+  const currentTab = menuItems.value.find((tab) => {
     return currentPath.startsWith(tab.url)
   })
   return currentTab ? currentTab.url : null

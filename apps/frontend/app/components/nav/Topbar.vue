@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, EllipsisVertical } from 'lucide-vue-next'
+import { ArrowLeft, EllipsisVertical } from '@lucide/vue'
 
 const router = useRouter()
 
@@ -54,15 +54,13 @@ const { title, subtitle, back, context, useImage, image, icon, loading } = defin
   loading?: boolean
 }>()
 
-const localeRoute = useLocaleRoute()
-
 function goBack() {
   // TODO: This is a terrible hack and only works for this case
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(router.options as unknown as any).is_back = true
 
   if (back?.startsWith('/')) {
-    navigateTo(localeRoute(back))
+    navigateTo(back)
   } else {
     router.back()
   }

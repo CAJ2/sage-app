@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import type { LocaleObject } from '@nuxtjs/i18n'
-import { Check } from 'lucide-vue-next'
+import { Check } from '@lucide/vue'
+import { useTranslate } from '@tolgee/vue'
 import { DrawerClose } from 'vaul-vue'
 
-const { t } = useI18n()
+const { t } = useTranslate('common')
+
+interface LocaleObject {
+  code: string
+  name: string
+}
 
 const { locales, current } = defineProps<{
   locales: LocaleObject[]

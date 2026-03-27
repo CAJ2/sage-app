@@ -4,7 +4,7 @@
       <Carousel :opts="{ align: 'start' }">
         <CarouselContent class="-ml-2">
           <CarouselItem v-for="v in variants" :key="v.id" class="basis-1/3 pl-2">
-            <NuxtLinkLocale :to="`/explore/variants/${v.id}`">
+            <NuxtLink :to="`/explore/variants/${v.id}`">
               <Card class="overflow-hidden">
                 <div class="flex flex-col">
                   <img
@@ -24,7 +24,7 @@
                   </div>
                 </div>
               </Card>
-            </NuxtLinkLocale>
+            </NuxtLink>
           </CarouselItem>
         </CarouselContent>
       </Carousel>

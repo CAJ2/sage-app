@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { Circle } from '@lucide/vue'
 import { reactiveOmit } from '@vueuse/core'
-import { Circle } from 'lucide-vue-next'
 import {
   DropdownMenuItemIndicator,
   DropdownMenuRadioItem,

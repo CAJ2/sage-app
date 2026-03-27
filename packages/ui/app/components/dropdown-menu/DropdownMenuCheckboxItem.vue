@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { Check } from '@lucide/vue'
 import { reactiveOmit } from '@vueuse/core'
-import { Check } from 'lucide-vue-next'
 import {
   DropdownMenuCheckboxItem,
   type DropdownMenuCheckboxItemEmits,

@@ -27,7 +27,6 @@ import {
 } from '~/gql/types.generated'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const posthog = usePostHog()
 const changeID = route.params.id as string
 const categoryID = route.params.category_id as string
@@ -146,9 +145,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           // Redirect to the new category page
           if (category?.data?.createCategory?.category?.id) {
             navigateTo(
-              localeRoute(
-                `/contribute/changes/${changeID}/categories/${category?.data?.createCategory?.category?.id}`,
-              ),
+              `/contribute/changes/${changeID}/categories/${category?.data?.createCategory?.category?.id}`,
             )
           }
         })

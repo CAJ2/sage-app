@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url'
+
 import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
@@ -9,7 +11,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/apollo',
     '@nuxtjs/color-mode',
-    '@nuxtjs/i18n',
     '@nuxt/icon',
     '@nuxt/eslint',
     '@nuxt/image',
@@ -37,12 +38,29 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss() as any],
     clearScreen: false,
+    envDir: fileURLToPath(new URL('.', import.meta.url)),
     envPrefix: ['VITE_', 'TAURI_'],
     server: {
       strictPort: true,
     },
     optimizeDeps: {
-      include: ['graphql'],
+      include: [
+        'graphql',
+        '@tauri-apps/api/core',
+        '@tolgee/format-icu',
+        '@tolgee/vue',
+        '@vueuse/core',
+        '@tauri-apps/plugin-sql',
+        'dexie',
+        '@lucide/vue',
+        'class-variance-authority',
+        'clsx',
+        'tailwind-merge',
+        'embla-carousel-vue',
+        'graphql-tag',
+        'better-auth/vue',
+        'vaul-vue',
+      ],
       noDiscovery: process.env.NODE_ENV === 'test' ? true : false,
     },
   },
@@ -58,19 +76,6 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
-
-  i18n: {
-    defaultLocale: 'en',
-    locales: [
-      { code: 'en', iso: 'en-US', name: 'English', file: 'en.json' },
-      { code: 'sv', iso: 'sv-SE', name: 'Svenska', file: 'sv.json' },
-    ],
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: 'i18n_set',
-      redirectOn: 'root',
-    },
-  },
 
   apollo: {
     clients: {

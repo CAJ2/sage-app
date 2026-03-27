@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight } from 'lucide-vue-next'
+import { ArrowRight } from '@lucide/vue'
 
 import { cn } from '../lib/utils'
 import type { WithClassAsProps } from './interface'

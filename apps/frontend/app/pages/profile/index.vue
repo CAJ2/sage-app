@@ -25,13 +25,13 @@
           <h1 class="py-3 text-2xl">Sign in to your Account</h1>
           <p class="py-3">Contribute to the project and save your settings.</p>
           <button class="btn btn-block btn-primary">
-            <NuxtLinkLocale to="/profile/sign_in">Sign in with Email</NuxtLinkLocale>
+            <NuxtLink to="/profile/sign_in">Sign in with Email</NuxtLink>
           </button>
         </div>
       </div>
       <div class="col-span-4 flex flex-col gap-3 px-4 py-3 md:col-span-6 md:col-start-4">
         <!-- Region -->
-        <NuxtLinkLocale to="/profile/region">
+        <NuxtLink to="/profile/region">
           <Card class="bg-base-200">
             <CardContent
               class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
@@ -46,10 +46,10 @@
               <ChevronRightIcon class="size-4 opacity-40" />
             </CardContent>
           </Card>
-        </NuxtLinkLocale>
+        </NuxtLink>
 
         <!-- Edit Profile (auth-gated) -->
-        <NuxtLinkLocale v-if="session.data" to="/profile/edit">
+        <NuxtLink v-if="session.data" to="/profile/edit">
           <Card class="bg-base-200">
             <CardContent
               class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
@@ -61,10 +61,10 @@
               <ChevronRightIcon class="size-4 opacity-40" />
             </CardContent>
           </Card>
-        </NuxtLinkLocale>
+        </NuxtLink>
 
         <!-- App Settings -->
-        <NuxtLinkLocale to="/profile/settings">
+        <NuxtLink to="/profile/settings">
           <Card class="bg-base-200">
             <CardContent
               class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
@@ -76,7 +76,7 @@
               <ChevronRightIcon class="size-4 opacity-40" />
             </CardContent>
           </Card>
-        </NuxtLinkLocale>
+        </NuxtLink>
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@ import {
   Map as MapIcon,
   Settings as SettingsIcon,
   UserIcon,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 import { useAuthClient } from '~/utils'
 

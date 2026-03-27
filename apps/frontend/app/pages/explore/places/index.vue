@@ -24,9 +24,9 @@
         </DrawerHeader>
         <h3 class="text-md font-semibold">{{ selectedPlace?.desc }}</h3>
         <p>{{ selectedPlace?.tags }}</p>
-        <NuxtLinkLocale :to="`/explore/places/${selectedPlace?.id}`" class="p-4">
+        <NuxtLink :to="`/explore/places/${selectedPlace?.id}`" class="p-4">
           <Button class="w-full">View Details</Button>
-        </NuxtLinkLocale>
+        </NuxtLink>
         <a
           :href="`https://maps.google.com/?q=${selectedPlace?.location?.latitude},${selectedPlace?.location?.longitude}`"
           target="_blank"

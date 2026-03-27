@@ -104,7 +104,7 @@
               :key="edit.id || edit.entityName"
               class="border-neutral-300"
             >
-              <NuxtLinkLocale :to="getEditSubLink(edit as Edit)">
+              <NuxtLink :to="getEditSubLink(edit as Edit)">
                 <div v-if="edit.changes" class="mx-3 my-4">
                   <div class="flex items-center">
                     <div class="badge badge-sm badge-secondary">
@@ -130,7 +130,7 @@
                     </div>
                   </div>
                 </div>
-              </NuxtLinkLocale>
+              </NuxtLink>
             </li>
             <span
               v-if="changeData.change.edits.nodes?.length === 0"
@@ -168,7 +168,6 @@ import type { Edit } from '~/gql/types.generated'
 import { ChangeStatus } from '~/gql/types.generated'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 
 const openEditTitle = ref(false)
 
@@ -288,7 +287,7 @@ const setStatus = async (status: ChangeStatus) => {
 const deleteChange = async () => {
   const result = await changeDelete.mutate()
   if (result?.data) {
-    navigateTo(localeRoute('/contribute/changes'))
+    navigateTo('/contribute/changes')
   }
 }
 

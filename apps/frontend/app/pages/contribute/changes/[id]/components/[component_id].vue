@@ -26,7 +26,6 @@ import type { CreateComponentInput, UpdateComponentInput } from '~/gql/graphql'
 import { ChangeStatus } from '~/gql/graphql'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
 const componentID = route.params.componentID as string
 
@@ -144,9 +143,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           // Redirect to the new component page
           if (component?.data?.createComponent?.component?.id) {
             navigateTo(
-              localeRoute(
-                `/contribute/changes/${changeID}/components/${component?.data?.createComponent?.component?.id}`,
-              ),
+              `/contribute/changes/${changeID}/components/${component?.data?.createComponent?.component?.id}`,
             )
           }
         })

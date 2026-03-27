@@ -50,10 +50,8 @@
             <FormCheckbox id="remember" class="my-1 inline-flex" :default-value="true" />
             <FormLabel for="remember" class="text-md">Remember me</FormLabel>
           </div>
-          <NuxtLinkLocale
-            to="/profile/forgot_password"
-            class="text-sm underline-offset-4 hover:underline"
-            >Forgot password?</NuxtLinkLocale
+          <NuxtLink to="/profile/forgot_password" class="text-sm underline-offset-4 hover:underline"
+            >Forgot password?</NuxtLink
           >
         </div>
         <div>

@@ -64,7 +64,7 @@
     "jsonld": "^8.3.3",
     "kysely": "^0.28.14",
     "kysely-knex": "^0.2.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "luxon": "^3.7.2",
     "meilisearch": "^0.56.0",
     "nanoid": "^3.0.0",

@@ -81,7 +81,7 @@ import {
 } from '@jsonforms/core'
 import type { RendererProps } from '@jsonforms/vue'
 import { DispatchRenderer, rendererProps, useJsonFormsArrayControl } from '@jsonforms/vue'
-import _ from 'lodash'
+import { has, isObjectLike, keys } from 'lodash-es'
 import { defineComponent, inject } from 'vue'
 
 import { useVanillaArrayControl } from '../util'
@@ -138,10 +138,10 @@ const controlRenderer = defineComponent({
       return (
         this.arraySchema !== undefined &&
         this.arraySchema.items &&
-        _.isObjectLike(this.arraySchema.items) &&
+        isObjectLike(this.arraySchema.items) &&
         (this.arraySchema.items as JsonSchema).type === 'object' &&
-        _.keys((this.arraySchema.items as JsonSchema).properties).length === 1 &&
-        _.has(this.arraySchema.items, 'properties.id.$ref')
+        keys((this.arraySchema.items as JsonSchema).properties).length === 1 &&
+        has(this.arraySchema.items, 'properties.id.$ref')
       )
     },
   },

@@ -1,7 +1,8 @@
 import type { Translator } from '@jsonforms/core'
+import { useTranslate } from '@tolgee/vue'
 import Ajv, { type JSONSchemaType } from 'ajv/dist/2020'
 import { createAuthClient } from 'better-auth/vue'
-import _ from 'lodash'
+import { cloneDeep, isNull, omitBy } from 'lodash-es'
 
 export const useAuthClient = () => {
   const config = useRuntimeConfig()
@@ -19,7 +20,7 @@ export const useAuthSession = () => {
 }
 
 export const formTranslate = (): Translator => {
-  const { t } = useI18n()
+  const { t } = useTranslate('common')
 
   return ((id: string, defaultMessage: string | undefined, values: object): string | undefined => {
     if (!defaultMessage) {
@@ -28,7 +29,7 @@ export const formTranslate = (): Translator => {
     if (!values) {
       return undefined
     }
-    return t(id, defaultMessage)
+    return t.value(id, defaultMessage)
   }) as Translator
 }
 
@@ -39,8 +40,8 @@ export const sanitizeFormData = <T, U extends object>(
   if (!data) {
     return {}
   }
-  data = _.cloneDeep(data)
-  data = _.omitBy(data, _.isNull) as U
+  data = cloneDeep(data)
+  data = omitBy(data, isNull) as U
   const ajv = new Ajv({
     allErrors: true,
     strict: true,

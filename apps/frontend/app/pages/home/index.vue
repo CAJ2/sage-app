@@ -20,7 +20,7 @@
           </div>
           <div v-for="item in data?.feed.nodes" :key="item.id">
             <component
-              :is="item.externalLink ? 'a' : NuxtLinkLocale"
+              :is="item.externalLink ? 'a' : NuxtLink"
               v-bind="
                 item.externalLink
                   ? { href: item.externalLink.url, target: '_blank', rel: 'noopener noreferrer' }
@@ -51,8 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import { NuxtLinkLocale } from '#components'
-import { MessageCircleDashed } from 'lucide-vue-next'
+import { NuxtLink } from '#components'
+import { MessageCircleDashed } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 

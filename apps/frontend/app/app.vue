@@ -1,11 +1,15 @@
 <template>
-  <div style="overflow: hidden">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
+  <TolgeeProvider>
+    <template #fallback><div /></template>
+    <div style="overflow: hidden">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
+  </TolgeeProvider>
 </template>
 <script setup lang="ts">
+import { TolgeeProvider } from '@tolgee/vue'
 import { useDark } from '@vueuse/core'
 
 useHead({

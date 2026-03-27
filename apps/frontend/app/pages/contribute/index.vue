@@ -6,7 +6,7 @@
     />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
-        <NuxtLinkLocale to="/contribute/changes">
+        <NuxtLink to="/contribute/changes">
           <div class="flex items-center">
             <h2 class="py-3 text-xl font-bold">Changes</h2>
             <font-awesome-icon
@@ -14,7 +14,7 @@
               class="mx-4 font-bold text-base-content/70"
             />
           </div>
-        </NuxtLinkLocale>
+        </NuxtLink>
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
@@ -22,7 +22,7 @@
               :key="change.id"
               class="basis-1/2 pl-1 md:basis-1/3 lg:basis-1/3"
             >
-              <NuxtLinkLocale :to="`/contribute/changes/${change.id}`">
+              <NuxtLink :to="`/contribute/changes/${change.id}`">
                 <div class="p-1">
                   <Card>
                     <CardHeader class="p-4 pb-2">
@@ -47,7 +47,7 @@
                     </CardContent>
                   </Card>
                 </div>
-              </NuxtLinkLocale>
+              </NuxtLink>
             </CarouselItem>
             <CarouselItem
               v-if="!result?.changes.nodes?.length"
@@ -70,10 +70,12 @@
 </template>
 
 <script setup lang="ts">
+import { useTranslate } from '@tolgee/vue'
+
 import { graphql } from '~/gql'
 import { ChangeStatus } from '~/gql/types.generated'
 
-const { t } = useI18n()
+const { t } = useTranslate('frontend')
 
 const changeListQuery = graphql(`
   query ContributeIndexGetChanges($first: Int) {

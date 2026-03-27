@@ -3,13 +3,13 @@
     <NavTopbar title="Explore" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
-        <NuxtLinkLocale to="/explore/places">
+        <NuxtLink to="/explore/places">
           <Button variant="outline" class="mb-4 w-full">
             <MapIcon />
             View Map
           </Button>
-        </NuxtLinkLocale>
-        <NuxtLinkLocale to="/explore/categories">
+        </NuxtLink>
+        <NuxtLink to="/explore/categories">
           <div class="flex items-center">
             <h2 class="py-3 text-xl font-bold">Categories</h2>
             <font-awesome-icon
@@ -17,7 +17,7 @@
               class="mx-4 font-bold text-neutral-700"
             />
           </div>
-        </NuxtLinkLocale>
+        </NuxtLink>
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
@@ -25,7 +25,7 @@
               :key="category.id"
               class="basis-1/2 pl-1 md:basis-1/3 lg:basis-1/3"
             >
-              <NuxtLinkLocale :to="`/explore/categories/${category.id}`">
+              <NuxtLink :to="`/explore/categories/${category.id}`">
                 <div class="p-1">
                   <Card class="min-h-32">
                     <CardHeader class="p-4 pb-2">
@@ -39,7 +39,7 @@
                     </CardContent>
                   </Card>
                 </div>
-              </NuxtLinkLocale>
+              </NuxtLink>
             </CarouselItem>
           </CarouselContent>
         </Carousel>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { Map as MapIcon } from 'lucide-vue-next'
+import { Map as MapIcon } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 

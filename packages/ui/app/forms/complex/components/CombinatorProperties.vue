@@ -8,7 +8,7 @@
 import type { JsonSchema, Layout, UISchemaElement } from '@jsonforms/core'
 import { Generate } from '@jsonforms/core'
 import { DispatchRenderer } from '@jsonforms/vue'
-import omit from 'lodash/omit'
+import { omit } from 'lodash-es'
 import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
 

@@ -2,7 +2,7 @@
   <nav class="relative flex items-center justify-around justify-items-center bg-base-200">
     <!-- Left Tabs -->
     <div class="flex flex-1 justify-center">
-      <NuxtLinkLocale :to="{ path: leftTabs['home'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: leftTabs['home'].path }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
@@ -13,10 +13,10 @@
           <HouseIcon :size="20" />
           <span class="text-sm">{{ leftTabs['home'].label }}</span>
         </button>
-      </NuxtLinkLocale>
+      </NuxtLink>
     </div>
     <div class="flex flex-1 justify-center">
-      <NuxtLinkLocale :to="{ path: leftTabs['explore'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: leftTabs['explore'].path }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
@@ -27,12 +27,12 @@
           <GlobeIcon :size="20" />
           <span class="text-sm">{{ leftTabs['explore'].label }}</span>
         </button>
-      </NuxtLinkLocale>
+      </NuxtLink>
     </div>
 
     <!-- Center Search Button -->
     <div class="inset-x-0 top-0 -translate-y-1/4 px-3">
-      <NuxtLinkLocale
+      <NuxtLink
         :to="{ path: '/search' }"
         class="flex items-center justify-center"
         @dragstart.prevent
@@ -55,12 +55,12 @@
             />
           </svg>
         </Button>
-      </NuxtLinkLocale>
+      </NuxtLink>
     </div>
 
     <!-- Right Tabs -->
     <div class="flex flex-1 justify-center">
-      <NuxtLinkLocale :to="{ path: rightTabs['contribute'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: rightTabs['contribute'].path }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
@@ -71,10 +71,10 @@
           <MessageCirclePlusIcon :size="20" />
           <span class="text-sm">{{ rightTabs['contribute'].label }}</span>
         </button>
-      </NuxtLinkLocale>
+      </NuxtLink>
     </div>
     <div class="flex flex-1 justify-center">
-      <NuxtLinkLocale :to="{ path: rightTabs['profile'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: rightTabs['profile'].path }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
@@ -85,7 +85,7 @@
           <UserSquareIcon :size="20" />
           <span class="text-sm">{{ rightTabs['profile'].label }}</span>
         </button>
-      </NuxtLinkLocale>
+      </NuxtLink>
     </div>
   </nav>
 </template>
@@ -96,36 +96,35 @@ import {
   House as HouseIcon,
   MessageCirclePlus as MessageCirclePlusIcon,
   UserRound as UserSquareIcon,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
+import { useTranslate } from '@tolgee/vue'
 
 const route = useRoute()
-const { t } = useI18n()
+const { t } = useTranslate('frontend')
 
 const leftTabs = computed(() => ({
   home: {
     path: '/home',
-    label: t('tabs.home'),
+    label: t.value('tabs.home'),
   },
   explore: {
     path: '/explore',
-    label: t('tabs.explore'),
+    label: t.value('tabs.explore'),
   },
 }))
 const rightTabs = computed(() => ({
   contribute: {
     path: '/contribute',
-    label: t('tabs.contribute'),
+    label: t.value('tabs.contribute'),
   },
   profile: {
     path: '/profile',
-    label: t('tabs.profile'),
+    label: t.value('tabs.profile'),
   },
 }))
 
-const localePath = useLocalePath()
-
 const activeTab = computed(() => {
-  const currentPath = localePath(route.path, 'en')
+  const currentPath = route.path
   const currentTab = [
     leftTabs.value['home'],
     leftTabs.value['explore'],

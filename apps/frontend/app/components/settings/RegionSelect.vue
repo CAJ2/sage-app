@@ -99,9 +99,9 @@
 </template>
 
 <script setup lang="ts">
+import { GlobeIcon, LocateIcon, SearchIcon } from '@lucide/vue'
 import { isTauri } from '@tauri-apps/api/core'
 import { watchDebounced } from '@vueuse/core'
-import { GlobeIcon, LocateIcon, SearchIcon } from 'lucide-vue-next'
 
 const emit = defineEmits<{
   update: [region: string]

@@ -2,7 +2,7 @@
   <template v-if="displayItems.length > 0">
     <li class="px-4 py-2 text-xs tracking-wide opacity-60">Recently viewed</li>
     <li v-for="res in displayItems" :key="res.id">
-      <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
+      <NuxtLink :to="exploreLink(res.__typename, res.id)">
         <div class="list-row flex items-center gap-2 pt-2 pb-3">
           <UiImage
             v-if="res.imageURL"
@@ -28,7 +28,7 @@
             <ChevronRightIcon class="size-5" />
           </button>
         </div>
-      </NuxtLinkLocale>
+      </NuxtLink>
     </li>
   </template>
   <li v-else class="flex h-full flex-col items-center justify-center py-8">
@@ -60,8 +60,6 @@
 </template>
 
 <script setup lang="ts">
-import { useApolloClient } from '@vue/apollo-composable'
-import { parse } from 'graphql'
 import {
   BoxIcon,
   Building2Icon,
@@ -70,7 +68,9 @@ import {
   MapPinIcon,
   PackageIcon,
   TagsIcon,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
+import { useApolloClient } from '@vue/apollo-composable'
+import { parse } from 'graphql'
 import type { Component } from 'vue'
 
 type DisplayItem = {

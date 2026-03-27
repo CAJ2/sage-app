@@ -2,7 +2,7 @@
   <div>
     <ul class="list">
       <li v-for="i in items" :key="i.id" class="bg-base-200">
-        <NuxtLinkLocale v-if="i.link" :to="i.link" class="list-row divide-y">
+        <NuxtLink v-if="i.link" :to="i.link" class="list-row divide-y">
           <div class="flex">
             <font-awesome-icon
               v-if="i.icon"
@@ -18,7 +18,7 @@
               </p>
             </div>
           </div>
-        </NuxtLinkLocale>
+        </NuxtLink>
         <div v-else class="list-row divide-y">
           <font-awesome-icon v-if="i.icon" :icon="i.icon" class="text-muted-foreground size-5" />
           <p class="text-sm leading-none font-medium">
@@ -34,7 +34,9 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
+import { useTranslate } from '@tolgee/vue'
+
+const { t } = useTranslate('common')
 const { items } = defineProps<{
   items: {
     id: string
