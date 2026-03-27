@@ -1,0 +1,67 @@
+apps/science/nuxt.config.ts
+  dba335a9736062a3 36
+packages/ui/app/components/form/change/SaveStatus.vue
+  dba335a9736062a3 8,19-20,80,83,85,87,89,91
+apps/frontend/app/pages/contribute/changes/[id]/index.vue
+  dba335a9736062a3 67,75,83,94,126,146,152,163-164
+apps/frontend/app/pages/explore/index.vue
+  dba335a9736062a3 15,49
+apps/science/app/pages/changes/index.vue
+  dba335a9736062a3 12,46-47
+packages/ui/app/components/ui/List.vue
+  dba335a9736062a3 7,19,43
+packages/ui/app/components/model/list/ActionButtons.vue
+  dba335a9736062a3 8,15,22,28-29
+apps/science/app/pages/components/index.vue
+  dba335a9736062a3 12,51-52
+apps/frontend/app/components/nav/Topbar.vue
+  dba335a9736062a3 8,38,42
+apps/frontend/app/pages/explore/places/index.vue
+  dba335a9736062a3 7,52
+apps/science/app/components/grid/ModelChanges.vue
+  dba335a9736062a3 9,14,28
+apps/frontend/nuxt.config.ts
+  dba335a9736062a3 36
+apps/science/app/components/sidebar/ChangeSelector.vue
+  dba335a9736062a3 13,19-20
+apps/frontend/app/pages/explore/categories/[id]/index.vue
+  dba335a9736062a3 12,20-21
+apps/science/app/components/grid/Model.vue
+  dba335a9736062a3 9,14
+apps/science/app/components/grid/EditActions.vue
+  dba335a9736062a3 3,9-10,13
+apps/science/app/pages/processes/index.vue
+  dba335a9736062a3 12,51-52
+apps/frontend/app/pages/contribute/index.vue
+  dba335a9736062a3 12,56,70
+apps/frontend/app/components/search/ScanResults.vue
+  dba335a9736062a3 19,36-37
+apps/science/app/pages/categories/index.vue
+  dba335a9736062a3 12,51-52
+apps/science/app/pages/items/index.vue
+  dba335a9736062a3 12,41-42
+packages/ui/nuxt.config.ts
+  dba335a9736062a3 27
+apps/science/app/pages/variants/index.vue
+  dba335a9736062a3 12,51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "c4ecd423563af88fc1d8dc7ba8d05d2b418173fe",
+  "prompts": {
+    "dba335a9736062a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e78af27-4356-4299-b80d-f2adb33bdbfa",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 80,
+      "total_deletions": 74,
+      "accepted_lines": 75,
+      "overriden_lines": 0
+    }
+  }
+}
