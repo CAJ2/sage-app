@@ -1,0 +1,16 @@
+<script>
+  // @nuxtjs/color-mode reads window.__NUXT_COLOR_MODE__ at the top level of its
+  // plugin.client.js module (outside the plugin function). In a real app this
+  // global is set by a <script> tag in the SSR-rendered <head>. Storybook never
+  // does that, so we seed it here — before any JS module is evaluated — to
+  // prevent "helper is undefined" on every story render.
+  window.__NUXT_COLOR_MODE__ = {
+    preference: 'light',
+    value: 'light',
+    getColorScheme: function () {
+      return 'light'
+    },
+    addColorScheme: function () {},
+    removeColorScheme: function () {},
+  }
+</script>

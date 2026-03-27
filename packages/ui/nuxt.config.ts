@@ -11,7 +11,6 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/eslint',
     '@nuxt/image',
-    '@nuxtjs/storybook',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     'reka-ui/nuxt',
@@ -31,6 +30,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss() as any],
     envDir: fileURLToPath(new URL('.', import.meta.url)),
     optimizeDeps: {
+      entries: 'app/**/*.{ts,vue}',
       include: ['graphql'],
     },
   },

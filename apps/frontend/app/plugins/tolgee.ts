@@ -17,6 +17,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const tolgee = builder.init({
     defaultNs: 'common',
     ns: ['common', 'frontend', platformNs],
+    availableLanguages: ['en', 'sv'],
     defaultLanguage: 'en',
     ...(useApi
       ? {
