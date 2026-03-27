@@ -1,0 +1,53 @@
+apps/frontend/app/plugins/apollo.ts
+  f228a7c05a1bfb4b 4,16-17
+apps/science/app/plugins/tolgee.ts
+  f228a7c05a1bfb4b 1-36
+apps/frontend/app/components/nav/Tabs.vue
+  f228a7c05a1bfb4b 108,112,118,122
+apps/frontend/app/pages/profile/settings.vue
+  f228a7c05a1bfb4b 71,76-82
+packages/ui/app/utils/index.ts
+  f228a7c05a1bfb4b 2,32
+apps/frontend/app/plugins/tolgee.ts
+  f228a7c05a1bfb4b 2-7,9-42
+apps/science/app/plugins/apollo.ts
+  f228a7c05a1bfb4b 4,13-14
+apps/frontend/app/components/settings/LocaleSelect.vue
+  f228a7c05a1bfb4b 7-11
+apps/science/app/layouts/default.vue
+  f228a7c05a1bfb4b 30,179-182,186-187,189,193,195,199-202
+packages/ui/app/components/ui/List.vue
+  f228a7c05a1bfb4b 37-38
+apps/frontend/nuxt.config.ts
+  f228a7c05a1bfb4b 41
+apps/science/app/app.vue
+  f228a7c05a1bfb4b 2-9,12
+apps/frontend/app/pages/contribute/index.vue
+  f228a7c05a1bfb4b 73,78
+apps/science/nuxt.config.ts
+  f228a7c05a1bfb4b 40
+packages/ui/nuxt.config.ts
+  f228a7c05a1bfb4b 32
+apps/frontend/app/app.vue
+  f228a7c05a1bfb4b 2-9,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "fe74b4a74233c7084318e921b2766f1af182b398",
+  "prompts": {
+    "f228a7c05a1bfb4b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a37123a1-ca18-46f5-8f51-95475579b0e3",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 342,
+      "total_deletions": 215,
+      "accepted_lines": 252,
+      "overriden_lines": 10
+    }
+  }
+}
