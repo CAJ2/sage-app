@@ -33,7 +33,7 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  css: ['~/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
+  css: ['~/assets/css/main.css'],
 
   vite: {
     plugins: [tailwindcss() as any],
@@ -50,6 +50,9 @@ export default defineNuxtConfig({
         'graphql-tag',
         '@tauri-apps/api/core',
         '@tauri-apps/plugin-sql',
+        '@tauri-apps/plugin-geolocation',
+        'maplibre-gl',
+        'pmtiles',
         '@tolgee/format-icu',
         '@tolgee/vue',
         '@vueuse/core',
@@ -61,6 +64,8 @@ export default defineNuxtConfig({
         'embla-carousel-vue',
         'vaul-vue',
         'better-auth/vue',
+        'ajv/dist/2020',
+        'lodash-es',
       ],
       noDiscovery: process.env.NODE_ENV === 'test' ? true : false,
     },

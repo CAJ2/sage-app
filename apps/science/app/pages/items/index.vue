@@ -9,7 +9,7 @@
           }
         "
       >
-        <font-awesome-icon icon="fa-solid fa-plus" />
+        <Plus />
         Add Item
       </Button>
     </div>
@@ -38,6 +38,8 @@
 </template>
 
 <script setup lang="ts">
+import { Plus } from '@lucide/vue'
+
 import { graphql } from '~/gql'
 
 const actionButton = (btn: string, id: string) => {

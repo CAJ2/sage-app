@@ -12,10 +12,7 @@
         <NuxtLink to="/explore/categories">
           <div class="flex items-center">
             <h2 class="py-3 text-xl font-bold">Categories</h2>
-            <font-awesome-icon
-              icon="fa-solid fa-arrow-right"
-              class="mx-4 font-bold text-neutral-700"
-            />
+            <ArrowRight class="mx-4 font-bold text-neutral-700" />
           </div>
         </NuxtLink>
         <Carousel class="w-full" :opts="{ align: 'start' }">
@@ -49,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { Map as MapIcon } from '@lucide/vue'
+import { ArrowRight, Map as MapIcon } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 

@@ -64,7 +64,7 @@
                 class="btn grow btn-sm btn-primary"
                 @click="setStatus(ChangeStatus.Proposed)"
               >
-                <font-awesome-icon icon="fa-solid fa-upload" class="mr-2 size-4" />
+                <Upload class="mr-2 size-4" />
                 Publish Change
               </button>
               <button
@@ -72,7 +72,7 @@
                 class="btn grow btn-sm btn-primary"
                 @click="setStatus(ChangeStatus.Draft)"
               >
-                <font-awesome-icon icon="fa-solid fa-pencil" class="mr-2 size-4" />
+                <Pencil class="mr-2 size-4" />
                 Revert to Draft
               </button>
               <button
@@ -80,7 +80,7 @@
                 class="btn grow btn-sm btn-primary"
                 @click="mergeChange"
               >
-                <font-awesome-icon icon="fa-solid fa-pencil" class="mr-2 size-4" />
+                <Pencil class="mr-2 size-4" />
                 Merge Change
               </button>
               <button
@@ -91,7 +91,7 @@
                 class="btn-danger btn btn-sm"
                 @click="deleteChange"
               >
-                <font-awesome-icon icon="fa-solid fa-trash" class="size-4" />
+                <Trash2 class="size-4" />
               </button>
             </div>
           </CardContent>
@@ -123,10 +123,7 @@
                       >
                     </div>
                     <div>
-                      <font-awesome-icon
-                        icon="fa-solid fa-chevron-right"
-                        class="text-neutral-300"
-                      />
+                      <ChevronRight class="text-neutral-300" />
                     </div>
                   </div>
                 </div>
@@ -146,13 +143,13 @@
                 id: 'new_category',
                 link: `/contribute/changes/${changeData.change?.id}/categories/new`,
                 title: 'New Category',
-                icon: 'fa-solid fa-plus',
+                icon: Plus,
               },
               {
                 id: 'new_process',
                 link: `/contribute/changes/${changeData.change?.id}/processes/new`,
                 title: 'New Process',
-                icon: 'fa-solid fa-plus',
+                icon: Plus,
               },
             ]"
           />
@@ -163,6 +160,8 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronRight, Pencil, Plus, Trash2, Upload } from '@lucide/vue'
+
 import { graphql } from '~/gql'
 import type { Edit } from '~/gql/types.generated'
 import { ChangeStatus } from '~/gql/types.generated'

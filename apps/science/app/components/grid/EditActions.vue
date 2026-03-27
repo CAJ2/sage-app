@@ -1,14 +1,16 @@
 <template>
   <Button v-for="btn in btns" :key="btn.action" variant="outline" @click="triggerAction(btn.action)"
-    ><font-awesome-icon v-if="btn.icon" :icon="btn.icon" />
+    ><component :is="btn.icon" v-if="btn.icon" />
     {{ btn.text }}
   </Button>
 </template>
 
 <script setup lang="ts">
+import type { Component } from 'vue'
+
 type Btns = {
   action: string
-  icon?: string
+  icon?: Component
   text?: string
 }[]
 const { btns } = defineProps<{

@@ -5,11 +5,7 @@
     </button>
     <div v-if="useImage" class="mx-2 flex items-center">
       <img v-if="image" :src="image" class="h-10 w-10 rounded-full bg-base-100" />
-      <font-awesome-icon
-        v-if="!image"
-        :icon="icon || 'fa-solid fa-image'"
-        class="h-6! w-6 pt-1 text-neutral-700 dark:text-neutral-300"
-      />
+      <Image v-if="!image" class="h-6! w-6 pt-1 text-neutral-700 dark:text-neutral-300" />
     </div>
     <div class="flex flex-1 flex-col" :class="{ 'items-center': !back }">
       <template v-if="loading">
@@ -39,18 +35,17 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, EllipsisVertical } from '@lucide/vue'
+import { ArrowLeft, EllipsisVertical, Image } from '@lucide/vue'
 
 const router = useRouter()
 
-const { title, subtitle, back, context, useImage, image, icon, loading } = defineProps<{
+const { title, subtitle, back, context, useImage, image, loading } = defineProps<{
   title?: string
   subtitle?: string
   back?: string
   context?: boolean
   useImage?: boolean
   image?: string
-  icon?: string
   loading?: boolean
 }>()
 

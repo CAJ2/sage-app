@@ -9,7 +9,7 @@
           id: 'edit',
           link: `/explore/categories/${data.category.id}/edit`,
           title: 'Edit Category',
-          icon: 'fa-solid fa-pen-to-square',
+          icon: SquarePen,
         },
       ]"
     />
@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { SquarePen } from '@lucide/vue'
+
 const route = useRoute()
 const sessionData = useAuthSession()
 const categoriesQuery = gql`

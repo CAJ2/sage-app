@@ -6,12 +6,12 @@
           <span>{{ title }}</span>
           <div class="flex justify-end gap-3">
             <Button :disabled="!hasPreviousPage" variant="outline" @click="prevPage">
-              <font-awesome-icon icon="fa-solid fa-caret-left" />
+              <ChevronLeft />
               Prev
             </Button>
             <Button :disabled="!hasNextPage" variant="outline" @click="nextPage">
               Next
-              <font-awesome-icon icon="fa-solid fa-caret-right" />
+              <ChevronRight />
             </Button>
           </div>
         </CardTitle>
@@ -32,6 +32,7 @@
 
 <script setup lang="ts">
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import { ChevronLeft, ChevronRight } from '@lucide/vue'
 
 const { title, desc, query, queryName, pageSize } = defineProps<{
   title?: string

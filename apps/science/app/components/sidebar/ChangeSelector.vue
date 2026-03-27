@@ -10,12 +10,14 @@
     </div>
     <div v-else class="text-md grow opacity-70">No Change Selected</div>
     <Button v-if="selectedChange" variant="ghost" @click.stop.prevent="clearChange">
-      <font-awesome-icon icon="fa-solid fa-xmark" width="5" height="5" />
+      <X :size="20" />
     </Button>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
+import { X } from '@lucide/vue'
+
 import { graphql } from '~/gql'
 
 const changeStore = useChangeStore()

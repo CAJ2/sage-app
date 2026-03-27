@@ -16,7 +16,7 @@
                     v-else
                     class="flex aspect-square w-full items-center justify-center border-b border-neutral-200"
                   >
-                    <font-awesome-icon icon="fa-solid fa-tags" class="size-8 opacity-30" />
+                    <Tags class="size-8 opacity-30" />
                   </span>
                   <div class="min-w-0 p-2">
                     <div class="truncate text-sm font-semibold">{{ v.name }}</div>
@@ -33,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+import { Tags } from '@lucide/vue'
+
 export type ScanVariant = {
   id: string
   name: string

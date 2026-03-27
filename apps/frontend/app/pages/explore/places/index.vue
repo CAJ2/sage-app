@@ -4,7 +4,7 @@
       class="fixed top-0 z-10 m-4 flex w-[calc(100vw-70px)] max-w-2xl rounded-full bg-white text-black shadow-md focus-visible:outline-hidden"
     >
       <span class="flex items-center justify-center px-2">
-        <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="mx-2 text-neutral-700" />
+        <Search class="mx-2 text-neutral-700" />
       </span>
       <input
         id="search"
@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { Search } from '@lucide/vue'
 import { watchDebounced } from '@vueuse/core'
 import maplibregl, { Map, NavigationControl, type LngLatLike } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'

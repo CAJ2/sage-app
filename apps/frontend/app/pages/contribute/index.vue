@@ -9,10 +9,7 @@
         <NuxtLink to="/contribute/changes">
           <div class="flex items-center">
             <h2 class="py-3 text-xl font-bold">Changes</h2>
-            <font-awesome-icon
-              icon="fa-solid fa-arrow-right"
-              class="mx-4 font-bold text-base-content/70"
-            />
+            <ArrowRight class="mx-4 font-bold text-base-content/70" />
           </div>
         </NuxtLink>
         <Carousel class="w-full" :opts="{ align: 'start' }">
@@ -56,7 +53,7 @@
               <div class="p-1">
                 <Card class="border-dashed">
                   <CardContent class="flex flex-col pt-4 text-sm opacity-70">
-                    <font-awesome-icon icon="fa-solid fa-circle-plus" class="mb-2 text-xl" />
+                    <CirclePlus class="mb-2 text-xl" />
                     Changes will show up here when you make an edit
                   </CardContent>
                 </Card>
@@ -70,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowRight, CirclePlus } from '@lucide/vue'
 import { useTranslate } from '@tolgee/vue'
 
 import { graphql } from '~/gql'
