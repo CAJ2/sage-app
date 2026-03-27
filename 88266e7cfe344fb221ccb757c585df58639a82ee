@@ -1,0 +1,41 @@
+apps/science/.storybook/preview.ts
+  3726c1a395334e38 1-26
+apps/frontend/package.json
+  3726c1a395334e38 94-97
+apps/science/.storybook/preview-head.html
+  3726c1a395334e38 1-16
+apps/science/tsconfig.storybook.json
+  3726c1a395334e38 1-10
+apps/frontend/.storybook/preview.ts
+  3726c1a395334e38 1-26
+apps/frontend/.storybook/main.ts
+  3726c1a395334e38 1-13
+apps/frontend/.storybook/preview-head.html
+  3726c1a395334e38 1-16
+apps/frontend/tsconfig.storybook.json
+  3726c1a395334e38 1-10
+apps/science/.storybook/main.ts
+  3726c1a395334e38 1-13
+apps/science/package.json
+  3726c1a395334e38 84-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "88266e7cfe344fb221ccb757c585df58639a82ee",
+  "prompts": {
+    "3726c1a395334e38": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222daa43-f59b-4a1c-a4cf-86334e8c2a36",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 140,
+      "total_deletions": 1,
+      "accepted_lines": 140,
+      "overriden_lines": 0
+    }
+  }
+}
