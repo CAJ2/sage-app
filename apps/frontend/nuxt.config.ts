@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url'
+
 import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
@@ -9,7 +11,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/apollo',
     '@nuxtjs/color-mode',
-    '@nuxtjs/i18n',
     '@nuxt/icon',
     '@nuxt/eslint',
     '@nuxt/image',
@@ -20,6 +21,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+      ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon-32x32.png' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
@@ -32,17 +36,44 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  css: ['~/assets/css/main.css', '@fortawesome/fontawesome-svg-core/styles.css'],
+  css: ['~/assets/css/main.css'],
 
   vite: {
     plugins: [tailwindcss() as any],
     clearScreen: false,
+    envDir: fileURLToPath(new URL('.', import.meta.url)),
     envPrefix: ['VITE_', 'TAURI_'],
     server: {
       strictPort: true,
     },
     optimizeDeps: {
-      include: ['graphql'],
+      entries: 'app/**/*.{ts,vue}',
+      include: [
+        'graphql',
+        'graphql-tag',
+        '@tauri-apps/api/core',
+        '@tauri-apps/plugin-sql',
+        '@tauri-apps/plugin-geolocation',
+        '@tauri-apps/plugin-barcode-scanner',
+        'maplibre-gl',
+        'pmtiles',
+        '@tolgee/format-icu',
+        '@tolgee/vue',
+        '@vueuse/core',
+        'dexie',
+        '@lucide/vue',
+        'class-variance-authority',
+        'clsx',
+        'tailwind-merge',
+        'embla-carousel-vue',
+        'vaul-vue',
+        'better-auth/vue',
+        'ajv/dist/2020',
+        'lodash-es',
+        '@tanstack/vue-form',
+        'zod',
+        '@ericblade/quagga2',
+      ],
       noDiscovery: process.env.NODE_ENV === 'test' ? true : false,
     },
   },
@@ -58,19 +89,6 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
-
-  i18n: {
-    defaultLocale: 'en',
-    locales: [
-      { code: 'en', iso: 'en-US', name: 'English', file: 'en.json' },
-      { code: 'sv', iso: 'sv-SE', name: 'Svenska', file: 'sv.json' },
-    ],
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: 'i18n_set',
-      redirectOn: 'root',
-    },
-  },
 
   apollo: {
     clients: {

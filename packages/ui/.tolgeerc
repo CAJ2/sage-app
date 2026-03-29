@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.tolgee.io/cli-schema.json",
+  "projectId": 29733,
+  "format": "JSON_TOLGEE",
+  "patterns": ["./app/**/*.{ts,vue}"],
+  "push": {
+    "filesTemplate": "./i18n/{namespace}/{languageTag}.json",
+    "languages": ["en"],
+    "namespaces": ["common", "ui"]
+  },
+  "pull": {
+    "path": "./i18n",
+    "namespaces": ["common", "ui"]
+  }
+}

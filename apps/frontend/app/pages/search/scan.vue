@@ -6,20 +6,20 @@
     </div>
     <div class="absolute top-0 right-0 left-0 z-10 flex justify-center px-5 pt-5">
       <div class="grid w-full max-w-2xl grid-cols-2 rounded-lg bg-base-200/80 p-1 backdrop-blur-sm">
-        <NuxtLinkLocale to="/search">
+        <NuxtLink to="/search">
           <button class="flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-sm">
             <SearchIcon :size="14" />
             Search
           </button>
-        </NuxtLinkLocale>
-        <NuxtLinkLocale to="/search/scan">
+        </NuxtLink>
+        <NuxtLink to="/search/scan">
           <button
             class="flex w-full items-center justify-center gap-1.5 rounded-md bg-base-100 py-1.5 text-sm shadow"
           >
             <ScanBarcodeIcon :size="14" />
             Scan
           </button>
-        </NuxtLinkLocale>
+        </NuxtLink>
       </div>
     </div>
     <div
@@ -34,9 +34,12 @@
 </template>
 
 <script setup lang="ts">
+import { SearchIcon, ScanBarcodeIcon } from '@lucide/vue'
 import { isTauri } from '@tauri-apps/api/core'
-import { SearchIcon, ScanBarcodeIcon } from 'lucide-vue-next'
+
 import type { ScanVariant } from '~/components/search/ScanResults.vue'
+
+useTopbar(null)
 
 const isNative = isTauri()
 

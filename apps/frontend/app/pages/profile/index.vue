@@ -15,94 +15,92 @@
           <div class="flex items-center gap-4">
             <div class="h-16 w-16 shrink-0 skeleton rounded-full" />
             <div class="flex flex-col gap-4">
-              <div class="h-4 w-20 skeleton" />
-              <div class="h-4 w-28 skeleton" />
+              <div class="h-6 w-20 skeleton" />
+              <div class="h-6 w-28 skeleton" />
             </div>
           </div>
-          <div class="h-32 w-full skeleton" />
+          <div class="h-18 w-full skeleton" />
         </div>
         <div v-if="!session.data && !session.isPending">
           <h1 class="py-3 text-2xl">Sign in to your Account</h1>
           <p class="py-3">Contribute to the project and save your settings.</p>
           <button class="btn btn-block btn-primary">
-            <NuxtLinkLocale to="/profile/sign_in">Sign in with Email</NuxtLinkLocale>
+            <NuxtLink to="/profile/sign_in">Sign in with Email</NuxtLink>
           </button>
         </div>
       </div>
-      <div class="col-span-4 flex flex-col gap-3 py-3 md:col-span-6 md:col-start-4">
-        <!-- Region card -->
-        <NuxtLinkLocale to="/profile/region">
-          <div class="card bg-base-100 shadow-md">
-            <div class="card-body flex-row items-center gap-3 p-4">
+      <div class="col-span-4 flex flex-col gap-3 px-4 py-3 md:col-span-6 md:col-start-4">
+        <!-- Region -->
+        <NuxtLink to="/profile/region">
+          <Card class="bg-base-200">
+            <CardContent
+              class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
+            >
               <div class="text-accent">
-                <MapIcon class="size-6" />
+                <MapIcon class="size-5" />
               </div>
               <div class="flex flex-1 flex-col">
                 <h2 class="font-medium">Region</h2>
-                <p class="text-xs opacity-70">{{ regionData?.region.name || '' }}</p>
+                <p class="text-xs opacity-60">{{ region.regionName }}</p>
               </div>
-            </div>
-          </div>
-        </NuxtLinkLocale>
+              <ChevronRightIcon class="size-4 opacity-40" />
+            </CardContent>
+          </Card>
+        </NuxtLink>
 
-        <!-- Edit Profile card (auth-gated) -->
-        <NuxtLinkLocale v-if="session.data" to="/profile/edit">
-          <div class="card bg-base-100 shadow-md">
-            <div class="card-body flex-row items-center gap-3 p-4">
+        <!-- Edit Profile (auth-gated) -->
+        <NuxtLink v-if="session.data" to="/profile/edit">
+          <Card class="bg-base-200">
+            <CardContent
+              class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
+            >
               <div class="text-accent">
-                <UserIcon class="size-6" />
+                <UserIcon class="size-5" />
               </div>
               <div class="flex-1 font-medium">Edit Profile</div>
-            </div>
-          </div>
-        </NuxtLinkLocale>
+              <ChevronRightIcon class="size-4 opacity-40" />
+            </CardContent>
+          </Card>
+        </NuxtLink>
 
-        <!-- App Settings card -->
-        <NuxtLinkLocale to="/profile/settings">
-          <div class="card bg-base-100 shadow-md">
-            <div class="card-body flex-row items-center gap-3 p-4">
+        <!-- App Settings -->
+        <NuxtLink to="/profile/settings">
+          <Card class="bg-base-200">
+            <CardContent
+              class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
+            >
               <div class="text-accent">
-                <SettingsIcon class="size-6" />
+                <SettingsIcon class="size-5" />
               </div>
               <div class="flex-1 font-medium">App Settings</div>
-            </div>
-          </div>
-        </NuxtLinkLocale>
+              <ChevronRightIcon class="size-4 opacity-40" />
+            </CardContent>
+          </Card>
+        </NuxtLink>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import {
+  ChevronRight as ChevronRightIcon,
+  LogOutIcon,
+  Map as MapIcon,
+  Settings as SettingsIcon,
+  UserIcon,
+} from '@lucide/vue'
+
 import { useAuthClient } from '~/utils'
-import { LogOutIcon, Map as MapIcon, Settings as SettingsIcon, UserIcon } from 'lucide-vue-next'
+
+useTopbar(null)
 
 const auth = useAuthClient()
 const session = auth.useSession()
 const region = useRegionStore()
-await region.load()
+region.load()
 
 const signOut = async () => {
   await auth.signOut()
 }
-
-const regionQuery = gql`
-  query RegionQuery($id: ID!) {
-    region(id: $id) {
-      id
-      name
-      placetype
-    }
-  }
-`
-type RegionResult = {
-  region: {
-    id: string
-    name?: string
-    placetype: string
-  }
-}
-const { data: regionData } = await useAsyncQuery<RegionResult>(regionQuery, {
-  id: region.selectedRegion,
-})
 </script>

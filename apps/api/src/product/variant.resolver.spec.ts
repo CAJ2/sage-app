@@ -1022,10 +1022,7 @@ describe('VariantResolver (integration)', () => {
     test('should handle multiple create mutations in single request', async () => {
       const res = await gql.send(
         graphql(`
-          mutation BatchCreateVariants(
-            $input1: CreateVariantInput!
-            $input2: CreateVariantInput!
-          ) {
+          mutation BatchCreateVariants($input1: CreateVariantInput!, $input2: CreateVariantInput!) {
             variant1: createVariant(input: $input1) {
               variant {
                 id

@@ -42,7 +42,7 @@ https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/labs/VPull
 </template>
 
 <script lang="ts" setup>
-import { ArrowDown, ArrowUp } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp } from '@lucide/vue'
 
 function clamp(value: number, min = 0, max = 1) {
   return Math.max(min, Math.min(max, value))

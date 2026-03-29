@@ -5,7 +5,7 @@
         class="flex items-center justify-center space-x-2 rounded-lg px-4 py-1 shadow-sm"
         :class="colorClass.text + ' ' + colorClass.shadow + ' ' + colorClass.bg"
       >
-        <font-awesome-icon :icon="iconClass" class="text-xl" />
+        <component :is="iconComponent" class="text-xl" />
         <span v-if="status === 'saving'" class="loading loading-md loading-spinner"></span>
         <span class="text-lg">
           {{ statusFmt }}
@@ -16,6 +16,8 @@
 </template>
 
 <script setup lang="ts">
+import { Check, Loader2, TriangleAlert, X } from '@lucide/vue'
+
 const { status } = defineProps<{
   status: 'saved' | 'saving' | 'not_saved' | 'error' | undefined
 }>()
@@ -75,18 +77,18 @@ const colorClass = computed(() => {
   }
 })
 
-const iconClass = computed(() => {
+const iconComponent = computed(() => {
   switch (status) {
     case 'saved':
-      return 'fa-solid fa-check'
+      return Check
     case 'saving':
-      return 'fa-solid fa-spinner'
+      return Loader2
     case 'not_saved':
-      return 'fa-solid fa-exclamation-triangle'
+      return TriangleAlert
     case 'error':
-      return 'fa-solid fa-xmark'
+      return X
     default:
-      return ''
+      return null
   }
 })
 </script>

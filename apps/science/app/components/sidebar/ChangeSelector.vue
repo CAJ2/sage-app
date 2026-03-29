@@ -1,5 +1,5 @@
 <template>
-  <NuxtLinkLocale to="/changes" class="flex content-center">
+  <NuxtLink to="/changes" class="flex content-center">
     <div v-if="isChangeSelected" class="flex grow flex-col">
       <div class="text-md font-bold">
         {{ result?.change?.title || 'Loading...' }}
@@ -10,12 +10,14 @@
     </div>
     <div v-else class="text-md grow opacity-70">No Change Selected</div>
     <Button v-if="selectedChange" variant="ghost" @click.stop.prevent="clearChange">
-      <font-awesome-icon icon="fa-solid fa-xmark" width="5" height="5" />
+      <X :size="20" />
     </Button>
-  </NuxtLinkLocale>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
+import { X } from '@lucide/vue'
+
 import { graphql } from '~/gql'
 
 const changeStore = useChangeStore()

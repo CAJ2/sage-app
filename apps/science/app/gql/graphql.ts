@@ -3,7 +3,7 @@
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -1909,12 +1909,15 @@ export type StreamScore = {
 
 /** A rating enum used to describe scores */
 export enum StreamScoreRating {
-  Excellent = 'EXCELLENT',
-  Fair = 'FAIR',
-  Good = 'GOOD',
-  Poor = 'POOR',
-  Unknown = 'UNKNOWN',
-  VeryGood = 'VERY_GOOD'
+  A = 'A',
+  APlus = 'A_PLUS',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  E = 'E',
+  F = 'F',
+  G = 'G',
+  Unknown = 'UNKNOWN'
 }
 
 /** A tag instance applied to a model, with optional instance-specific metadata */
@@ -2626,10 +2629,19 @@ export type CategoryChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type CategoryChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?: (
-          { __typename?: 'Category' }
-          & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-        ) | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename?: 'Process' } | { __typename?: 'Region' } | { __typename?: 'Variant' } | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+export type CategoryChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+          | (
+            { __typename?: 'Category' }
+            & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
+          )
+          | { __typename?: 'Component' }
+          | { __typename?: 'Item' }
+          | { __typename?: 'Material' }
+          | { __typename?: 'Place' }
+          | { __typename?: 'Process' }
+          | { __typename?: 'Region' }
+          | { __typename?: 'Variant' }
+         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type CategoriesSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2700,10 +2712,19 @@ export type ComponentChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ComponentChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?: { __typename?: 'Category' } | (
-          { __typename?: 'Component' }
-          & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
-        ) | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename?: 'Process' } | { __typename?: 'Region' } | { __typename?: 'Variant' } | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+export type ComponentChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+          | { __typename?: 'Category' }
+          | (
+            { __typename?: 'Component' }
+            & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
+          )
+          | { __typename?: 'Item' }
+          | { __typename?: 'Material' }
+          | { __typename?: 'Place' }
+          | { __typename?: 'Process' }
+          | { __typename?: 'Region' }
+          | { __typename?: 'Variant' }
+         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type ComponentsSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2779,10 +2800,19 @@ export type ProcessesChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ProcessesChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?: { __typename?: 'Category' } | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | (
-          { __typename?: 'Process' }
-          & { ' $fragmentRefs'?: { 'ListProcessFragmentFragment': ListProcessFragmentFragment } }
-        ) | { __typename?: 'Region' } | { __typename?: 'Variant' } | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+export type ProcessesChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+          | { __typename?: 'Category' }
+          | { __typename?: 'Component' }
+          | { __typename?: 'Item' }
+          | { __typename?: 'Material' }
+          | { __typename?: 'Place' }
+          | (
+            { __typename?: 'Process' }
+            & { ' $fragmentRefs'?: { 'ListProcessFragmentFragment': ListProcessFragmentFragment } }
+          )
+          | { __typename?: 'Region' }
+          | { __typename?: 'Variant' }
+         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type ProcessesSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2826,10 +2856,19 @@ export type VariantsChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type VariantsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?: { __typename?: 'Category' } | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename?: 'Process' } | { __typename?: 'Region' } | (
-          { __typename?: 'Variant' }
-          & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
-        ) | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+export type VariantsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+          | { __typename?: 'Category' }
+          | { __typename?: 'Component' }
+          | { __typename?: 'Item' }
+          | { __typename?: 'Material' }
+          | { __typename?: 'Place' }
+          | { __typename?: 'Process' }
+          | { __typename?: 'Region' }
+          | (
+            { __typename?: 'Variant' }
+            & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
+          )
+         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type VariantsSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2971,31 +3010,40 @@ export type RefSearchQueryQueryVariables = Exact<{
 }>;
 
 
-export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<(
-      { __typename?: 'Category' }
-      & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-    ) | (
-      { __typename?: 'Component' }
-      & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
-    ) | (
-      { __typename?: 'Item' }
-      & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
-    ) | (
-      { __typename?: 'Material' }
-      & { ' $fragmentRefs'?: { 'ListMaterialFragmentFragment': ListMaterialFragmentFragment } }
-    ) | (
-      { __typename?: 'Org' }
-      & { ' $fragmentRefs'?: { 'ListOrgFragmentFragment': ListOrgFragmentFragment } }
-    ) | (
-      { __typename?: 'Place' }
-      & { ' $fragmentRefs'?: { 'ListPlaceFragmentFragment': ListPlaceFragmentFragment } }
-    ) | (
-      { __typename?: 'Region' }
-      & { ' $fragmentRefs'?: { 'ListRegionFragmentFragment': ListRegionFragmentFragment } }
-    ) | (
-      { __typename?: 'Variant' }
-      & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
-    )> | null } };
+export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | (
+        { __typename?: 'Category' }
+        & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Component' }
+        & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Item' }
+        & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Material' }
+        & { ' $fragmentRefs'?: { 'ListMaterialFragmentFragment': ListMaterialFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Org' }
+        & { ' $fragmentRefs'?: { 'ListOrgFragmentFragment': ListOrgFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Place' }
+        & { ' $fragmentRefs'?: { 'ListPlaceFragmentFragment': ListPlaceFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Region' }
+        & { ' $fragmentRefs'?: { 'ListRegionFragmentFragment': ListRegionFragmentFragment } }
+      )
+      | (
+        { __typename?: 'Variant' }
+        & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
+      )
+    > | null } };
 
 export const ListCategoryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListCategoryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Category"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name_req"},"name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"descShort"}},{"kind":"Field","name":{"kind":"Name","value":"imageURL"}}]}}]} as unknown as DocumentNode<ListCategoryFragmentFragment, unknown>;
 export const ListChangeFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListChangeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Change"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<ListChangeFragmentFragment, unknown>;

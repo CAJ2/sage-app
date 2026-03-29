@@ -20,11 +20,12 @@ import type {
   UISchemaElement,
 } from '@jsonforms/core'
 import { rankWith, Generate, findUISchema, isObjectControl } from '@jsonforms/core'
-import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { DispatchRenderer, rendererProps, useJsonFormsControlWithDetail } from '@jsonforms/vue'
+import { isEmpty } from 'lodash-es'
+import { defineComponent } from 'vue'
+
 import { useVanillaControl } from '../util'
-import isEmpty from 'lodash/isEmpty'
 
 const controlRenderer = defineComponent({
   name: 'ObjectRenderer',

@@ -7,10 +7,10 @@
 <script lang="ts">
 import type { JsonSchema, Layout, UISchemaElement } from '@jsonforms/core'
 import { Generate } from '@jsonforms/core'
-import omit from 'lodash/omit'
+import { DispatchRenderer } from '@jsonforms/vue'
+import { omit } from 'lodash-es'
 import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
-import { DispatchRenderer } from '@jsonforms/vue'
 
 interface CombinatorProps {
   schema: JsonSchema

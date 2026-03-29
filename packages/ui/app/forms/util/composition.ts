@@ -1,6 +1,5 @@
 import { composePaths, findUISchema, getFirstPrimitiveProp, Resolve } from '@jsonforms/core'
-import cloneDeep from 'lodash/cloneDeep'
-import merge from 'lodash/merge'
+import { cloneDeep, merge } from 'lodash-es'
 import { computed, ref } from 'vue'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

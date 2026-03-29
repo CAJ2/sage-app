@@ -5,26 +5,28 @@
       class="btn btn-square btn-ghost"
       @click.prevent.stop="() => emits('button', 'select')"
     >
-      <font-awesome-icon icon="fa-solid fa-check" class="size-[1.2em]" />
+      <Check class="size-[1.2em]" />
     </button>
     <button
       v-if="buttons && buttons.includes('edit')"
       class="btn btn-square btn-ghost"
       @click.prevent.stop="() => emits('button', 'edit')"
     >
-      <font-awesome-icon icon="fa-solid fa-pencil" class="size-[1.2em]" />
+      <Pencil class="size-[1.2em]" />
     </button>
     <button
       v-if="buttons && buttons.includes('delete')"
       class="btn btn-square btn-ghost"
       @click.prevent.stop="() => emits('button', 'delete')"
     >
-      <font-awesome-icon icon="fa-solid fa-trash" class="size-[1.2em]" />
+      <Trash2 class="size-[1.2em]" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Check, Pencil, Trash2 } from '@lucide/vue'
+
 const { buttons } = defineProps<{
   buttons?: ('select' | 'edit' | 'delete')[]
 }>()

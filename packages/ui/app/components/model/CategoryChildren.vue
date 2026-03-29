@@ -10,7 +10,7 @@
 
       <div v-if="data">
         <li v-for="category in data.nodes" :key="category.id">
-          <NuxtLinkLocale :to="`/explore/categories/${category.id}`" class="list-row">
+          <NuxtLink :to="`/explore/categories/${category.id}`" class="list-row">
             <div>
               <UiImage class="size-10" :src="category.imageURL"></UiImage>
             </div>
@@ -38,7 +38,7 @@
                 </g>
               </svg>
             </button>
-          </NuxtLinkLocale>
+          </NuxtLink>
         </li>
       </div>
 

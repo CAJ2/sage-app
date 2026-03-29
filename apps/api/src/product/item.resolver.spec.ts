@@ -697,10 +697,7 @@ describe('ItemResolver (integration)', () => {
     test('should handle multiple create mutations in single request', async () => {
       const res = await gql.send(
         graphql(`
-          mutation BatchCreateItems(
-            $input1: CreateItemInput!
-            $input2: CreateItemInput!
-          ) {
+          mutation BatchCreateItems($input1: CreateItemInput!, $input2: CreateItemInput!) {
             item1: createItem(input: $input1) {
               item {
                 id

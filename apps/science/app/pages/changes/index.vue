@@ -9,7 +9,7 @@
           }
         "
       >
-        <font-awesome-icon icon="fa-solid fa-plus" />
+        <Plus />
         Add Change
       </Button>
     </div>
@@ -43,6 +43,8 @@
 </template>
 
 <script setup lang="ts">
+import { Plus } from '@lucide/vue'
+
 import { graphql } from '~/gql'
 import type { ListChangeFragmentFragment } from '~/gql/graphql'
 import { ChangeStatus } from '~/gql/types.generated'

@@ -142,11 +142,7 @@ describe('SearchResolver (integration)', () => {
     })
     const res = await gql.send(
       graphql(`
-        query SearchResolverCategoryResults(
-          $query: String!
-          $types: [SearchType!]
-          $limit: Int
-        ) {
+        query SearchResolverCategoryResults($query: String!, $types: [SearchType!], $limit: Int) {
           search(query: $query, types: $types, limit: $limit) {
             nodes {
               __typename
@@ -178,11 +174,7 @@ describe('SearchResolver (integration)', () => {
   test('should search with specific types', async () => {
     const res = await gql.send(
       graphql(`
-        query SearchResolverSearchTypes(
-          $query: String!
-          $types: [SearchType!]
-          $limit: Int
-        ) {
+        query SearchResolverSearchTypes($query: String!, $types: [SearchType!], $limit: Int) {
           search(query: $query, types: $types, limit: $limit) {
             nodes {
               __typename
@@ -208,11 +200,7 @@ describe('SearchResolver (integration)', () => {
   test('should search with location filter', async () => {
     const res = await gql.send(
       graphql(`
-        query SearchResolverSearchWithLocation(
-          $query: String!
-          $latlong: [Float!]
-          $limit: Int
-        ) {
+        query SearchResolverSearchWithLocation($query: String!, $latlong: [Float!], $limit: Int) {
           search(query: $query, latlong: $latlong, limit: $limit) {
             nodes {
               __typename
@@ -304,11 +292,7 @@ describe('SearchResolver (integration)', () => {
   test('should search with pagination', async () => {
     const res = await gql.send(
       graphql(`
-        query SearchResolverSearchPagination(
-          $query: String!
-          $limit: Int
-          $offset: Int
-        ) {
+        query SearchResolverSearchPagination($query: String!, $limit: Int, $offset: Int) {
           search(query: $query, limit: $limit, offset: $offset) {
             nodes {
               __typename

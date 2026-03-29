@@ -2,6 +2,7 @@
   "extends": "./.nuxt/tsconfig.json",
   "include": [
     ".nuxt/nuxt.d.ts",
+    "app/**/*",
     "src/**/*.stories.ts",
     "src/**/*.stories.tsx",
     "src/**/*.stories.mdx",

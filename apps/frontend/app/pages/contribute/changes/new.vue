@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <NavTopbar title="New Change" back="true" />
-  </div>
+  <div></div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useTopbar({ title: 'New Change', back: 'true' })
+</script>

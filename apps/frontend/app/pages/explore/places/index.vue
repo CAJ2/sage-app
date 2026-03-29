@@ -1,10 +1,10 @@
 <template>
   <div>
     <div
-      class="fixed top-0 z-10 m-4 flex w-[calc(100vw-70px)] max-w-2xl rounded-full bg-white text-black shadow-md focus-visible:outline-hidden"
+      class="fixed top-[env(safe-area-inset-top)] z-10 m-4 flex w-[calc(100vw-70px)] max-w-2xl rounded-full bg-white text-black shadow-md focus-visible:outline-hidden"
     >
       <span class="flex items-center justify-center px-2">
-        <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="mx-2 text-neutral-700" />
+        <Search class="mx-2 text-neutral-700" />
       </span>
       <input
         id="search"
@@ -24,9 +24,9 @@
         </DrawerHeader>
         <h3 class="text-md font-semibold">{{ selectedPlace?.desc }}</h3>
         <p>{{ selectedPlace?.tags }}</p>
-        <NuxtLinkLocale :to="`/explore/places/${selectedPlace?.id}`" class="p-4">
+        <NuxtLink :to="`/explore/places/${selectedPlace?.id}`" class="p-4">
           <Button class="w-full">View Details</Button>
-        </NuxtLinkLocale>
+        </NuxtLink>
         <a
           :href="`https://maps.google.com/?q=${selectedPlace?.location?.latitude},${selectedPlace?.location?.longitude}`"
           target="_blank"
@@ -49,12 +49,16 @@
 </template>
 
 <script setup lang="ts">
+import { Search } from '@lucide/vue'
 import { watchDebounced } from '@vueuse/core'
 import maplibregl, { Map, NavigationControl, type LngLatLike } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'
+
 import { graphql } from '~/gql'
 import type { Place } from '~/gql/types.generated'
+
+useTopbar(null)
 
 const searchInput = ref('')
 const openDetails = ref(false)

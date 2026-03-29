@@ -42,6 +42,7 @@
 <script lang="ts">
 import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
+
 import type { Styles } from '../styles'
 import { classes } from '../styles'
 

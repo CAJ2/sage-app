@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar :title="categoryID === 'new' ? 'New Category' : 'Edit Category'" back="true" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <FormChangeSaveStatus v-if="!readOnly" :status="saveStatus" />
@@ -18,6 +17,7 @@
 
 <script setup lang="ts">
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+
 import { graphql } from '~/gql'
 import {
   ChangeStatus,
@@ -26,10 +26,11 @@ import {
 } from '~/gql/types.generated'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const posthog = usePostHog()
 const changeID = route.params.id as string
 const categoryID = route.params.category_id as string
+
+useTopbar({ title: categoryID === 'new' ? 'New Category' : 'Edit Category', back: 'true' })
 
 const categorySchema = graphql(`
   query ChangesCategorySchema {
@@ -108,13 +109,7 @@ const categoryCreateMutation = graphql(`
     }
   }
 `)
-const categoryCreate = useMutation(categoryCreateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-    } as CreateCategoryInput,
-  },
-})
+const categoryCreate = useMutation(categoryCreateMutation)
 const categoryUpdateMutation = graphql(`
   mutation ChangeCategoryUpdate($input: UpdateCategoryInput!) {
     updateCategory(input: $input) {
@@ -124,15 +119,7 @@ const categoryUpdateMutation = graphql(`
     }
   }
 `)
-const categoryUpdate = useMutation(categoryUpdateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-      id: categoryID,
-      ...updateData.value,
-    },
-  },
-})
+const categoryUpdate = useMutation(categoryUpdateMutation)
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
 const onChange = async (event: JsonFormsChangeEvent) => {
@@ -159,9 +146,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           // Redirect to the new category page
           if (category?.data?.createCategory?.category?.id) {
             navigateTo(
-              localeRoute(
-                `/contribute/changes/${changeID}/categories/${category?.data?.createCategory?.category?.id}`,
-              ),
+              `/contribute/changes/${changeID}/categories/${category?.data?.createCategory?.category?.id}`,
             )
           }
         })

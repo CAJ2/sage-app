@@ -178,9 +178,7 @@ describe('SourceResolver (integration)', () => {
     // Create a new source to delete
     const createRes = await gql.send(
       graphql(`
-        mutation SourceResolverCreateSourceToDelete(
-          $input: CreateSourceInput!
-        ) {
+        mutation SourceResolverCreateSourceToDelete($input: CreateSourceInput!) {
           createSource(input: $input) {
             source {
               id

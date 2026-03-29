@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core'
+
 import type { ComponentRecycle } from '~/gql/types.generated'
 
 const { image, recycle } = defineProps<{

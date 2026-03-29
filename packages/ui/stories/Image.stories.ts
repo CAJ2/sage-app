@@ -59,6 +59,54 @@ export const Icon: Story = {
   }),
 }
 
+export const IconGameIcons: Story = {
+  args: {
+    src: 'icon://game-icons/oat',
+    alt: 'Oat icon',
+    width: 16,
+    height: 16,
+  },
+  render: (args) => ({
+    components: { Image },
+    setup() {
+      return { args }
+    },
+    template: '<Image v-bind="args" />',
+  }),
+}
+
+export const IconSingleColor: Story = {
+  args: {
+    src: 'icon://lets-icons/map-duotone?color=4ade80',
+    alt: 'Map icon in green',
+    width: 16,
+    height: 16,
+  },
+  render: (args) => ({
+    components: { Image },
+    setup() {
+      return { args }
+    },
+    template: '<Image v-bind="args" />',
+  }),
+}
+
+export const IconDuotone: Story = {
+  args: {
+    src: 'icon://marketeq/multi-folder?color=4ade80,166534',
+    alt: 'Multi-folder duotone icon',
+    width: 16,
+    height: 16,
+  },
+  render: (args) => ({
+    components: { Image },
+    setup() {
+      return { args }
+    },
+    template: '<Image v-bind="args" />',
+  }),
+}
+
 export const NullSrc: Story = {
   args: {
     src: null,

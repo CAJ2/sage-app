@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar :title="data?.category.name || 'Category'" back="true" />
     <ModelCategoryChildren :status="status" :data="data?.category.children" />
     <UiList
       v-if="sessionData && data"
@@ -9,7 +8,7 @@
           id: 'edit',
           link: `/explore/categories/${data.category.id}/edit`,
           title: 'Edit Category',
-          icon: 'fa-solid fa-pen-to-square',
+          icon: SquarePen,
         },
       ]"
     />
@@ -17,6 +16,8 @@
 </template>
 
 <script setup lang="ts">
+import { SquarePen } from '@lucide/vue'
+
 const route = useRoute()
 const sessionData = useAuthSession()
 const categoriesQuery = gql`
@@ -64,6 +65,8 @@ type CategoryResult = {
 
 const { result: data, loading } = useQuery<CategoryResult>(categoriesQuery, vars)
 const status = computed(() => (loading.value ? 'pending' : 'success'))
+
+useTopbar({ title: computed(() => data.value?.category.name), loading, back: 'true' })
 
 const recentStore = useRecentStore()
 onMounted(() => {

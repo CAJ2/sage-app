@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, PlusIcon, XIcon } from 'lucide-vue-next'
+import { MinusIcon, PlusIcon, XIcon } from '@lucide/vue'
 import maplibregl, { Map } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'

@@ -20,9 +20,10 @@
 <script lang="ts">
 import type { JsonFormsRendererRegistryEntry, Layout } from '@jsonforms/core'
 import { isLayout, rankWith } from '@jsonforms/core'
-import { defineComponent } from 'vue'
 import type { RendererProps } from '@jsonforms/vue'
 import { DispatchRenderer, rendererProps, useJsonFormsLayout } from '@jsonforms/vue'
+import { defineComponent } from 'vue'
+
 import { useVanillaLayout } from '../util'
 
 const layoutRenderer = defineComponent({

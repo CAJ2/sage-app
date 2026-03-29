@@ -2,5 +2,6 @@
     <!-- Base application theme. -->
     <style name="Theme.sageleaf_frontend" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/base_200_dark</item>
     </style>
 </resources>

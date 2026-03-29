@@ -65,9 +65,7 @@ describe('TagResolver (integration)', () => {
   test('should create a tag definition', async () => {
     const res = await gql.send(
       graphql(`
-        mutation TagResolverCreateTagDefinition(
-          $input: CreateTagDefinitionInput!
-        ) {
+        mutation TagResolverCreateTagDefinition($input: CreateTagDefinitionInput!) {
           createTagDefinition(input: $input) {
             tag {
               id
@@ -111,9 +109,7 @@ describe('TagResolver (integration)', () => {
   test('should update a tag definition', async () => {
     const res = await gql.send(
       graphql(`
-        mutation TagResolverUpdateTagDefinition(
-          $input: UpdateTagDefinitionInput!
-        ) {
+        mutation TagResolverUpdateTagDefinition($input: UpdateTagDefinitionInput!) {
           updateTagDefinition(input: $input) {
             tag {
               id

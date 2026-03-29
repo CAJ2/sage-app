@@ -2,8 +2,6 @@ import { defineStore } from 'pinia'
 
 import type { HistoryEntry } from '~/utils/hybridStorage'
 
-export type { HistoryEntry }
-
 export const useRecentStore = defineStore('recent', () => {
   const items = ref<HistoryEntry[]>([])
   const loaded = ref(false)

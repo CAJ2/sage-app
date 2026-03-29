@@ -3,7 +3,7 @@
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -1909,12 +1909,15 @@ export type StreamScore = {
 
 /** A rating enum used to describe scores */
 export enum StreamScoreRating {
-  Excellent = 'EXCELLENT',
-  Fair = 'FAIR',
-  Good = 'GOOD',
-  Poor = 'POOR',
-  Unknown = 'UNKNOWN',
-  VeryGood = 'VERY_GOOD'
+  A = 'A',
+  APlus = 'A_PLUS',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  E = 'E',
+  F = 'F',
+  G = 'G',
+  Unknown = 'UNKNOWN'
 }
 
 /** A tag instance applied to a model, with optional instance-specific metadata */
@@ -3400,14 +3403,32 @@ export type FlowCreateProcessMutationVariables = Exact<{
 }>;
 
 
-export type FlowCreateProcessMutation = { __typename?: 'Mutation', createProcess?: { __typename?: 'CreateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string, status: ChangeStatus, edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', entityName: string, id?: string | null, createInput?: any | null, changes?: { __typename?: 'Category' } | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null } | { __typename?: 'Region' } | { __typename?: 'Variant' } | null }> | null } } | null } | null };
+export type FlowCreateProcessMutation = { __typename?: 'Mutation', createProcess?: { __typename?: 'CreateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string, status: ChangeStatus, edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', entityName: string, id?: string | null, createInput?: any | null, changes?:
+            | { __typename?: 'Category' }
+            | { __typename?: 'Component' }
+            | { __typename?: 'Item' }
+            | { __typename?: 'Material' }
+            | { __typename?: 'Place' }
+            | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
+            | { __typename?: 'Region' }
+            | { __typename?: 'Variant' }
+           | null }> | null } } | null } | null };
 
 export type FlowUpdateProcessMaterialMutationVariables = Exact<{
   input: UpdateProcessInput;
 }>;
 
 
-export type FlowUpdateProcessMaterialMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string, edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', entityName: string, id?: string | null, updateInput?: any | null, changes?: { __typename?: 'Category' } | { __typename?: 'Component' } | { __typename?: 'Item' } | { __typename?: 'Material' } | { __typename?: 'Place' } | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null } | { __typename?: 'Region' } | { __typename?: 'Variant' } | null }> | null } } | null } | null };
+export type FlowUpdateProcessMaterialMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string, edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', entityName: string, id?: string | null, updateInput?: any | null, changes?:
+            | { __typename?: 'Category' }
+            | { __typename?: 'Component' }
+            | { __typename?: 'Item' }
+            | { __typename?: 'Material' }
+            | { __typename?: 'Place' }
+            | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
+            | { __typename?: 'Region' }
+            | { __typename?: 'Variant' }
+           | null }> | null } } | null } | null };
 
 export type FlowCreateOrgMutationVariables = Exact<{
   input: CreateOrgInput;
@@ -4128,7 +4149,16 @@ export type SearchResolverSearchAllQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverSearchAllQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string } | { __typename: 'Component', id: string, name?: string | null } | { __typename: 'Item', id: string, name?: string | null } | { __typename: 'Material', id: string, name?: string | null } | { __typename: 'Org', id: string, name: string } | { __typename: 'Place', id: string, name?: string | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, name?: string | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean } } };
+export type SearchResolverSearchAllQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category', id: string, name: string }
+      | { __typename: 'Component', id: string, name?: string | null }
+      | { __typename: 'Item', id: string, name?: string | null }
+      | { __typename: 'Material', id: string, name?: string | null }
+      | { __typename: 'Org', id: string, name: string }
+      | { __typename: 'Place', id: string, name?: string | null }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, name?: string | null }
+    > | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean } } };
 
 export type SearchResolverCategoryResultsQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4137,7 +4167,16 @@ export type SearchResolverCategoryResultsQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverCategoryResultsQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string } | { __typename: 'Component', id: string, name?: string | null } | { __typename: 'Item', id: string, name?: string | null } | { __typename: 'Material', id: string, name?: string | null } | { __typename: 'Org', id: string, name: string } | { __typename: 'Place', id: string, name?: string | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, name?: string | null }> | null } };
+export type SearchResolverCategoryResultsQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category', id: string, name: string }
+      | { __typename: 'Component', id: string, name?: string | null }
+      | { __typename: 'Item', id: string, name?: string | null }
+      | { __typename: 'Material', id: string, name?: string | null }
+      | { __typename: 'Org', id: string, name: string }
+      | { __typename: 'Place', id: string, name?: string | null }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, name?: string | null }
+    > | null } };
 
 export type SearchResolverSearchTypesQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4146,7 +4185,16 @@ export type SearchResolverSearchTypesQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverSearchTypesQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string } | { __typename: 'Component', id: string, name?: string | null } | { __typename: 'Item', id: string, name?: string | null } | { __typename: 'Material', id: string, name?: string | null } | { __typename: 'Org', id: string, name: string } | { __typename: 'Place', id: string, name?: string | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, name?: string | null }> | null } };
+export type SearchResolverSearchTypesQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category', id: string, name: string }
+      | { __typename: 'Component', id: string, name?: string | null }
+      | { __typename: 'Item', id: string, name?: string | null }
+      | { __typename: 'Material', id: string, name?: string | null }
+      | { __typename: 'Org', id: string, name: string }
+      | { __typename: 'Place', id: string, name?: string | null }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, name?: string | null }
+    > | null } };
 
 export type SearchResolverSearchWithLocationQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4155,7 +4203,16 @@ export type SearchResolverSearchWithLocationQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverSearchWithLocationQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string } | { __typename: 'Component', id: string, name?: string | null } | { __typename: 'Item', id: string, name?: string | null } | { __typename: 'Material', id: string, name?: string | null } | { __typename: 'Org', id: string, name: string } | { __typename: 'Place', id: string, name?: string | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, name?: string | null }> | null } };
+export type SearchResolverSearchWithLocationQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category', id: string, name: string }
+      | { __typename: 'Component', id: string, name?: string | null }
+      | { __typename: 'Item', id: string, name?: string | null }
+      | { __typename: 'Material', id: string, name?: string | null }
+      | { __typename: 'Org', id: string, name: string }
+      | { __typename: 'Place', id: string, name?: string | null }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, name?: string | null }
+    > | null } };
 
 export type SearchResolverSearchEmptyQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4163,7 +4220,16 @@ export type SearchResolverSearchEmptyQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverSearchEmptyQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category' } | { __typename: 'Component' } | { __typename: 'Item' } | { __typename: 'Material' } | { __typename: 'Org' } | { __typename: 'Place' } | { __typename: 'Region' } | { __typename: 'Variant' }> | null } };
+export type SearchResolverSearchEmptyQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category' }
+      | { __typename: 'Component' }
+      | { __typename: 'Item' }
+      | { __typename: 'Material' }
+      | { __typename: 'Org' }
+      | { __typename: 'Place' }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant' }
+    > | null } };
 
 export type SearchResolverLangFallbackSingleQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4171,7 +4237,16 @@ export type SearchResolverLangFallbackSingleQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverLangFallbackSingleQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category' } | { __typename: 'Component' } | { __typename: 'Item' } | { __typename: 'Material' } | { __typename: 'Org' } | { __typename: 'Place' } | { __typename: 'Region' } | { __typename: 'Variant' }> | null } };
+export type SearchResolverLangFallbackSingleQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category' }
+      | { __typename: 'Component' }
+      | { __typename: 'Item' }
+      | { __typename: 'Material' }
+      | { __typename: 'Org' }
+      | { __typename: 'Place' }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant' }
+    > | null } };
 
 export type SearchResolverLangFallbackFederatedQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4179,7 +4254,16 @@ export type SearchResolverLangFallbackFederatedQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverLangFallbackFederatedQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category' } | { __typename: 'Component' } | { __typename: 'Item' } | { __typename: 'Material' } | { __typename: 'Org' } | { __typename: 'Place' } | { __typename: 'Region' } | { __typename: 'Variant' }> | null } };
+export type SearchResolverLangFallbackFederatedQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category' }
+      | { __typename: 'Component' }
+      | { __typename: 'Item' }
+      | { __typename: 'Material' }
+      | { __typename: 'Org' }
+      | { __typename: 'Place' }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant' }
+    > | null } };
 
 export type SearchResolverSearchPaginationQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -4188,7 +4272,16 @@ export type SearchResolverSearchPaginationQueryVariables = Exact<{
 }>;
 
 
-export type SearchResolverSearchPaginationQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<{ __typename: 'Category', id: string, name: string } | { __typename: 'Component', id: string, name?: string | null } | { __typename: 'Item', id: string, name?: string | null } | { __typename: 'Material', id: string, name?: string | null } | { __typename: 'Org', id: string, name: string } | { __typename: 'Place', id: string, name?: string | null } | { __typename: 'Region' } | { __typename: 'Variant', id: string, name?: string | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean } } };
+export type SearchResolverSearchPaginationQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+      | { __typename: 'Category', id: string, name: string }
+      | { __typename: 'Component', id: string, name?: string | null }
+      | { __typename: 'Item', id: string, name?: string | null }
+      | { __typename: 'Material', id: string, name?: string | null }
+      | { __typename: 'Org', id: string, name: string }
+      | { __typename: 'Place', id: string, name?: string | null }
+      | { __typename: 'Region' }
+      | { __typename: 'Variant', id: string, name?: string | null }
+    > | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean } } };
 
 export type OrgResolverGetOrgQueryVariables = Exact<{
   id: Scalars['ID']['input'];

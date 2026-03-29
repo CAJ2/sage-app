@@ -1,10 +1,5 @@
 <template>
   <div>
-    <NavTopbar
-      :title="changeData?.change?.title || 'Change'"
-      :subtitle="changeData?.change?.description || undefined"
-      back="true"
-    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <Card class="mb-4">
@@ -63,7 +58,7 @@
                 class="btn grow btn-sm btn-primary"
                 @click="setStatus(ChangeStatus.Proposed)"
               >
-                <font-awesome-icon icon="fa-solid fa-upload" class="mr-2 size-4" />
+                <Upload class="mr-2 size-4" />
                 Publish Change
               </button>
               <button
@@ -71,7 +66,7 @@
                 class="btn grow btn-sm btn-primary"
                 @click="setStatus(ChangeStatus.Draft)"
               >
-                <font-awesome-icon icon="fa-solid fa-pencil" class="mr-2 size-4" />
+                <Pencil class="mr-2 size-4" />
                 Revert to Draft
               </button>
               <button
@@ -79,7 +74,7 @@
                 class="btn grow btn-sm btn-primary"
                 @click="mergeChange"
               >
-                <font-awesome-icon icon="fa-solid fa-pencil" class="mr-2 size-4" />
+                <Pencil class="mr-2 size-4" />
                 Merge Change
               </button>
               <button
@@ -90,7 +85,7 @@
                 class="btn-danger btn btn-sm"
                 @click="deleteChange"
               >
-                <font-awesome-icon icon="fa-solid fa-trash" class="size-4" />
+                <Trash2 class="size-4" />
               </button>
             </div>
           </CardContent>
@@ -103,7 +98,7 @@
               :key="edit.id || edit.entityName"
               class="border-neutral-300"
             >
-              <NuxtLinkLocale :to="getEditSubLink(edit as Edit)">
+              <NuxtLink :to="getEditSubLink(edit as Edit)">
                 <div v-if="edit.changes" class="mx-3 my-4">
                   <div class="flex items-center">
                     <div class="badge badge-sm badge-secondary">
@@ -122,14 +117,11 @@
                       >
                     </div>
                     <div>
-                      <font-awesome-icon
-                        icon="fa-solid fa-chevron-right"
-                        class="text-neutral-300"
-                      />
+                      <ChevronRight class="text-neutral-300" />
                     </div>
                   </div>
                 </div>
-              </NuxtLinkLocale>
+              </NuxtLink>
             </li>
             <span
               v-if="changeData.change.edits.nodes?.length === 0"
@@ -145,13 +137,13 @@
                 id: 'new_category',
                 link: `/contribute/changes/${changeData.change?.id}/categories/new`,
                 title: 'New Category',
-                icon: 'fa-solid fa-plus',
+                icon: Plus,
               },
               {
                 id: 'new_process',
                 link: `/contribute/changes/${changeData.change?.id}/processes/new`,
                 title: 'New Process',
-                icon: 'fa-solid fa-plus',
+                icon: Plus,
               },
             ]"
           />
@@ -162,12 +154,13 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronRight, Pencil, Plus, Trash2, Upload } from '@lucide/vue'
+
 import { graphql } from '~/gql'
-import type { Edit, UpdateChangeInput } from '~/gql/types.generated'
+import type { Edit } from '~/gql/types.generated'
 import { ChangeStatus } from '~/gql/types.generated'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 
 const openEditTitle = ref(false)
 
@@ -234,8 +227,19 @@ const changeQuery = graphql(`
     }
   }
 `)
-const { result: changeData, refetch: refetchChangeData } = useQuery(changeQuery, {
+const {
+  result: changeData,
+  loading: changeLoading,
+  refetch: refetchChangeData,
+} = useQuery(changeQuery, {
   id: route.params.id as string,
+})
+
+useTopbar({
+  title: computed(() => changeData.value?.change?.title || undefined),
+  subtitle: computed(() => changeData.value?.change?.description || undefined),
+  loading: changeLoading,
+  back: 'true',
 })
 
 const entityToPage: Record<string, string> = {
@@ -260,13 +264,7 @@ const changeEditMutation = graphql(`
     }
   }
 `)
-const changeEdit = useMutation(changeEditMutation, {
-  variables: {
-    input: {
-      id: route.params.id as string,
-    } as UpdateChangeInput,
-  },
-})
+const changeEdit = useMutation(changeEditMutation)
 const changeDeleteMutation = graphql(`
   mutation ChangeDeleteMutation($id: ID!) {
     deleteChange(id: $id) {
@@ -274,11 +272,7 @@ const changeDeleteMutation = graphql(`
     }
   }
 `)
-const changeDelete = useMutation(changeDeleteMutation, {
-  variables: {
-    id: route.params.id as string,
-  },
-})
+const changeDelete = useMutation(changeDeleteMutation)
 
 const setStatus = async (status: ChangeStatus) => {
   await changeEdit.mutate({
@@ -293,7 +287,7 @@ const setStatus = async (status: ChangeStatus) => {
 const deleteChange = async () => {
   const result = await changeDelete.mutate()
   if (result?.data) {
-    navigateTo(localeRoute('/contribute/changes'))
+    navigateTo('/contribute/changes')
   }
 }
 
@@ -317,11 +311,7 @@ const changeMergeMutation = graphql(`
     }
   }
 `)
-const changeMerge = useMutation(changeMergeMutation, {
-  variables: {
-    id: route.params.id as string,
-  },
-})
+const changeMerge = useMutation(changeMergeMutation)
 const mergeChange = async () => {
   const result = await changeMerge.mutate()
   if (result?.data) {

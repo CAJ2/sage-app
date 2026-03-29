@@ -1,10 +1,13 @@
 {
   "scoreRating": {
-    "POOR": "Bad",
-    "FAIR": "Fair",
-    "GOOD": "Good",
-    "VERY_GOOD": "Very Good",
-    "EXCELLENT": "Excellent",
+    "A_PLUS": "A+",
+    "A": "A",
+    "B": "B",
+    "C": "C",
+    "D": "D",
+    "E": "E",
+    "F": "F",
+    "G": "G",
     "UNKNOWN": "Unknown"
   }
 }

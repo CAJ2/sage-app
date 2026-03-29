@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar title="Sign In" back="true" />
     <div class="flex grow items-center justify-center p-6 lg:p-10">
       <form class="grid w-full max-w-sm grid-cols-1 gap-8" @submit.prevent.stop="form.handleSubmit">
         <div class="mt-4">
@@ -50,10 +49,8 @@
             <FormCheckbox id="remember" class="my-1 inline-flex" :default-value="true" />
             <FormLabel for="remember" class="text-md">Remember me</FormLabel>
           </div>
-          <NuxtLinkLocale
-            to="/profile/forgot_password"
-            class="text-sm underline-offset-4 hover:underline"
-            >Forgot password?</NuxtLinkLocale
+          <NuxtLink to="/profile/forgot_password" class="text-sm underline-offset-4 hover:underline"
+            >Forgot password?</NuxtLink
           >
         </div>
         <div>
@@ -76,6 +73,8 @@
 <script setup lang="ts">
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
+
+useTopbar({ title: 'Sign In', back: 'true' })
 
 const auth = useAuthClient()
 const router = useRouter()

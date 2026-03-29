@@ -6,11 +6,14 @@ import {
 } from '@src/process/process.entity'
 
 export enum StreamScoreRating {
-  POOR = 'POOR',
-  FAIR = 'FAIR',
-  GOOD = 'GOOD',
-  VERY_GOOD = 'VERY_GOOD',
-  EXCELLENT = 'EXCELLENT',
+  A_PLUS = 'A_PLUS',
+  A = 'A',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  E = 'E',
+  F = 'F',
+  G = 'G',
   UNKNOWN = 'UNKNOWN',
 }
 

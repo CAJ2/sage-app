@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar title="Edit Profile" back="true" />
     <div class="flex grow items-center justify-center p-6 lg:p-10">
       <form class="grid w-full max-w-sm grid-cols-1 gap-8" @submit.prevent.stop="form.handleSubmit">
         <div class="mt-4" />
@@ -22,6 +21,8 @@
 <script setup lang="ts">
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
+
+useTopbar({ title: 'Edit Profile', back: 'true' })
 
 const auth = useAuthClient()
 const router = useRouter()

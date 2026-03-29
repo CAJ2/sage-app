@@ -1,5 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep'
-import mergeWith from 'lodash/mergeWith'
+import { cloneDeep, mergeWith } from 'lodash-es'
 
 import type { Styles } from './styles'
 

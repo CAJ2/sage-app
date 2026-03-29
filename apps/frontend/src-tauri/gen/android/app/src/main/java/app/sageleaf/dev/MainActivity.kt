@@ -29,6 +29,5 @@ class MainActivity : TauriActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
-    window.decorView.let { WindowInsetsUtil.applySystemBarsPadding(it) }
   }
 }

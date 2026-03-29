@@ -20,7 +20,7 @@
           </div>
           <div v-for="item in data?.feed.nodes" :key="item.id">
             <component
-              :is="item.externalLink ? 'a' : NuxtLinkLocale"
+              :is="item.externalLink ? 'a' : NuxtLink"
               v-bind="
                 item.externalLink
                   ? { href: item.externalLink.url, target: '_blank', rel: 'noopener noreferrer' }
@@ -35,7 +35,7 @@
                 <CardHeader class="p-4 pb-2">
                   <div class="flex items-center justify-between gap-2">
                     <CardTitle class="text-base">{{ item.title }}</CardTitle>
-                    <span class="badge-outline badge shrink-0 text-xs">{{ item.format }}</span>
+                    <span class="badge shrink-0 badge-outline text-xs">{{ item.format }}</span>
                   </div>
                 </CardHeader>
                 <CardContent v-if="item.markdownShort" class="px-4 pb-3">
@@ -51,9 +51,12 @@
 </template>
 
 <script setup lang="ts">
+import { NuxtLink } from '#components'
+import { MessageCircleDashed } from '@lucide/vue'
+
 import { graphql } from '~/gql'
-import { NuxtLinkLocale } from '#components'
-import { MessageCircleDashed } from 'lucide-vue-next'
+
+useTopbar(null)
 
 const homeFeedQuery = graphql(`
   query HomeFeed($regionId: ID) {

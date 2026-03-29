@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
+import type { Component } from 'vue'
+
 import SidebarMenuButtonChild, { type SidebarMenuButtonProps } from './SidebarMenuButtonChild.vue'
 import { useSidebar } from './utils'
 

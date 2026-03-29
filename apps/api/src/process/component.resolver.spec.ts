@@ -166,9 +166,7 @@ describe('ComponentResolver (integration)', () => {
   test('should create a component', async () => {
     const res = await gql.send(
       graphql(`
-        mutation ComponentResolverCreateComponent(
-          $input: CreateComponentInput!
-        ) {
+        mutation ComponentResolverCreateComponent($input: CreateComponentInput!) {
           createComponent(input: $input) {
             component {
               id
@@ -194,9 +192,7 @@ describe('ComponentResolver (integration)', () => {
   test('should update a component', async () => {
     const res = await gql.send(
       graphql(`
-        mutation ComponentResolverUpdateComponent(
-          $input: UpdateComponentInput!
-        ) {
+        mutation ComponentResolverUpdateComponent($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
               id
@@ -692,7 +688,9 @@ describe('ComponentResolver (integration)', () => {
         graphql(`
           mutation CreateCaveatComponent($input: CreateComponentInput!) {
             createComponent(input: $input) {
-              component { id }
+              component {
+                id
+              }
             }
           }
         `),

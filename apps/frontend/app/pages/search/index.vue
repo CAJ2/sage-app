@@ -2,20 +2,20 @@
   <div>
     <div class="flex justify-center px-5 pt-5">
       <div class="grid w-full max-w-2xl grid-cols-2 rounded-lg bg-base-200 p-1">
-        <NuxtLinkLocale to="/search">
+        <NuxtLink to="/search">
           <button
             class="flex w-full items-center justify-center gap-1.5 rounded-md bg-base-100 py-1.5 text-sm shadow"
           >
             <SearchIcon :size="14" />
             Search
           </button>
-        </NuxtLinkLocale>
-        <NuxtLinkLocale to="/search/scan">
+        </NuxtLink>
+        <NuxtLink to="/search/scan">
           <button class="flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-sm">
             <ScanBarcodeIcon :size="14" />
             Scan
           </button>
-        </NuxtLinkLocale>
+        </NuxtLink>
       </div>
     </div>
     <div class="flex justify-center">
@@ -44,11 +44,17 @@
 
           <div v-if="result && !loading">
             <li v-for="res in result.search.nodes" :key="res.id">
-              <NuxtLinkLocale :to="exploreLink(res.__typename, res.id)">
+              <NuxtLink :to="exploreLink(res.__typename, res.id)">
                 <div v-if="res.id" class="list-row flex items-center gap-2 pt-2 pb-3">
-                  <img v-if="res.imageURL" class="size-20 rounded-box" :src="res.imageURL" />
+                  <UiImage
+                    v-if="res.imageURL"
+                    :src="res.imageURL"
+                    :width="20"
+                    :height="20"
+                    class="size-20 rounded-box"
+                  />
                   <span
-                    v-else
+                    v-if="!res.imageURL"
                     class="flex size-20 items-center justify-center rounded-box border border-neutral-200"
                   >
                     <component :is="placeholderIcon(res.__typename)" class="size-8" />
@@ -71,7 +77,7 @@
                     <ChevronRightIcon class="size-5" />
                   </button>
                 </div>
-              </NuxtLinkLocale>
+              </NuxtLink>
             </li>
           </div>
 
@@ -86,7 +92,6 @@
 </template>
 
 <script setup lang="ts">
-import { watchDebounced } from '@vueuse/core'
 import {
   BoxIcon,
   Building2Icon,
@@ -97,8 +102,11 @@ import {
   ScanBarcodeIcon,
   SearchIcon,
   TagsIcon,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
+import { watchDebounced } from '@vueuse/core'
 import type { Component } from 'vue'
+
+useTopbar(null)
 
 onMounted(() => {
   ;(document.querySelector('#search') as HTMLElement)?.focus()

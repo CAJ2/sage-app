@@ -18,11 +18,12 @@
 </template>
 
 <script setup lang="ts">
-import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+import type { JSONSchemaType } from 'ajv'
+
 import { graphql } from '~/gql'
 import { ChangeStatus, type Exact } from '~/gql/graphql'
-import type { JSONSchemaType } from 'ajv'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SchemaQuery = any
@@ -154,22 +155,8 @@ const readOnly = computed<boolean | undefined>(() => {
   return true
 })
 
-const create = useMutation(createMutation, {
-  variables: {
-    input: {
-      changeID: changeId,
-    },
-  },
-})
-const update = useMutation(updateMutation, {
-  variables: {
-    input: {
-      changeID: changeId,
-      id: modelId,
-      ...updateData.value,
-    },
-  },
-})
+const create = useMutation(createMutation)
+const update = useMutation(updateMutation)
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
   modelId === 'new' ? 'not_saved' : 'saved',

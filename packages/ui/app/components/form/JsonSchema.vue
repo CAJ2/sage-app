@@ -12,11 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import { JsonForms, type JsonFormsChangeEvent } from '@jsonforms/vue'
-import { renderers } from '../../forms'
-import Ajv from 'ajv/dist/2020'
-import addFormats from 'ajv-formats'
 import type { JsonSchema, UISchemaElement } from '@jsonforms/core'
+import { JsonForms, type JsonFormsChangeEvent } from '@jsonforms/vue'
+import addFormats from 'ajv-formats'
+import Ajv from 'ajv/dist/2020'
+
+import { renderers } from '../../forms'
 
 const ajv = new Ajv({
   allErrors: true,

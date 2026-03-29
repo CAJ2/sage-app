@@ -1,9 +1,5 @@
 <template>
   <div>
-    <NavTopbar
-      :title="route.params.componentID === 'new' ? 'Create Component' : 'Edit Component'"
-      back="true"
-    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <FormJsonSchema
@@ -20,14 +16,21 @@
 
 <script setup lang="ts">
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+
 import { graphql } from '~/gql'
 import type { CreateComponentInput, UpdateComponentInput } from '~/gql/graphql'
 import { ChangeStatus } from '~/gql/graphql'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
 const componentID = route.params.componentID as string
+
+useTopbar({
+  title: computed(() =>
+    route.params.componentID === 'new' ? 'Create Component' : 'Edit Component',
+  ),
+  back: 'true',
+})
 
 const formQuery = graphql(`
   query ChangesComponentSchema {
@@ -106,13 +109,7 @@ const componentCreateMutation = graphql(`
     }
   }
 `)
-const componentCreate = useMutation(componentCreateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-    } as CreateComponentInput,
-  },
-})
+const componentCreate = useMutation(componentCreateMutation)
 const componentUpdateMutation = graphql(`
   mutation ChangeComponentUpdate($input: UpdateComponentInput!) {
     updateComponent(input: $input) {
@@ -122,15 +119,7 @@ const componentUpdateMutation = graphql(`
     }
   }
 `)
-const componentUpdate = useMutation(componentUpdateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-      id: componentID,
-      ...updateData.value,
-    },
-  },
-})
+const componentUpdate = useMutation(componentUpdateMutation)
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
 const onChange = async (event: JsonFormsChangeEvent) => {
@@ -157,9 +146,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           // Redirect to the new component page
           if (component?.data?.createComponent?.component?.id) {
             navigateTo(
-              localeRoute(
-                `/contribute/changes/${changeID}/components/${component?.data?.createComponent?.component?.id}`,
-              ),
+              `/contribute/changes/${changeID}/components/${component?.data?.createComponent?.component?.id}`,
             )
           }
         })

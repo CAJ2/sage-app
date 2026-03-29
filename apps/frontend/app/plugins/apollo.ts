@@ -1,18 +1,20 @@
 import type { ApolloClient } from '@apollo/client/core'
 import { from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
+import type { TolgeeInstance } from '@tolgee/vue'
 import { provideApolloClient } from '@vue/apollo-composable'
 
 export default defineNuxtPlugin(({ hook }) => {
-  const { $i18n } = useNuxtApp()
   const { clients } = useApollo()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultClient: ApolloClient<any> = (clients as any).default
 
   const regionStore = useRegionStore()
 
-  const ctxLink = setContext((_, { headers }) => {
-    const locale = $i18n.locale.value
+  const ctxLink = setContext(async (_, { headers }) => {
+    await regionStore.load()
+    const { $tolgee } = useNuxtApp()
+    const locale = ($tolgee as TolgeeInstance | undefined)?.getLanguage() ?? ''
     let lang = (navigator && navigator.language) || ''
     if (locale) {
       lang = locale + ',' + lang
@@ -35,6 +37,9 @@ export default defineNuxtPlugin(({ hook }) => {
 
   hook('apollo:error', (error) => {
     // oxlint-disable-next-line no-console
-    console.log('error: ', error)
+    console.error(
+      'Apollo error:',
+      JSON.stringify(error, Object.getOwnPropertyNames(error as object)),
+    )
   })
 })

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar :title="processID === 'new' ? 'New Process' : 'Edit Process'" back="true" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <FormChangeSaveStatus :status="saveStatus" />
@@ -18,6 +17,7 @@
 
 <script setup lang="ts">
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+
 import { graphql } from '~/gql'
 import {
   ChangeStatus,
@@ -26,9 +26,10 @@ import {
 } from '~/gql/types.generated'
 
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const changeID = route.params.id as string
 const processID = route.params.process_id as string
+
+useTopbar({ title: processID === 'new' ? 'New Process' : 'Edit Process', back: 'true' })
 
 const processSchema = graphql(`
   query ChangesProcessSchema {
@@ -107,13 +108,7 @@ const processCreateMutation = graphql(`
     }
   }
 `)
-const processCreate = useMutation(processCreateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-    } as CreateProcessInput,
-  },
-})
+const processCreate = useMutation(processCreateMutation)
 const processUpdateMutation = graphql(`
   mutation ChangeProcessUpdate($input: UpdateProcessInput!) {
     updateProcess(input: $input) {
@@ -123,15 +118,7 @@ const processUpdateMutation = graphql(`
     }
   }
 `)
-const processUpdate = useMutation(processUpdateMutation, {
-  variables: {
-    input: {
-      changeID: changeID,
-      id: processID,
-      ...updateData.value,
-    },
-  },
-})
+const processUpdate = useMutation(processUpdateMutation)
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>('not_saved')
 const onChange = async (event: JsonFormsChangeEvent) => {
@@ -158,9 +145,7 @@ const onChange = async (event: JsonFormsChangeEvent) => {
           // Redirect to the new process page
           if (process?.data?.createProcess?.process?.id) {
             navigateTo(
-              localeRoute(
-                `/contribute/changes/${changeID}/processes/${process?.data?.createProcess?.process?.id}`,
-              ),
+              `/contribute/changes/${changeID}/processes/${process?.data?.createProcess?.process?.id}`,
             )
           }
         })

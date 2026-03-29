@@ -38,17 +38,17 @@ test('/profile has a "Dark Mode" label', async ({ page, goto }) => {
 
 test('/profile has a Dark Mode toggle switch', async ({ page, goto }) => {
   await goto('/profile/settings', { waitUntil: 'hydration' })
-  await expect(page.locator('.dropdown-end')).toBeVisible()
+  await expect(page.locator('[data-slot="dropdown-menu-trigger"]')).toBeVisible()
 })
 
 test('/profile Dark Mode toggle changes state when clicked', async ({ page, goto }) => {
   await goto('/profile/settings', { waitUntil: 'hydration' })
-  const trigger = page.locator('.dropdown-end button').first()
+  const trigger = page.locator('[data-slot="dropdown-menu-trigger"]').first()
   const before = (await trigger.textContent())?.trim()
   await trigger.click()
   // Pick whichever option differs from current
   const target = before === 'Dark' ? 'Light' : 'Dark'
-  await page.getByRole('button', { name: target }).click()
+  await page.getByRole('menuitem', { name: target }).click()
   await expect(trigger).toContainText(target)
 })
 

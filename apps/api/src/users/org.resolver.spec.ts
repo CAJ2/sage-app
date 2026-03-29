@@ -400,9 +400,15 @@ describe('OrgResolver (integration)', () => {
                 history {
                   nodes {
                     datetime
-                    user { id }
-                    original { id }
-                    changes { id }
+                    user {
+                      id
+                    }
+                    original {
+                      id
+                    }
+                    changes {
+                      id
+                    }
                   }
                 }
               }
@@ -430,7 +436,9 @@ describe('OrgResolver (integration)', () => {
                 history {
                   nodes {
                     datetime
-                    user { id }
+                    user {
+                      id
+                    }
                     original {
                       id
                       name

@@ -1,11 +1,20 @@
 <template>
-  <div style="overflow: hidden">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
+  <TolgeeProvider>
+    <template #fallback><div /></template>
+    <div
+      class="pointer-events-none fixed top-0 right-0 left-0 z-[100] bg-base-200"
+      style="height: env(safe-area-inset-top)"
+      aria-hidden="true"
+    />
+    <div style="overflow: hidden">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
+  </TolgeeProvider>
 </template>
 <script setup lang="ts">
+import { TolgeeProvider } from '@tolgee/vue'
 import { useDark } from '@vueuse/core'
 
 useHead({
@@ -28,7 +37,7 @@ useDark({
 .page-right-enter-active,
 .page-right-leave-active {
   position: fixed;
-  top: 0;
+  top: var(--topbar-h, 0px);
   left: 0;
   right: 0;
   bottom: 0;
@@ -90,5 +99,32 @@ useDark({
 .page-right-leave-to {
   transform: translateX(100%);
   opacity: 0;
+}
+
+/* ─── Cross-tab fade ──────────────────────────────────────────── */
+
+.page-fade-enter-active,
+.page-fade-leave-active {
+  position: fixed;
+  top: var(--topbar-h, 0px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: opacity 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: opacity;
+}
+.page-fade-enter-active {
+  z-index: 10;
+}
+.page-fade-leave-active {
+  z-index: 1;
+}
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+}
+.page-fade-enter-to,
+.page-fade-leave-from {
+  opacity: 1;
 }
 </style>

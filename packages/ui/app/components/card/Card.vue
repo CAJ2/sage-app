@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes } from 'vue'
+
 import { cn } from '../lib/utils'
 
 const cardVariants = cva(

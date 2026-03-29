@@ -1,10 +1,5 @@
 <template>
   <div>
-    <NavTopbar
-      title="Edit Category"
-      subtitle="Manage your category details and changes."
-      back="true"
-    />
     <div class="flex flex-col items-center" />
   </div>
 </template>
@@ -12,8 +7,13 @@
 <script setup lang="ts">
 import { graphql } from '~/gql'
 
+useTopbar({
+  title: 'Edit Category',
+  subtitle: 'Manage your category details and changes.',
+  back: 'true',
+})
+
 const route = useRoute()
-const localeRoute = useLocaleRoute()
 const categoryId = route.params.id as string
 
 const updateQuery = graphql(`
@@ -25,18 +25,11 @@ const updateQuery = graphql(`
     }
   }
 `)
-const mutation = useMutation(updateQuery, {
-  variables: {
-    input: {
-      id: categoryId,
-      change: {},
-    },
-  },
-})
+const mutation = useMutation(updateQuery)
 const result = await mutation.mutate()
 if (result?.data?.updateCategory?.change?.id) {
   const changeID = result.data.updateCategory.change.id
-  navigateTo(localeRoute(`/contribute/changes/${changeID}/categories/${categoryId}`), {
+  navigateTo(`/contribute/changes/${changeID}/categories/${categoryId}`, {
     replace: true,
   })
 }

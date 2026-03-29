@@ -14,10 +14,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const fromSeg = from.path.split('/')[1]
   const lastToSeg = to.path.split('/').at(-1)
   const lastFromSeg = from.path.split('/').at(-1)
-  if (toSeg !== fromSeg) {
-    // We are changing tabs, no transition
-    setTransition('none')
-  } else if (lastFromSeg === 'new' && lastToSeg !== 'new') {
+  if (lastFromSeg === 'new' && lastToSeg !== 'new') {
     // We just created a new model, so do not show a transition
     setTransition('none')
   } else if (toDepth > fromDepth) {
@@ -27,6 +24,10 @@ export default defineNuxtRouteMiddleware((to, from) => {
   } else if (toDepth < fromDepth || (router.options as any).is_back) {
     to.meta.pageTransition = { name: 'page-right' }
     from.meta.pageTransition = { name: 'page-right' }
+    // oxlint-disable-next-line no-negated-condition
+  } else if (toSeg !== fromSeg) {
+    // Same depth, different tab — fade instead of slide
+    setTransition('page-fade')
   } else {
     to.meta.pageTransition = { name: 'page-left' }
     from.meta.pageTransition = { name: 'page-left' }

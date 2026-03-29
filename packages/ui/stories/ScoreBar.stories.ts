@@ -14,7 +14,7 @@ const meta: Meta<typeof Bar> = {
     score: { control: { type: 'range', min: 0, max: 100, step: 1 } },
     rating: {
       control: 'select',
-      options: ['POOR', 'FAIR', 'GOOD', 'VERY_GOOD', 'EXCELLENT', 'UNKNOWN'],
+      options: ['A_PLUS', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'UNKNOWN'],
     },
     ratingFmt: { control: 'text' },
     scoreSlide: { control: 'boolean' },
@@ -22,8 +22,8 @@ const meta: Meta<typeof Bar> = {
   args: {
     size: 'medium',
     score: 72,
-    rating: 'GOOD',
-    ratingFmt: 'Good',
+    rating: 'B',
+    ratingFmt: 'B',
     scoreSlide: false,
   },
 }
@@ -32,7 +32,7 @@ export default meta
 type Story = StoryObj<typeof Bar>
 
 export const SmallGood: Story = {
-  args: { size: 'small', score: 72, rating: 'GOOD', ratingFmt: 'Good' },
+  args: { size: 'small', score: 72, rating: 'B', ratingFmt: 'B' },
   render: (args) => ({
     components: { Bar },
     setup() {
@@ -43,7 +43,7 @@ export const SmallGood: Story = {
 }
 
 export const MediumExcellent: Story = {
-  args: { size: 'medium', score: 95, rating: 'EXCELLENT', ratingFmt: 'Excellent' },
+  args: { size: 'medium', score: 95, rating: 'A_PLUS', ratingFmt: 'A+' },
   render: (args) => ({
     components: { Bar },
     setup() {
@@ -54,7 +54,7 @@ export const MediumExcellent: Story = {
 }
 
 export const LargePoor: Story = {
-  args: { size: 'large', score: 20, rating: 'POOR', ratingFmt: 'Poor' },
+  args: { size: 'large', score: 20, rating: 'G', ratingFmt: 'G' },
   render: (args) => ({
     components: { Bar },
     setup() {
@@ -80,24 +80,36 @@ export const AllRatings: Story = {
     template: `
       <div class="flex flex-col gap-6 w-72">
         <div>
-          <p class="text-xs text-gray-500 mb-1">POOR (20)</p>
-          <Bar size="medium" :score="20" rating="POOR" rating-fmt="Poor" />
+          <p class="text-xs text-gray-500 mb-1">A+</p>
+          <Bar size="medium" :score="100" rating="A_PLUS" rating-fmt="A+" />
         </div>
         <div>
-          <p class="text-xs text-gray-500 mb-1">FAIR (40)</p>
-          <Bar size="medium" :score="40" rating="FAIR" rating-fmt="Fair" />
+          <p class="text-xs text-gray-500 mb-1">A</p>
+          <Bar size="medium" :score="88" rating="A" rating-fmt="A" />
         </div>
         <div>
-          <p class="text-xs text-gray-500 mb-1">GOOD (65)</p>
-          <Bar size="medium" :score="65" rating="GOOD" rating-fmt="Good" />
+          <p class="text-xs text-gray-500 mb-1">B</p>
+          <Bar size="medium" :score="75" rating="B" rating-fmt="B" />
         </div>
         <div>
-          <p class="text-xs text-gray-500 mb-1">VERY GOOD (80)</p>
-          <Bar size="medium" :score="80" rating="VERY_GOOD" rating-fmt="Very Good" />
+          <p class="text-xs text-gray-500 mb-1">C</p>
+          <Bar size="medium" :score="60" rating="C" rating-fmt="C" />
         </div>
         <div>
-          <p class="text-xs text-gray-500 mb-1">EXCELLENT (95)</p>
-          <Bar size="medium" :score="95" rating="EXCELLENT" rating-fmt="Excellent" />
+          <p class="text-xs text-gray-500 mb-1">D</p>
+          <Bar size="medium" :score="45" rating="D" rating-fmt="D" />
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 mb-1">E</p>
+          <Bar size="medium" :score="30" rating="E" rating-fmt="E" />
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 mb-1">F</p>
+          <Bar size="medium" :score="20" rating="F" rating-fmt="F" />
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 mb-1">G</p>
+          <Bar size="medium" :score="10" rating="G" rating-fmt="G" />
         </div>
       </div>
     `,

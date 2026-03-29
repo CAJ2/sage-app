@@ -1,20 +1,13 @@
 <template>
   <div>
-    <NavTopbar
-      :title="t('contribute.title')"
-      subtitle="Help us improve the platform by contributing."
-    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
-        <NuxtLinkLocale to="/contribute/changes">
+        <NuxtLink to="/contribute/changes">
           <div class="flex items-center">
             <h2 class="py-3 text-xl font-bold">Changes</h2>
-            <font-awesome-icon
-              icon="fa-solid fa-arrow-right"
-              class="mx-4 font-bold text-base-content/70"
-            />
+            <ArrowRight class="mx-4 font-bold text-base-content/70" />
           </div>
-        </NuxtLinkLocale>
+        </NuxtLink>
         <Carousel class="w-full" :opts="{ align: 'start' }">
           <CarouselContent class="ml-1">
             <CarouselItem
@@ -22,7 +15,7 @@
               :key="change.id"
               class="basis-1/2 pl-1 md:basis-1/3 lg:basis-1/3"
             >
-              <NuxtLinkLocale :to="`/contribute/changes/${change.id}`">
+              <NuxtLink :to="`/contribute/changes/${change.id}`">
                 <div class="p-1">
                   <Card>
                     <CardHeader class="p-4 pb-2">
@@ -47,7 +40,7 @@
                     </CardContent>
                   </Card>
                 </div>
-              </NuxtLinkLocale>
+              </NuxtLink>
             </CarouselItem>
             <CarouselItem
               v-if="!result?.changes.nodes?.length"
@@ -56,7 +49,7 @@
               <div class="p-1">
                 <Card class="border-dashed">
                   <CardContent class="flex flex-col pt-4 text-sm opacity-70">
-                    <font-awesome-icon icon="fa-solid fa-circle-plus" class="mb-2 text-xl" />
+                    <CirclePlus class="mb-2 text-xl" />
                     Changes will show up here when you make an edit
                   </CardContent>
                 </Card>
@@ -70,10 +63,15 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowRight, CirclePlus } from '@lucide/vue'
+import { useTranslate } from '@tolgee/vue'
+
 import { graphql } from '~/gql'
 import { ChangeStatus } from '~/gql/types.generated'
 
-const { t } = useI18n()
+const { t } = useTranslate('frontend')
+
+useTopbar({ title: computed(() => t.value('contribute.title')) })
 
 const changeListQuery = graphql(`
   query ContributeIndexGetChanges($first: Int) {

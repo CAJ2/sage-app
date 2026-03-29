@@ -17,9 +17,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import type { RendererProps } from '@jsonforms/vue'
-import { rendererProps, useJsonFormsMultiEnumControl } from '@jsonforms/vue'
 import type { ControlElement, JsonFormsRendererRegistryEntry, JsonSchema } from '@jsonforms/core'
 import {
   rankWith,
@@ -29,6 +26,10 @@ import {
   hasType,
   schemaSubPathMatches,
 } from '@jsonforms/core'
+import type { RendererProps } from '@jsonforms/vue'
+import { rendererProps, useJsonFormsMultiEnumControl } from '@jsonforms/vue'
+import { defineComponent } from 'vue'
+
 import { useVanillaArrayControl } from '../util'
 
 const controlRenderer = defineComponent({
