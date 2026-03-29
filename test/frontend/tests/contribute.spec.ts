@@ -28,16 +28,22 @@ test('/contribute/changes topbar shows the subtitle', async ({ page, goto }) => 
 
 test('/contribute/changes topbar has a back button', async ({ page, goto }) => {
   await goto('/contribute/changes', { waitUntil: 'hydration' })
-  const backButton = page.locator('button').filter({ has: page.locator('.fa-angle-left') })
+  const backButton = page.locator('button').filter({ has: page.locator('.lucide-arrow-left') })
   await expect(backButton).toBeVisible()
 })
 
-test('/contribute/changes back button navigates away from /contribute/changes', async ({ page, goto }) => {
+test('/contribute/changes back button navigates away from /contribute/changes', async ({
+  page,
+  goto,
+}) => {
   // Navigate through the UI so router.back() has a history entry to return to
   await goto('/contribute', { waitUntil: 'hydration' })
   await page.getByRole('heading', { name: 'Changes' }).click()
   await expect(page).toHaveURL(/\/contribute\/changes/)
-  await page.locator('button').filter({ has: page.locator('.fa-angle-left') }).click()
+  await page
+    .locator('button')
+    .filter({ has: page.locator('.lucide-arrow-left') })
+    .click()
   await expect(page).not.toHaveURL(/\/contribute\/changes/)
 })
 
@@ -48,6 +54,6 @@ test('/contribute/changes/new topbar shows "New Change"', async ({ page, goto })
 
 test('/contribute/changes/new topbar has a back button', async ({ page, goto }) => {
   await goto('/contribute/changes/new', { waitUntil: 'hydration' })
-  const backButton = page.locator('button').filter({ has: page.locator('.fa-angle-left') })
+  const backButton = page.locator('button').filter({ has: page.locator('.lucide-arrow-left') })
   await expect(backButton).toBeVisible()
 })

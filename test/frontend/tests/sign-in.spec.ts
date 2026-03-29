@@ -8,7 +8,7 @@ test('/profile/sign_in topbar shows "Sign In"', async ({ page, goto }) => {
 test('/profile/sign_in topbar has a back button', async ({ page, goto }) => {
   await goto('/profile/sign_in', { waitUntil: 'hydration' })
   // NavTopbar with back="true" renders a button with an arrow icon
-  const backButton = page.locator('button').filter({ has: page.locator('.fa-angle-left') })
+  const backButton = page.locator('button').filter({ has: page.locator('.lucide-arrow-left') })
   await expect(backButton).toBeVisible()
 })
 
@@ -16,7 +16,10 @@ test('/profile/sign_in back button navigates back when clicked', async ({ page, 
   await goto('/profile', { waitUntil: 'hydration' })
   await page.locator('a[href*="sign_in"]').first().click()
   await expect(page).toHaveURL(/sign_in/)
-  await page.locator('button').filter({ has: page.locator('.fa-angle-left') }).click()
+  await page
+    .locator('button')
+    .filter({ has: page.locator('.lucide-arrow-left') })
+    .click()
   await expect(page).not.toHaveURL(/sign_in/)
 })
 
@@ -57,7 +60,10 @@ test('/profile/sign_in has a "Sign In" submit button', async ({ page, goto }) =>
   await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible()
 })
 
-test('/profile/sign_in shows email validation error when email is invalid', async ({ page, goto }) => {
+test('/profile/sign_in shows email validation error when email is invalid', async ({
+  page,
+  goto,
+}) => {
   await goto('/profile/sign_in', { waitUntil: 'hydration' })
   const emailInput = page.locator('input[type="email"]')
   await emailInput.fill('notanemail')
@@ -65,7 +71,10 @@ test('/profile/sign_in shows email validation error when email is invalid', asyn
   await expect(page.getByRole('alert').first()).toBeVisible({ timeout: 5000 })
 })
 
-test('/profile/sign_in shows email validation error when email is empty and field is blurred', async ({ page, goto }) => {
+test('/profile/sign_in shows email validation error when email is empty and field is blurred', async ({
+  page,
+  goto,
+}) => {
   await goto('/profile/sign_in', { waitUntil: 'hydration' })
   const emailInput = page.locator('input[type="email"]')
   await emailInput.focus()
@@ -73,15 +82,23 @@ test('/profile/sign_in shows email validation error when email is empty and fiel
   await expect(page.getByRole('alert').first()).toBeVisible({ timeout: 5000 })
 })
 
-test('/profile/sign_in shows password validation error when password is too short', async ({ page, goto }) => {
+test('/profile/sign_in shows password validation error when password is too short', async ({
+  page,
+  goto,
+}) => {
   await goto('/profile/sign_in', { waitUntil: 'hydration' })
   const passwordInput = page.locator('input[type="password"]')
   await passwordInput.fill('short')
   await passwordInput.blur()
-  await expect(page.getByText('Password must be at least 8 characters')).toBeVisible({ timeout: 5000 })
+  await expect(page.getByText('Password must be at least 8 characters')).toBeVisible({
+    timeout: 5000,
+  })
 })
 
-test('/profile/sign_in shows no validation errors before any interaction', async ({ page, goto }) => {
+test('/profile/sign_in shows no validation errors before any interaction', async ({
+  page,
+  goto,
+}) => {
   await goto('/profile/sign_in', { waitUntil: 'hydration' })
   // Alert elements are only rendered after field blur — fresh form has none in the DOM
   await expect(page.locator('[role="alert"]')).toHaveCount(0)
