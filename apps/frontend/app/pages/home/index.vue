@@ -56,6 +56,8 @@ import { MessageCircleDashed } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 
+useTopbar(null)
+
 const homeFeedQuery = graphql(`
   query HomeFeed($regionId: ID) {
     feed(regionId: $regionId) {

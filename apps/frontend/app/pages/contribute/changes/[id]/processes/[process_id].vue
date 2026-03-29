@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar :title="processID === 'new' ? 'New Process' : 'Edit Process'" back="true" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <FormChangeSaveStatus :status="saveStatus" />
@@ -29,6 +28,8 @@ import {
 const route = useRoute()
 const changeID = route.params.id as string
 const processID = route.params.process_id as string
+
+useTopbar({ title: processID === 'new' ? 'New Process' : 'Edit Process', back: 'true' })
 
 const processSchema = graphql(`
   query ChangesProcessSchema {

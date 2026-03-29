@@ -1,9 +1,5 @@
 <template>
   <div>
-    <NavTopbar
-      :title="t('contribute.title')"
-      subtitle="Help us improve the platform by contributing."
-    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <NuxtLink to="/contribute/changes">
@@ -74,6 +70,8 @@ import { graphql } from '~/gql'
 import { ChangeStatus } from '~/gql/types.generated'
 
 const { t } = useTranslate('frontend')
+
+useTopbar({ title: computed(() => t.value('contribute.title')) })
 
 const changeListQuery = graphql(`
   query ContributeIndexGetChanges($first: Int) {

@@ -41,7 +41,7 @@
               </div>
               <div class="flex flex-1 flex-col">
                 <h2 class="font-medium">Region</h2>
-                <p class="text-xs opacity-60">{{ regionData?.region.name || '' }}</p>
+                <p class="text-xs opacity-60">{{ region.regionName }}</p>
               </div>
               <ChevronRightIcon class="size-4 opacity-40" />
             </CardContent>
@@ -93,32 +93,14 @@ import {
 
 import { useAuthClient } from '~/utils'
 
+useTopbar(null)
+
 const auth = useAuthClient()
 const session = auth.useSession()
 const region = useRegionStore()
-await region.load()
+region.load()
 
 const signOut = async () => {
   await auth.signOut()
 }
-
-const regionQuery = gql`
-  query RegionQuery($id: ID!) {
-    region(id: $id) {
-      id
-      name
-      placetype
-    }
-  }
-`
-type RegionResult = {
-  region: {
-    id: string
-    name?: string
-    placetype: string
-  }
-}
-const { data: regionData } = await useAsyncQuery<RegionResult>(regionQuery, {
-  id: region.selectedRegion,
-})
 </script>

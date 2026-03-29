@@ -141,6 +141,11 @@ export class I18nService {
     }
 
     let langStr = langResult.data
+    if (!langStr) {
+      throw new GraphQLError(
+        'A language code is required for text input (provide either an "Accept-Language" header or the "lang" query parameter)',
+      )
+    }
     const bits = langStr.split('-')
     if (bits.length >= 2) {
       langStr = bits[0]

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar :title="categoryID === 'new' ? 'New Category' : 'Edit Category'" back="true" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <FormChangeSaveStatus v-if="!readOnly" :status="saveStatus" />
@@ -30,6 +29,8 @@ const route = useRoute()
 const posthog = usePostHog()
 const changeID = route.params.id as string
 const categoryID = route.params.category_id as string
+
+useTopbar({ title: categoryID === 'new' ? 'New Category' : 'Edit Category', back: 'true' })
 
 const categorySchema = graphql(`
   query ChangesCategorySchema {

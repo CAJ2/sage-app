@@ -67,20 +67,18 @@
             :key="res.id"
             class="list-row border-t border-neutral-200 first:border-t-0"
           >
-            <div class="flex items-center gap-3 py-2">
-              <span
-                class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-neutral-200"
-              >
-                <GlobeIcon class="size-5" />
-              </span>
-              <div class="flex min-w-0 flex-1 flex-col">
-                <span class="truncate font-medium">{{ res.name }}</span>
-                <span class="text-sm opacity-60">{{ formatPlaceType(res.placetype) }}</span>
-              </div>
-              <button class="btn shrink-0 btn-sm btn-primary" @click.stop="selectRegion(res.id)">
-                Select
-              </button>
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-neutral-200"
+            >
+              <GlobeIcon class="size-5" />
+            </span>
+            <div class="flex min-w-0 flex-col">
+              <span class="truncate font-medium">{{ res.name }}</span>
+              <span class="text-sm opacity-60">{{ formatPlaceType(res.placetype) }}</span>
             </div>
+            <button class="btn shrink-0 btn-sm btn-primary" @click.stop="selectRegion(res.id)">
+              Select
+            </button>
           </li>
           <li v-if="searchData.search.nodes.length === 0" class="list-row text-sm opacity-60">
             No results for "{{ searchInput }}"
@@ -221,13 +219,16 @@ watchDebounced(
 )
 
 const selectRegion = async (regionId: string) => {
-  regionStore.setRegion(regionId)
   emit('update', regionId)
   const { data, status } = await useAsyncQuery<RegionResult>(regionQuery, {
     id: regionId,
   })
   regionData.value = data.value
   regionStatus.value = status.value
+  regionStore.setRegion(regionId, {
+    name: data.value?.region.name,
+    placetype: data.value?.region.placetype,
+  })
 }
 
 const clearRegion = () => {
@@ -278,16 +279,18 @@ async function requestGeolocation() {
     const { data } = await useAsyncQuery<CurrentRegionResult>(currentRegionQuery)
     const region = data.value?.currentRegion?.region
     if (region?.id) {
-      regionStore.setRegion(region.id)
       const { data: rd, status: rs } = await useAsyncQuery<RegionResult>(regionQuery, {
         id: region.id,
       })
       regionData.value = rd.value
       regionStatus.value = rs.value
+      regionStore.setRegion(region.id, { name: region.name, placetype: region.placetype })
     } else {
       locationError.value = 'Could not determine your region. Please search manually.'
     }
-  } catch {
+  } catch (e) {
+    // oxlint-disable-next-line no-console
+    console.error('Geolocation error:', JSON.stringify(e, Object.getOwnPropertyNames(e as object)))
     locationError.value = 'Could not get location. Please search manually.'
   } finally {
     locating.value = false

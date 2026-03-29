@@ -106,6 +106,8 @@ import {
 import { watchDebounced } from '@vueuse/core'
 import type { Component } from 'vue'
 
+useTopbar(null)
+
 onMounted(() => {
   ;(document.querySelector('#search') as HTMLElement)?.focus()
 })

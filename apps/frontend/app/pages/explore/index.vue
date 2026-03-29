@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar title="Explore" />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <NuxtLink to="/explore/places">
@@ -49,6 +48,8 @@
 import { ArrowRight, Map as MapIcon } from '@lucide/vue'
 
 import { graphql } from '~/gql'
+
+useTopbar({ title: 'Explore' })
 
 const categoriesQuery = graphql(`
   query GetCategories {

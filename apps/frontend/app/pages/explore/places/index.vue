@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="fixed top-0 z-10 m-4 flex w-[calc(100vw-70px)] max-w-2xl rounded-full bg-white text-black shadow-md focus-visible:outline-hidden"
+      class="fixed top-[env(safe-area-inset-top)] z-10 m-4 flex w-[calc(100vw-70px)] max-w-2xl rounded-full bg-white text-black shadow-md focus-visible:outline-hidden"
     >
       <span class="flex items-center justify-center px-2">
         <Search class="mx-2 text-neutral-700" />
@@ -57,6 +57,8 @@ import type { ShallowRef } from 'vue'
 
 import { graphql } from '~/gql'
 import type { Place } from '~/gql/types.generated'
+
+useTopbar(null)
 
 const searchInput = ref('')
 const openDetails = ref(false)

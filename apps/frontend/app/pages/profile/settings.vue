@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar title="App Settings" back="true" />
     <div class="flex justify-center px-4 py-4">
       <div class="flex w-full max-w-lg flex-col gap-3">
         <!-- Language -->
@@ -72,6 +71,8 @@ import { useTolgee } from '@tolgee/vue'
 import { useColorMode } from '@vueuse/core'
 import { DrawerTrigger } from 'vaul-vue'
 import { computed } from 'vue'
+
+useTopbar({ title: 'App Settings', back: 'true' })
 
 const tolgee = useTolgee(['language'])
 const locale = computed(() => tolgee.value.getLanguage() ?? 'en')

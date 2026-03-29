@@ -37,6 +37,9 @@ export default defineNuxtPlugin(({ hook }) => {
 
   hook('apollo:error', (error) => {
     // oxlint-disable-next-line no-console
-    console.log('error: ', error)
+    console.error(
+      'Apollo error:',
+      JSON.stringify(error, Object.getOwnPropertyNames(error as object)),
+    )
   })
 })

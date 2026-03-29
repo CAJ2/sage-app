@@ -22,6 +22,9 @@ const PRODUCT_FORMATS = [
 ] as const
 
 onMounted(async () => {
+  document.documentElement.style.background = 'transparent'
+  document.body.style.background = 'transparent'
+
   const { scan, cancel, checkPermissions, requestPermissions, Format } =
     await import('@tauri-apps/plugin-barcode-scanner')
 
@@ -54,6 +57,9 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(async () => {
+  document.documentElement.style.removeProperty('background')
+  document.body.style.removeProperty('background')
+
   scanning.value = false
   const { cancel } = await import('@tauri-apps/plugin-barcode-scanner')
   cancel()

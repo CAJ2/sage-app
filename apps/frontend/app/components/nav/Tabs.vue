@@ -1,5 +1,7 @@
 <template>
-  <nav class="relative flex items-center justify-around justify-items-center bg-base-200">
+  <nav
+    class="relative flex items-center justify-around justify-items-center bg-base-200 pb-[env(safe-area-inset-bottom)]"
+  >
     <!-- Left Tabs -->
     <div class="flex flex-1 justify-center">
       <NuxtLink :to="{ path: leftTabs['home'].path }" @dragstart.prevent>

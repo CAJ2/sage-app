@@ -1,6 +1,6 @@
 <template>
   <button
-    class="fixed top-4 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-base-100/80 shadow-md backdrop-blur-sm"
+    class="fixed top-[calc(env(safe-area-inset-top)+0.75rem)] left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-base-100/80 shadow-md backdrop-blur-sm"
     aria-label="Go back"
     @click.prevent="goBack"
   >

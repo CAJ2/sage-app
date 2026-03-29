@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavTopbar :title="data?.category.name" :loading="loading" back="true" />
     <ModelCategoryChildren :status="status" :data="data?.category.children" />
     <UiList
       v-if="sessionData && data"
@@ -66,6 +65,8 @@ type CategoryResult = {
 
 const { result: data, loading } = useQuery<CategoryResult>(categoriesQuery, vars)
 const status = computed(() => (loading.value ? 'pending' : 'success'))
+
+useTopbar({ title: computed(() => data.value?.category.name), loading, back: 'true' })
 
 const recentStore = useRecentStore()
 onMounted(() => {

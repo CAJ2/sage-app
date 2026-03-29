@@ -1,11 +1,5 @@
 <template>
   <div>
-    <NavTopbar
-      :title="changeData?.change?.title || undefined"
-      :subtitle="changeData?.change?.description || undefined"
-      :loading="changeLoading"
-      back="true"
-    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <Card class="mb-4">
@@ -239,6 +233,13 @@ const {
   refetch: refetchChangeData,
 } = useQuery(changeQuery, {
   id: route.params.id as string,
+})
+
+useTopbar({
+  title: computed(() => changeData.value?.change?.title || undefined),
+  subtitle: computed(() => changeData.value?.change?.description || undefined),
+  loading: changeLoading,
+  back: 'true',
 })
 
 const entityToPage: Record<string, string> = {

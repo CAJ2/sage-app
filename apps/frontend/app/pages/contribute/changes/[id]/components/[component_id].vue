@@ -1,9 +1,5 @@
 <template>
   <div>
-    <NavTopbar
-      :title="route.params.componentID === 'new' ? 'Create Component' : 'Edit Component'"
-      back="true"
-    />
     <div class="flex justify-center">
       <div class="w-full max-w-2xl p-5">
         <FormJsonSchema
@@ -28,6 +24,13 @@ import { ChangeStatus } from '~/gql/graphql'
 const route = useRoute()
 const changeID = route.params.id as string
 const componentID = route.params.componentID as string
+
+useTopbar({
+  title: computed(() =>
+    route.params.componentID === 'new' ? 'Create Component' : 'Edit Component',
+  ),
+  back: 'true',
+})
 
 const formQuery = graphql(`
   query ChangesComponentSchema {

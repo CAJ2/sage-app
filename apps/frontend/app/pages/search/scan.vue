@@ -39,6 +39,8 @@ import { isTauri } from '@tauri-apps/api/core'
 
 import type { ScanVariant } from '~/components/search/ScanResults.vue'
 
+useTopbar(null)
+
 const isNative = isTauri()
 
 const scanQuery = gql`

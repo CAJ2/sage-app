@@ -1,16 +1,17 @@
 <template>
   <div>
-    <NavTopbar
-      title="Edit Category"
-      subtitle="Manage your category details and changes."
-      back="true"
-    />
     <div class="flex flex-col items-center" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { graphql } from '~/gql'
+
+useTopbar({
+  title: 'Edit Category',
+  subtitle: 'Manage your category details and changes.',
+  back: 'true',
+})
 
 const route = useRoute()
 const categoryId = route.params.id as string

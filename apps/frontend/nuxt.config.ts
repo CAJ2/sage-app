@@ -21,6 +21,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+      ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon-32x32.png' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
@@ -51,6 +54,7 @@ export default defineNuxtConfig({
         '@tauri-apps/api/core',
         '@tauri-apps/plugin-sql',
         '@tauri-apps/plugin-geolocation',
+        '@tauri-apps/plugin-barcode-scanner',
         'maplibre-gl',
         'pmtiles',
         '@tolgee/format-icu',
@@ -66,6 +70,9 @@ export default defineNuxtConfig({
         'better-auth/vue',
         'ajv/dist/2020',
         'lodash-es',
+        '@tanstack/vue-form',
+        'zod',
+        '@ericblade/quagga2',
       ],
       noDiscovery: process.env.NODE_ENV === 'test' ? true : false,
     },

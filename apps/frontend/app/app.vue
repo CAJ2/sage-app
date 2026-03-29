@@ -1,6 +1,11 @@
 <template>
   <TolgeeProvider>
     <template #fallback><div /></template>
+    <div
+      class="pointer-events-none fixed top-0 right-0 left-0 z-[100] bg-base-200"
+      style="height: env(safe-area-inset-top)"
+      aria-hidden="true"
+    />
     <div style="overflow: hidden">
       <NuxtLayout>
         <NuxtPage />
@@ -32,7 +37,7 @@ useDark({
 .page-right-enter-active,
 .page-right-leave-active {
   position: fixed;
-  top: 0;
+  top: var(--topbar-h, 0px);
   left: 0;
   right: 0;
   bottom: 0;
@@ -101,11 +106,11 @@ useDark({
 .page-fade-enter-active,
 .page-fade-leave-active {
   position: fixed;
-  top: 0;
+  top: var(--topbar-h, 0px);
   left: 0;
   right: 0;
   bottom: 0;
-  transition: opacity 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: opacity 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
   will-change: opacity;
 }
 .page-fade-enter-active {
