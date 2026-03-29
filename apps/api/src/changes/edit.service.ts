@@ -1370,10 +1370,7 @@ export class EditService {
     if (!relation?.targetMeta) {
       return { id: value }
     }
-    if (typeof (this.em as any).getReference === 'function') {
-      return this.em.getReference(relation.targetMeta.class, value as any)
-    }
-    return { id: value }
+    return this.em.getReference(relation.targetMeta.class, value as any)
   }
 
   /**

@@ -105,6 +105,12 @@ describe('Complex Merge Resolver (integration)', () => {
     await app.close()
   })
 
+  // Sequence A:
+  // 1) Seed a change from an existing variant.
+  // 2) Apply multiple updates in the same change to variant/component/process with set/add/remove churn.
+  // 3) Exercise pivot refs with metadata (variant-components quantity/unit, component-material fractions).
+  // 4) Exercise single refs (process material/variant/org/region, variant region).
+  // 5) Merge and assert final relation state reflects latest staged values.
   test('Sequence A: multi-entity updates with pivot metadata + single-reference reassignment', async () => {
     const changeSeedRes = await gql.send(
       gqlDoc(`
@@ -385,6 +391,11 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(processEntity?.region?.id).toBe(REGION_IDS[1])
   })
 
+  // Sequence B:
+  // 1) Seed a change from another existing variant.
+  // 2) Perform repeated update passes with set/add/remove for variant and component relations.
+  // 3) Reassign single refs on process and region refs on variant/component.
+  // 4) Merge and verify precision: removed rows gone, expected rows/metadata retained, no stale refs.
   test('Sequence B: another dense multi-update flow validating set/add/remove precision', async () => {
     const changeSeedRes = await gql.send(
       gqlDoc(`
@@ -670,6 +681,11 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(processEntity?.region?.id).toBe(REGION_IDS[1])
   })
 
+  // Sequence C:
+  // 1) Create item/component/variant/org inside a new change.
+  // 2) Update both existing and newly created entities to reference those change-created entities.
+  // 3) Cover pivot refs (variant-items, variant-components, variant-orgs, component-materials) and single refs.
+  // 4) Merge and verify cross-edit references resolve correctly with persisted pivot payload fields.
   test('Sequence C: CREATE edits then UPDATE edits reference those created entities before merge', async () => {
     const createItemRes = await gql.send(
       gqlDoc(`
@@ -963,6 +979,11 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(fractions.get(MATERIAL_IDS[3])).toBeCloseTo(0.8, 5)
   })
 
+  // Sequence D:
+  // 1) Start with multiple CREATE edits (variant/org/item/component).
+  // 2) Apply UPDATE edits that cross-reference these created entities from both existing and created records.
+  // 3) Churn pivot rows with metadata updates (variant-components quantity/unit, component-material fractions).
+  // 4) Merge and assert created-to-created and existing-to-created relations are applied atomically.
   test('Sequence D: multiple CREATE edits with cross-entity UPDATE references and pivot metadata churn', async () => {
     const createVariantRes = await gql.send(
       gqlDoc(`
@@ -1282,6 +1303,10 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createdVariantOrgRows.map((row) => row.org.id)).toContain(createdOrgID)
   })
 
+  // Sequence E:
+  // 1) Baseline an existing process to reference a variant that has multiple pivot links.
+  // 2) In a change, stage delete for that variant.
+  // 3) Merge and verify cleanup: parent row deleted, pivot rows removed, and process variant ref cleared.
   test('Sequence E: delete edit removes refs cleanly (including pivot refs) across multiple entities', async () => {
     const baselineProcessRes = await gql.send(
       gqlDoc(`
@@ -1383,6 +1408,10 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(pivotOrgRows).toHaveLength(0)
   })
 
+  // Sequence F:
+  // 1) In a single change, stage an update that points process.variant to a target variant.
+  // 2) Attempt to stage delete for that same target variant in the same change.
+  // 3) Verify delete is rejected due to an intra-change reference conflict.
   test('Sequence F: delete with change fails when another edit in same change references target', async () => {
     const updateProcessRes = await gql.send(
       gqlDoc(`
@@ -1435,6 +1464,10 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(deleteVariantRes.errors?.[0]?.message).toContain('references it')
   })
 
+  // Sequence G:
+  // 1) Stage delete for a variant inside a change.
+  // 2) Attempt update and create mutations in that same change that reference the pending-delete variant.
+  // 3) Verify both mutations fail with pending-deletion guard errors.
   test('Sequence G: create/update in change fails when referencing entity pending deletion', async () => {
     const seedChangeRes = await gql.send(
       gqlDoc(`
