@@ -236,9 +236,9 @@ export class EditService {
     return collection
   }
 
-  async setOrAddPivot<U extends object & { id: string }, T extends object>(
+  async setOrAddPivot<U extends BaseEntity & { id: string }, T extends object>(
     id: string,
-    changeID: string | undefined,
+    change: Change | undefined,
     collection: Collection<T>,
     collEntity: EntityName<U>,
     pivotEntity: EntityName<T>,
@@ -273,19 +273,25 @@ export class EditService {
     }
     if (toSet) {
       if (Array.isArray(toSet) && toSet.length > 0) {
-        const foundItems = await this.em.find(
-          relEntity,
-          { id: { $in: toSet.map((item) => item.id) } } as any,
-          { populate: false },
-        )
-        if (foundItems.length !== toSet.length) {
-          const foundIds = foundItems.map((item) => item.id)
-          throw NotFoundErr(
-            `No ${relEntity} found for IDs: ${toSet
-              .map((item) => item.id)
-              .filter((id) => !_.includes(foundIds, id))
-              .join(', ')}`,
+        if (change) {
+          for (const item of toSet) {
+            await this.findRefWithChange(change, relEntity, { id: item.id } as any)
+          }
+        } else {
+          const foundItems = await this.em.find(
+            relEntity,
+            { id: { $in: toSet.map((item) => item.id) } } as any,
+            { populate: false },
           )
+          if (foundItems.length !== toSet.length) {
+            const foundIds = foundItems.map((item) => item.id)
+            throw NotFoundErr(
+              `No ${relEntity} found for IDs: ${toSet
+                .map((item) => item.id)
+                .filter((id) => !_.includes(foundIds, id))
+                .join(', ')}`,
+            )
+          }
         }
         const toSetEntities = toSet.map((item) => {
           const newEntity = this.em.create(
@@ -296,63 +302,99 @@ export class EditService {
               ..._.omit(item, 'id'),
             } as any,
             {
-              managed: !!changeID,
-              persist: !changeID,
+              managed: !!change,
+              persist: !change,
             },
           )
-          if (!changeID) {
+          if (!change) {
             this.em.persist(newEntity)
           }
           return newEntity
         })
-        collection.set(toSetEntities)
+        if (!collection.isInitialized()) {
+          await collection.init({ ref: true })
+        }
+        const existing = collection.getItems()
+        for (const pivotItem of existing) {
+          collection.removeWithoutPropagation(pivotItem)
+          if (!change) {
+            this.em.remove(pivotItem)
+          }
+        }
+        collection.add(toSetEntities)
       } else if (!Array.isArray(toSet) && toSet.id) {
-        const foundItem = await this.em.findOne(relEntity, { id: toSet.id } as any, {
-          populate: false,
-        })
-        if (!foundItem) {
-          throw NotFoundErr(`No ${relEntity} found for ID: ${toSet.id}`)
+        if (change) {
+          await this.findRefWithChange(change, relEntity, { id: toSet.id } as any)
+        } else {
+          const foundItem = await this.em.findOne(relEntity, { id: toSet.id } as any, {
+            populate: false,
+          })
+          if (!foundItem) {
+            throw NotFoundErr(`No ${relEntity} found for ID: ${toSet.id}`)
+          }
         }
         const toSetEntity = this.em.create(
           pivotEntity,
           {
             [collField]: id,
-            [relField]: foundItem.id,
+            [relField]: toSet.id,
             ..._.omit(toSet, 'id'),
           } as any,
           {
-            managed: !!changeID,
-            persist: !changeID,
+            managed: !!change,
+            persist: !change,
           },
         )
-        if (!changeID) {
+        if (!change) {
           this.em.persist(toSetEntity)
         }
-        collection.set([toSetEntity])
+        if (!collection.isInitialized()) {
+          await collection.init({ ref: true })
+        }
+        const existing = collection.getItems()
+        for (const pivotItem of existing) {
+          collection.removeWithoutPropagation(pivotItem)
+          if (!change) {
+            this.em.remove(pivotItem)
+          }
+        }
+        collection.add([toSetEntity])
       }
     }
     if (toAdd) {
       if (Array.isArray(toAdd) && toAdd.length > 0) {
-        const foundItems = await this.em.find(
-          relEntity,
-          { id: { $in: toAdd.map((item) => item.id) } } as any,
-          { populate: false },
-        )
-        if (foundItems.length !== toAdd.length) {
-          const foundIds = foundItems.map((item) => item.id)
-          throw NotFoundErr(
-            `No ${relEntity} found for IDs: ${toAdd
-              .map((item) => item.id)
-              .filter((id) => !_.includes(foundIds, id))
-              .join(', ')}`,
+        if (change) {
+          for (const item of toAdd) {
+            await this.findRefWithChange(change, relEntity, { id: item.id } as any)
+          }
+        } else {
+          const foundItems = await this.em.find(
+            relEntity,
+            { id: { $in: toAdd.map((item) => item.id) } } as any,
+            { populate: false },
           )
+          if (foundItems.length !== toAdd.length) {
+            const foundIds = foundItems.map((item) => item.id)
+            throw NotFoundErr(
+              `No ${relEntity} found for IDs: ${toAdd
+                .map((item) => item.id)
+                .filter((id) => !_.includes(foundIds, id))
+                .join(', ')}`,
+            )
+          }
         }
         const toAddEntities: T[] = []
         for (const item of toAdd) {
           const existing = id
-            ? await this.em.findOne(pivotEntity, { [collField]: id, [relField]: item.id } as any, {
-                populate: false,
-              })
+            ? !change
+              ? await this.em.findOne(
+                  pivotEntity,
+                  { [collField]: id, [relField]: item.id } as any,
+                  {
+                    populate: false,
+                  },
+                )
+              : null
             : null
           if (existing) {
             const extraFields = _.omit(item, 'id')
@@ -369,11 +411,11 @@ export class EditService {
               ..._.omit(item, 'id'),
             } as any,
             {
-              managed: !!changeID,
-              persist: !changeID,
+              managed: !!change,
+              persist: !change,
             },
           )
-          if (!changeID) {
+          if (!change) {
             this.em.persist(newEntity)
           }
           toAddEntities.push(newEntity)
@@ -382,16 +424,22 @@ export class EditService {
           collection.add(toAddEntities)
         }
       } else if (!Array.isArray(toAdd) && toAdd.id) {
-        const foundItem = await this.em.findOne(relEntity, { id: toAdd.id } as any, {
-          populate: false,
-        })
-        if (!foundItem) {
-          throw NotFoundErr(`No ${relEntity} found for ID: ${toAdd.id}`)
+        if (change) {
+          await this.findRefWithChange(change, relEntity, { id: toAdd.id } as any)
+        } else {
+          const foundItem = await this.em.findOne(relEntity, { id: toAdd.id } as any, {
+            populate: false,
+          })
+          if (!foundItem) {
+            throw NotFoundErr(`No ${relEntity} found for ID: ${toAdd.id}`)
+          }
         }
         const existing = id
-          ? await this.em.findOne(pivotEntity, { [collField]: id, [relField]: toAdd.id } as any, {
-              populate: false,
-            })
+          ? !change
+            ? await this.em.findOne(pivotEntity, { [collField]: id, [relField]: toAdd.id } as any, {
+                populate: false,
+              })
+            : null
           : null
         if (existing) {
           const extraFields = _.omit(toAdd, 'id')
@@ -403,15 +451,15 @@ export class EditService {
             pivotEntity,
             {
               [collField]: id,
-              [relField]: foundItem.id,
+              [relField]: toAdd.id,
               ..._.omit(toAdd, 'id'),
             } as any,
             {
-              managed: !!changeID,
-              persist: !changeID,
+              managed: !!change,
+              persist: !change,
             },
           )
-          if (!changeID) {
+          if (!change) {
             this.em.persist(toAddEntity)
           }
           collection.add([toAddEntity])
@@ -421,8 +469,8 @@ export class EditService {
     return collection
   }
 
-  async removeFromPivot<U extends object & { id: string }, T extends object>(
-    changeID: string | undefined,
+  async removeFromPivot<U extends BaseEntity & { id: string }, T extends object>(
+    change: Change | undefined,
     collection: Collection<T>,
     collEntity: EntityName<U>,
     pivotEntity: EntityName<T>,
@@ -456,31 +504,43 @@ export class EditService {
     }
     if (toRemove) {
       if (Array.isArray(toRemove)) {
-        const foundItems = await this.em.find(relEntity, { id: { $in: toRemove } } as any, {
-          populate: false,
-        })
-        if (foundItems.length !== toRemove.length) {
-          const foundIds = foundItems.map((item) => item.id)
-          throw NotFoundErr(
-            `No ${relEntity} found for IDs: ${toRemove
-              .filter((id) => !_.includes(foundIds, id))
-              .join(', ')}`,
-          )
-        }
-        // Find the actual pivot entities to remove
-        const pivotItems = await collection.matching({
-          where: { [relField]: { $in: toRemove } },
-        } as any)
         if (!collection.isInitialized()) {
           await collection.init({ ref: true })
         }
-        collection.remove(pivotItems)
-      } else {
-        const foundItem = await this.em.findOne(relEntity, { id: toRemove } as any, {
-          populate: false,
+        if (!change) {
+          const foundItems = await this.em.find(relEntity, { id: { $in: toRemove } } as any, {
+            populate: false,
+          })
+          if (foundItems.length !== toRemove.length) {
+            const foundIds = foundItems.map((item) => item.id)
+            throw NotFoundErr(
+              `No ${relEntity} found for IDs: ${toRemove
+                .filter((id) => !_.includes(foundIds, id))
+                .join(', ')}`,
+            )
+          }
+        }
+        const pivotItems = collection.getItems().filter((item: any) => {
+          const itemRelId = item[relField]?.id || item[relField]
+          return toRemove.includes(itemRelId)
         })
-        if (!foundItem) {
-          throw NotFoundErr(`No ${relEntity} found for ID: ${toRemove}`)
+        for (const pivotItem of pivotItems) {
+          collection.removeWithoutPropagation(pivotItem)
+          if (!change) {
+            this.em.remove(pivotItem)
+          }
+        }
+      } else {
+        if (!change) {
+          const foundItem = await this.em.findOne(relEntity, { id: toRemove } as any, {
+            populate: false,
+          })
+          if (!foundItem) {
+            throw NotFoundErr(`No ${relEntity} found for ID: ${toRemove}`)
+          }
+        }
+        if (!collection.isInitialized()) {
+          await collection.init({ ref: true })
         }
         // Find the actual pivot entity to remove
         const pivotItem = collection.getItems().find((item: any) => {
@@ -488,7 +548,10 @@ export class EditService {
           return itemRelId === toRemove
         })
         if (pivotItem) {
-          collection.remove(pivotItem)
+          collection.removeWithoutPropagation(pivotItem)
+          if (!change) {
+            this.em.remove(pivotItem)
+          }
         }
       }
     }
@@ -502,8 +565,9 @@ export class EditService {
     options?: FindOneOptions<T, never, '*', never>,
   ): Promise<{ id: string } & Reference<Loaded<T>>> {
     // First check if it exists in the change
+    const entityName = this.em.getMetadata().get(model).name
     const edit = change.edits.find((e) => {
-      if (e.entityName === model && e.entityID === where.id) {
+      if (e.entityName === entityName && e.entityID === where.id) {
         return true
       }
       return false
@@ -514,7 +578,6 @@ export class EditService {
     // If not, check if it exists in the database
     const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
     if (!entity) {
-      const entityName = model.toString()
       throw NotFoundErr(`${entityName} with ID "${where.id}" not found`)
     }
     // TODO: Type this correctly?
@@ -664,6 +727,95 @@ export class EditService {
     change.edits.add(edit)
   }
 
+  private applyEntityCreate(entityName: string, pojo: Record<string, any>): void {
+    const meta = this.em.getMetadata().get(entityName)
+    const { flattenArrayRefs, flattenToId } = this.categorizePOJORelations(meta)
+    const pivotFieldNames = new Set(flattenArrayRefs.map((r) => r.name))
+    const scalarData: Record<string, any> = {}
+    for (const [key, val] of Object.entries(pojo)) {
+      if (pivotFieldNames.has(key)) continue
+      scalarData[key] = flattenToId.includes(key) ? this.toRelationReference(meta, key, val) : val
+    }
+    this.em.create(meta.class, scalarData as any, { persist: true })
+    for (const { name, targetMeta } of flattenArrayRefs) {
+      if (!(name in pojo)) continue
+      const items: any[] = Array.isArray(pojo[name]) ? pojo[name] : []
+      for (const itemData of items) {
+        const restored = this.unflattenNestedRefs(itemData, targetMeta)
+        this.em.create(targetMeta.class, restored, { persist: true })
+      }
+    }
+  }
+
+  private async applyEntityUpdate(
+    entityName: string,
+    entityID: string,
+    pojo: Record<string, any>,
+  ): Promise<BaseEntity> {
+    const meta = this.em.getMetadata().get(entityName)
+    const { flattenArrayRefs, flattenToId } = this.categorizePOJORelations(meta)
+    const populateFields = flattenArrayRefs.map((r) => r.name)
+    const entity = populateFields.length
+      ? await this.em.findOne(
+          entityName,
+          { id: entityID } as any,
+          {
+            populate: populateFields,
+          } as any,
+        )
+      : await this.em.findOne(entityName, { id: entityID } as any)
+    if (!entity) {
+      throw NotFoundErr(`${entityName} with ID "${entityID}" not found`)
+    }
+
+    for (const { name, targetMeta } of flattenArrayRefs) {
+      if (!(name in pojo)) continue
+      const collection = (entity as any)[name] as Collection<any>
+      if (!collection.isInitialized()) {
+        await collection.init({ ref: true })
+      }
+      const existing = collection.getItems()
+      const existingByKey = new Map<string, any>()
+      for (const item of existing) {
+        existingByKey.set(
+          this.getPrimaryKeySignature(item as Record<string, any>, targetMeta),
+          item,
+        )
+      }
+
+      const newItems: any[] = Array.isArray(pojo[name]) ? pojo[name] : []
+      const incomingByKey = new Map<string, Record<string, any>>()
+      for (const itemData of newItems) {
+        const restored = this.unflattenNestedRefs(itemData, targetMeta)
+        incomingByKey.set(this.getPrimaryKeySignature(restored, targetMeta), restored)
+      }
+
+      for (const [key, existingItem] of existingByKey.entries()) {
+        const incomingItem = incomingByKey.get(key)
+        if (!incomingItem) {
+          this.em.remove(existingItem)
+          continue
+        }
+        this.em.assign(existingItem, incomingItem as any)
+        incomingByKey.delete(key)
+      }
+
+      for (const incomingItem of incomingByKey.values()) {
+        const pivotEntity = this.em.create(targetMeta.class, incomingItem)
+        this.em.persist(pivotEntity)
+      }
+    }
+
+    const pivotFieldNames = new Set(flattenArrayRefs.map((r) => r.name))
+    const scalarData: Record<string, any> = {}
+    for (const [key, val] of Object.entries(pojo)) {
+      if (pivotFieldNames.has(key)) continue
+      scalarData[key] = flattenToId.includes(key) ? this.toRelationReference(meta, key, val) : val
+    }
+    this.em.assign(entity as any, scalarData)
+    return entity as BaseEntity
+  }
+
   async checkMerge(change: Change, mergeInput: MergeInput) {
     if (change.status === ChangeStatus.APPROVED && mergeInput.apply) {
       await this.merge(change)
@@ -691,33 +843,43 @@ export class EditService {
         changes: EntityDTO<BaseEntity> | undefined
       }> = []
 
-      // Split creates from updates/deletes
       const createEdits = change.edits.filter((e) => !!e.entityID && !e.original && !!e.changes)
       const otherEdits = change.edits.filter((e) => !!e.entityID && (!!e.original || !e.changes))
 
-      // Topological sort: visit FK string values that match another pending create's
-      // entityID and schedule the dependency before the dependent.
-      const pendingIds = new Set(createEdits.map((e) => e.entityID!))
-      const visited = new Set<string>()
-      const sortedCreates: ChangeEdits[] = []
+      const createByID = new Map(createEdits.map((edit) => [edit.entityID!, edit]))
+      const createIDs = new Set(createByID.keys())
+      const orderedCreates: ChangeEdits[] = []
+      const visitedCreates = new Set<string>()
+      const visitingCreates = new Set<string>()
+
       const visitCreate = (edit: ChangeEdits) => {
-        if (visited.has(edit.entityID!)) return
-        visited.add(edit.entityID!)
-        for (const val of Object.values(edit.changes as Record<string, unknown>)) {
-          if (typeof val === 'string' && pendingIds.has(val)) {
-            const dep = createEdits.find((e) => e.entityID === val)
-            if (dep) visitCreate(dep)
+        const id = edit.entityID!
+        if (visitedCreates.has(id)) return
+        if (visitingCreates.has(id)) return
+        visitingCreates.add(id)
+        const deps = this.getCreateDependencies(
+          edit.entityName,
+          edit.changes as Record<string, any>,
+          createIDs,
+          id,
+        )
+        for (const depID of deps) {
+          const depEdit = createByID.get(depID)
+          if (depEdit) {
+            visitCreate(depEdit)
           }
         }
-        sortedCreates.push(edit)
+        visitingCreates.delete(id)
+        visitedCreates.add(id)
+        orderedCreates.push(edit)
       }
-      for (const edit of createEdits) visitCreate(edit)
 
-      // Flush each create individually in dependency order so that when entity B
-      // references entity A, A is already committed and its FK constraint is satisfied.
-      for (const edit of sortedCreates) {
-        this.em.create(edit.entityName, edit.changes!)
-        await this.em.flush()
+      for (const edit of createEdits) {
+        visitCreate(edit)
+      }
+
+      for (const edit of orderedCreates) {
+        this.applyEntityCreate(edit.entityName, edit.changes as Record<string, any>)
         historyItems.push({
           name: edit.entityName,
           userID: change.user.id,
@@ -726,19 +888,19 @@ export class EditService {
         })
       }
 
-      // Process updates and deletes
       for (const edit of otherEdits) {
-        let entity = await this.em.findOne(edit.entityName, { id: edit.entityID })
+        const entity = await this.em.findOne(edit.entityName, { id: edit.entityID })
         if (!entity && edit.original) {
-          // TODO: Entity could have been deleted, handle stale edits
           throw NotFoundErr(`Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`)
         }
         if (entity && edit.original && !edit.changes) {
-          // This is a delete
           this.em.remove(entity)
         } else if (entity && edit.original && edit.changes) {
-          // This is an update
-          entity = this.changePOJOToEntity(edit.entityName, edit.changes)
+          await this.applyEntityUpdate(
+            edit.entityName,
+            edit.entityID!,
+            edit.changes as Record<string, any>,
+          )
         } else {
           throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
         }
@@ -750,11 +912,8 @@ export class EditService {
         })
       }
 
-      // Flush updates/deletes before writing history records.
       await this.em.flush()
 
-      // Create history records after all entities are committed so FK references
-      // to parent rows are always satisfied.
       for (const { name, userID, original, changes } of historyItems) {
         this.createHistory<BaseEntity>(name, userID, original, changes)
       }
@@ -803,8 +962,33 @@ export class EditService {
     if (!meta) {
       throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
     }
+    const { flattenArrayRefs, flattenToId, changeOmit } = this.categorizePOJORelations(meta)
 
-    // Step 1: Collect pivot entity class names referenced by owning M:N relations
+    const pojo: any = _.cloneDeep(entity.toPOJO())
+
+    flattenToId.forEach((name) => {
+      if (pojo[name] && _.isObject(pojo[name]) && _.has(pojo[name], 'id')) {
+        pojo[name] = (pojo[name] as any).id
+      }
+    })
+
+    flattenArrayRefs.forEach(({ name }) => {
+      if (!pojo[name]) return
+      if (Array.isArray(pojo[name])) {
+        pojo[name] = pojo[name].map((item: any) => (item ? this.flattenNestedRefs(item) : item))
+      } else if (_.isObject(pojo[name])) {
+        pojo[name] = this.flattenNestedRefs(pojo[name] as Record<string, any>)
+      }
+    })
+
+    return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
+  }
+
+  private categorizePOJORelations(meta: EntityMetadata): {
+    flattenArrayRefs: Array<{ name: string; targetMeta: EntityMetadata }>
+    flattenToId: string[]
+    changeOmit: string[]
+  } {
     const pivotEntityNames = new Set<string>()
     meta.relations.forEach((rel) => {
       if (rel.kind === 'm:n' && rel.pivotEntity && !rel.mappedBy) {
@@ -812,9 +996,8 @@ export class EditService {
       }
     })
 
-    // Step 2: Categorize all relations
-    const flattenArrayRefs: string[] = [] // 1:M to pivot/tree targets
-    const flattenToId: string[] = [] // m:1 (non-primary), 1:1
+    const flattenArrayRefs: Array<{ name: string; targetMeta: EntityMetadata }> = []
+    const flattenToId: string[] = []
     const changeOmit: string[] = []
 
     meta.relations.forEach((rel) => {
@@ -830,13 +1013,19 @@ export class EditService {
           const targetName = rel.targetMeta?.className
           const isPivot = !!targetName && pivotEntityNames.has(targetName)
           const isTree = !!rel.targetMeta && this.isTreeEntity(rel.targetMeta)
-          if (isPivot || isTree) flattenArrayRefs.push(rel.name)
-          else changeOmit.push(rel.name)
+          if ((isPivot || isTree) && rel.targetMeta) {
+            flattenArrayRefs.push({ name: rel.name, targetMeta: rel.targetMeta })
+          } else {
+            changeOmit.push(rel.name)
+          }
           break
         }
         case 'm:1':
-          if (rel.primary) changeOmit.push(rel.name)
-          else flattenToId.push(rel.name)
+          if (rel.primary) {
+            changeOmit.push(rel.name)
+          } else {
+            flattenToId.push(rel.name)
+          }
           break
         case '1:1':
           flattenToId.push(rel.name)
@@ -844,27 +1033,11 @@ export class EditService {
       }
     })
 
-    // Step 3: Build and post-process the POJO
-    const pojo: any = _.cloneDeep(entity.toPOJO())
-
-    // Flatten m:1 / 1:1 to ID string
-    flattenToId.forEach((name) => {
-      if (pojo[name] && _.isObject(pojo[name]) && _.has(pojo[name], 'id')) {
-        pojo[name] = (pojo[name] as any).id
-      }
-    })
-
-    // Flatten 1:M arrays: replace ALL nested {id:...} objects with just the ID
-    flattenArrayRefs.forEach((name) => {
-      if (!pojo[name]) return
-      if (Array.isArray(pojo[name])) {
-        pojo[name] = pojo[name].map((item: any) => (item ? this.flattenNestedRefs(item) : item))
-      } else if (_.isObject(pojo[name])) {
-        pojo[name] = this.flattenNestedRefs(pojo[name] as Record<string, any>)
-      }
-    })
-
-    return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
+    return {
+      flattenArrayRefs,
+      flattenToId,
+      changeOmit,
+    }
   }
 
   /** Returns true if every primary M:1 on this entity points to the same entity type
@@ -901,6 +1074,68 @@ export class EditService {
     return result
   }
 
+  private getPrimaryKeySignature(item: Record<string, any>, targetMeta: EntityMetadata): string {
+    return targetMeta.primaryKeys
+      .map((key) => {
+        const val = item[key]
+        if (val && _.isObject(val) && !Array.isArray(val) && _.has(val, 'id')) {
+          return String((val as any).id)
+        }
+        return String(val)
+      })
+      .join('::')
+  }
+
+  private toRelationReference(meta: EntityMetadata, fieldName: string, value: unknown): unknown {
+    if (typeof value !== 'string') {
+      return value
+    }
+    const relation = meta.relations.find((rel) => rel.name === fieldName)
+    if (!relation?.targetMeta) {
+      return { id: value }
+    }
+    return this.em.getReference(relation.targetMeta.class, value as any)
+  }
+
+  private getCreateDependencies(
+    entityName: string,
+    pojo: Record<string, any>,
+    createIDs: Set<string>,
+    selfID?: string,
+  ): string[] {
+    const meta = this.em.getMetadata().get(entityName)
+    const { flattenArrayRefs, flattenToId } = this.categorizePOJORelations(meta)
+    const deps = new Set<string>()
+
+    for (const field of flattenToId) {
+      const val = pojo[field]
+      if (typeof val === 'string' && createIDs.has(val)) {
+        deps.add(val)
+      }
+    }
+
+    for (const { name, targetMeta } of flattenArrayRefs) {
+      const rows = Array.isArray(pojo[name]) ? pojo[name] : pojo[name] ? [pojo[name]] : []
+      const relationFields = targetMeta.relations
+        .filter((rel) => rel.kind === 'm:1' || rel.kind === '1:1')
+        .map((rel) => rel.name)
+      for (const row of rows) {
+        if (!row || !_.isObject(row)) continue
+        for (const relName of relationFields) {
+          const relVal = (row as any)[relName]
+          if (typeof relVal === 'string' && createIDs.has(relVal)) {
+            deps.add(relVal)
+          }
+        }
+      }
+    }
+
+    if (selfID) {
+      deps.delete(selfID)
+    }
+    return [...deps]
+  }
+
   /**
    * Reverse of entityToChangePOJO: takes a stored POJO from a ChangeEdit, restores the
    * flattened relation fields to {id: string} ref objects, and returns the initialized entity.
@@ -915,38 +1150,7 @@ export class EditService {
     if (!meta) {
       throw NotFoundErr(`Entity "${entityName}" not found in metadata`)
     }
-
-    // Categorize relations — mirrors entityToChangePOJO exactly
-    const pivotEntityNames = new Set<string>()
-    meta.relations.forEach((rel) => {
-      if (rel.kind === 'm:n' && rel.pivotEntity && !rel.mappedBy) {
-        pivotEntityNames.add(rel.pivotEntity as string)
-      }
-    })
-
-    const flattenArrayRefs: Array<{ name: string; targetMeta: EntityMetadata }> = []
-    const flattenToId: string[] = []
-
-    meta.relations.forEach((rel) => {
-      if (rel.name.startsWith('history')) return
-      switch (rel.kind) {
-        case '1:m': {
-          const targetName = rel.targetMeta?.className
-          const isPivot = !!targetName && pivotEntityNames.has(targetName)
-          const isTree = !!rel.targetMeta && this.isTreeEntity(rel.targetMeta)
-          if ((isPivot || isTree) && rel.targetMeta) {
-            flattenArrayRefs.push({ name: rel.name, targetMeta: rel.targetMeta })
-          }
-          break
-        }
-        case 'm:1':
-          if (!rel.primary) flattenToId.push(rel.name)
-          break
-        case '1:1':
-          flattenToId.push(rel.name)
-          break
-      }
-    })
+    const { flattenArrayRefs, flattenToId } = this.categorizePOJORelations(meta)
 
     // Build restored POJO from the plain JSON (avoid cloneDeep on MikroORM entities)
     const restored: Record<string, any> = { ...pojo }

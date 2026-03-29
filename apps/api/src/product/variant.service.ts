@@ -21,6 +21,7 @@ import {
   Variant,
   VariantHistory,
   VariantsComponents,
+  VariantsItems,
   VariantsOrgs,
   VariantsSources,
   VariantsTags,
@@ -195,6 +196,7 @@ export class VariantService implements IEntityService<Variant> {
       {
         populate: [
           'items',
+          'variantItems',
           'components',
           'variantComponents',
           'tags',
@@ -310,7 +312,8 @@ export class VariantService implements IEntityService<Variant> {
     }
     if (!change && input.addSources) {
       for (const source of input.addSources) {
-        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const sourceEntity = await this.em.findOne(Source, { id: source.id })
+        if (!sourceEntity) throw NotFoundErr(`Source with ID "${source.id}" not found`)
         const existing = variant.variantSources.find((vs) => vs.source.id === source.id)
         if (existing) {
           existing.meta = source.meta
@@ -333,41 +336,30 @@ export class VariantService implements IEntityService<Variant> {
       }
     }
     if (input.items || input.addItems) {
-      for (const item of input.items || input.addItems || []) {
-        if (!change) {
-          const itemEntity = await this.em.findOneOrFail(Item, { id: item.id })
-          if (variant.items.contains(ref(itemEntity))) {
-            variant.items.remove(ref(itemEntity))
-          }
-          variant.items.add(ref(itemEntity))
-        } else {
-          const itemEntity = await this.editService.findRefWithChange(change, Item, { id: item.id })
-          if (variant.items.contains(itemEntity)) {
-            variant.items.remove(itemEntity)
-          }
-          variant.items.add(itemEntity)
-        }
-      }
+      variant.variantItems = await this.editService.setOrAddPivot(
+        variant.id,
+        change,
+        variant.variantItems,
+        Variant,
+        VariantsItems,
+        input.items?.map((i) => ({ id: i.id })),
+        input.addItems?.map((i) => ({ id: i.id })),
+      )
     }
     if (input.removeItems) {
-      for (const item of input.removeItems) {
-        if (!change) {
-          const itemEntity = await this.em.findOneOrFail(Item, { id: item })
-          if (variant.items.contains(ref(itemEntity))) {
-            variant.items.remove(ref(itemEntity))
-          }
-        } else {
-          const itemEntity = await this.editService.findRefWithChange(change, Item, { id: item })
-          if (variant.items.contains(itemEntity)) {
-            variant.items.remove(itemEntity)
-          }
-        }
-      }
+      variant.variantItems = await this.editService.removeFromPivot(
+        change,
+        variant.variantItems,
+        Variant,
+        VariantsItems,
+        input.removeItems,
+      )
     }
     if (input.regions) {
       variant.regions = []
       for (const region of input.regions) {
-        const regionEntity = await this.em.findOneOrFail(Region, { id: region.id })
+        const regionEntity = await this.em.findOne(Region, { id: region.id })
+        if (!regionEntity) throw NotFoundErr(`Region with ID "${region.id}" not found`)
         if (!variant.regions.includes(regionEntity.id)) {
           variant.regions.push(regionEntity.id)
         }
@@ -376,7 +368,8 @@ export class VariantService implements IEntityService<Variant> {
     if (input.addRegions) {
       if (!variant.regions) variant.regions = []
       for (const region of input.addRegions) {
-        const regionEntity = await this.em.findOneOrFail(Region, { id: region.id })
+        const regionEntity = await this.em.findOne(Region, { id: region.id })
+        if (!regionEntity) throw NotFoundErr(`Region with ID "${region.id}" not found`)
         if (!variant.regions.includes(regionEntity.id)) {
           variant.regions.push(regionEntity.id)
         }
@@ -388,7 +381,8 @@ export class VariantService implements IEntityService<Variant> {
     if (input.regions || input.addRegions || input.removeRegions) {
       if (variant.regions && variant.regions.length > 0) {
         if (!change) {
-          const primaryRegion = await this.em.findOneOrFail(Region, { id: variant.regions[0] })
+          const primaryRegion = await this.em.findOne(Region, { id: variant.regions[0] })
+          if (!primaryRegion) throw NotFoundErr(`Region with ID "${variant.regions[0]}" not found`)
           variant.region = ref(primaryRegion)
         } else {
           variant.region = await this.editService.findRefWithChange(change, Region, {
@@ -401,9 +395,8 @@ export class VariantService implements IEntityService<Variant> {
     }
     if (input.region) {
       if (!change) {
-        const region = await this.em.findOneOrFail(Region, {
-          id: input.region.id,
-        })
+        const region = await this.em.findOne(Region, { id: input.region.id })
+        if (!region) throw NotFoundErr(`Region with ID "${input.region.id}" not found`)
         variant.region = ref(region)
         if (!variant.regions) variant.regions = []
         if (!variant.regions.includes(region.id)) {
@@ -426,7 +419,7 @@ export class VariantService implements IEntityService<Variant> {
     if (input.orgs || input.addOrgs) {
       variant.variantOrgs = await this.editService.setOrAddPivot(
         variant.id,
-        change?.id,
+        change,
         variant.variantOrgs,
         Variant,
         VariantsOrgs,
@@ -436,7 +429,7 @@ export class VariantService implements IEntityService<Variant> {
     }
     if (input.removeOrgs) {
       variant.variantOrgs = await this.editService.removeFromPivot(
-        change?.id,
+        change,
         variant.variantOrgs,
         Variant,
         VariantsOrgs,
@@ -449,7 +442,7 @@ export class VariantService implements IEntityService<Variant> {
       }
       variant.variantTags = await this.editService.setOrAddPivot(
         variant.id,
-        change?.id,
+        change,
         variant.variantTags,
         Variant,
         VariantsTags,
@@ -459,7 +452,7 @@ export class VariantService implements IEntityService<Variant> {
     }
     if (input.removeTags) {
       variant.variantTags = await this.editService.removeFromPivot(
-        change?.id,
+        change,
         variant.variantTags,
         Variant,
         VariantsTags,
@@ -469,7 +462,7 @@ export class VariantService implements IEntityService<Variant> {
     if (input.components || input.addComponents) {
       variant.variantComponents = await this.editService.setOrAddPivot(
         variant.id,
-        change?.id,
+        change,
         variant.variantComponents,
         Variant,
         VariantsComponents,
@@ -479,7 +472,7 @@ export class VariantService implements IEntityService<Variant> {
     }
     if (input.removeComponents) {
       variant.variantComponents = await this.editService.removeFromPivot(
-        change?.id,
+        change,
         variant.variantComponents,
         Variant,
         VariantsComponents,

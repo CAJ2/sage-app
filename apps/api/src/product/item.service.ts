@@ -229,7 +229,8 @@ export class ItemService implements IEntityService<Item> {
     }
     if (input.tags || input.addTags) {
       for (const tag of input.tags || input.addTags || []) {
-        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
+        const tagEntity = await this.em.findOne(Tag, { id: tag.id })
+        if (!tagEntity) throw NotFoundErr(`Tag with ID "${tag.id}" not found`)
         const tagDef = await this.tagService.validateTagInput(tag)
         const tagInst = new ItemsTags()
         tagInst.tag = tagEntity

@@ -169,7 +169,8 @@ export class ProcessService implements IEntityService<Process> {
   ) {
     if (!change && input.addSources) {
       for (const source of input.addSources) {
-        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const sourceEntity = await this.em.findOne(Source, { id: source.id })
+        if (!sourceEntity) throw NotFoundErr(`Source with ID "${source.id}" not found`)
         const existing = process.processSources.find((ps) => ps.source.id === source.id)
         if (existing) {
           existing.meta = source.meta

@@ -5,6 +5,7 @@ import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { Source, SourceType } from '@src/changes/source.entity'
+import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService } from '@src/db/base.entity'
@@ -236,7 +237,8 @@ export class ComponentService implements IEntityService<Component> {
   ) {
     if (!change && input.addSources) {
       for (const source of input.addSources) {
-        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const sourceEntity = await this.em.findOne(Source, { id: source.id })
+        if (!sourceEntity) throw NotFoundErr(`Source with ID "${source.id}" not found`)
         const existing = component.componentSources.find((cs) => cs.source.id === source.id)
         if (existing) {
           existing.meta = source.meta
@@ -291,7 +293,7 @@ export class ComponentService implements IEntityService<Component> {
     if (input.materials) {
       component.componentMaterials = await this.editService.setOrAddPivot(
         component.id,
-        change?.id,
+        change,
         component.componentMaterials,
         Component,
         ComponentsMaterials,
@@ -304,7 +306,7 @@ export class ComponentService implements IEntityService<Component> {
       }
       component.componentTags = await this.editService.setOrAddPivot(
         component.id,
-        change?.id,
+        change,
         component.componentTags,
         Component,
         ComponentsTags,
@@ -314,7 +316,7 @@ export class ComponentService implements IEntityService<Component> {
     }
     if (input.removeTags) {
       component.componentTags = await this.editService.removeFromPivot(
-        change?.id,
+        change,
         component.componentTags,
         Component,
         ComponentsTags,
