@@ -613,7 +613,7 @@ type EditEdge {
   node: Edit!
 }
 
-union EditModel = Category | Component | Item | Material | Place | Process | Region | Variant
+union EditModel = Category | Component | Item | Material | Org | Place | Process | Variant
 
 """Type of the model being edited"""
 enum EditModelType {
@@ -621,9 +621,9 @@ enum EditModelType {
   Component
   Item
   Material
+  Org
   Place
   Process
-  Region
   Variant
 }
 
@@ -859,6 +859,7 @@ type Mutation {
   deleteChange(id: ID!): DeleteChangeOutput
   deleteComponent(input: DeleteInput!): DeleteOutput
   deleteItem(input: DeleteInput!): DeleteOutput
+  deleteOrg(input: DeleteInput!): DeleteOutput
   deleteProcess(input: DeleteInput!): DeleteOutput
   deleteSource(id: ID!): DeleteSourceOutput
   deleteVariant(input: DeleteInput!): DeleteOutput

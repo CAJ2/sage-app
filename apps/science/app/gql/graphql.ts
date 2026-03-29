@@ -728,7 +728,7 @@ export type EditEdge = {
   node: Edit;
 };
 
-export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
+export type EditModel = Category | Component | Item | Material | Org | Place | Process | Variant;
 
 /** Type of the model being edited */
 export enum EditModelType {
@@ -736,9 +736,9 @@ export enum EditModelType {
   Component = 'Component',
   Item = 'Item',
   Material = 'Material',
+  Org = 'Org',
   Place = 'Place',
   Process = 'Process',
-  Region = 'Region',
   Variant = 'Variant'
 }
 
@@ -1072,6 +1072,7 @@ export type Mutation = {
   deleteChange?: Maybe<DeleteChangeOutput>;
   deleteComponent?: Maybe<DeleteOutput>;
   deleteItem?: Maybe<DeleteOutput>;
+  deleteOrg?: Maybe<DeleteOutput>;
   deleteProcess?: Maybe<DeleteOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
   deleteVariant?: Maybe<DeleteOutput>;
@@ -1153,6 +1154,11 @@ export type MutationDeleteComponentArgs = {
 
 
 export type MutationDeleteItemArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDeleteOrgArgs = {
   input: DeleteInput;
 };
 
@@ -2637,9 +2643,9 @@ export type CategoryChangesQueryQuery = { __typename?: 'Query', change?: { __typ
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
           | { __typename?: 'Material' }
+          | { __typename?: 'Org' }
           | { __typename?: 'Place' }
           | { __typename?: 'Process' }
-          | { __typename?: 'Region' }
           | { __typename?: 'Variant' }
          | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
@@ -2720,9 +2726,9 @@ export type ComponentChangesQueryQuery = { __typename?: 'Query', change?: { __ty
           )
           | { __typename?: 'Item' }
           | { __typename?: 'Material' }
+          | { __typename?: 'Org' }
           | { __typename?: 'Place' }
           | { __typename?: 'Process' }
-          | { __typename?: 'Region' }
           | { __typename?: 'Variant' }
          | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
@@ -2805,12 +2811,12 @@ export type ProcessesChangesQueryQuery = { __typename?: 'Query', change?: { __ty
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
           | { __typename?: 'Material' }
+          | { __typename?: 'Org' }
           | { __typename?: 'Place' }
           | (
             { __typename?: 'Process' }
             & { ' $fragmentRefs'?: { 'ListProcessFragmentFragment': ListProcessFragmentFragment } }
           )
-          | { __typename?: 'Region' }
           | { __typename?: 'Variant' }
          | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
@@ -2861,9 +2867,9 @@ export type VariantsChangesQueryQuery = { __typename?: 'Query', change?: { __typ
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
           | { __typename?: 'Material' }
+          | { __typename?: 'Org' }
           | { __typename?: 'Place' }
           | { __typename?: 'Process' }
-          | { __typename?: 'Region' }
           | (
             { __typename?: 'Variant' }
             & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }

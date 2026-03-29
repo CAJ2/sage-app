@@ -169,7 +169,8 @@ export class ProcessService implements IEntityService<Process> {
   ) {
     if (!change && input.addSources) {
       for (const source of input.addSources) {
-        const sourceEntity = await this.em.findOneOrFail(Source, { id: source.id })
+        const sourceEntity = await this.em.findOne(Source, { id: source.id })
+        if (!sourceEntity) throw NotFoundErr(`Source with ID "${source.id}" not found`)
         const existing = process.processSources.find((ps) => ps.source.id === source.id)
         if (existing) {
           existing.meta = source.meta
@@ -216,18 +217,30 @@ export class ProcessService implements IEntityService<Process> {
       process.rules = input.rules
     }
     if (input.material) {
-      const material = await this.em.findOne(Material, input.material.id)
-      if (!material) {
-        throw NotFoundErr(`Material with ID "${input.material.id}" not found`)
+      if (!change) {
+        const material = await this.em.findOne(Material, input.material.id)
+        if (!material) {
+          throw NotFoundErr(`Material with ID "${input.material.id}" not found`)
+        }
+        process.material = ref(Material, material.id)
+      } else {
+        process.material = await this.editService.findRefWithChange(change, Material, {
+          id: input.material.id,
+        })
       }
-      process.material = ref(Material, material.id)
     }
     if (input.variant) {
-      const variant = await this.em.findOne(Variant, { id: input.variant.id })
-      if (!variant) {
-        throw NotFoundErr(`Variant with ID "${input.variant.id}" not found`)
+      if (!change) {
+        const variant = await this.em.findOne(Variant, { id: input.variant.id })
+        if (!variant) {
+          throw NotFoundErr(`Variant with ID "${input.variant.id}" not found`)
+        }
+        process.variant = ref(Variant, variant.id)
+      } else {
+        process.variant = await this.editService.findRefWithChange(change, Variant, {
+          id: input.variant.id,
+        })
       }
-      process.variant = ref(Variant, variant.id)
     }
     if (input.org) {
       if (!change) {
@@ -235,22 +248,38 @@ export class ProcessService implements IEntityService<Process> {
         if (!org) {
           throw NotFoundErr(`Org with ID "${input.org.id}" not found`)
         }
+        process.org = ref(Org, org.id)
+      } else {
+        process.org = await this.editService.findRefWithChange(change, Org, {
+          id: input.org.id,
+        })
       }
-      process.org = ref(Org, input.org.id)
     }
     if (input.region) {
-      const region = await this.em.findOne(Region, { id: input.region.id })
-      if (!region) {
-        throw NotFoundErr(`Region with ID "${input.region.id}" not found`)
+      if (!change) {
+        const region = await this.em.findOne(Region, { id: input.region.id })
+        if (!region) {
+          throw NotFoundErr(`Region with ID "${input.region.id}" not found`)
+        }
+        process.region = ref(Region, region.id)
+      } else {
+        process.region = await this.editService.findRefWithChange(change, Region, {
+          id: input.region.id,
+        })
       }
-      process.region = ref(Region, region.id)
     }
     if (input.place) {
-      const place = await this.em.findOne(Place, { id: input.place.id })
-      if (!place) {
-        throw NotFoundErr(`Place with ID "${input.place.id}" not found`)
+      if (!change) {
+        const place = await this.em.findOne(Place, { id: input.place.id })
+        if (!place) {
+          throw NotFoundErr(`Place with ID "${input.place.id}" not found`)
+        }
+        process.place = ref(Place, place.id)
+      } else {
+        process.place = await this.editService.findRefWithChange(change, Place, {
+          id: input.place.id,
+        })
       }
-      process.place = ref(Place, place.id)
     }
   }
 }

@@ -728,7 +728,7 @@ export type EditEdge = {
   node: Edit;
 };
 
-export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
+export type EditModel = Category | Component | Item | Material | Org | Place | Process | Variant;
 
 /** Type of the model being edited */
 export enum EditModelType {
@@ -736,9 +736,9 @@ export enum EditModelType {
   Component = 'Component',
   Item = 'Item',
   Material = 'Material',
+  Org = 'Org',
   Place = 'Place',
   Process = 'Process',
-  Region = 'Region',
   Variant = 'Variant'
 }
 
@@ -1072,6 +1072,7 @@ export type Mutation = {
   deleteChange?: Maybe<DeleteChangeOutput>;
   deleteComponent?: Maybe<DeleteOutput>;
   deleteItem?: Maybe<DeleteOutput>;
+  deleteOrg?: Maybe<DeleteOutput>;
   deleteProcess?: Maybe<DeleteOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
   deleteVariant?: Maybe<DeleteOutput>;
@@ -1153,6 +1154,11 @@ export type MutationDeleteComponentArgs = {
 
 
 export type MutationDeleteItemArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDeleteOrgArgs = {
   input: DeleteInput;
 };
 
@@ -2784,6 +2790,34 @@ export type PojoSpecMergeCategoryMutationVariables = Exact<{
 
 export type PojoSpecMergeCategoryMutation = { __typename?: 'Mutation', mergeChange?: { __typename?: 'MergeChangeOutput', change?: { __typename?: 'Change', id: string } | null } | null };
 
+export type CrossRefCreateItemMutationVariables = Exact<{
+  input: CreateItemInput;
+}>;
+
+
+export type CrossRefCreateItemMutation = { __typename?: 'Mutation', createItem?: { __typename?: 'CreateItemOutput', item?: { __typename?: 'Item', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type CrossRefUpdateVariantMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type CrossRefUpdateVariantMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type CrossRefApproveMutationVariables = Exact<{
+  input: UpdateChangeInput;
+}>;
+
+
+export type CrossRefApproveMutation = { __typename?: 'Mutation', updateChange?: { __typename?: 'UpdateChangeOutput', change?: { __typename?: 'Change', id: string, status: ChangeStatus } | null } | null };
+
+export type CrossRefMergeMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CrossRefMergeMutation = { __typename?: 'Mutation', mergeChange?: { __typename?: 'MergeChangeOutput', change?: { __typename?: 'Change', id: string, status: ChangeStatus } | null } | null };
+
 export type SourceResolverListSourcesQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
 }>;
@@ -3408,9 +3442,9 @@ export type FlowCreateProcessMutation = { __typename?: 'Mutation', createProcess
             | { __typename?: 'Component' }
             | { __typename?: 'Item' }
             | { __typename?: 'Material' }
+            | { __typename?: 'Org' }
             | { __typename?: 'Place' }
             | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
-            | { __typename?: 'Region' }
             | { __typename?: 'Variant' }
            | null }> | null } } | null } | null };
 
@@ -3424,9 +3458,9 @@ export type FlowUpdateProcessMaterialMutation = { __typename?: 'Mutation', updat
             | { __typename?: 'Component' }
             | { __typename?: 'Item' }
             | { __typename?: 'Material' }
+            | { __typename?: 'Org' }
             | { __typename?: 'Place' }
             | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
-            | { __typename?: 'Region' }
             | { __typename?: 'Variant' }
            | null }> | null } } | null } | null };
 
@@ -4442,6 +4476,10 @@ export const PojoSpecMergeVariantDocument = {"kind":"Document","definitions":[{"
 export const PojoSpecUpdateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"POJOSpecUpdateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"category"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<PojoSpecUpdateCategoryMutation, PojoSpecUpdateCategoryMutationVariables>;
 export const PojoSpecApproveCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"POJOSpecApproveCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateChangeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<PojoSpecApproveCategoryMutation, PojoSpecApproveCategoryMutationVariables>;
 export const PojoSpecMergeCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"POJOSpecMergeCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mergeChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<PojoSpecMergeCategoryMutation, PojoSpecMergeCategoryMutationVariables>;
+export const CrossRefCreateItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CrossRefCreateItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"item"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CrossRefCreateItemMutation, CrossRefCreateItemMutationVariables>;
+export const CrossRefUpdateVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CrossRefUpdateVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CrossRefUpdateVariantMutation, CrossRefUpdateVariantMutationVariables>;
+export const CrossRefApproveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CrossRefApprove"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateChangeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<CrossRefApproveMutation, CrossRefApproveMutationVariables>;
+export const CrossRefMergeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CrossRefMerge"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mergeChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<CrossRefMergeMutation, CrossRefMergeMutationVariables>;
 export const SourceResolverListSourcesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SourceResolverListSources"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sources"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}}]}}]}}]}}]} as unknown as DocumentNode<SourceResolverListSourcesQuery, SourceResolverListSourcesQueryVariables>;
 export const SourceResolverListSourcesByTypeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SourceResolverListSourcesByType"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"type"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SourceType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sources"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"Variable","name":{"kind":"Name","value":"type"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<SourceResolverListSourcesByTypeQuery, SourceResolverListSourcesByTypeQueryVariables>;
 export const SourceResolverGetSourceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SourceResolverGetSource"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"source"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]} as unknown as DocumentNode<SourceResolverGetSourceQuery, SourceResolverGetSourceQueryVariables>;

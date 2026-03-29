@@ -218,6 +218,7 @@ export class ItemService implements IEntityService<Item> {
         Category,
         input.categories,
         input.addCategories,
+        change,
       )
     }
     if (input.removeCategories) {
@@ -225,11 +226,15 @@ export class ItemService implements IEntityService<Item> {
         item.categories,
         Category,
         input.removeCategories,
+        change,
       )
     }
     if (input.tags || input.addTags) {
       for (const tag of input.tags || input.addTags || []) {
-        const tagEntity = await this.em.findOneOrFail(Tag, { id: tag.id })
+        if (change) {
+          await this.editService.findRefWithChange(change, Tag, { id: tag.id })
+        }
+        const tagEntity = this.em.getReference(Tag, tag.id)
         const tagDef = await this.tagService.validateTagInput(tag)
         const tagInst = new ItemsTags()
         tagInst.tag = tagEntity
@@ -245,7 +250,12 @@ export class ItemService implements IEntityService<Item> {
       }
     }
     if (input.removeTags) {
-      item.tags = await this.editService.removeFromCollection(item.tags, Tag, input.removeTags)
+      item.tags = await this.editService.removeFromCollection(
+        item.tags,
+        Tag,
+        input.removeTags,
+        change,
+      )
     }
   }
 }

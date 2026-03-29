@@ -6,6 +6,7 @@ import { EditService } from './edit.service'
 function makeService(metaMap: Record<string, any>) {
   const em = {
     getMetadata: () => ({ get: (name: string) => metaMap[name] }),
+    getReference: (_entity: any, id: string) => ({ id }),
   } as any
   return new EditService(em, {} as any, {} as any)
 }
@@ -237,6 +238,7 @@ describe('EditService.changePOJOToEntity', () => {
       getMetadata: () => ({ get: (name: string) => metaMap[name] }),
       assign: (entity: any, data: any) => Object.assign(entity, data),
       fork: () => forkedEm,
+      getReference: (_entity: any, id: string) => ({ id }),
     } as any
     const metaService = {
       findEntityService: () => [
@@ -421,6 +423,7 @@ describe('EditService.changePOJOToEntity', () => {
         Object.assign(entity, data)
         return entity
       },
+      getReference: (_entity: any, id: string) => ({ id }),
     } as any
     const metaService = {
       findEntityService: () => [null, { findOneByID: async () => null }],
@@ -438,6 +441,7 @@ describe('EditService.changePOJOToEntity', () => {
   test('no entityID provided → throws NotFoundErr', async () => {
     const em = {
       getMetadata: () => ({ get: () => ({ relations: [] }) }),
+      getReference: (_entity: any, id: string) => ({ id }),
     } as any
     const metaService = { findEntityService: () => null } as any
     const svc = new EditService(em, {} as any, metaService)
@@ -447,6 +451,7 @@ describe('EditService.changePOJOToEntity', () => {
   test('no entity service found → throws NotFoundErr', async () => {
     const em = {
       getMetadata: () => ({ get: () => ({ relations: [], class: class Variant {} }) }),
+      getReference: (_entity: any, id: string) => ({ id }),
     } as any
     const metaService = { findEntityService: () => null } as any
     const svc = new EditService(em, {} as any, metaService)

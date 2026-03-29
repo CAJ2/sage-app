@@ -16,7 +16,8 @@ import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { ProcessHistory } from '@src/process/process.entity'
 import { CategoryHistory } from '@src/product/category.entity'
-import { VariantHistory } from '@src/product/variant.entity'
+import { Item } from '@src/product/item.entity'
+import { Variant, VariantHistory } from '@src/product/variant.entity'
 
 describe('History via Change/Merge flow (integration)', () => {
   let app: INestApplication
@@ -462,6 +463,118 @@ describe('History via Change/Merge flow (integration)', () => {
           )
         }
       }
+    })
+  })
+
+  describe('Item created in change, Variant updated to reference it, then merged', () => {
+    let changeID: string
+    let newItemID: string
+    const existingVariantID = VARIANT_IDS[0]
+
+    test('should create an Item within a new Change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CrossRefCreateItem($input: CreateItemInput!) {
+            createItem(input: $input) {
+              item {
+                id
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            nameTr: [{ lang: 'en', text: 'Cross-ref Item', auto: false }],
+            change: { title: 'Cross-entity ref change' },
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.createItem?.item).toBeDefined()
+      expect(res.data?.createItem?.change).toBeDefined()
+      newItemID = res.data!.createItem!.item!.id
+      changeID = res.data!.createItem!.change!.id
+    })
+
+    test('should update the Variant to reference the new Item within the same Change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CrossRefUpdateVariant($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: existingVariantID,
+            addItems: [{ id: newItemID }],
+            changeID,
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateVariant?.variant).toBeDefined()
+      expect(res.data?.updateVariant?.change?.id).toBe(changeID)
+    })
+
+    test('should approve the Change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CrossRefApprove($input: UpdateChangeInput!) {
+            updateChange(input: $input) {
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        { input: { id: changeID, status: ChangeStatus.Approved } },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.updateChange?.change?.status).toBe('APPROVED')
+    })
+
+    test('should merge the Change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CrossRefMerge($id: ID!) {
+            mergeChange(id: $id) {
+              change {
+                id
+                status
+              }
+            }
+          }
+        `),
+        { id: changeID },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.mergeChange?.change).toBeDefined()
+    })
+
+    test('should have the new Item in the database after merge', async () => {
+      const em = orm.em.fork()
+      const item = await em.findOne(Item, { id: newItemID })
+      expect(item).toBeDefined()
+      expect(item!.id).toBe(newItemID)
+    })
+
+    test('should have the new Item linked to the Variant after merge', async () => {
+      const em = orm.em.fork()
+      const variant = await em.findOne(Variant, { id: existingVariantID }, { populate: ['items'] })
+      expect(variant).toBeDefined()
+      const itemIDs = variant!.items.getItems().map((i) => i.id)
+      expect(itemIDs).toContain(newItemID)
     })
   })
 })

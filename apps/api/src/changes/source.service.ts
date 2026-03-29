@@ -87,7 +87,8 @@ export class SourceService {
   }
 
   async link(input: LinkSourceInput) {
-    const source = await this.em.findOneOrFail(Source, { id: input.id })
+    const source = await this.em.findOne(Source, { id: input.id })
+    if (!source) throw NotFoundErr(`Source with ID "${input.id}" not found`)
     const graph = await this.expandJsonLdGraph(source)
     const [expanded] = await jsonld.expand(input.jsonld as jsonld.JsonLdDocument)
     const idx = graph.findIndex((n) => n['@id'] === expanded['@id'])
@@ -99,7 +100,8 @@ export class SourceService {
   }
 
   async unlink(input: UnlinkSourceInput) {
-    const source = await this.em.findOneOrFail(Source, { id: input.id })
+    const source = await this.em.findOne(Source, { id: input.id })
+    if (!source) throw NotFoundErr(`Source with ID "${input.id}" not found`)
     const graph = await this.expandJsonLdGraph(source)
     if (graph.length === 0) return { source }
     const targetId = input.jsonld['@id'] as string

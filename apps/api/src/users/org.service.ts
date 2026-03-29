@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/core'
 import { Injectable } from '@nestjs/common'
 
-import { isUsingChange } from '@src/changes/change-ext.model'
+import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
@@ -95,6 +95,14 @@ export class OrgService implements IEntityService<Org> {
     await this.em.persist(change).flush()
     await this.editService.checkMerge(change, input)
     return { org, change, currentOrg: currentOrg ?? undefined }
+  }
+
+  async delete(input: DeleteInput) {
+    const deleted = await this.editService.deleteOneWithChange(input, Org)
+    if (!deleted) {
+      throw NotFoundErr('ORG_NOT_FOUND', `Org not found`)
+    }
+    return deleted
   }
 
   async history(orgID: string, opts: CursorOptions<OrgHistory>) {
