@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "45c23cc1463678df75b8d003d4c95a8895eba129",
+  "prompts": {
+    "21ef8fe723de272f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fdfe53e-eb84-483a-9d51-34a2d7a1bc62",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 8,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
