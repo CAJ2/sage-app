@@ -1,0 +1,114 @@
+apps/frontend/src-tauri/gen/android/buildSrc/src/main/java/app/sageleaf/dev/kotlin/BuildTask.kt
+  43177b5613f9cbf8 51
+apps/frontend/app/components/search/ScannerNative.vue
+  43177b5613f9cbf8 25-27,60-62
+apps/frontend/app/pages/contribute/index.vue
+  43177b5613f9cbf8 74-75
+apps/frontend/app/pages/search/index.vue
+  43177b5613f9cbf8 109
+apps/frontend/app/components/nav/HomeLogo.vue
+  43177b5613f9cbf8 3
+apps/frontend/app/stores/region_store.ts
+  43177b5613f9cbf8 7-8,21-22,34-35,42-45,64-65
+apps/frontend/app/pages/contribute/changes/new.vue
+  43177b5613f9cbf8 5-6
+apps/frontend/app/pages/contribute/changes/index.vue
+  43177b5613f9cbf8 14-15
+apps/frontend/app/pages/profile/settings.vue
+  43177b5613f9cbf8 75
+apps/frontend/app/pages/explore/places/index.vue
+  43177b5613f9cbf8 61
+apps/frontend/src-tauri/gen/android/app/src/main/res/values-night/themes.xml
+  43177b5613f9cbf8 5
+apps/frontend/app/pages/explore/categories/[id]/index.vue
+  43177b5613f9cbf8 69-70
+apps/frontend/app/pages/contribute/changes/[id]/components/[component_id].vue
+  43177b5613f9cbf8 28-29,31,33-34
+apps/frontend/src-tauri/gen/android/app/src/main/res/values/colors.xml
+  43177b5613f9cbf8 10-11
+apps/frontend/app/plugins/apollo.ts
+  43177b5613f9cbf8 40-41
+apps/frontend/app/components/settings/RegionSelect.vue
+  43177b5613f9cbf8 75,79-81,228-231,287,291,293
+apps/frontend/src-tauri/gen/android/app/src/main/res/values/themes.xml
+  43177b5613f9cbf8 5
+apps/frontend/app/pages/profile/region.vue
+  43177b5613f9cbf8 9-10
+apps/frontend/app/pages/explore/items/[id].vue
+  43177b5613f9cbf8 38-39
+apps/frontend/src-tauri/gen/android/app/build.gradle.kts
+  43177b5613f9cbf8 73
+apps/frontend/app/pages/explore/index.vue
+  43177b5613f9cbf8 52-53
+apps/frontend/app/pages/contribute/changes/[id]/index.vue
+  43177b5613f9cbf8 238-244
+apps/frontend/app/app.vue
+  43177b5613f9cbf8 4-8,40,109,113
+apps/frontend/app/pages/explore/categories/index.vue
+  43177b5613f9cbf8 9-11
+apps/frontend/app/pages/contribute/changes/[id]/processes/[process_id].vue
+  43177b5613f9cbf8 32-33
+apps/frontend/app/pages/home/index.vue
+  43177b5613f9cbf8 59-60
+apps/frontend/app/pages/profile/index.vue
+  43177b5613f9cbf8 44,96
+apps/frontend/app/components/nav/Topbar.vue
+  43177b5613f9cbf8 2-3
+apps/api/src/common/i18n.service.ts
+  cb9027905739d1d7 144-145,147-148
+apps/frontend/app/pages/contribute/changes/[id]/categories/[category_id].vue
+  43177b5613f9cbf8 33-34
+apps/frontend/app/layouts/default.vue
+  43177b5613f9cbf8 3-20,32-54
+apps/frontend/app/pages/explore/categories/[id]/edit.vue
+  43177b5613f9cbf8 10-12,14-15
+apps/frontend/app/pages/profile/sign_in.vue
+  43177b5613f9cbf8 77-78
+apps/frontend/nuxt.config.ts
+  43177b5613f9cbf8 24,26
+apps/frontend/app/components/nav/Tabs.vue
+  43177b5613f9cbf8 3
+apps/frontend/app/composables/useTopbar.ts
+  43177b5613f9cbf8 1-51
+apps/frontend/app/pages/profile/edit.vue
+  43177b5613f9cbf8 25-26
+apps/frontend/app/pages/explore/places/[id].vue
+  43177b5613f9cbf8 37-38
+apps/frontend/app/pages/search/scan.vue
+  43177b5613f9cbf8 42
+apps/frontend/app/pages/explore/orgs/[id].vue
+  43177b5613f9cbf8 37-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "69c8815612df2b6997119f78ba3d643cea4e1d72",
+  "prompts": {
+    "43177b5613f9cbf8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "18dc2645-d480-4d64-8751-439015b75405",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 237,
+      "total_deletions": 136,
+      "accepted_lines": 205,
+      "overriden_lines": 5
+    },
+    "cb9027905739d1d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "67d8de34-0299-4536-a297-571bed7365d1",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 0,
+      "accepted_lines": 4,
+      "overriden_lines": 1
+    }
+  }
+}
