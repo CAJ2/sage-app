@@ -1,0 +1,35 @@
+apps/api/src/product/variant.service.ts
+  7214871c5dd4ba2e 315-316,361-362,371-372,384-385,398-399
+apps/api/src/process/component.service.ts
+  7214871c5dd4ba2e 8,240-241
+apps/api/src/changes/history.spec.ts
+  7214871c5dd4ba2e 19-20,468-579
+apps/api/src/changes/edit.service.ts
+  7214871c5dd4ba2e 568,570,751-752,817-818
+apps/api/src/changes/source.service.ts
+  7214871c5dd4ba2e 90-91,103-104
+apps/api/src/process/process.service.ts
+  7214871c5dd4ba2e 172-173
+apps/api/src/product/item.service.ts
+  7214871c5dd4ba2e 232-233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "8f69b454ec254adfd08c3e03335d9030b5ba5144",
+  "prompts": {
+    "7214871c5dd4ba2e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24ba2d2a-a184-463a-844d-e4ddbc9700d7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 173,
+      "total_deletions": 26,
+      "accepted_lines": 141,
+      "overriden_lines": 30
+    }
+  }
+}
