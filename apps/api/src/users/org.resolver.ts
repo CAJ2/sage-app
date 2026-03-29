@@ -3,10 +3,12 @@ import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nest
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
+import { DeleteInput } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { DeleteOutput } from '@src/graphql/base.model'
 import { Org as OrgEntity } from '@src/users/org.entity'
 import {
   CreateOrgInput,
@@ -76,6 +78,15 @@ export class OrgResolver {
       ? await this.transform.entityToModel(Org, updated.currentOrg)
       : undefined
     return { org: result, change, currentOrg }
+  }
+
+  @Mutation(() => DeleteOutput, { name: 'deleteOrg', nullable: true })
+  async deleteOrg(@Args('input') input: DeleteInput): Promise<DeleteOutput> {
+    const deleted = await this.orgService.delete(input)
+    if (!deleted) {
+      throw NotFoundErr('Org not found')
+    }
+    return { success: true, id: deleted.id }
   }
 
   @ResolveField(() => OrgHistoryPage)

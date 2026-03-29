@@ -724,7 +724,7 @@ export type EditEdge = {
   node: Edit;
 };
 
-export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
+export type EditModel = Category | Component | Item | Material | Org | Place | Process | Variant;
 
 /** Type of the model being edited */
 export enum EditModelType {
@@ -732,9 +732,9 @@ export enum EditModelType {
   Component = 'Component',
   Item = 'Item',
   Material = 'Material',
+  Org = 'Org',
   Place = 'Place',
   Process = 'Process',
-  Region = 'Region',
   Variant = 'Variant'
 }
 
@@ -1068,6 +1068,7 @@ export type Mutation = {
   deleteChange?: Maybe<DeleteChangeOutput>;
   deleteComponent?: Maybe<DeleteOutput>;
   deleteItem?: Maybe<DeleteOutput>;
+  deleteOrg?: Maybe<DeleteOutput>;
   deleteProcess?: Maybe<DeleteOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
   deleteVariant?: Maybe<DeleteOutput>;
@@ -1149,6 +1150,11 @@ export type MutationDeleteComponentArgs = {
 
 
 export type MutationDeleteItemArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDeleteOrgArgs = {
   input: DeleteInput;
 };
 

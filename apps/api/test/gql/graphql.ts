@@ -728,7 +728,7 @@ export type EditEdge = {
   node: Edit;
 };
 
-export type EditModel = Category | Component | Item | Material | Place | Process | Region | Variant;
+export type EditModel = Category | Component | Item | Material | Org | Place | Process | Variant;
 
 /** Type of the model being edited */
 export enum EditModelType {
@@ -736,9 +736,9 @@ export enum EditModelType {
   Component = 'Component',
   Item = 'Item',
   Material = 'Material',
+  Org = 'Org',
   Place = 'Place',
   Process = 'Process',
-  Region = 'Region',
   Variant = 'Variant'
 }
 
@@ -1072,6 +1072,7 @@ export type Mutation = {
   deleteChange?: Maybe<DeleteChangeOutput>;
   deleteComponent?: Maybe<DeleteOutput>;
   deleteItem?: Maybe<DeleteOutput>;
+  deleteOrg?: Maybe<DeleteOutput>;
   deleteProcess?: Maybe<DeleteOutput>;
   deleteSource?: Maybe<DeleteSourceOutput>;
   deleteVariant?: Maybe<DeleteOutput>;
@@ -1153,6 +1154,11 @@ export type MutationDeleteComponentArgs = {
 
 
 export type MutationDeleteItemArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationDeleteOrgArgs = {
   input: DeleteInput;
 };
 
@@ -3436,9 +3442,9 @@ export type FlowCreateProcessMutation = { __typename?: 'Mutation', createProcess
             | { __typename?: 'Component' }
             | { __typename?: 'Item' }
             | { __typename?: 'Material' }
+            | { __typename?: 'Org' }
             | { __typename?: 'Place' }
             | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
-            | { __typename?: 'Region' }
             | { __typename?: 'Variant' }
            | null }> | null } } | null } | null };
 
@@ -3452,9 +3458,9 @@ export type FlowUpdateProcessMaterialMutation = { __typename?: 'Mutation', updat
             | { __typename?: 'Component' }
             | { __typename?: 'Item' }
             | { __typename?: 'Material' }
+            | { __typename?: 'Org' }
             | { __typename?: 'Place' }
             | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
-            | { __typename?: 'Region' }
             | { __typename?: 'Variant' }
            | null }> | null } } | null } | null };
 
