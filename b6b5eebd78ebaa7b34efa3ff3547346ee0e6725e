@@ -1,0 +1,29 @@
+test/frontend/tests/sign-in.spec.ts
+  2c5b93e2741137c4 11,21
+test/frontend/tests/contribute.spec.ts
+  2c5b93e2741137c4 31,45,57
+test/frontend/tests/explore.spec.ts
+  2c5b93e2741137c4 40,75
+test/frontend/tests/profile.spec.ts
+  2c5b93e2741137c4 41,46,51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "b6b5eebd78ebaa7b34efa3ff3547346ee0e6725e",
+  "prompts": {
+    "2c5b93e2741137c4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f5002-7f91-4b8c-b7fd-3a5229285aa0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 10,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
