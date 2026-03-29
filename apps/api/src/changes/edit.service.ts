@@ -141,101 +141,188 @@ export class EditService {
     return change
   }
 
-  async setOrAddCollection<T extends object & { id: string }, U extends { id: string }>(
+  /**
+   * Applies set/add operations for simple entity collections (no explicit pivot payload).
+   *
+   * In change mode, this validates referenced IDs against staged edits or persisted rows via
+   * `findRefWithChange`, then attaches lightweight references so services can compose pending edits.
+   * In direct mode, it validates against the database and mutates the managed collection normally.
+   *
+   * Use this for relation fields that only need target IDs and do not require pivot metadata.
+   */
+  async setOrAddCollection<T extends BaseEntity & { id: string }, U extends { id: string }>(
     collection: Collection<T>,
     entity: EntityName<T>,
     toSet?: U | U[],
     toAdd?: U | U[],
+    change?: Change,
   ): Promise<Collection<T>> {
     if (toSet) {
       if (Array.isArray(toSet)) {
-        const foundItems = await this.em.find(
-          entity,
-          { id: { $in: toSet.map((item) => item.id) } } as any,
-          { populate: false },
-        )
-        if (foundItems.length !== toSet.length) {
-          const foundIds = foundItems.map((item) => item.id)
-          throw NotFoundErr(
-            `No ${entity} found for IDs: ${toSet
-              .map((item) => item.id)
-              .filter((id) => !_.includes(foundIds, id))
-              .join(', ')}`,
+        if (change) {
+          const ids = toSet.map((item) => item.id)
+          for (const id of ids) {
+            await this.findRefWithChange(change, entity as EntityName<BaseEntity>, { id } as any)
+          }
+          collection.set(ids.map((id) => this.em.getReference(entity, id as any)))
+        } else {
+          const foundItems = await this.em.find(
+            entity,
+            { id: { $in: toSet.map((item) => item.id) } } as any,
+            { populate: false },
           )
+          if (foundItems.length !== toSet.length) {
+            const foundIds = foundItems.map((item) => item.id)
+            throw NotFoundErr(
+              `No ${entity} found for IDs: ${toSet
+                .map((item) => item.id)
+                .filter((id) => !_.includes(foundIds, id))
+                .join(', ')}`,
+            )
+          }
+          collection.set(foundItems)
         }
-        collection.set(foundItems)
       } else {
-        const foundItem = await this.em.findOne(entity, { id: toSet.id } as any, {
-          populate: false,
-        })
-        if (!foundItem) {
-          throw NotFoundErr(`No ${entity} found for ID: ${toSet.id}`)
+        if (change) {
+          await this.findRefWithChange(
+            change,
+            entity as EntityName<BaseEntity>,
+            {
+              id: toSet.id,
+            } as any,
+          )
+          collection.set([this.em.getReference(entity, toSet.id as any)])
+        } else {
+          const foundItem = await this.em.findOne(entity, { id: toSet.id } as any, {
+            populate: false,
+          })
+          if (!foundItem) {
+            throw NotFoundErr(`No ${entity} found for ID: ${toSet.id}`)
+          }
+          collection.set([foundItem])
         }
-        collection.set([foundItem])
       }
     }
     if (toAdd) {
       if (Array.isArray(toAdd)) {
-        const foundItems = await this.em.find(
-          entity,
-          { id: { $in: toAdd.map((item) => item.id) } } as any,
-          { populate: false },
-        )
-        if (foundItems.length !== toAdd.length) {
-          const foundIds = foundItems.map((item) => item.id)
-          throw NotFoundErr(
-            `No ${entity} found for IDs: ${toAdd
-              .map((item) => item.id)
-              .filter((id) => !_.includes(foundIds, id))
-              .join(', ')}`,
+        if (change) {
+          const ids = toAdd.map((item) => item.id)
+          for (const id of ids) {
+            await this.findRefWithChange(change, entity as EntityName<BaseEntity>, { id } as any)
+          }
+          collection.add(ids.map((id) => this.em.getReference(entity, id as any)))
+        } else {
+          const foundItems = await this.em.find(
+            entity,
+            { id: { $in: toAdd.map((item) => item.id) } } as any,
+            { populate: false },
           )
+          if (foundItems.length !== toAdd.length) {
+            const foundIds = foundItems.map((item) => item.id)
+            throw NotFoundErr(
+              `No ${entity} found for IDs: ${toAdd
+                .map((item) => item.id)
+                .filter((id) => !_.includes(foundIds, id))
+                .join(', ')}`,
+            )
+          }
+          collection.add(foundItems)
         }
-        collection.add(foundItems)
       } else {
-        const foundItem = await this.em.findOne(entity, { id: toAdd.id } as any, {
-          populate: false,
-        })
-        if (!foundItem) {
-          throw NotFoundErr(`No ${entity} found for ID: ${toAdd.id}`)
+        if (change) {
+          await this.findRefWithChange(
+            change,
+            entity as EntityName<BaseEntity>,
+            {
+              id: toAdd.id,
+            } as any,
+          )
+          collection.add(this.em.getReference(entity, toAdd.id as any))
+        } else {
+          const foundItem = await this.em.findOne(entity, { id: toAdd.id } as any, {
+            populate: false,
+          })
+          if (!foundItem) {
+            throw NotFoundErr(`No ${entity} found for ID: ${toAdd.id}`)
+          }
+          collection.add(foundItem)
         }
-        collection.add(foundItem)
       }
     }
     return collection
   }
 
-  async removeFromCollection<T extends object & { id: string }>(
+  /**
+   * Removes members from a simple entity collection by ID.
+   *
+   * In change mode, removal is performed against the in-memory collection only so staged edits can
+   * remove references to entities that may not yet exist in the database. In direct mode, IDs are
+   * validated in the database before removal.
+   *
+   * Use this together with `setOrAddCollection` for non-pivot relation updates.
+   */
+  async removeFromCollection<T extends BaseEntity & { id: string }>(
     collection: Collection<T>,
     entity: EntityName<T>,
     toRemove?: string | string[],
+    change?: Change,
   ): Promise<Collection<T>> {
     if (toRemove) {
       if (Array.isArray(toRemove)) {
-        const foundItems = await this.em.find(entity, { id: { $in: toRemove } } as any, {
-          populate: false,
-        })
-        if (foundItems.length !== toRemove.length) {
-          const foundIds = foundItems.map((item) => item.id)
-          throw NotFoundErr(
-            `No ${entity} found for IDs: ${toRemove
-              .filter((id) => !_.includes(foundIds, id))
-              .join(', ')}`,
-          )
+        if (change) {
+          if (!collection.isInitialized()) {
+            await collection.init({ ref: true })
+          }
+          const idSet = new Set(toRemove)
+          const foundItems = collection.getItems().filter((item) => idSet.has(item.id))
+          collection.remove(foundItems)
+        } else {
+          const foundItems = await this.em.find(entity, { id: { $in: toRemove } } as any, {
+            populate: false,
+          })
+          if (foundItems.length !== toRemove.length) {
+            const foundIds = foundItems.map((item) => item.id)
+            throw NotFoundErr(
+              `No ${entity} found for IDs: ${toRemove
+                .filter((id) => !_.includes(foundIds, id))
+                .join(', ')}`,
+            )
+          }
+          collection.remove(foundItems)
         }
-        collection.remove(foundItems)
       } else {
-        const foundItem = await this.em.findOne(entity, { id: toRemove } as any, {
-          populate: false,
-        })
-        if (!foundItem) {
-          throw NotFoundErr(`No ${entity} found for ID: ${toRemove}`)
+        if (change) {
+          if (!collection.isInitialized()) {
+            await collection.init({ ref: true })
+          }
+          const foundItem = collection.getItems().find((item) => item.id === toRemove)
+          if (foundItem) {
+            collection.remove(foundItem)
+          }
+        } else {
+          const foundItem = await this.em.findOne(entity, { id: toRemove } as any, {
+            populate: false,
+          })
+          if (!foundItem) {
+            throw NotFoundErr(`No ${entity} found for ID: ${toRemove}`)
+          }
+          collection.remove(foundItem)
         }
-        collection.remove(foundItem)
       }
     }
     return collection
   }
 
+  /**
+   * Applies set/add operations for relations represented by an explicit pivot entity.
+   *
+   * The method derives owner and related fields from pivot metadata, validates related IDs, and
+   * creates/reuses pivot rows. When `toAdd` contains extra properties, those values are assigned to
+   * the pivot row (for example quantity/unit or role metadata).
+   *
+   * Use this for many-to-many style relations modeled with pivot entities that can carry additional
+   * fields beyond foreign keys.
+   */
   async setOrAddPivot<U extends BaseEntity & { id: string }, T extends object>(
     id: string,
     change: Change | undefined,
@@ -469,6 +556,15 @@ export class EditService {
     return collection
   }
 
+  /**
+   * Removes pivot rows from an explicit pivot collection by related entity ID.
+   *
+   * In change mode, it removes rows from the staged in-memory collection without requiring database
+   * presence of the related entity. In direct mode, IDs are validated and rows are scheduled for
+   * deletion through the active entity manager.
+   *
+   * Use this for remove operations on pivot-backed relation fields.
+   */
   async removeFromPivot<U extends BaseEntity & { id: string }, T extends object>(
     change: Change | undefined,
     collection: Collection<T>,
@@ -558,6 +654,16 @@ export class EditService {
     return collection
   }
 
+  /**
+   * Resolves an entity reference while honoring staged edits in a change.
+   *
+   * Resolution order is: matching edit in the change, then persisted row in the database. If the
+   * matching edit is a pending delete, this rejects the reference to prevent new relations to an
+   * entity scheduled for removal.
+   *
+   * Use this in service `setFields` paths that must accept references created or updated in the same
+   * change.
+   */
   async findRefWithChange<T extends BaseEntity>(
     change: Change,
     model: EntityName<T>,
@@ -573,6 +679,11 @@ export class EditService {
       return false
     })
     if (edit) {
+      if (this.isPendingDeleteEdit(edit)) {
+        throw BadRequestErr(
+          `${entityName} with ID "${where.id}" is pending deletion in this change`,
+        )
+      }
       return this.em.getReference(model, edit.entityID as any) as any
     }
     // If not, check if it exists in the database
@@ -584,6 +695,15 @@ export class EditService {
     return entity.toReference() as unknown as { id: string } & Reference<Loaded<T>>
   }
 
+  /**
+   * Loads the editable entity context for mutations that may run directly or through a change.
+   *
+   * Direct edits require admin privileges and return the persisted entity. Change edits resolve an
+   * existing staged edit first (including reconstructed state from stored POJO), otherwise load from
+   * the database and pair it with the resolved change.
+   *
+   * Use this as the standard entry point in update service methods that accept `changeID/change`.
+   */
   async findOneWithChangeInput<T extends BaseEntity, H extends string>(
     input: IChangeInputWithLang,
     userID: string,
@@ -608,6 +728,9 @@ export class EditService {
       return false
     })
     if (edit) {
+      if (this.isPendingDeleteEdit(edit)) {
+        throw BadRequestErr(`${meta.name} with ID "${where.id}" is pending deletion in this change`)
+      }
       if (edit.changes || edit.original) {
         const entity = this.em.create(
           model,
@@ -623,16 +746,27 @@ export class EditService {
       }
     }
     // If not, check if it exists in the database
-    if (!options) {
-      options = { disableIdentityMap: isUsingChange(input) }
-    }
-    const entity = await this.em.findOne<T, H>(model, where as FilterQuery<T>, options)
+    const findOptions = {
+      ...options,
+      disableIdentityMap: true,
+    } as FindOneOptions<T, H, '*', never>
+    const entity = await this.em.findOne<T, H>(model, where as FilterQuery<T>, findOptions)
     if (!entity) {
       throw NotFoundErr(`${meta.name} with ID "${where.id}" not found`)
     }
     return { entity: entity as Loaded<T>, change }
   }
 
+  /**
+   * Registers a delete operation as part of a change.
+   *
+   * If an edit already exists, this converts it to a delete (or discards create edits). If no edit
+   * exists, it captures the current entity state as `original` so merge can apply deletion later.
+   * Before scheduling delete, it checks for staged edits in the same change that still reference the
+   * target entity.
+   *
+   * Use this from entity delete services that support change-based workflows.
+   */
   async deleteOneWithChange<T extends BaseEntity & { id: string }>(
     input: DeleteInput,
     model: EntityName<T>,
@@ -656,6 +790,12 @@ export class EditService {
       }
       return false
     })
+    const conflictingEdit = this.findConflictingReferenceEdit(change, meta.name, input.id, edit)
+    if (conflictingEdit) {
+      throw BadRequestErr(
+        `Cannot delete ${meta.name} with ID "${input.id}" because pending edit "${conflictingEdit.entityName}" with ID "${conflictingEdit.entityID}" references it`,
+      )
+    }
     if (edit) {
       if (!edit.original) {
         // The edit is currently a create, so discard the edit entirely
@@ -664,7 +804,7 @@ export class EditService {
         edit.changes = undefined // Turn the edit into a delete
       }
       await this.em.persist(change).flush()
-      return
+      return { id: input.id }
     }
     // If not, check if it exists in the database
     const options = { disableIdentityMap: isUsingChange(input) }
@@ -682,6 +822,14 @@ export class EditService {
     return { id: input.id }
   }
 
+  /**
+   * Ensures a change edit exists for an entity before mutating staged values.
+   *
+   * If no edit exists, this captures the current entity snapshot into `original`. If an edit already
+   * exists, it is reused and subsequent update steps can overwrite `changes`.
+   *
+   * Use this at the start of update flows in change mode.
+   */
   async beginUpdateEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
     if (!this.authUser.sameUserOrAdmin(change.user.id)) {
       throw BadRequestErr('You can only update edits for your own changes')
@@ -699,6 +847,14 @@ export class EditService {
     }
   }
 
+  /**
+   * Writes the latest staged entity state into an existing change edit.
+   *
+   * This serializes the entity with `entityToChangePOJO` and stores it in `edit.changes`, preserving
+   * the `original` snapshot created earlier by `beginUpdateEntityEdit`.
+   *
+   * Use after service field mutation logic has finished in change mode.
+   */
   async updateEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
     const edit = change.edits.find(
       (e) => e.entityName === entity.constructor.name && e.entityID === entity.id,
@@ -711,6 +867,14 @@ export class EditService {
     edit.changes = this.entityToChangePOJO(entity.constructor.name, entity)
   }
 
+  /**
+   * Creates a new create-edit entry for an entity inside a change.
+   *
+   * The entity is serialized into `changes` and does not set `original`, which marks the edit as a
+   * create operation for merge.
+   *
+   * Use this when creating new entities in change mode.
+   */
   async createEntityEdit(change: Change, entity: BaseEntity & { id: string }) {
     if (!this.authUser.sameUserOrAdmin(change.user.id)) {
       throw BadRequestErr('You can only create edits for your own changes')
@@ -727,6 +891,15 @@ export class EditService {
     change.edits.add(edit)
   }
 
+  /**
+   * Schedules creation of an entity edit payload onto the active unit of work.
+   *
+   * Scalar fields and to-one references are created on the root entity, while pivot/tree rows are
+   * materialized separately from array relation payloads. This keeps creation compatible with pivot
+   * entities that have composite keys or additional relation fields.
+   *
+   * Use only from merge when replaying create edits.
+   */
   private applyEntityCreate(entityName: string, pojo: Record<string, any>): void {
     const meta = this.em.getMetadata().get(entityName)
     const { flattenArrayRefs, flattenToId } = this.categorizePOJORelations(meta)
@@ -747,6 +920,15 @@ export class EditService {
     }
   }
 
+  /**
+   * Applies an update edit payload to an existing persisted entity.
+   *
+   * For pivot/tree collections, it computes row-level diffs by primary key signature to remove stale
+   * rows, update existing rows, and insert missing rows. Scalar and to-one fields are then assigned on
+   * the parent entity.
+   *
+   * Use only from merge when replaying update edits.
+   */
   private async applyEntityUpdate(
     entityName: string,
     entityID: string,
@@ -816,12 +998,63 @@ export class EditService {
     return entity as BaseEntity
   }
 
+  /**
+   * Applies a delete edit by removing pivot/tree dependents before deleting the parent entity.
+   *
+   * This ensures dependent rows represented as explicit 1:m pivot/tree collections are scheduled for
+   * deletion in the same unit of work, avoiding FK ordering issues during flush.
+   *
+   * Use only from merge when replaying delete edits.
+   */
+  private async applyEntityDelete(entityName: string, entityID: string): Promise<BaseEntity> {
+    const meta = this.em.getMetadata().get(entityName)
+    const { flattenArrayRefs } = this.categorizePOJORelations(meta)
+    const populateFields = flattenArrayRefs.map((r) => r.name)
+    const entity = populateFields.length
+      ? await this.em.findOne(
+          entityName,
+          { id: entityID } as any,
+          {
+            populate: populateFields,
+          } as any,
+        )
+      : await this.em.findOne(entityName, { id: entityID } as any)
+    if (!entity) {
+      throw NotFoundErr(`${entityName} with ID "${entityID}" not found`)
+    }
+
+    for (const { name } of flattenArrayRefs) {
+      const collection = (entity as any)[name] as Collection<any>
+      if (!collection.isInitialized()) {
+        await collection.init({ ref: true })
+      }
+      const existing = collection.getItems()
+      for (const item of existing) {
+        collection.removeWithoutPropagation(item)
+        this.em.remove(item)
+      }
+    }
+
+    this.em.remove(entity)
+    return entity as BaseEntity
+  }
+
+  /**
+   * Triggers merge immediately when the caller requested apply-on-approve semantics.
+   *
+   * Use this after persisting change edits in mutation handlers that accept `MergeInput`.
+   */
   async checkMerge(change: Change, mergeInput: MergeInput) {
     if (change.status === ChangeStatus.APPROVED && mergeInput.apply) {
       await this.merge(change)
     }
   }
 
+  /**
+   * Validates merge preconditions and merges a change by ID.
+   *
+   * Use this from resolver endpoints that trigger merge directly by change identifier.
+   */
   async mergeID(changeID: string) {
     const change = await this.em.findOne(Change, { id: changeID }, { populate: ['edits'] })
     if (!change) {
@@ -833,6 +1066,15 @@ export class EditService {
     return this.merge(change)
   }
 
+  /**
+   * Replays all edits in an approved change into persistent storage in one transactional workflow.
+   *
+   * The method orders create edits by detected dependencies, applies create/update/delete operations,
+   * flushes once, records history entries for create/update edits, and commits the transaction. On any
+   * failure, it rolls back transactional work and marks the change as rejected.
+   *
+   * Use this as the canonical merge execution path.
+   */
   async merge(change: Change) {
     await this.em.begin()
     try {
@@ -889,13 +1131,9 @@ export class EditService {
       }
 
       for (const edit of otherEdits) {
-        const entity = await this.em.findOne(edit.entityName, { id: edit.entityID })
-        if (!entity && edit.original) {
-          throw NotFoundErr(`Entity with ID "${edit.entityID}" not found in "${edit.entityName}"`)
-        }
-        if (entity && edit.original && !edit.changes) {
-          this.em.remove(entity)
-        } else if (entity && edit.original && edit.changes) {
+        if (edit.original && !edit.changes) {
+          await this.applyEntityDelete(edit.entityName, edit.entityID!)
+        } else if (edit.original && edit.changes) {
           await this.applyEntityUpdate(
             edit.entityName,
             edit.entityID!,
@@ -904,18 +1142,20 @@ export class EditService {
         } else {
           throw BadRequestErr(`Edit for entity "${edit.entityName}" is invalid`)
         }
-        historyItems.push({
-          name: edit.entityName,
-          userID: change.user.id,
-          original: edit.original,
-          changes: edit.changes,
-        })
+        if (edit.changes) {
+          historyItems.push({
+            name: edit.entityName,
+            userID: change.user.id,
+            original: edit.original,
+            changes: edit.changes,
+          })
+        }
       }
 
       await this.em.flush()
 
       for (const { name, userID, original, changes } of historyItems) {
-        this.createHistory<BaseEntity>(name, userID, original, changes)
+        await this.createHistory<BaseEntity>(name, userID, original, changes)
       }
 
       change.status = ChangeStatus.MERGED
@@ -929,6 +1169,14 @@ export class EditService {
     }
   }
 
+  /**
+   * Appends a history record for an entity operation when a corresponding history model exists.
+   *
+   * The method skips no-op updates, validates that an entity ID is present in `original/changes`, and
+   * creates a row keyed to the target entity and current user.
+   *
+   * Use from service update/create paths and from merge after replaying non-delete edits.
+   */
   async createHistory<T>(
     name: EntityName<T>,
     userID: string,
@@ -942,7 +1190,12 @@ export class EditService {
     if (original && changes && _.isEqual(original, changes)) {
       return
     }
-    const id = (changes as any).id || (original as any).id
+    const id =
+      (changes && typeof changes === 'object' ? (changes as any).id : undefined) ||
+      (original && typeof original === 'object' ? (original as any).id : undefined)
+    if (!id) {
+      throw BadRequestErr(`Cannot create history for "${String(name)}" without entity ID`)
+    }
     const pk0 = historyMeta.primaryKeys[0]
     const parentEntityClass = historyMeta.properties[pk0].type
     this.em.create(historyMeta.className, {
@@ -984,6 +1237,15 @@ export class EditService {
     return _.omit(pojo, [...changeOmit, 'createdAt', 'updatedAt'])
   }
 
+  /**
+   * Classifies entity relations for POJO serialization/deserialization and merge application.
+   *
+   * - `flattenToId`: to-one relations stored as IDs in change payloads.
+   * - `flattenArrayRefs`: 1:m pivot/tree collections preserved as row arrays in change payloads.
+   * - `changeOmit`: relation fields excluded from persisted change payloads.
+   *
+   * Use this helper anywhere relation-aware transformation of change POJOs is needed.
+   */
   private categorizePOJORelations(meta: EntityMetadata): {
     flattenArrayRefs: Array<{ name: string; targetMeta: EntityMetadata }>
     flattenToId: string[]
@@ -1069,11 +1331,19 @@ export class EditService {
     const relFields = new Set(targetMeta.relations.map((r) => r.name))
     const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(item)) {
-      result[key] = typeof val === 'string' && relFields.has(key) ? { id: val } : val
+      result[key] =
+        typeof val === 'string' && relFields.has(key)
+          ? this.toRelationReference(targetMeta, key, val)
+          : val
     }
     return result
   }
 
+  /**
+   * Builds a stable composite-key signature for pivot/tree rows.
+   *
+   * Use this when diffing existing and incoming pivot rows during merge updates.
+   */
   private getPrimaryKeySignature(item: Record<string, any>, targetMeta: EntityMetadata): string {
     return targetMeta.primaryKeys
       .map((key) => {
@@ -1086,6 +1356,12 @@ export class EditService {
       .join('::')
   }
 
+  /**
+   * Converts a string ID into an ORM relation reference for a specific relation field.
+   *
+   * Use during POJO restoration whenever a flattened relation value needs to become assignable
+   * relation data again.
+   */
   private toRelationReference(meta: EntityMetadata, fieldName: string, value: unknown): unknown {
     if (typeof value !== 'string') {
       return value
@@ -1094,9 +1370,109 @@ export class EditService {
     if (!relation?.targetMeta) {
       return { id: value }
     }
-    return this.em.getReference(relation.targetMeta.class, value as any)
+    if (typeof (this.em as any).getReference === 'function') {
+      return this.em.getReference(relation.targetMeta.class, value as any)
+    }
+    return { id: value }
   }
 
+  /**
+   * Returns whether an edit currently represents a pending delete operation.
+   *
+   * Use as a guard before allowing new references to, or updates of, staged entities.
+   */
+  private isPendingDeleteEdit(edit: ChangeEdits): boolean {
+    return !!edit.original && !edit.changes
+  }
+
+  /**
+   * Finds any staged edit in a change that references a target entity.
+   *
+   * Use before scheduling deletes to enforce referential safety within the change boundary.
+   */
+  private findConflictingReferenceEdit(
+    change: Change,
+    targetEntityName: string,
+    targetID: string,
+    ignoreEdit?: ChangeEdits,
+  ): ChangeEdits | undefined {
+    return change.edits.find((edit) => {
+      if (ignoreEdit && edit === ignoreEdit) return false
+      return this.editReferencesEntity(edit, targetEntityName, targetID)
+    })
+  }
+
+  /**
+   * Checks whether a single edit payload references a specific target entity ID.
+   *
+   * The check covers both flattened to-one relation fields and nested pivot/tree row relation fields.
+   * Use as the primitive matcher for delete-conflict detection.
+   */
+  private editReferencesEntity(
+    edit: ChangeEdits,
+    targetEntityName: string,
+    targetID: string,
+  ): boolean {
+    if (!edit.changes) return false
+    const meta = this.em.getMetadata().get(edit.entityName)
+    const changes = edit.changes as Record<string, any>
+    const { flattenArrayRefs, flattenToId } = this.categorizePOJORelations(meta)
+
+    for (const field of flattenToId) {
+      const relation = meta.relations.find((rel) => rel.name === field)
+      if (!relation?.targetMeta || relation.targetMeta.name !== targetEntityName) {
+        continue
+      }
+      const val = changes[field]
+      const refID =
+        typeof val === 'string'
+          ? val
+          : val && _.isObject(val) && _.has(val, 'id')
+            ? String((val as any).id)
+            : undefined
+      if (refID === targetID) {
+        return true
+      }
+    }
+
+    for (const { name, targetMeta } of flattenArrayRefs) {
+      const rows = Array.isArray(changes[name])
+        ? changes[name]
+        : changes[name]
+          ? [changes[name]]
+          : []
+      const relFields = targetMeta.relations.filter(
+        (rel) => rel.kind === 'm:1' || rel.kind === '1:1',
+      )
+      for (const row of rows) {
+        if (!row || !_.isObject(row)) continue
+        for (const rel of relFields) {
+          if (!rel.targetMeta || rel.targetMeta.name !== targetEntityName) {
+            continue
+          }
+          const val = (row as any)[rel.name]
+          const refID =
+            typeof val === 'string'
+              ? val
+              : val && _.isObject(val) && _.has(val, 'id')
+                ? String((val as any).id)
+                : undefined
+          if (refID === targetID) {
+            return true
+          }
+        }
+      }
+    }
+
+    return false
+  }
+
+  /**
+   * Extracts create-edit dependencies from relation values in a change payload.
+   *
+   * A dependency exists when a relation points to another entity ID that is also being created in the
+   * same change. Use this output to order create edits before merge flush.
+   */
   private getCreateDependencies(
     entityName: string,
     pojo: Record<string, any>,

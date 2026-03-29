@@ -282,13 +282,19 @@ export class ComponentService implements IEntityService<Component> {
       component.visual = { image: input.imageURL }
     }
     if (input.primaryMaterial) {
-      const material = await this.em.findOne(Material, {
-        id: input.primaryMaterial.id,
-      })
-      if (!material) {
-        throw new Error(`Material with ID "${input.primaryMaterial.id}" not found`)
+      if (!change) {
+        const material = await this.em.findOne(Material, {
+          id: input.primaryMaterial.id,
+        })
+        if (!material) {
+          throw new Error(`Material with ID "${input.primaryMaterial.id}" not found`)
+        }
+        component.primaryMaterial = ref(Material, material.id)
+      } else {
+        component.primaryMaterial = await this.editService.findRefWithChange(change, Material, {
+          id: input.primaryMaterial.id,
+        })
       }
-      component.primaryMaterial = ref(Material, material.id)
     }
     if (input.materials) {
       component.componentMaterials = await this.editService.setOrAddPivot(
@@ -324,11 +330,17 @@ export class ComponentService implements IEntityService<Component> {
       )
     }
     if (input.region) {
-      const region = await this.em.findOne(Region, { id: input.region.id })
-      if (!region) {
-        throw new Error(`Region with ID "${input.region.id}" not found`)
+      if (!change) {
+        const region = await this.em.findOne(Region, { id: input.region.id })
+        if (!region) {
+          throw new Error(`Region with ID "${input.region.id}" not found`)
+        }
+        component.region = ref(Region, region.id)
+      } else {
+        component.region = await this.editService.findRefWithChange(change, Region, {
+          id: input.region.id,
+        })
       }
-      component.region = ref(Region, region.id)
     }
   }
 }
