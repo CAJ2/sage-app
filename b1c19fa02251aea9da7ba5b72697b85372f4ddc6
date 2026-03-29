@@ -1,0 +1,31 @@
+package.json
+  21ef8fe723de272f 34,40-41
+packages/ui/tsconfig.storybook.json
+  21ef8fe723de272f 5
+apps/frontend/package.json
+  21ef8fe723de272f 75
+packages/ui/package.json
+  21ef8fe723de272f 52
+apps/science/package.json
+  21ef8fe723de272f 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "b1c19fa02251aea9da7ba5b72697b85372f4ddc6",
+  "prompts": {
+    "21ef8fe723de272f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fdfe53e-eb84-483a-9d51-34a2d7a1bc62",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 122,
+      "total_deletions": 101,
+      "accepted_lines": 27,
+      "overriden_lines": 0
+    }
+  }
+}
