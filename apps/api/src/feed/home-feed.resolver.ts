@@ -16,7 +16,7 @@ export class HomeFeedResolver {
   @OptionalAuth()
   async feed(@Args() args: FeedArgs): Promise<FeedPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(FeedArgs, args)
-    const cursor = await this.homeFeedService.find(filter, args.regionId)
+    const cursor = await this.homeFeedService.find(filter, args.regionId, args.format)
     return this.transform.entityToPaginated(
       FeedItem,
       FeedPage,

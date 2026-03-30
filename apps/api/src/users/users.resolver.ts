@@ -2,10 +2,11 @@ import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
+import { Change, ChangesPage } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { Org, OrgsPage } from '@src/users/org.model'
-import { User, UsersOrgsArgs } from '@src/users/users.model'
+import { User, UserChangesArgs, UsersOrgsArgs } from '@src/users/users.model'
 import { UsersService } from '@src/users/users.service'
 
 @Resolver(() => User)
@@ -40,5 +41,12 @@ export class UsersResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(UsersOrgsArgs, args)
     const cursor = await this.usersService.orgs(user.id, filter)
     return this.transform.entityToPaginated(Org, OrgsPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => ChangesPage)
+  async changes(@Parent() user: User, @Args() args: UserChangesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(UserChangesArgs, args)
+    const cursor = await this.usersService.changes(user.id, filter)
+    return this.transform.entityToPaginated(Change, ChangesPage, cursor, parsedArgs)
   }
 }

@@ -1,5 +1,16 @@
 {
   "contribute": {
+    "features": {
+      "addEvents": "Add Events",
+      "findEvents": "Find Local Events",
+      "suggestEdits": "Suggest Edits",
+      "uploadPhotos": "Upload Photos"
+    },
+    "hero": {
+      "subtitle": "We're integrating contributions — stay tuned",
+      "title": "Help build the Sage database"
+    },
+    "relatedProjects": "Related Projects",
     "title": "Contribute"
   },
   "tabs": {

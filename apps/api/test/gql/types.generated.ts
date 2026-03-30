@@ -748,6 +748,7 @@ export enum FeedFormat {
   Article = 'ARTICLE',
   External = 'EXTERNAL',
   Feature = 'FEATURE',
+  Project = 'PROJECT',
   Update = 'UPDATE'
 }
 
@@ -1606,6 +1607,7 @@ export type QueryFeedArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  format?: InputMaybe<FeedFormat>;
   last?: InputMaybe<Scalars['Int']['input']>;
   regionId?: InputMaybe<Scalars['ID']['input']>;
 };

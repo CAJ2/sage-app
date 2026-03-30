@@ -748,6 +748,7 @@ export enum FeedFormat {
   Article = 'ARTICLE',
   External = 'EXTERNAL',
   Feature = 'FEATURE',
+  Project = 'PROJECT',
   Update = 'UPDATE'
 }
 
@@ -1606,6 +1607,7 @@ export type QueryFeedArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  format?: InputMaybe<FeedFormat>;
   last?: InputMaybe<Scalars['Int']['input']>;
   regionId?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -2294,6 +2296,8 @@ export type UpdateVariantOutput = {
 export type User = {
   __typename?: 'User';
   avatarURL?: Maybe<Scalars['String']['output']>;
+  /** Changes this user is involved in */
+  changes: ChangesPage;
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   emailVerified: Scalars['Boolean']['output'];
@@ -2306,6 +2310,15 @@ export type User = {
   profile?: Maybe<UserProfile>;
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
+};
+
+
+/** A registered user of the platform */
+export type UserChangesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

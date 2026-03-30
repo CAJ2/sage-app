@@ -10,6 +10,7 @@ export enum FeedFormat {
   ARTICLE = 'ARTICLE',
   EXTERNAL = 'EXTERNAL',
   FEATURE = 'FEATURE',
+  PROJECT = 'PROJECT',
   UPDATE = 'UPDATE',
 }
 registerEnumType(FeedFormat, { name: 'FeedFormat' })
@@ -64,9 +65,14 @@ export class FeedPage extends Paginated(FeedItem) {}
 export class FeedArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema.extend({
     regionId: z.string().optional(),
+    format: z.enum(FeedFormat).optional(),
   })
 
   @Field(() => ID, { nullable: true })
   @IsOptional()
   regionId?: string
+
+  @Field(() => FeedFormat, { nullable: true })
+  @IsOptional()
+  format?: FeedFormat
 }

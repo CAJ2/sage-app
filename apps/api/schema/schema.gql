@@ -636,6 +636,7 @@ enum FeedFormat {
   ARTICLE
   EXTERNAL
   FEATURE
+  PROJECT
   UPDATE
 }
 
@@ -1123,7 +1124,7 @@ type Query {
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
-  feed(after: String, before: String, first: Int, last: Int, regionId: ID): FeedPage!
+  feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, regionId: ID): FeedPage!
   item(id: ID!): Item
   itemSchema: ModelEditSchema
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -1763,6 +1764,9 @@ type UpdateVariantOutput {
 """A registered user of the platform"""
 type User {
   avatarURL: String
+
+  """Changes this user is involved in"""
+  changes(after: String, before: String, first: Int, last: Int): ChangesPage!
   createdAt: DateTime!
   email: String!
   emailVerified: Boolean!
