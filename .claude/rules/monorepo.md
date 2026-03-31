@@ -257,7 +257,7 @@ Common test issues:
 
 ```bash
 git clone <repository-url>
-cd sage-app
+cd sageleaf
 pnpm install
 ```
 

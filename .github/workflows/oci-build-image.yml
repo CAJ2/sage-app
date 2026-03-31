@@ -44,7 +44,7 @@ on:
       registry:
         type: string
         required: false
-        default: 'ghcr.io/caj2'
+        default: 'ghcr.io/sage-eco'
       push_in_pr:
         type: boolean
         required: false
