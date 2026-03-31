@@ -1,23 +1,15 @@
 {
-  "contribute": {
-    "features": {
-      "addEvents": "Add Events",
-      "findEvents": "Find Local Events",
-      "suggestEdits": "Suggest Edits",
-      "uploadPhotos": "Upload Photos"
-    },
-    "hero": {
-      "subtitle": "We're integrating contributions — stay tuned",
-      "title": "Help build the Sage database"
-    },
-    "relatedProjects": "Related Projects",
-    "title": "Contribute"
-  },
-  "tabs": {
-    "contribute": "Contribute",
-    "explore": "Explore",
-    "home": "Home",
-    "profile": "Profile",
-    "search": "Search"
-  }
+  "contribute.features.addEvents": "Add Events",
+  "contribute.features.findEvents": "Find Local Events",
+  "contribute.features.suggestEdits": "Suggest Edits",
+  "contribute.features.uploadPhotos": "Upload Photos",
+  "contribute.hero.subtitle": "We're integrating contributions — stay tuned",
+  "contribute.hero.title": "Help build the Sage database",
+  "contribute.relatedProjects": "Related Projects",
+  "contribute.title": "Contribute",
+  "tabs.contribute": "Contribute",
+  "tabs.explore": "Explore",
+  "tabs.home": "Home",
+  "tabs.profile": "Profile",
+  "tabs.search": "Search"
 }

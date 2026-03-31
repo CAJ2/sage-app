@@ -1,12 +1,8 @@
 {
-  "contribute": {
-    "title": "Bidra"
-  },
-  "tabs": {
-    "contribute": "Bidra",
-    "explore": "Utforska",
-    "home": "Hem",
-    "profile": "Profil",
-    "search": "Sök"
-  }
+  "contribute.title": "Bidra",
+  "tabs.contribute": "Bidra",
+  "tabs.explore": "Utforska",
+  "tabs.home": "Hem",
+  "tabs.profile": "Profil",
+  "tabs.search": "Sök"
 }

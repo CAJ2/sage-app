@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { Check } from '@lucide/vue'
-import { useTranslate } from '@tolgee/vue'
+import { T } from '@tolgee/vue'
 import { DrawerClose } from 'vaul-vue'
-
-const { t } = useTranslate('common')
 
 interface LocaleObject {
   code: string
@@ -25,7 +23,7 @@ const emits = defineEmits<{
 <template>
   <div class="mx-auto w-full max-w-sm">
     <DrawerHeader>
-      <DrawerTitle>{{ t('settings.language.select_title') }}</DrawerTitle>
+      <DrawerTitle><T ns="common" key-name="settings.language.select_title" /></DrawerTitle>
     </DrawerHeader>
     <div class="overflow-y-auto px-4 pb-0" style="max-height: 60vh">
       <ul class="flex flex-col gap-1">

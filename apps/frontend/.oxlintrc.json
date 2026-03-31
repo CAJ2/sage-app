@@ -149,7 +149,6 @@
     "useRegionStore": "readonly",
     "useRecentStore": "readonly",
     "hybridStorage": "readonly",
-    "formTranslate": "readonly",
     "sanitizeFormData": "readonly",
     "useAuthClient": "readonly",
     "useAuthSession": "readonly",

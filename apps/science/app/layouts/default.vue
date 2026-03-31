@@ -119,22 +119,22 @@ import {
 } from '@lucide/vue'
 import { useTranslate } from '@tolgee/vue'
 
-const { t } = useTranslate('science')
-
 const sidebarOpen = ref(true)
 const showSignIn = useShowSignIn()
 
+const { t } = useTranslate()
+
 const menuItems = computed(() => [
-  { title: t.value('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
-  { title: t.value('nav.categories'), url: '/categories', icon: Shapes },
-  { title: t.value('nav.items'), url: '/items', icon: List },
-  { title: t.value('nav.variants'), url: '/variants', icon: LayoutGrid },
-  { title: t.value('nav.components'), url: '/components', icon: Blocks },
-  { title: t.value('nav.processes'), url: '/processes', icon: Workflow },
-  { title: t.value('nav.sources'), url: '/sources', icon: Database },
-  { title: t.value('nav.orgs'), url: '/orgs', icon: Building2 },
-  { title: t.value('nav.places'), url: '/places', icon: MapPin },
-  { title: t.value('nav.changes'), url: '/changes', icon: GitMerge },
+  { title: t.value('nav.dashboard', { ns: 'science' }), url: '/dashboard', icon: LayoutDashboard },
+  { title: t.value('nav.categories', { ns: 'science' }), url: '/categories', icon: Shapes },
+  { title: t.value('nav.items', { ns: 'science' }), url: '/items', icon: List },
+  { title: t.value('nav.variants', { ns: 'science' }), url: '/variants', icon: LayoutGrid },
+  { title: t.value('nav.components', { ns: 'science' }), url: '/components', icon: Blocks },
+  { title: t.value('nav.processes', { ns: 'science' }), url: '/processes', icon: Workflow },
+  { title: t.value('nav.sources', { ns: 'science' }), url: '/sources', icon: Database },
+  { title: t.value('nav.orgs', { ns: 'science' }), url: '/orgs', icon: Building2 },
+  { title: t.value('nav.places', { ns: 'science' }), url: '/places', icon: MapPin },
+  { title: t.value('nav.changes', { ns: 'science' }), url: '/changes', icon: GitMerge },
 ])
 
 const router = useRouter()

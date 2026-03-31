@@ -147,7 +147,6 @@
     "useSubscription": "readonly",
     "useSubscriptionLoading": "readonly",
     "useRegionStore": "readonly",
-    "formTranslate": "readonly",
     "sanitizeFormData": "readonly",
     "useAuthClient": "readonly",
     "useAuthSession": "readonly",

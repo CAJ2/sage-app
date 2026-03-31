@@ -7,10 +7,10 @@
             <component :is="i.icon" v-if="i.icon" class="text-muted-foreground min-h-6 w-6 p-3" />
             <div class="mx-2 flex grow flex-col justify-around">
               <p class="text-md leading-none">
-                {{ t(i.title) }}
+                {{ i.title }}
               </p>
               <p v-if="i.subtitle" class="text-muted-foreground text-sm">
-                {{ t(i.subtitle) }}
+                {{ i.subtitle }}
               </p>
             </div>
           </div>
@@ -18,10 +18,10 @@
         <div v-else class="list-row divide-y">
           <component :is="i.icon" v-if="i.icon" class="text-muted-foreground size-5" />
           <p class="text-sm leading-none font-medium">
-            {{ t(i.title) }}
+            {{ i.title }}
           </p>
           <p v-if="i.subtitle" class="text-muted-foreground text-sm">
-            {{ t(i.subtitle) }}
+            {{ i.subtitle }}
           </p>
         </div>
       </li>
@@ -30,10 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { useTranslate } from '@tolgee/vue'
 import type { Component } from 'vue'
 
-const { t } = useTranslate('common')
 const { items } = defineProps<{
   items: {
     id: string

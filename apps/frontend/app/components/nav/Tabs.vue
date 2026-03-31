@@ -4,30 +4,30 @@
   >
     <!-- Left Tabs -->
     <div class="flex flex-1 justify-center">
-      <NuxtLink :to="{ path: leftTabs['home'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: tabs.home }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
-            'text-accent': activeTab === leftTabs['home'].path,
-            'text-base-content': activeTab !== leftTabs['home'].path,
+            'text-accent': activeTab === tabs.home,
+            'text-base-content': activeTab !== tabs.home,
           }"
         >
           <HouseIcon :size="20" />
-          <span class="text-sm">{{ leftTabs['home'].label }}</span>
+          <span class="text-sm"><T ns="frontend" key-name="tabs.home" /></span>
         </button>
       </NuxtLink>
     </div>
     <div class="flex flex-1 justify-center">
-      <NuxtLink :to="{ path: leftTabs['explore'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: tabs.explore }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
-            'text-accent': activeTab === leftTabs['explore'].path,
-            'text-base-content': activeTab !== leftTabs['explore'].path,
+            'text-accent': activeTab === tabs.explore,
+            'text-base-content': activeTab !== tabs.explore,
           }"
         >
           <GlobeIcon :size="20" />
-          <span class="text-sm">{{ leftTabs['explore'].label }}</span>
+          <span class="text-sm"><T ns="frontend" key-name="tabs.explore" /></span>
         </button>
       </NuxtLink>
     </div>
@@ -62,30 +62,30 @@
 
     <!-- Right Tabs -->
     <div class="flex flex-1 justify-center">
-      <NuxtLink :to="{ path: rightTabs['contribute'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: tabs.contribute }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
-            'text-accent': activeTab === rightTabs['contribute'].path,
-            'text-base-content': activeTab !== rightTabs['contribute'].path,
+            'text-accent': activeTab === tabs.contribute,
+            'text-base-content': activeTab !== tabs.contribute,
           }"
         >
           <MessageCirclePlusIcon :size="20" />
-          <span class="text-sm">{{ rightTabs['contribute'].label }}</span>
+          <span class="text-sm"><T ns="frontend" key-name="tabs.contribute" /></span>
         </button>
       </NuxtLink>
     </div>
     <div class="flex flex-1 justify-center">
-      <NuxtLink :to="{ path: rightTabs['profile'].path }" @dragstart.prevent>
+      <NuxtLink :to="{ path: tabs.profile }" @dragstart.prevent>
         <button
           class="flex cursor-pointer flex-col items-center p-1"
           :class="{
-            'text-accent': activeTab === rightTabs['profile'].path,
-            'text-base-content': activeTab !== rightTabs['profile'].path,
+            'text-accent': activeTab === tabs.profile,
+            'text-base-content': activeTab !== tabs.profile,
           }"
         >
           <UserSquareIcon :size="20" />
-          <span class="text-sm">{{ rightTabs['profile'].label }}</span>
+          <span class="text-sm"><T ns="frontend" key-name="tabs.profile" /></span>
         </button>
       </NuxtLink>
     </div>
@@ -99,42 +99,19 @@ import {
   MessageCirclePlus as MessageCirclePlusIcon,
   UserRound as UserSquareIcon,
 } from '@lucide/vue'
-import { useTranslate } from '@tolgee/vue'
+import { T } from '@tolgee/vue'
 
 const route = useRoute()
-const { t } = useTranslate('frontend')
 
-const leftTabs = computed(() => ({
-  home: {
-    path: '/home',
-    label: t.value('tabs.home'),
-  },
-  explore: {
-    path: '/explore',
-    label: t.value('tabs.explore'),
-  },
-}))
-const rightTabs = computed(() => ({
-  contribute: {
-    path: '/contribute',
-    label: t.value('tabs.contribute'),
-  },
-  profile: {
-    path: '/profile',
-    label: t.value('tabs.profile'),
-  },
-}))
+const tabs = {
+  home: '/home',
+  explore: '/explore',
+  contribute: '/contribute',
+  profile: '/profile',
+}
 
 const activeTab = computed(() => {
   const currentPath = route.path
-  const currentTab = [
-    leftTabs.value['home'],
-    leftTabs.value['explore'],
-    rightTabs.value['contribute'],
-    rightTabs.value['profile'],
-  ].find((tab) => {
-    return currentPath.startsWith(tab.path)
-  })
-  return currentTab ? currentTab.path : null
+  return Object.values(tabs).find((path) => currentPath.startsWith(path)) ?? null
 })
 </script>

@@ -14,7 +14,7 @@
     "generate:prod": "pnpm exec nuxi generate --dotenv=config/production/.env",
     "preview": "pnpm exec nuxi preview",
     "postinstall": "pnpm exec nuxi prepare",
-    "i18n:pull": "pnpm exec tolgee pull",
+    "i18n": "tolgee -c .tolgeerc sync --yes",
     "lint": "pnpm exec oxlint --fix && pnpm exec eslint --fix",
     "lint:ci": "pnpm exec oxlint --deny-warnings && pnpm exec eslint . --max-warnings 0",
     "fmt": "pnpm exec oxfmt",
