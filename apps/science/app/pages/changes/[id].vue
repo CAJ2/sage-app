@@ -1,0 +1,289 @@
+<template>
+  <div>
+    <div class="flex items-start gap-3 p-3">
+      <Button variant="ghost" @click="navigateTo('/changes')">
+        <ArrowLeft class="size-4" />
+        Changes
+      </Button>
+      <div class="flex-1">
+        <h1 class="text-xl font-bold">{{ entity?.title ?? id }}</h1>
+        <EntityMeta
+          v-if="entity"
+          :id="entity.id"
+          :created-at="entity.createdAt"
+          :updated-at="entity.updatedAt"
+        />
+      </div>
+      <Button @click="requireAuth(() => (showEdit = true))">
+        <Pencil class="size-4" />
+        Edit
+      </Button>
+      <Button variant="destructive" @click="requireAuth(() => (showDelete = true))">
+        <Trash2 class="size-4" />
+        Delete
+      </Button>
+    </div>
+
+    <div v-if="entity">
+      <Card class="m-3 border-0 bg-base-100 shadow-md">
+        <CardHeader>
+          <CardTitle>Overview</CardTitle>
+        </CardHeader>
+        <CardContent class="flex flex-col gap-2">
+          <div><span class="font-semibold">Title:</span> {{ entity.title }}</div>
+          <div v-if="entity.description">
+            <span class="font-semibold">Description:</span> {{ entity.description }}
+          </div>
+          <div>
+            <span class="font-semibold">Status:</span>
+            <span
+              class="ml-2 badge badge-sm"
+              :class="{
+                'badge-primary': entity.status === ChangeStatus.Merged,
+                'badge-info': entity.status === ChangeStatus.Proposed,
+                'badge-success': entity.status === ChangeStatus.Approved,
+                'badge-warning': entity.status === ChangeStatus.Draft,
+                'badge-error': entity.status === ChangeStatus.Rejected,
+              }"
+              >{{ entity.status }}</span
+            >
+          </div>
+          <div><span class="font-semibold">Created by:</span> {{ entity.user?.name }}</div>
+        </CardContent>
+      </Card>
+
+      <Card class="m-3 border-0 bg-base-100 shadow-md">
+        <CardHeader>
+          <CardTitle>Edits ({{ entity.edits?.totalCount ?? 0 }})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div v-if="entity.edits?.nodes?.length" class="flex gap-3">
+            <ul class="w-1/2 space-y-2 overflow-y-auto">
+              <li
+                v-for="(edit, i) in entity.edits.nodes"
+                :key="edit.id ?? i"
+                class="cursor-pointer rounded-md border p-2 text-sm transition-colors"
+                :class="
+                  selectedEditId === edit.id
+                    ? 'border-primary bg-primary/10'
+                    : 'border-base-300 hover:bg-base-200'
+                "
+                @click="selectedEditId = edit.id ?? null"
+              >
+                <span class="badge badge-outline badge-sm">{{ edit.entityName }}</span>
+                <span v-if="edit.id" class="ml-2 font-mono text-xs opacity-50">{{ edit.id }}</span>
+              </li>
+            </ul>
+            <div class="w-1/2 rounded-md border border-base-300 bg-base-200 p-3">
+              <template v-if="selectedEdit">
+                <div v-if="selectedEdit.updateInput" class="overflow-x-auto">
+                  <pre class="text-xs break-all whitespace-pre-wrap">{{
+                    JSON.stringify(selectedEdit.updateInput, null, 2)
+                  }}</pre>
+                </div>
+                <div v-else class="text-sm opacity-60">No update input</div>
+              </template>
+              <div v-else class="text-sm opacity-60">Select an edit to view its raw JSON</div>
+            </div>
+          </div>
+          <div v-else class="text-sm opacity-60">No edits</div>
+        </CardContent>
+      </Card>
+
+      <Card class="m-3 border-0 bg-base-100 shadow-md">
+        <CardHeader>
+          <CardTitle>Sources</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul class="space-y-2">
+            <li
+              v-for="cs in entity.sources?.nodes ?? []"
+              :key="cs.source.id"
+              class="flex items-center gap-2 text-sm"
+            >
+              <span class="badge badge-outline badge-sm">{{ cs.source.type }}</span>
+              <a
+                v-if="cs.source.contentURL"
+                :href="cs.source.contentURL"
+                target="_blank"
+                class="max-w-xs link truncate link-primary"
+                >{{ cs.source.contentURL }}</a
+              >
+              <NuxtLink :to="`/sources/${cs.source.id}`" class="link text-xs link-secondary"
+                >View</NuxtLink
+              >
+            </li>
+          </ul>
+          <div v-if="!entity.sources?.nodes?.length" class="text-sm opacity-60">None</div>
+        </CardContent>
+      </Card>
+    </div>
+
+    <div v-else class="flex justify-center p-8">
+      <span class="loading loading-lg loading-spinner" />
+    </div>
+
+    <Dialog v-model:open="showEdit">
+      <DialogContent class="max-h-[80vh] overflow-auto">
+        <DialogTitle>Edit Change</DialogTitle>
+        <form class="flex flex-col gap-4" @submit.prevent="doEdit">
+          <div class="flex flex-col gap-1">
+            <label class="label">Title</label>
+            <FormInput v-model="editForm.title" placeholder="Title" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="label">Description</label>
+            <FormTextArea v-model="editForm.description" placeholder="Description" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="label">Status</label>
+            <select v-model="editForm.status" class="select-bordered select w-full">
+              <option v-for="s in statusOptions" :key="s" :value="s">{{ s }}</option>
+            </select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" @click="showEdit = false">Cancel</Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog v-model:open="showDelete">
+      <DialogContent>
+        <DialogTitle>Delete Change</DialogTitle>
+        <p>
+          Are you sure you want to delete <strong>{{ entity?.title }}</strong
+          >?
+        </p>
+        <DialogFooter>
+          <Button variant="outline" @click="showDelete = false">Cancel</Button>
+          <Button variant="destructive" @click="doDelete">Delete</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ArrowLeft, Pencil, Trash2 } from '@lucide/vue'
+
+import { graphql } from '~/gql'
+import { ChangeStatus } from '~/gql/graphql'
+
+const route = useRoute()
+const id = route.params.id as string
+
+const { requireAuth } = useRequireAuth()
+
+const detailQuery = graphql(`
+  query ChangeDetail($id: ID!) {
+    change(id: $id) {
+      id
+      title
+      description
+      status
+      createdAt
+      updatedAt
+      user {
+        id
+        name
+      }
+      sources(first: 10) {
+        nodes {
+          source {
+            id
+            type
+            contentURL
+            location
+          }
+        }
+      }
+      edits(first: 20) {
+        totalCount
+        nodes {
+          id
+          entityName
+          updateInput
+          changes {
+            __typename
+          }
+        }
+      }
+    }
+  }
+`)
+
+const { result, refetch } = useQuery(detailQuery, { id })
+const entity = computed(() => result.value?.change ?? null)
+
+const selectedEditId = ref<string | null>(null)
+const selectedEdit = computed(
+  () => entity.value?.edits?.nodes?.find((e) => e.id === selectedEditId.value) ?? null,
+)
+
+const updateChangeMutation = graphql(`
+  mutation UpdateChangeFromDetail($input: UpdateChangeInput!) {
+    updateChange(input: $input) {
+      change {
+        id
+        title
+        description
+        status
+      }
+    }
+  }
+`)
+
+const deleteChangeMutation = graphql(`
+  mutation DeleteChangeFromDetail($id: ID!) {
+    deleteChange(id: $id) {
+      success
+    }
+  }
+`)
+
+const { mutate: updateChange } = useMutation(updateChangeMutation)
+const { mutate: deleteChange } = useMutation(deleteChangeMutation)
+
+const statusOptions = Object.values(ChangeStatus)
+
+const editForm = reactive({
+  title: '',
+  description: '',
+  status: ChangeStatus.Draft as ChangeStatus,
+})
+
+watch(
+  entity,
+  (val) => {
+    if (val) {
+      editForm.title = val.title ?? ''
+      editForm.description = val.description ?? ''
+      editForm.status = val.status
+    }
+  },
+  { immediate: true },
+)
+
+const showEdit = ref(false)
+const showDelete = ref(false)
+
+const doEdit = async () => {
+  await updateChange({
+    input: {
+      id,
+      title: editForm.title,
+      description: editForm.description,
+      status: editForm.status,
+    },
+  })
+  await refetch()
+  showEdit.value = false
+}
+
+const doDelete = async () => {
+  await deleteChange({ id })
+  navigateTo('/changes')
+}
+</script>

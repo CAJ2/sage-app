@@ -65,6 +65,11 @@ export class OrgHistoryPage extends Paginated(OrgHistory) {}
 export class OrgsPage extends Paginated(Org) {}
 
 @ArgsType()
+export class OrgsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
 export class OrgHistoryArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema
 }

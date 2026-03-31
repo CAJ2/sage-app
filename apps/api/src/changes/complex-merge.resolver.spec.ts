@@ -2,9 +2,10 @@ import { MikroORM } from '@mikro-orm/postgresql'
 import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
+import { graphql } from '@test/gql'
 import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
-import { parse } from 'graphql'
+import { assertNoErrors } from '@test/helpers/gql'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
@@ -37,15 +38,9 @@ describe('Complex Merge Resolver (integration)', () => {
   let gql: GraphQLTestClient
   let orm: MikroORM
 
-  const gqlDoc = (source: string) => parse(source) as any
-
-  const assertNoErrors = (res: { errors?: unknown }) => {
-    expect(res.errors).toBeUndefined()
-  }
-
   const approveAndMerge = async (changeID: string) => {
     const approveRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeApprove($input: UpdateChangeInput!) {
           updateChange(input: $input) {
             change {
@@ -61,7 +56,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(approveRes.data?.updateChange?.change?.status).toBe('APPROVED')
 
     const mergeRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeMerge($id: ID!) {
           mergeChange(id: $id) {
             change {
@@ -113,7 +108,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 5) Merge and assert final relation state reflects latest staged values.
   test('Sequence A: multi-entity updates with pivot metadata + single-reference reassignment', async () => {
     const changeSeedRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeASeedChange($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             change {
@@ -139,7 +134,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(changeID).toBeDefined()
 
     const updateVariantSetRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeAUpdateVariantSet($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -167,7 +162,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateVariantSetRes)
 
     const updateVariantChurnRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeAUpdateVariantChurn($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -193,7 +188,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateVariantChurnRes)
 
     const updateComponentSetRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeAUpdateComponentSet($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
@@ -220,7 +215,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateComponentSetRes)
 
     const updateComponentRewriteRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeAUpdateComponentRewrite($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
@@ -247,7 +242,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateComponentRewriteRes)
 
     const updateProcessInterimRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeAUpdateProcessInterim($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -274,7 +269,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateProcessInterimRes)
 
     const updateProcessFinalRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeAUpdateProcessFinal($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -303,7 +298,7 @@ describe('Complex Merge Resolver (integration)', () => {
     await approveAndMerge(changeID!)
 
     const variantGraphRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         query ComplexMergeAGetVariant($id: ID!) {
           variant(id: $id) {
             id
@@ -398,7 +393,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 4) Merge and verify precision: removed rows gone, expected rows/metadata retained, no stale refs.
   test('Sequence B: another dense multi-update flow validating set/add/remove precision', async () => {
     const changeSeedRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBSeedChange($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             change {
@@ -424,7 +419,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(changeID).toBeDefined()
 
     const updateVariantSetRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBUpdateVariantSet($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -452,7 +447,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateVariantSetRes)
 
     const updateVariantChurnRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBUpdateVariantChurn($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -479,7 +474,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateVariantChurnRes)
 
     const updateComponentSetRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBUpdateComponentSet($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
@@ -506,7 +501,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateComponentSetRes)
 
     const updateComponentFinalRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBUpdateComponentFinal($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
@@ -533,7 +528,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateComponentFinalRes)
 
     const updateProcessInterimRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBUpdateProcessInterim($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -560,7 +555,7 @@ describe('Complex Merge Resolver (integration)', () => {
     assertNoErrors(updateProcessInterimRes)
 
     const updateProcessFinalRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeBUpdateProcessFinal($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -589,7 +584,7 @@ describe('Complex Merge Resolver (integration)', () => {
     await approveAndMerge(changeID!)
 
     const variantGraphRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         query ComplexMergeBGetVariant($id: ID!) {
           variant(id: $id) {
             id
@@ -688,7 +683,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 4) Merge and verify cross-edit references resolve correctly with persisted pivot payload fields.
   test('Sequence C: CREATE edits then UPDATE edits reference those created entities before merge', async () => {
     const createItemRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCCreateItem($input: CreateItemInput!) {
           createItem(input: $input) {
             item {
@@ -714,7 +709,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createdItemID).toBeDefined()
 
     const createComponentRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCCreateComponent($input: CreateComponentInput!) {
           createComponent(input: $input) {
             component {
@@ -749,7 +744,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createComponentRes.data?.createComponent?.change?.id).toBe(changeID)
 
     const createVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCCreateVariant($input: CreateVariantInput!) {
           createVariant(input: $input) {
             variant {
@@ -774,7 +769,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createVariantRes.data?.createVariant?.change?.id).toBe(changeID)
 
     const createOrgRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCCreateOrg($input: CreateOrgInput!) {
           createOrg(input: $input) {
             org {
@@ -800,7 +795,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createOrgRes.data?.createOrg?.change?.id).toBe(changeID)
 
     const updateCreatedVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCUpdateCreatedVariantRefs($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -827,7 +822,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateCreatedVariantRes.data?.updateVariant?.change?.id).toBe(changeID)
 
     const updateVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCUpdateVariantRefs($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -853,7 +848,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateVariantRes.data?.updateVariant?.change?.id).toBe(changeID)
 
     const updateProcessRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCUpdateProcessRefs($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -881,7 +876,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateProcessRes.data?.updateProcess?.change?.id).toBe(changeID)
 
     const updateCreatedComponentRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeCUpdateCreatedComponent($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
@@ -986,7 +981,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 4) Merge and assert created-to-created and existing-to-created relations are applied atomically.
   test('Sequence D: multiple CREATE edits with cross-entity UPDATE references and pivot metadata churn', async () => {
     const createVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDCreateVariant($input: CreateVariantInput!) {
           createVariant(input: $input) {
             variant {
@@ -1012,7 +1007,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createdVariantID).toBeDefined()
 
     const createOrgRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDCreateOrg($input: CreateOrgInput!) {
           createOrg(input: $input) {
             org {
@@ -1038,7 +1033,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createOrgRes.data?.createOrg?.change?.id).toBe(changeID)
 
     const createItemRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDCreateItem($input: CreateItemInput!) {
           createItem(input: $input) {
             item {
@@ -1063,7 +1058,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createItemRes.data?.createItem?.change?.id).toBe(changeID)
 
     const createComponentRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDCreateComponent($input: CreateComponentInput!) {
           createComponent(input: $input) {
             component {
@@ -1091,7 +1086,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createComponentRes.data?.createComponent?.change?.id).toBe(changeID)
 
     const updateCreatedVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDUpdateCreatedVariant($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -1118,7 +1113,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateCreatedVariantRes.data?.updateVariant?.change?.id).toBe(changeID)
 
     const updateProcessRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDUpdateProcessRefs($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -1146,7 +1141,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateProcessRes.data?.updateProcess?.change?.id).toBe(changeID)
 
     const updateVariantSetRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDUpdateVariantSetRefs($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -1175,7 +1170,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateVariantSetRes.data?.updateVariant?.change?.id).toBe(changeID)
 
     const updateVariantChurnRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDUpdateVariantChurnRefs($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             variant {
@@ -1203,7 +1198,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateVariantChurnRes.data?.updateVariant?.change?.id).toBe(changeID)
 
     const updateCreatedComponentRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeDUpdateCreatedComponent($input: UpdateComponentInput!) {
           updateComponent(input: $input) {
             component {
@@ -1309,7 +1304,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 3) Merge and verify cleanup: parent row deleted, pivot rows removed, and process variant ref cleared.
   test('Sequence E: delete edit removes refs cleanly (including pivot refs) across multiple entities', async () => {
     const baselineProcessRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeESetBaselineProcess($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -1344,7 +1339,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(preProcess?.variant?.id).toBe(VARIANT_IDS[4])
 
     const seedChangeRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeESeedChange($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             change {
@@ -1369,7 +1364,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(changeID).toBeDefined()
 
     const deleteVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeEDeleteVariant($input: DeleteInput!) {
           deleteVariant(input: $input) {
             success
@@ -1414,7 +1409,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 3) Verify delete is rejected due to an intra-change reference conflict.
   test('Sequence F: delete with change fails when another edit in same change references target', async () => {
     const updateProcessRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeFUpdateProcessToTarget($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -1443,7 +1438,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(changeID).toBeDefined()
 
     const deleteVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeFDeleteVariant($input: DeleteInput!) {
           deleteVariant(input: $input) {
             success
@@ -1470,7 +1465,7 @@ describe('Complex Merge Resolver (integration)', () => {
   // 3) Verify both mutations fail with pending-deletion guard errors.
   test('Sequence G: create/update in change fails when referencing entity pending deletion', async () => {
     const seedChangeRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeGSeedChange($input: UpdateVariantInput!) {
           updateVariant(input: $input) {
             change {
@@ -1495,7 +1490,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(changeID).toBeDefined()
 
     const deleteVariantRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeGDeleteVariant($input: DeleteInput!) {
           deleteVariant(input: $input) {
             success
@@ -1514,7 +1509,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(deleteVariantRes.data?.deleteVariant?.success).toBe(true)
 
     const updateProcessRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeGUpdateProcessToDeleted($input: UpdateProcessInput!) {
           updateProcess(input: $input) {
             process {
@@ -1543,7 +1538,7 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(updateProcessRes.errors?.[0]?.message).toContain('pending deletion')
 
     const createProcessRes = await gql.send(
-      gqlDoc(`
+      graphql(`
         mutation ComplexMergeGCreateProcessToDeleted($input: CreateProcessInput!) {
           createProcess(input: $input) {
             process {

@@ -20,11 +20,15 @@
       <CardContent>
         <div>
           <ul class="list">
-            <div v-for="n in nodes" :key="n.changes.id" class="flex items-center">
+            <div
+              v-for="n in nodes.filter((n: { changes?: { id?: string } }) => n.changes?.id)"
+              :key="n.changes.id"
+              class="flex items-center"
+            >
               <div class="flex-1">
                 <slot :node="n" />
               </div>
-              <button class="btn btn-square btn-ghost" @click="discardEdit(n.changes.id)">
+              <button class="btn btn-square btn-ghost" @click="confirmDiscard(n.changes.id)">
                 <Trash2 />
               </button>
             </div>
@@ -32,6 +36,19 @@
         </div>
       </CardContent>
     </Card>
+
+    <Dialog v-model:open="showConfirm">
+      <DialogContent>
+        <DialogTitle>Discard Edit</DialogTitle>
+        <p class="text-sm text-base-content/70">
+          Are you sure you want to discard this edit? This cannot be undone.
+        </p>
+        <DialogFooter>
+          <Button variant="outline" @click="showConfirm = false">Cancel</Button>
+          <Button variant="danger" @click="doDiscard">Discard</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
@@ -105,13 +122,24 @@ const discardEditMutation = graphql(`
   }
 `)
 
-const discardEdit = async (editId: string) => {
+const showConfirm = ref(false)
+const pendingEditId = ref<string | null>(null)
+
+const confirmDiscard = (editId: string) => {
+  pendingEditId.value = editId
+  showConfirm.value = true
+}
+
+const doDiscard = async () => {
+  if (!pendingEditId.value) return
   const { mutate } = useMutation(discardEditMutation, {
     variables: {
       changeID: selectedChange.value || '',
-      editID: editId,
+      editID: pendingEditId.value,
     },
   })
   await mutate()
+  showConfirm.value = false
+  pendingEditId.value = null
 }
 </script>

@@ -60,6 +60,8 @@ export class ChangeService {
       }
       edit._type = EditModel
       const editModel = (await this.transform.entityToModel(EditModel, edit)) as EditModel
+      editModel.originalJSON = edit.original
+      editModel.changesJSON = edit.changes
       const changesEntity =
         edit.changes && edit.entityID
           ? await this.editService.changePOJOToEntity(edit.entityName, edit.changes)
@@ -78,6 +80,8 @@ export class ChangeService {
       change.edits.map(async (edit) => {
         edit._type = EditModel
         const editModel = (await this.transform.entityToModel(EditModel, edit)) as EditModel
+        editModel.originalJSON = edit.original
+        editModel.changesJSON = edit.changes
         const changesEntity =
           edit.changes && edit.entityID
             ? await this.editService.changePOJOToEntity(edit.entityName, edit.changes)

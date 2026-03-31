@@ -1,5 +1,6 @@
 <template>
-  <li class="list-row">
+  <li class="list-row relative" :class="{ 'cursor-pointer hover:bg-base-200': !!href }">
+    <NuxtLink v-if="href" :to="href" class="absolute inset-0" />
     <div>
       <span
         class="badge badge-sm"
@@ -23,6 +24,7 @@
     <ModelListActionButtons
       v-if="buttons && buttons.length"
       :id="change.id"
+      class="relative z-10"
       :buttons="buttons"
       @button="(btn: string) => emits('button', btn, change.id)"
     />
@@ -45,6 +47,7 @@ const ListChangeFragment = graphql(`
 const props = defineProps<{
   change: FragmentType<typeof ListChangeFragment>
   buttons?: ('select' | 'edit' | 'delete')[]
+  href?: string
 }>()
 
 const emits = defineEmits<{

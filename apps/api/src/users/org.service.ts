@@ -21,6 +21,12 @@ export class OrgService implements IEntityService<Org> {
     private readonly i18n: I18nService,
   ) {}
 
+  async find(opts: CursorOptions<Org>) {
+    const items = await this.em.find(Org, opts.where, opts.options)
+    const count = await this.em.count(Org, opts.where)
+    return { items, count }
+  }
+
   async findOneByID(id: string) {
     return await this.em.findOne(Org, { id })
   }

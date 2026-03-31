@@ -35,7 +35,7 @@ import {
   CreateComponentInput,
   UpdateComponentInput,
 } from '@src/process/component.model'
-import { MaterialIDSchema } from '@src/process/material.model'
+import { Material, MaterialIDSchema } from '@src/process/material.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
 import { User } from '@src/users/users.model'
 
@@ -77,14 +77,13 @@ export class ComponentSchemaService implements ISchemaService {
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
       model.imageURL = entity.visual?.image
-      if (entity.region) {
-        const regionRef = entity.region as any
-        const regionId = regionRef.id ?? regionRef.$id
-        if (regionId) {
-          const regionModel = new RegionModel()
-          regionModel.id = regionId
-          model.region = regionModel
-        }
+      if (entity.region?.id) {
+        model.region = new RegionModel()
+        model.region.id = entity.region.id
+      }
+      if (entity.primaryMaterial?.id) {
+        model.primaryMaterial = new Material()
+        model.primaryMaterial.id = entity.primaryMaterial.id
       }
       return model
     })

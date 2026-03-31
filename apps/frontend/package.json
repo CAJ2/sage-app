@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm exec nuxi build",
+    "codegen": "pnpm exec graphql-codegen --config codegen.ts",
     "dev": "pnpm exec nuxi dev",
     "generate": "pnpm exec nuxi generate --dotenv=config/dev/.env",
     "generate:prod": "pnpm exec nuxi generate --dotenv=config/production/.env",

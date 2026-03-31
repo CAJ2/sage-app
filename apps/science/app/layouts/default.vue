@@ -24,7 +24,6 @@
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel>Pages</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem v-for="item in menuItems" :key="item.url">
@@ -36,7 +35,7 @@
                     }"
                   >
                     <NuxtLink :to="item.url" class="flex content-center items-center">
-                      <UiImage :src="item.icon" :width="6" :height="6" class="p-0" />
+                      <component :is="item.icon" class="size-5 shrink-0" />
                       <span class="pl-2">{{ item.title }}</span>
                     </NuxtLink>
                   </SidebarMenuButton>
@@ -61,49 +60,14 @@
                       }"
                     >
                       <div class="w-8 rounded-full">
-                        <span v-if="!session?.data?.user.image" class="text-neutral-400"
-                          ><svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"
-                            />
-                          </svg>
+                        <span v-if="!session?.data?.user.image" class="text-neutral-400">
+                          <User :size="24" />
                         </span>
                         <img v-if="session?.data?.user.image" :src="session.data.user.image" />
                       </div>
                     </div>
                     {{ session?.data?.user.name || 'Sign in' }}
-                    <svg
-                      v-if="session?.data?.user"
-                      class="mr-1 ml-auto"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-dasharray="12"
-                        stroke-dashoffset="12"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 8l-7 7M12 8l7 7"
-                      >
-                        <animate
-                          fill="freeze"
-                          attributeName="stroke-dashoffset"
-                          dur="0.3s"
-                          values="12;0"
-                        />
-                      </path>
-                    </svg>
+                    <ChevronsUpDown v-if="session?.data?.user" class="mr-1 ml-auto" :size="20" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent v-if="session?.data?.user" side="top" class="w-48">
@@ -119,44 +83,7 @@
       <main class="flex w-full flex-col bg-base-200">
         <div class="flex h-12 w-full items-center">
           <SidebarTrigger v-if="!sidebarOpen" class="ml-2 text-neutral-400" />
-          <Dialog>
-            <DialogTrigger as-child>
-              <Button
-                class="btn mx-3 w-48 justify-start bg-zinc-600/30 hover:bg-zinc-300/50"
-                variant="ghost"
-              >
-                Search...
-              </Button>
-            </DialogTrigger>
-            <DialogContent class="p-0 sm:max-w-[475px]">
-              <div class="flex h-full w-full flex-col overflow-hidden rounded-md bg-base-200">
-                <div class="flex items-center border-b px-3">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                  >
-                    <g
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                    >
-                      <path d="m21 21l-4.34-4.34" />
-                      <circle cx="11" cy="11" r="8" />
-                    </g>
-                  </svg>
-                  <FormInput
-                    id="search"
-                    class="text-md my-1 flex h-10 w-full rounded-md border-0 bg-transparent py-3 outline-none focus:border-0"
-                  />
-                </div>
-                <div class="max-h-[300px] overflow-x-hidden overflow-y-auto" role="listbox"></div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <SearchDialog />
         </div>
         <slot />
       </main>
@@ -176,29 +103,38 @@
 </template>
 
 <script setup lang="ts">
+import {
+  Blocks,
+  Building2,
+  ChevronsUpDown,
+  Database,
+  GitMerge,
+  LayoutDashboard,
+  LayoutGrid,
+  List,
+  MapPin,
+  Shapes,
+  User,
+  Workflow,
+} from '@lucide/vue'
 import { useTranslate } from '@tolgee/vue'
 
 const { t } = useTranslate('science')
 
 const sidebarOpen = ref(true)
-const showSignIn = ref(false)
+const showSignIn = useShowSignIn()
 
 const menuItems = computed(() => [
-  { title: t.value('nav.dashboard'), url: '/dashboard', icon: 'icon://mdi:home' },
-  {
-    title: t.value('nav.categories'),
-    url: '/categories',
-    icon: 'icon://material-symbols:category',
-  },
-  { title: t.value('nav.items'), url: '/items', icon: 'icon://material-symbols:list-rounded' },
-  {
-    title: t.value('nav.variants'),
-    url: '/variants',
-    icon: 'icon://qlementine-icons:items-grid-16',
-  },
-  { title: t.value('nav.components'), url: '/components', icon: 'icon://uiw:component' },
-  { title: t.value('nav.processes'), url: '/processes', icon: 'icon://clarity:process-on-vm-line' },
-  { title: t.value('nav.sources'), url: '/sources', icon: 'icon://ic:outline-source' },
+  { title: t.value('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
+  { title: t.value('nav.categories'), url: '/categories', icon: Shapes },
+  { title: t.value('nav.items'), url: '/items', icon: List },
+  { title: t.value('nav.variants'), url: '/variants', icon: LayoutGrid },
+  { title: t.value('nav.components'), url: '/components', icon: Blocks },
+  { title: t.value('nav.processes'), url: '/processes', icon: Workflow },
+  { title: t.value('nav.sources'), url: '/sources', icon: Database },
+  { title: t.value('nav.orgs'), url: '/orgs', icon: Building2 },
+  { title: t.value('nav.places'), url: '/places', icon: MapPin },
+  { title: t.value('nav.changes'), url: '/changes', icon: GitMerge },
 ])
 
 const router = useRouter()

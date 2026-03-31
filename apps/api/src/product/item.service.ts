@@ -7,7 +7,6 @@ import { EditService } from '@src/changes/edit.service'
 import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
-import { MeiliService } from '@src/common/meilisearch.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
@@ -24,7 +23,6 @@ export class ItemService implements IEntityService<Item> {
     private readonly em: EntityManager,
     private readonly editService: EditService,
     private readonly tagService: TagService,
-    private readonly searchService: MeiliService,
     private readonly i18n: I18nService,
   ) {}
 

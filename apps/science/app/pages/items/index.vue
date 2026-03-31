@@ -3,19 +3,34 @@
     <div class="p-3">
       <Button
         @click="
-          () => {
+          requireAuth(() => {
             editItemId = 'new'
             showEditItem = true
-          }
+          })
         "
       >
         <Plus />
         Add Item
       </Button>
     </div>
+    <GridModelChanges v-if="selectedChange" :query="itemsChangesQuery" :type="EditModelType.Item">
+      <template #default="{ node }">
+        <ModelListItem
+          :item="node.changes"
+          :href="`/items/${node.changes.id}`"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
+      </template>
+    </GridModelChanges>
     <GridModel title="Items" :query="itemsQuery" :query-name="'items'">
       <template #default="{ node }">
-        <ModelListItem :item="node" :buttons="['edit']" @button="actionButton" />
+        <ModelListItem
+          :item="node"
+          :href="`/items/${node.id}`"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
       </template>
     </GridModel>
     <Dialog v-model:open="showEditItem">
@@ -24,7 +39,8 @@
           <span v-if="editItemId === 'new'">Create Item</span>
           <span v-else>Edit Item</span>
         </DialogTitle>
-        <ModelFormDirect
+        <ModelForm
+          :change-id="selectedChange"
           :model-id="editItemId"
           :schema-query="itemSchema"
           :create-mutation="createItemMutation"
@@ -41,6 +57,12 @@
 import { Plus } from '@lucide/vue'
 
 import { graphql } from '~/gql'
+import { EditModelType } from '~/gql/graphql'
+
+const changeStore = useChangeStore()
+const { selectedChange } = storeToRefs(changeStore)
+
+const { requireAuth } = useRequireAuth()
 
 const actionButton = (btn: string, id: string) => {
   if (btn === 'edit') {
@@ -60,6 +82,33 @@ const itemsQuery = graphql(`
         hasPreviousPage
         startCursor
         endCursor
+      }
+    }
+  }
+`)
+
+const itemsChangesQuery = graphql(`
+  query ItemsChangesQuery(
+    $changeID: ID!
+    $type: EditModelType
+    $first: Int
+    $last: Int
+    $before: String
+    $after: String
+  ) {
+    change(id: $changeID) {
+      edits(type: $type, first: $first, last: $last, before: $before, after: $after) {
+        nodes {
+          changes {
+            ...ListItemFragment
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
       }
     }
   }

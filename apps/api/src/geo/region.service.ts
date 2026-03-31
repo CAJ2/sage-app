@@ -2,14 +2,20 @@ import { QueryOrder } from '@mikro-orm/core'
 import { EntityManager, raw } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
+import { BadRequestErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
+import { SearchIndex } from '@src/search/meilisearch.service'
+import { SearchService } from '@src/search/search.service'
 
 @Injectable()
 @IsEntityService(Region)
 export class RegionService implements IEntityService<Region> {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly searchService: SearchService,
+  ) {}
 
   async find(opts: CursorOptions<Region>) {
     const regions = await this.em.find(Region, opts.where, opts.options)
@@ -44,6 +50,26 @@ export class RegionService implements IEntityService<Region> {
       { orderBy: { adminLevel: QueryOrder.DESC_NULLS_LAST }, limit: 1 },
     )
     return results[0] ?? null
+  }
+
+  async searchWithin(
+    region: Region,
+    query: string,
+    opts: { adminLevel?: number; limit?: number; offset?: number },
+  ) {
+    const bbox = region.properties?.['geom:bbox']
+    if (
+      !bbox ||
+      bbox
+        .split(',')
+        .map(Number)
+        .some((n: number) => isNaN(n))
+    ) {
+      throw BadRequestErr(
+        'This region does not have a valid bounding box and cannot be searched within.',
+      )
+    }
+    return this.searchService.searchWithin(SearchIndex.REGIONS, bbox, query, opts)
   }
 
   async searchByPoint(args: { latitude: number; longitude: number }, opts: CursorOptions<Region>) {

@@ -251,4 +251,11 @@ export class UpdatePlaceOutput {
 
   @Field(() => Place, { nullable: true })
   place?: Place & {}
+
+  @Field(() => Place, {
+    nullable: true,
+    description:
+      'The place as currently persisted in the database, before any pending change is merged',
+  })
+  currentPlace?: Place & {}
 }

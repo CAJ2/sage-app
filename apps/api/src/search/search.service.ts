@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 
+import { InternalServerErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
-import { MeiliService, SearchIndex } from '@src/common/meilisearch.service'
 import { MetaService } from '@src/common/meta.service'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
@@ -10,6 +10,7 @@ import { Material } from '@src/process/material.entity'
 import { Category } from '@src/product/category.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
+import { MeiliService, SearchIndex } from '@src/search/meilisearch.service'
 import { SearchType } from '@src/search/search.model'
 import { Org } from '@src/users/org.entity'
 
@@ -99,6 +100,35 @@ export class SearchService {
       result.push(entity)
     }
     return result
+  }
+
+  async searchWithin(
+    index: SearchIndex,
+    bbox: string | undefined,
+    query: string,
+    opts: { adminLevel?: number; limit?: number; offset?: number },
+  ): Promise<{ items: any[]; count: number }> {
+    if (!bbox) {
+      return { items: [], count: 0 }
+    }
+    const [minLon, minLat, maxLon, maxLat] = bbox.split(',').map(Number)
+    if ([minLon, minLat, maxLon, maxLat].some((n) => isNaN(n))) {
+      throw InternalServerErr(`Invalid bbox format for searchWithin: "${bbox}"`)
+    }
+    const filters: string[] = [`_geoBoundingBox([${maxLat}, ${maxLon}], [${minLat}, ${minLon}])`]
+    if (opts.adminLevel !== undefined) {
+      filters.push(`adminLevel = ${opts.adminLevel}`)
+    }
+    const lang = this.i18n.getLang()
+    const available = lang !== 'en' ? await this.meili.getAvailableIndexes() : []
+    const result = await this.meili.search(this.resolveIndex(index, lang, available), query, {
+      filter: filters,
+      limit: opts.limit ?? 10,
+      offset: opts.offset ?? 0,
+    })
+    const entityClass = this.mapIndexToEntityClass(index)
+    const items = await this.hydrateHits(result.hits, entityClass)
+    return { items, count: result.totalHits ?? result.estimatedTotalHits ?? 0 }
   }
 
   async searchAll(

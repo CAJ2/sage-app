@@ -1,8 +1,11 @@
 {
   "nav.categories": "Categories",
+  "nav.changes": "Changes",
   "nav.components": "Components",
   "nav.dashboard": "Dashboard",
   "nav.items": "Items",
+  "nav.orgs": "Orgs",
+  "nav.places": "Places",
   "nav.processes": "Processes",
   "nav.sources": "Sources",
   "nav.variants": "Variants"

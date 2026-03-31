@@ -15,7 +15,7 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  */
 type Documents = {
     "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    change(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          updateInput\n        }\n      }\n    }\n  }\n": typeof types.ChangesGetEditDocument,
-    "\n  query DirectGetEdit($id: ID!) {\n    directEdit(id: $id) {\n      entityName\n      id\n      updateInput\n    }\n  }\n": typeof types.DirectGetEditDocument,
+    "\n  query DirectGetEdit($id: ID!, $entityName: String!) {\n    directEdit(id: $id, entityName: $entityName) {\n      entityName\n      id\n      updateInput\n    }\n  }\n": typeof types.DirectGetEditDocument,
     "\n    query RefCategoryQuery($id: ID!) {\n      category(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  ": typeof types.RefCategoryQueryDocument,
     "\n    query RefItemQuery($id: ID!) {\n      item(id: $id) {\n        ...ListItemFragment\n      }\n    }\n  ": typeof types.RefItemQueryDocument,
     "\n    query RefVariantQuery($id: ID!) {\n      variant(id: $id) {\n        ...ListVariantFragment\n      }\n    }\n  ": typeof types.RefVariantQueryDocument,
@@ -38,7 +38,7 @@ type Documents = {
 };
 const documents: Documents = {
     "\n  query ChangesGetEdit($id: ID!, $changeID: ID!) {\n    change(id: $changeID) {\n      status\n      edits(id: $id) {\n        nodes {\n          updateInput\n        }\n      }\n    }\n  }\n": types.ChangesGetEditDocument,
-    "\n  query DirectGetEdit($id: ID!) {\n    directEdit(id: $id) {\n      entityName\n      id\n      updateInput\n    }\n  }\n": types.DirectGetEditDocument,
+    "\n  query DirectGetEdit($id: ID!, $entityName: String!) {\n    directEdit(id: $id, entityName: $entityName) {\n      entityName\n      id\n      updateInput\n    }\n  }\n": types.DirectGetEditDocument,
     "\n    query RefCategoryQuery($id: ID!) {\n      category(id: $id) {\n        ...ListCategoryFragment\n      }\n    }\n  ": types.RefCategoryQueryDocument,
     "\n    query RefItemQuery($id: ID!) {\n      item(id: $id) {\n        ...ListItemFragment\n      }\n    }\n  ": types.RefItemQueryDocument,
     "\n    query RefVariantQuery($id: ID!) {\n      variant(id: $id) {\n        ...ListVariantFragment\n      }\n    }\n  ": types.RefVariantQueryDocument,
@@ -81,7 +81,7 @@ export function graphql(source: "\n  query ChangesGetEdit($id: ID!, $changeID: I
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query DirectGetEdit($id: ID!) {\n    directEdit(id: $id) {\n      entityName\n      id\n      updateInput\n    }\n  }\n"): (typeof documents)["\n  query DirectGetEdit($id: ID!) {\n    directEdit(id: $id) {\n      entityName\n      id\n      updateInput\n    }\n  }\n"];
+export function graphql(source: "\n  query DirectGetEdit($id: ID!, $entityName: String!) {\n    directEdit(id: $id, entityName: $entityName) {\n      entityName\n      id\n      updateInput\n    }\n  }\n"): (typeof documents)["\n  query DirectGetEdit($id: ID!, $entityName: String!) {\n    directEdit(id: $id, entityName: $entityName) {\n      entityName\n      id\n      updateInput\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

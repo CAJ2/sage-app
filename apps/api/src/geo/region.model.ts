@@ -1,4 +1,4 @@
-import { ArgsType, Field, ID, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ID, Int, ObjectType } from '@nestjs/graphql'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
@@ -53,6 +53,21 @@ export class RegionHistory {
 
 @ObjectType()
 export class RegionsPage extends Paginated(Region) {}
+
+@ArgsType()
+export class RegionSearchWithinArgs {
+  @Field(() => String)
+  query!: string
+
+  @Field(() => Int, { nullable: true })
+  adminLevel?: number
+
+  @Field(() => Int, { nullable: true })
+  limit?: number
+
+  @Field(() => Int, { nullable: true })
+  offset?: number
+}
 
 @ArgsType()
 export class RegionsArgs extends PaginationBasicArgs {

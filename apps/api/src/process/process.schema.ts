@@ -13,9 +13,10 @@ import { I18nService } from '@src/common/i18n.service'
 import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
 import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
+import { Place } from '@src/geo/place.model'
 import { PlaceIDSchema } from '@src/geo/place.schema'
-import { RegionIDSchema } from '@src/geo/region.model'
-import { MaterialIDSchema } from '@src/process/material.model'
+import { Region, RegionIDSchema } from '@src/geo/region.model'
+import { Material, MaterialIDSchema } from '@src/process/material.model'
 import {
   ProcessEfficiencySchema,
   Process as ProcessEntity,
@@ -34,7 +35,9 @@ import {
   UpdateProcessInput,
 } from '@src/process/process.model'
 import { RecyclingStream, StreamScore } from '@src/process/stream.model'
+import { Variant } from '@src/product/variant.model'
 import { VariantIDSchema } from '@src/product/variant.schema'
+import { Org } from '@src/users/org.model'
 import { OrgIDSchema } from '@src/users/org.schema'
 import { User } from '@src/users/users.model'
 
@@ -88,13 +91,27 @@ export class ProcessSchemaService implements ISchemaService {
         eff.valueRatio = entity.efficiency.valueRatio
         model.efficiency = eff
       }
-      // Handle M:1 refs stored as string IDs (from POJO) or entity/Ref objects (from DB)
-      for (const field of ['material', 'variant', 'org', 'region', 'place'] as const) {
-        const raw = (entity as any)[field]
-        if (raw) {
-          const id = typeof raw === 'string' ? raw : raw?.id
-          if (id) (model as any)[field] = { id }
-        }
+      // entity.material etc. may be a MikroORM Ref (from DB) or a plain string ID (from history POJO)
+      const refId = (v: any): string | undefined => (typeof v === 'string' ? v : v?.id)
+      if (refId(entity.material)) {
+        model.material = new Material()
+        model.material.id = refId(entity.material)!
+      }
+      if (refId(entity.variant)) {
+        model.variant = new Variant()
+        model.variant.id = refId(entity.variant)!
+      }
+      if (refId(entity.org)) {
+        model.org = new Org()
+        model.org.id = refId(entity.org)!
+      }
+      if (refId(entity.region)) {
+        model.region = new Region()
+        model.region.id = refId(entity.region)!
+      }
+      if (refId(entity.place)) {
+        model.place = new Place()
+        model.place.id = refId(entity.place)!
       }
       return model
     })

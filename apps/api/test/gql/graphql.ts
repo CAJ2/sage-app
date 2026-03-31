@@ -564,6 +564,36 @@ export type CreateOrgOutput = {
   org?: Maybe<Org>;
 };
 
+export type CreatePlaceInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  addressTr?: InputMaybe<Array<TranslatedInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  descTr?: InputMaybe<Array<TranslatedInput>>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<PlaceLocationInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameTr?: InputMaybe<Array<TranslatedInput>>;
+  org?: InputMaybe<PlaceOrgInput>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<PlaceTagsInput>>;
+};
+
+export type CreatePlaceOutput = {
+  __typename?: 'CreatePlaceOutput';
+  change?: Maybe<Change>;
+  place?: Maybe<Place>;
+};
+
 export type CreateProcessInput = {
   /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
@@ -711,6 +741,8 @@ export type Edit = {
   __typename?: 'Edit';
   /** The proposed state of the entity after this edit */
   changes?: Maybe<EditModel>;
+  /** The raw JSON of the proposed entity changes */
+  changesJSON?: Maybe<Scalars['JSONObject']['output']>;
   /** Input values for creating a new entity */
   createInput?: Maybe<Scalars['JSONObject']['output']>;
   /** The type name of the entity being edited (e.g. Item, Component) */
@@ -718,6 +750,8 @@ export type Edit = {
   id?: Maybe<Scalars['ID']['output']>;
   /** The state of the entity before this edit */
   original?: Maybe<EditModel>;
+  /** The raw JSON of the entity before this edit */
+  originalJSON?: Maybe<Scalars['JSONObject']['output']>;
   /** Current input values for updating an existing entity */
   updateInput?: Maybe<Scalars['JSONObject']['output']>;
 };
@@ -1065,6 +1099,7 @@ export type Mutation = {
   createComponent?: Maybe<CreateComponentOutput>;
   createItem?: Maybe<CreateItemOutput>;
   createOrg?: Maybe<CreateOrgOutput>;
+  createPlace?: Maybe<CreatePlaceOutput>;
   createProcess?: Maybe<CreateProcessOutput>;
   createSource?: Maybe<CreateSourceOutput>;
   createTagDefinition?: Maybe<CreateTagDefinitionOutput>;
@@ -1087,6 +1122,7 @@ export type Mutation = {
   updateComponent?: Maybe<UpdateComponentOutput>;
   updateItem?: Maybe<UpdateItemOutput>;
   updateOrg?: Maybe<UpdateOrgOutput>;
+  updatePlace?: Maybe<UpdatePlaceOutput>;
   updateProcess?: Maybe<UpdateProcessOutput>;
   updateSource?: Maybe<UpdateSourceOutput>;
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
@@ -1116,6 +1152,11 @@ export type MutationCreateItemArgs = {
 
 export type MutationCreateOrgArgs = {
   input: CreateOrgInput;
+};
+
+
+export type MutationCreatePlaceArgs = {
+  input: CreatePlaceInput;
 };
 
 
@@ -1230,6 +1271,11 @@ export type MutationUpdateOrgArgs = {
 };
 
 
+export type MutationUpdatePlaceArgs = {
+  input: UpdatePlaceInput;
+};
+
+
 export type MutationUpdateProcessArgs = {
   input: UpdateProcessInput;
 };
@@ -1324,6 +1370,14 @@ export type OrgHistoryPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type OrgsPage = {
+  __typename?: 'OrgsPage';
+  edges?: Maybe<Array<OrgEdge>>;
+  nodes?: Maybe<Array<Org>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Scalars['String']['output']>;
@@ -1372,6 +1426,20 @@ export type PlaceLocation = {
   __typename?: 'PlaceLocation';
   latitude: Scalars['Float']['output'];
   longitude: Scalars['Float']['output'];
+};
+
+export type PlaceLocationInput = {
+  latitude: Scalars['Float']['input'];
+  longitude: Scalars['Float']['input'];
+};
+
+export type PlaceOrgInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type PlaceTagsInput = {
+  id: Scalars['ID']['input'];
+  meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
 export type PlacesPage = {
@@ -1538,7 +1606,10 @@ export type Query = {
   materials: MaterialsPage;
   me?: Maybe<User>;
   org?: Maybe<Org>;
+  orgSchema?: Maybe<ModelEditSchema>;
+  orgs: OrgsPage;
   place?: Maybe<Place>;
+  placeSchema?: Maybe<ModelEditSchema>;
   places: PlacesPage;
   process?: Maybe<Process>;
   processSchema?: Maybe<ModelEditSchema>;
@@ -1645,6 +1716,14 @@ export type QueryMaterialsArgs = {
 
 export type QueryOrgArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryOrgsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1771,6 +1850,8 @@ export type Region = {
   __typename?: 'Region';
   /** Bounding box as [minLon, minLat, maxLon, maxLat] */
   bbox?: Maybe<Array<Scalars['Float']['output']>>;
+  country?: Maybe<Region>;
+  county?: Maybe<Region>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   /** Minimum map zoom level at which this region should be displayed */
@@ -1778,7 +1859,18 @@ export type Region = {
   name?: Maybe<Scalars['String']['output']>;
   /** The type of geographic entity (e.g. country, region, locality) */
   placetype: Scalars['String']['output'];
+  province?: Maybe<Region>;
+  searchWithin: RegionsPage;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+
+/** A geographic region based on the Who's On First dataset */
+export type RegionSearchWithinArgs = {
+  adminLevel?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
 };
 
 export type RegionEdge = {
@@ -2181,6 +2273,41 @@ export type UpdateOrgOutput = {
   org?: Maybe<Org>;
 };
 
+export type UpdatePlaceInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  addTags?: InputMaybe<Array<PlaceTagsInput>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  addressTr?: InputMaybe<Array<TranslatedInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  descTr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<PlaceLocationInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameTr?: InputMaybe<Array<TranslatedInput>>;
+  org?: InputMaybe<PlaceOrgInput>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  removeTags?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<PlaceTagsInput>>;
+};
+
+export type UpdatePlaceOutput = {
+  __typename?: 'UpdatePlaceOutput';
+  change?: Maybe<Change>;
+  /** The place as currently persisted in the database, before any pending change is merged */
+  currentPlace?: Maybe<Place>;
+  place?: Maybe<Place>;
+};
+
 export type UpdateProcessInput = {
   /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
@@ -2300,6 +2427,8 @@ export type UpdateVariantOutput = {
 export type User = {
   __typename?: 'User';
   avatarURL?: Maybe<Scalars['String']['output']>;
+  /** Changes this user is involved in */
+  changes: ChangesPage;
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   emailVerified: Scalars['Boolean']['output'];
@@ -2312,6 +2441,15 @@ export type User = {
   profile?: Maybe<UserProfile>;
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
+};
+
+
+/** A registered user of the platform */
+export type UserChangesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2663,6 +2801,314 @@ export type ChangeResolverDeleteChangeMutationVariables = Exact<{
 
 
 export type ChangeResolverDeleteChangeMutation = { __typename?: 'Mutation', deleteChange?: { __typename?: 'DeleteChangeOutput', success?: boolean | null } | null };
+
+export type ComplexMergeApproveMutationVariables = Exact<{
+  input: UpdateChangeInput;
+}>;
+
+
+export type ComplexMergeApproveMutation = { __typename?: 'Mutation', updateChange?: { __typename?: 'UpdateChangeOutput', change?: { __typename?: 'Change', id: string, status: ChangeStatus } | null } | null };
+
+export type ComplexMergeMergeMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ComplexMergeMergeMutation = { __typename?: 'Mutation', mergeChange?: { __typename?: 'MergeChangeOutput', change?: { __typename?: 'Change', id: string, status: ChangeStatus } | null } | null };
+
+export type ComplexMergeASeedChangeMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeASeedChangeMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', change?: { __typename?: 'Change', id: string, status: ChangeStatus } | null, variant?: { __typename?: 'Variant', id: string } | null } | null };
+
+export type ComplexMergeAUpdateVariantSetMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeAUpdateVariantSetMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeAUpdateVariantChurnMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeAUpdateVariantChurnMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeAUpdateComponentSetMutationVariables = Exact<{
+  input: UpdateComponentInput;
+}>;
+
+
+export type ComplexMergeAUpdateComponentSetMutation = { __typename?: 'Mutation', updateComponent?: { __typename?: 'UpdateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeAUpdateComponentRewriteMutationVariables = Exact<{
+  input: UpdateComponentInput;
+}>;
+
+
+export type ComplexMergeAUpdateComponentRewriteMutation = { __typename?: 'Mutation', updateComponent?: { __typename?: 'UpdateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeAUpdateProcessInterimMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeAUpdateProcessInterimMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeAUpdateProcessFinalMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeAUpdateProcessFinalMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeAGetVariantQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ComplexMergeAGetVariantQuery = { __typename?: 'Query', variant?: { __typename?: 'Variant', id: string, items: { __typename?: 'ItemsPage', nodes?: Array<{ __typename?: 'Item', id: string }> | null }, components: { __typename?: 'VariantComponentsPage', nodes?: Array<{ __typename?: 'VariantComponent', quantity?: number | null, unit?: string | null, component: { __typename?: 'Component', id: string } }> | null }, regions: { __typename?: 'RegionsPage', nodes?: Array<{ __typename?: 'Region', id: string }> | null } } | null };
+
+export type ComplexMergeBSeedChangeMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeBSeedChangeMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', change?: { __typename?: 'Change', id: string, status: ChangeStatus } | null, variant?: { __typename?: 'Variant', id: string } | null } | null };
+
+export type ComplexMergeBUpdateVariantSetMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeBUpdateVariantSetMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeBUpdateVariantChurnMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeBUpdateVariantChurnMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeBUpdateComponentSetMutationVariables = Exact<{
+  input: UpdateComponentInput;
+}>;
+
+
+export type ComplexMergeBUpdateComponentSetMutation = { __typename?: 'Mutation', updateComponent?: { __typename?: 'UpdateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeBUpdateComponentFinalMutationVariables = Exact<{
+  input: UpdateComponentInput;
+}>;
+
+
+export type ComplexMergeBUpdateComponentFinalMutation = { __typename?: 'Mutation', updateComponent?: { __typename?: 'UpdateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeBUpdateProcessInterimMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeBUpdateProcessInterimMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeBUpdateProcessFinalMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeBUpdateProcessFinalMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeBGetVariantQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ComplexMergeBGetVariantQuery = { __typename?: 'Query', variant?: { __typename?: 'Variant', id: string, items: { __typename?: 'ItemsPage', nodes?: Array<{ __typename?: 'Item', id: string }> | null }, components: { __typename?: 'VariantComponentsPage', nodes?: Array<{ __typename?: 'VariantComponent', quantity?: number | null, unit?: string | null, component: { __typename?: 'Component', id: string } }> | null }, regions: { __typename?: 'RegionsPage', nodes?: Array<{ __typename?: 'Region', id: string }> | null } } | null };
+
+export type ComplexMergeCCreateItemMutationVariables = Exact<{
+  input: CreateItemInput;
+}>;
+
+
+export type ComplexMergeCCreateItemMutation = { __typename?: 'Mutation', createItem?: { __typename?: 'CreateItemOutput', item?: { __typename?: 'Item', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCCreateComponentMutationVariables = Exact<{
+  input: CreateComponentInput;
+}>;
+
+
+export type ComplexMergeCCreateComponentMutation = { __typename?: 'Mutation', createComponent?: { __typename?: 'CreateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCCreateVariantMutationVariables = Exact<{
+  input: CreateVariantInput;
+}>;
+
+
+export type ComplexMergeCCreateVariantMutation = { __typename?: 'Mutation', createVariant?: { __typename?: 'CreateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCCreateOrgMutationVariables = Exact<{
+  input: CreateOrgInput;
+}>;
+
+
+export type ComplexMergeCCreateOrgMutation = { __typename?: 'Mutation', createOrg?: { __typename?: 'CreateOrgOutput', org?: { __typename?: 'Org', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCUpdateCreatedVariantRefsMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeCUpdateCreatedVariantRefsMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCUpdateVariantRefsMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeCUpdateVariantRefsMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCUpdateProcessRefsMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeCUpdateProcessRefsMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeCUpdateCreatedComponentMutationVariables = Exact<{
+  input: UpdateComponentInput;
+}>;
+
+
+export type ComplexMergeCUpdateCreatedComponentMutation = { __typename?: 'Mutation', updateComponent?: { __typename?: 'UpdateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDCreateVariantMutationVariables = Exact<{
+  input: CreateVariantInput;
+}>;
+
+
+export type ComplexMergeDCreateVariantMutation = { __typename?: 'Mutation', createVariant?: { __typename?: 'CreateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDCreateOrgMutationVariables = Exact<{
+  input: CreateOrgInput;
+}>;
+
+
+export type ComplexMergeDCreateOrgMutation = { __typename?: 'Mutation', createOrg?: { __typename?: 'CreateOrgOutput', org?: { __typename?: 'Org', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDCreateItemMutationVariables = Exact<{
+  input: CreateItemInput;
+}>;
+
+
+export type ComplexMergeDCreateItemMutation = { __typename?: 'Mutation', createItem?: { __typename?: 'CreateItemOutput', item?: { __typename?: 'Item', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDCreateComponentMutationVariables = Exact<{
+  input: CreateComponentInput;
+}>;
+
+
+export type ComplexMergeDCreateComponentMutation = { __typename?: 'Mutation', createComponent?: { __typename?: 'CreateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDUpdateCreatedVariantMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeDUpdateCreatedVariantMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDUpdateProcessRefsMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeDUpdateProcessRefsMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDUpdateVariantSetRefsMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeDUpdateVariantSetRefsMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDUpdateVariantChurnRefsMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeDUpdateVariantChurnRefsMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', variant?: { __typename?: 'Variant', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeDUpdateCreatedComponentMutationVariables = Exact<{
+  input: UpdateComponentInput;
+}>;
+
+
+export type ComplexMergeDUpdateCreatedComponentMutation = { __typename?: 'Mutation', updateComponent?: { __typename?: 'UpdateComponentOutput', component?: { __typename?: 'Component', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeESetBaselineProcessMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeESetBaselineProcessMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null } | null };
+
+export type ComplexMergeESeedChangeMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeESeedChangeMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', change?: { __typename?: 'Change', id: string } | null, variant?: { __typename?: 'Variant', id: string } | null } | null };
+
+export type ComplexMergeEDeleteVariantMutationVariables = Exact<{
+  input: DeleteInput;
+}>;
+
+
+export type ComplexMergeEDeleteVariantMutation = { __typename?: 'Mutation', deleteVariant?: { __typename?: 'DeleteOutput', success: boolean, id?: string | null } | null };
+
+export type ComplexMergeFUpdateProcessToTargetMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeFUpdateProcessToTargetMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeFDeleteVariantMutationVariables = Exact<{
+  input: DeleteInput;
+}>;
+
+
+export type ComplexMergeFDeleteVariantMutation = { __typename?: 'Mutation', deleteVariant?: { __typename?: 'DeleteOutput', success: boolean, id?: string | null } | null };
+
+export type ComplexMergeGSeedChangeMutationVariables = Exact<{
+  input: UpdateVariantInput;
+}>;
+
+
+export type ComplexMergeGSeedChangeMutation = { __typename?: 'Mutation', updateVariant?: { __typename?: 'UpdateVariantOutput', change?: { __typename?: 'Change', id: string } | null, variant?: { __typename?: 'Variant', id: string } | null } | null };
+
+export type ComplexMergeGDeleteVariantMutationVariables = Exact<{
+  input: DeleteInput;
+}>;
+
+
+export type ComplexMergeGDeleteVariantMutation = { __typename?: 'Mutation', deleteVariant?: { __typename?: 'DeleteOutput', success: boolean, id?: string | null } | null };
+
+export type ComplexMergeGUpdateProcessToDeletedMutationVariables = Exact<{
+  input: UpdateProcessInput;
+}>;
+
+
+export type ComplexMergeGUpdateProcessToDeletedMutation = { __typename?: 'Mutation', updateProcess?: { __typename?: 'UpdateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
+
+export type ComplexMergeGCreateProcessToDeletedMutationVariables = Exact<{
+  input: CreateProcessInput;
+}>;
+
+
+export type ComplexMergeGCreateProcessToDeletedMutation = { __typename?: 'Mutation', createProcess?: { __typename?: 'CreateProcessOutput', process?: { __typename?: 'Process', id: string } | null, change?: { __typename?: 'Change', id: string } | null } | null };
 
 export type DirectEditResolverTestQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -3081,6 +3527,27 @@ export type RegionResolverGetNonExistentRegionQueryVariables = Exact<{
 
 
 export type RegionResolverGetNonExistentRegionQuery = { __typename?: 'Query', region?: { __typename?: 'Region', id: string } | null };
+
+export type RegionHierarchyFieldsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RegionHierarchyFieldsQuery = { __typename?: 'Query', region?: { __typename?: 'Region', id: string, county?: { __typename?: 'Region', id: string } | null, province?: { __typename?: 'Region', id: string } | null, country?: { __typename?: 'Region', id: string } | null } | null };
+
+export type RegionSearchWithinQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RegionSearchWithinQuery = { __typename?: 'Query', region?: { __typename?: 'Region', searchWithin: { __typename?: 'RegionsPage', totalCount: number, nodes?: Array<{ __typename?: 'Region', id: string }> | null } } | null };
+
+export type RegionSearchWithinAdminLevelQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RegionSearchWithinAdminLevelQuery = { __typename?: 'Query', region?: { __typename?: 'Region', searchWithin: { __typename?: 'RegionsPage', totalCount: number } } | null };
 
 export type RegionResolverCurrentRegionNoHeaderQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4460,6 +4927,50 @@ export const ChangeResolverUpdateChangeDocument = {"kind":"Document","definition
 export const ChangeResolverEditVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeResolverEditVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"edits"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"entityName"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<ChangeResolverEditVariantMutation, ChangeResolverEditVariantMutationVariables>;
 export const ChangeResolverDiscardEditDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeResolverDiscardEdit"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"editID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discardEdit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"changeID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}}},{"kind":"Argument","name":{"kind":"Name","value":"editID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"editID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ChangeResolverDiscardEditMutation, ChangeResolverDiscardEditMutationVariables>;
 export const ChangeResolverDeleteChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeResolverDeleteChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<ChangeResolverDeleteChangeMutation, ChangeResolverDeleteChangeMutationVariables>;
+export const ComplexMergeApproveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeApprove"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateChangeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeApproveMutation, ComplexMergeApproveMutationVariables>;
+export const ComplexMergeMergeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeMerge"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mergeChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeMergeMutation, ComplexMergeMergeMutationVariables>;
+export const ComplexMergeASeedChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeASeedChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeASeedChangeMutation, ComplexMergeASeedChangeMutationVariables>;
+export const ComplexMergeAUpdateVariantSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeAUpdateVariantSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAUpdateVariantSetMutation, ComplexMergeAUpdateVariantSetMutationVariables>;
+export const ComplexMergeAUpdateVariantChurnDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeAUpdateVariantChurn"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAUpdateVariantChurnMutation, ComplexMergeAUpdateVariantChurnMutationVariables>;
+export const ComplexMergeAUpdateComponentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeAUpdateComponentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAUpdateComponentSetMutation, ComplexMergeAUpdateComponentSetMutationVariables>;
+export const ComplexMergeAUpdateComponentRewriteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeAUpdateComponentRewrite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAUpdateComponentRewriteMutation, ComplexMergeAUpdateComponentRewriteMutationVariables>;
+export const ComplexMergeAUpdateProcessInterimDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeAUpdateProcessInterim"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAUpdateProcessInterimMutation, ComplexMergeAUpdateProcessInterimMutationVariables>;
+export const ComplexMergeAUpdateProcessFinalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeAUpdateProcessFinal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAUpdateProcessFinalMutation, ComplexMergeAUpdateProcessFinalMutationVariables>;
+export const ComplexMergeAGetVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComplexMergeAGetVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"components"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"regions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeAGetVariantQuery, ComplexMergeAGetVariantQueryVariables>;
+export const ComplexMergeBSeedChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBSeedChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBSeedChangeMutation, ComplexMergeBSeedChangeMutationVariables>;
+export const ComplexMergeBUpdateVariantSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBUpdateVariantSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBUpdateVariantSetMutation, ComplexMergeBUpdateVariantSetMutationVariables>;
+export const ComplexMergeBUpdateVariantChurnDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBUpdateVariantChurn"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBUpdateVariantChurnMutation, ComplexMergeBUpdateVariantChurnMutationVariables>;
+export const ComplexMergeBUpdateComponentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBUpdateComponentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBUpdateComponentSetMutation, ComplexMergeBUpdateComponentSetMutationVariables>;
+export const ComplexMergeBUpdateComponentFinalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBUpdateComponentFinal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBUpdateComponentFinalMutation, ComplexMergeBUpdateComponentFinalMutationVariables>;
+export const ComplexMergeBUpdateProcessInterimDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBUpdateProcessInterim"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBUpdateProcessInterimMutation, ComplexMergeBUpdateProcessInterimMutationVariables>;
+export const ComplexMergeBUpdateProcessFinalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeBUpdateProcessFinal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBUpdateProcessFinalMutation, ComplexMergeBUpdateProcessFinalMutationVariables>;
+export const ComplexMergeBGetVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComplexMergeBGetVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"components"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"regions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeBGetVariantQuery, ComplexMergeBGetVariantQueryVariables>;
+export const ComplexMergeCCreateItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCCreateItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"item"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCCreateItemMutation, ComplexMergeCCreateItemMutationVariables>;
+export const ComplexMergeCCreateComponentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCCreateComponent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCCreateComponentMutation, ComplexMergeCCreateComponentMutationVariables>;
+export const ComplexMergeCCreateVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCCreateVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCCreateVariantMutation, ComplexMergeCCreateVariantMutationVariables>;
+export const ComplexMergeCCreateOrgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCCreateOrg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateOrgInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createOrg"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCCreateOrgMutation, ComplexMergeCCreateOrgMutationVariables>;
+export const ComplexMergeCUpdateCreatedVariantRefsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCUpdateCreatedVariantRefs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCUpdateCreatedVariantRefsMutation, ComplexMergeCUpdateCreatedVariantRefsMutationVariables>;
+export const ComplexMergeCUpdateVariantRefsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCUpdateVariantRefs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCUpdateVariantRefsMutation, ComplexMergeCUpdateVariantRefsMutationVariables>;
+export const ComplexMergeCUpdateProcessRefsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCUpdateProcessRefs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCUpdateProcessRefsMutation, ComplexMergeCUpdateProcessRefsMutationVariables>;
+export const ComplexMergeCUpdateCreatedComponentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeCUpdateCreatedComponent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeCUpdateCreatedComponentMutation, ComplexMergeCUpdateCreatedComponentMutationVariables>;
+export const ComplexMergeDCreateVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDCreateVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDCreateVariantMutation, ComplexMergeDCreateVariantMutationVariables>;
+export const ComplexMergeDCreateOrgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDCreateOrg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateOrgInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createOrg"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDCreateOrgMutation, ComplexMergeDCreateOrgMutationVariables>;
+export const ComplexMergeDCreateItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDCreateItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"item"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDCreateItemMutation, ComplexMergeDCreateItemMutationVariables>;
+export const ComplexMergeDCreateComponentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDCreateComponent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDCreateComponentMutation, ComplexMergeDCreateComponentMutationVariables>;
+export const ComplexMergeDUpdateCreatedVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDUpdateCreatedVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDUpdateCreatedVariantMutation, ComplexMergeDUpdateCreatedVariantMutationVariables>;
+export const ComplexMergeDUpdateProcessRefsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDUpdateProcessRefs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDUpdateProcessRefsMutation, ComplexMergeDUpdateProcessRefsMutationVariables>;
+export const ComplexMergeDUpdateVariantSetRefsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDUpdateVariantSetRefs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDUpdateVariantSetRefsMutation, ComplexMergeDUpdateVariantSetRefsMutationVariables>;
+export const ComplexMergeDUpdateVariantChurnRefsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDUpdateVariantChurnRefs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDUpdateVariantChurnRefsMutation, ComplexMergeDUpdateVariantChurnRefsMutationVariables>;
+export const ComplexMergeDUpdateCreatedComponentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeDUpdateCreatedComponent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComponentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComponent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"component"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeDUpdateCreatedComponentMutation, ComplexMergeDUpdateCreatedComponentMutationVariables>;
+export const ComplexMergeESetBaselineProcessDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeESetBaselineProcess"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeESetBaselineProcessMutation, ComplexMergeESetBaselineProcessMutationVariables>;
+export const ComplexMergeESeedChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeESeedChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeESeedChangeMutation, ComplexMergeESeedChangeMutationVariables>;
+export const ComplexMergeEDeleteVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeEDeleteVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ComplexMergeEDeleteVariantMutation, ComplexMergeEDeleteVariantMutationVariables>;
+export const ComplexMergeFUpdateProcessToTargetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeFUpdateProcessToTarget"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeFUpdateProcessToTargetMutation, ComplexMergeFUpdateProcessToTargetMutationVariables>;
+export const ComplexMergeFDeleteVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeFDeleteVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ComplexMergeFDeleteVariantMutation, ComplexMergeFDeleteVariantMutationVariables>;
+export const ComplexMergeGSeedChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeGSeedChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeGSeedChangeMutation, ComplexMergeGSeedChangeMutationVariables>;
+export const ComplexMergeGDeleteVariantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeGDeleteVariant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ComplexMergeGDeleteVariantMutation, ComplexMergeGDeleteVariantMutationVariables>;
+export const ComplexMergeGUpdateProcessToDeletedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeGUpdateProcessToDeleted"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeGUpdateProcessToDeletedMutation, ComplexMergeGUpdateProcessToDeletedMutationVariables>;
+export const ComplexMergeGCreateProcessToDeletedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ComplexMergeGCreateProcessToDeleted"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateProcessInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createProcess"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ComplexMergeGCreateProcessToDeletedMutation, ComplexMergeGCreateProcessToDeletedMutationVariables>;
 export const DirectEditResolverTestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DirectEditResolverTest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityName"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"directEdit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityName"}}},{"kind":"Argument","name":{"kind":"Name","value":"changeID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"changeID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"entityName"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createInput"}},{"kind":"Field","name":{"kind":"Name","value":"updateInput"}}]}}]}}]} as unknown as DocumentNode<DirectEditResolverTestQuery, DirectEditResolverTestQueryVariables>;
 export const DirectEditUpdateVariantChange1Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DirectEditUpdateVariantChange1"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<DirectEditUpdateVariantChange1Mutation, DirectEditUpdateVariantChange1MutationVariables>;
 export const DirectEditUpdateVariantChange2Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DirectEditUpdateVariantChange2"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateVariantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateVariant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"variant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<DirectEditUpdateVariantChange2Mutation, DirectEditUpdateVariantChange2MutationVariables>;
@@ -4519,6 +5030,9 @@ export const PlaceResolverGetNonExistentPlaceDocument = {"kind":"Document","defi
 export const RegionResolverListRegionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionResolverListRegions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"regions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}}]}}]}}]}}]} as unknown as DocumentNode<RegionResolverListRegionsQuery, RegionResolverListRegionsQueryVariables>;
 export const RegionResolverSearchRegionsByPointDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionResolverSearchRegionsByPoint"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"latlong"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"searchRegionsByPoint"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"latlong"},"value":{"kind":"Variable","name":{"kind":"Name","value":"latlong"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}}]}}]}}]}}]} as unknown as DocumentNode<RegionResolverSearchRegionsByPointQuery, RegionResolverSearchRegionsByPointQueryVariables>;
 export const RegionResolverGetNonExistentRegionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionResolverGetNonExistentRegion"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<RegionResolverGetNonExistentRegionQuery, RegionResolverGetNonExistentRegionQueryVariables>;
+export const RegionHierarchyFieldsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionHierarchyFields"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"county"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"province"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"country"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<RegionHierarchyFieldsQuery, RegionHierarchyFieldsQueryVariables>;
+export const RegionSearchWithinDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionSearchWithin"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"searchWithin"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"StringValue","value":"francisco","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RegionSearchWithinQuery, RegionSearchWithinQueryVariables>;
+export const RegionSearchWithinAdminLevelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionSearchWithinAdminLevel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"searchWithin"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"StringValue","value":"city","block":false}},{"kind":"Argument","name":{"kind":"Name","value":"adminLevel"},"value":{"kind":"IntValue","value":"6"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]}}]} as unknown as DocumentNode<RegionSearchWithinAdminLevelQuery, RegionSearchWithinAdminLevelQueryVariables>;
 export const RegionResolverCurrentRegionNoHeaderDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionResolverCurrentRegionNoHeader"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentRegion"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"regionHierarchy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<RegionResolverCurrentRegionNoHeaderQuery, RegionResolverCurrentRegionNoHeaderQueryVariables>;
 export const RegionResolverCurrentRegionByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionResolverCurrentRegionByID"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentRegion"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}},{"kind":"Field","name":{"kind":"Name","value":"regionHierarchy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}}]}}]}}]} as unknown as DocumentNode<RegionResolverCurrentRegionByIdQuery, RegionResolverCurrentRegionByIdQueryVariables>;
 export const RegionResolverCurrentRegionByLatLngDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RegionResolverCurrentRegionByLatLng"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentRegion"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"region"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}},{"kind":"Field","name":{"kind":"Name","value":"regionHierarchy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"placetype"}}]}}]}}]}}]} as unknown as DocumentNode<RegionResolverCurrentRegionByLatLngQuery, RegionResolverCurrentRegionByLatLngQueryVariables>;

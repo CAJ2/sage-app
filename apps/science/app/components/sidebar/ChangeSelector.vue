@@ -1,9 +1,16 @@
 <template>
-  <NuxtLink to="/changes" class="flex content-center">
-    <div v-if="isChangeSelected" class="flex grow flex-col">
-      <div class="text-md font-bold">
-        {{ result?.change?.title || 'Loading...' }}
-      </div>
+  <NuxtLink to="/changes" class="flex min-h-16 content-center items-center">
+    <div v-if="isChangeSelected" class="flex min-w-0 grow flex-col">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <div class="text-md line-clamp-2 font-bold">
+              {{ result?.change?.title || 'Loading...' }}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>{{ result?.change?.title }}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <div class="line-clamp-1 text-sm opacity-70">
         {{ result?.change?.description || '' }}
       </div>

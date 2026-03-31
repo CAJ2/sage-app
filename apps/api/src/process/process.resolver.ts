@@ -8,7 +8,13 @@ import { Change } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { Place } from '@src/geo/place.model'
+import { PlaceService } from '@src/geo/place.service'
+import { Region } from '@src/geo/region.model'
+import { RegionService } from '@src/geo/region.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { Material } from '@src/process/material.model'
+import { MaterialService } from '@src/process/material.service'
 import { Process as ProcessEntity } from '@src/process/process.entity'
 import {
   CreateProcessInput,
@@ -27,6 +33,10 @@ import {
 } from '@src/process/process.model'
 import { ProcessSchemaService } from '@src/process/process.schema'
 import { ProcessService } from '@src/process/process.service'
+import { Variant } from '@src/product/variant.model'
+import { VariantService } from '@src/product/variant.service'
+import { Org } from '@src/users/org.model'
+import { OrgService } from '@src/users/org.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Process)
@@ -35,6 +45,11 @@ export class ProcessResolver {
     private readonly processService: ProcessService,
     private readonly transform: TransformService,
     private readonly processSchemaService: ProcessSchemaService,
+    private readonly materialService: MaterialService,
+    private readonly variantService: VariantService,
+    private readonly orgService: OrgService,
+    private readonly regionService: RegionService,
+    private readonly placeService: PlaceService,
   ) {}
 
   @Query(() => ProcessPage, { name: 'processes' })
@@ -114,6 +129,41 @@ export class ProcessResolver {
     input = await this.processSchemaService.parseDeleteInput(input)
     const process = await this.processService.delete(input)
     return { success: true, id: process.id }
+  }
+
+  @ResolveField(() => Material, { nullable: true })
+  async material(@Parent() process: Process) {
+    if (!process.material?.id) return null
+    const entity = await this.materialService.findOneByID(process.material.id)
+    return entity ? this.transform.entityToModel(Material, entity) : null
+  }
+
+  @ResolveField(() => Variant, { nullable: true })
+  async variant(@Parent() process: Process) {
+    if (!process.variant?.id) return null
+    const entity = await this.variantService.findOneByID(process.variant.id)
+    return entity ? this.transform.entityToModel(Variant, entity) : null
+  }
+
+  @ResolveField(() => Org, { nullable: true })
+  async org(@Parent() process: Process) {
+    if (!process.org?.id) return null
+    const entity = await this.orgService.findOneByID(process.org.id)
+    return entity ? this.transform.entityToModel(Org, entity) : null
+  }
+
+  @ResolveField(() => Region, { nullable: true })
+  async region(@Parent() process: Process) {
+    if (!process.region?.id) return null
+    const entity = await this.regionService.findOneByID(process.region.id)
+    return entity ? this.transform.entityToModel(Region, entity) : null
+  }
+
+  @ResolveField(() => Place, { nullable: true })
+  async place(@Parent() process: Process) {
+    if (!process.place?.id) return null
+    const entity = await this.placeService.findOneByID(process.place.id)
+    return entity ? this.transform.entityToModel(Place, entity) : null
   }
 
   @ResolveField(() => ProcessSourcesPage)
