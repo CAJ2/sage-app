@@ -1,0 +1,128 @@
+apps/science/app/pages/variants/[id].vue
+  a2829e33baf43922 1-2,4-7,18-23,25-30,32-123,125-128,130-131,133-142,144-183,186-300
+apps/science/app/pages/sources/index.vue
+  a2829e33baf43922 1-3,5-41,44-67
+apps/api/src/geo/place.service.ts
+  465a5efe29eb4052 1,5-7,9-10,13,15,17,23-25,98-149,151-206
+apps/science/app/pages/changes/index.vue
+  a2829e33baf43922 26
+apps/science/app/pages/items/[id].vue
+  a2829e33baf43922 1-2,4-7,18-23,25-30,32-80,82-121,124-210
+apps/science/app/components/source/SourceForm.vue
+  a2829e33baf43922 1-4,6-19,21-24,26-126
+apps/science/app/pages/changes/[id].vue
+  a2829e33baf43922 1-2,4-7,18-20,22-39,41-59,62,64,72,75,90-103,105-108,110-111,113-122,124-139,141-176,179-206,208-218,224-265,267-277,280-289
+packages/ui/app/components/model/list/Process.vue
+  a2829e33baf43922 2-3,35
+apps/api/src/users/org.resolver.ts
+  106421c94f5c4162 20-21,53-60
+  465a5efe29eb4052 11,35,38-52
+apps/api/src/geo/region.model.ts
+  1f150ff65a82ced9 1,58-71
+apps/api/src/geo/region.resolver.ts
+  1f150ff65a82ced9 1,67-125,127-130,132-134
+apps/science/app/pages/sources/[id].vue
+  a2829e33baf43922 1-2,4-7,11,21-23,25-37,39-41,43-93,95-132,135-187
+packages/ui/app/components/model/list/Component.vue
+  a2829e33baf43922 2-3,38
+apps/science/app/pages/processes/[id].vue
+  a2829e33baf43922 1-2,4-7,18-23,25-30,32-46,48-56,58-85,89-106,108-111,113-114,116-125,127-166,169-273
+apps/api/src/geo/region.resolver.spec.ts
+  1f150ff65a82ced9 7,18,21-22,26-28,111-208
+apps/api/src/search/search.module.ts
+  1f150ff65a82ced9 6,11-13
+apps/science/app/pages/components/[id].vue
+  a2829e33baf43922 1-2,4-7,18-23,25-30,32-101,103-106,108-109,111-120,122-161,164-265
+packages/ui/app/components/model/list/Item.vue
+  a2829e33baf43922 2-3,38
+packages/ui/app/components/model/list/Variant.vue
+  a2829e33baf43922 2-3,38
+apps/api/src/changes/change.model.ts
+  106421c94f5c4162 37-46
+apps/api/src/geo/geo.module.ts
+  465a5efe29eb4052 3
+  1f150ff65a82ced9 15
+apps/api/src/search/search.service.ts
+  1f150ff65a82ced9 105-114,118-133
+apps/api/src/geo/place.model.ts
+  465a5efe29eb4052 254-260
+apps/science/app/pages/categories/[id].vue
+  a2829e33baf43922 1-2,4-7,18-23,25-30,32-97,99-138,141-234
+apps/api/src/users/org.schema.ts
+  465a5efe29eb4052 2,6-8,11,22-34,76-124
+apps/api/src/geo/place.resolver.ts
+  465a5efe29eb4052 1,3,5,8-17,28,31-45,78-110
+apps/api/src/users/org.model.ts
+  106421c94f5c4162 68-71
+packages/ui/app/components/model/list/Change.vue
+  a2829e33baf43922 2-3,50
+apps/science/app/pages/items/index.vue
+  a2829e33baf43922 30-31
+packages/ui/app/components/model/list/Category.vue
+  a2829e33baf43922 2-3,38
+apps/api/src/users/org.service.ts
+  106421c94f5c4162 24-29
+apps/api/src/changes/change.service.ts
+  106421c94f5c4162 63-64,83-84
+apps/api/src/geo/region.service.ts
+  1f150ff65a82ced9 9-10,16-17,55-59,73-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "163905872fc8c93eabc0875b057b2e76b948cba7",
+  "prompts": {
+    "106421c94f5c4162": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba4b22af-f35d-4361-a6b2-0e47a91e59cc",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 37,
+      "total_deletions": 0,
+      "accepted_lines": 37,
+      "overriden_lines": 0
+    },
+    "1f150ff65a82ced9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "93b99250-700f-445f-bd1f-88c99a453529",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 276,
+      "total_deletions": 47,
+      "accepted_lines": 231,
+      "overriden_lines": 3
+    },
+    "465a5efe29eb4052": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9a215be6-d2aa-4d6e-b1fd-9a8194ed9752",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 276,
+      "total_deletions": 8,
+      "accepted_lines": 274,
+      "overriden_lines": 1
+    },
+    "a2829e33baf43922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6afe1253-a675-46e7-ba36-25e654a723a7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen <johansen.christian.a@gmail.com>",
+      "messages": [],
+      "total_additions": 1964,
+      "total_deletions": 282,
+      "accepted_lines": 1836,
+      "overriden_lines": 94
+    }
+  }
+}
