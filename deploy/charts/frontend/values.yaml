@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/caj2/sageleaf-frontend
+  repository: ghcr.io/sage-eco/sageleaf-web
   pullPolicy: Always
   tag: 'main'
 
@@ -46,6 +46,7 @@ service:
 env:
   configMap: frontend-configmap
   secret: frontend-secret
+  app: frontend
 
 ingress:
   enabled: false

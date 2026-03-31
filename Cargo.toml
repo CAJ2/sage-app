@@ -3,7 +3,7 @@ members = ["apps/frontend/src-tauri"]
 resolver = "3"
 
 [workspace.package]
-repository = "https://github.com/CAJ2/sage-app"
+repository = "https://github.com/sage-eco/sageleaf"
 authors = ["Christian Johansen <johansen.christian.a@gmail.com>"]
 version = "0.1.0"
 license = "AGPL-3.0"

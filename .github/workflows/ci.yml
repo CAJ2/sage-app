@@ -170,15 +170,15 @@ jobs:
       security-events: write
       id-token: write
     with:
-      registry: ghcr.io/caj2
+      registry: ghcr.io/sage-eco
       image_name: sageleaf-api
       target: api
       version: ${{ needs.nx-affected.outputs.version }}
 
-  build-image-frontend:
-    name: 'Build frontend images'
+  build-image-web:
+    name: 'Build web image'
     uses: ./.github/workflows/oci-build-image.yml
-    if: ${{ !failure() && !cancelled() && contains(needs.nx-affected.outputs.affected, '@sageleaf/frontend') }}
+    if: ${{ !failure() && !cancelled() && (contains(needs.nx-affected.outputs.affected, '@sageleaf/frontend') || contains(needs.nx-affected.outputs.affected, '@sageleaf/science')) }}
     needs: [nx-affected, test, test-frontend]
     permissions:
       contents: read
@@ -186,22 +186,7 @@ jobs:
       security-events: write
       id-token: write
     with:
-      registry: ghcr.io/caj2
-      image_name: sageleaf-frontend
-      target: frontend
+      registry: ghcr.io/sage-eco
+      image_name: sageleaf-web
+      target: web
       version: ${{ needs.nx-affected.outputs.version }}
-
-  build-image-science:
-    name: 'Build science images'
-    uses: ./.github/workflows/oci-build-image.yml
-    if: ${{ !failure() && !cancelled() && contains(needs.nx-affected.outputs.affected, '@sageleaf/science') }}
-    needs: [nx-affected, test, test-frontend]
-    permissions:
-      contents: read
-      packages: write
-      security-events: write
-      id-token: write
-    with:
-      registry: ghcr.io/caj2
-      image_name: sageleaf-science
-      target: science

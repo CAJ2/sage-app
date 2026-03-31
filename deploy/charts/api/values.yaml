@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/caj2/sageleaf-api
+  repository: ghcr.io/sage-eco/sageleaf-api
   pullPolicy: Always
   tag: 'main'
 
@@ -32,7 +32,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1001
@@ -50,8 +50,7 @@ env:
 ingress:
   enabled: false
   className: ''
-  annotations:
-    {}
+  annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -66,8 +65,7 @@ ingress:
 
 ingressRoute:
   enabled: false
-  annotations:
-    {}
+  annotations: {}
   routes:
     - kind: Rule
       match: Host(`www.example.com`) && PathPrefix(`/images`)

@@ -14,7 +14,7 @@ This document provides an overview of the Sage monorepo and instructions for cod
 ### Workspace Structure
 
 ```
-sage-app/
+sageleaf/
 ├── apps/
 │   ├── api/          # @sageleaf/api - NestJS GraphQL backend
 │   ├── frontend/     # @sageleaf/frontend - Nuxt web & mobile app
@@ -678,7 +678,7 @@ Helm charts located in `deploy/charts/`:
 
    ```bash
    git clone <repository-url>
-   cd sage-app
+   cd sageleaf
    pnpm install
    ```
 

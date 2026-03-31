@@ -5,7 +5,7 @@
 ## Workspace Structure
 
 ```
-sage-app/
+sageleaf/
 ├── apps/
 │   ├── api/          # @sageleaf/api       — NestJS GraphQL backend
 │   ├── frontend/     # @sageleaf/frontend  — Nuxt web & mobile app
@@ -43,10 +43,10 @@ pnpm install            # Install all workspace deps (always at root)
 
 See `.claude/rules/` for detailed, workspace-scoped guidance:
 
-| File | Scope | Contents |
-|------|-------|----------|
-| `monorepo.md` | All files | AI quick start, workflows, pitfalls, coding standards |
-| `api.md` | `apps/api/**` | NestJS, GraphQL, MikroORM, API commands |
-| `frontend.md` | `apps/frontend/**` | Nuxt, Vue, Tauri mobile, frontend commands |
-| `science.md` | `apps/science/**` | Science app (desktop, data viz focus) |
-| `ui.md` | `packages/ui/**` | Shared UI component library |
+| File          | Scope              | Contents                                              |
+| ------------- | ------------------ | ----------------------------------------------------- |
+| `monorepo.md` | All files          | AI quick start, workflows, pitfalls, coding standards |
+| `api.md`      | `apps/api/**`      | NestJS, GraphQL, MikroORM, API commands               |
+| `frontend.md` | `apps/frontend/**` | Nuxt, Vue, Tauri mobile, frontend commands            |
+| `science.md`  | `apps/science/**`  | Science app (desktop, data viz focus)                 |
+| `ui.md`       | `packages/ui/**`   | Shared UI component library                           |

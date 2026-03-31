@@ -37,14 +37,6 @@ COPY packages/ui /usr/src/app/packages/ui/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
 RUN pnpm --filter=@sageleaf/frontend exec nuxi prepare
 RUN nx run-many -p frontend -t build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...frontend --prod /prod/frontend
-
-FROM base AS frontend
-COPY --from=frontend-build /prod/frontend /prod/frontend
-ENV NODE_ENV=production
-WORKDIR /prod/frontend
-EXPOSE 3000
-CMD [ "node", ".output/server/index.mjs" ]
 
 FROM build AS science-build
 COPY apps/science /usr/src/app/apps/science
@@ -52,11 +44,14 @@ COPY packages/ui /usr/src/app/packages/ui/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
 RUN pnpm --filter=@sageleaf/science exec nuxi prepare
 RUN nx run-many -p science -t build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm deploy --legacy --filter=...science --prod /prod/science
 
-FROM base AS science
-COPY --from=science-build /prod/science /prod/science
+FROM base AS web
+COPY --from=frontend-build /usr/src/app/apps/frontend/.output /prod/frontend/.output
+COPY --from=science-build /usr/src/app/apps/science/.output /prod/science/.output
 ENV NODE_ENV=production
-WORKDIR /prod/science
+ENV APP_VERSION=$APP_VERSION
+ENV APP_SHA=$APP_SHA
+RUN printf '#!/bin/sh\nexec node /prod/${APP}/.output/server/index.mjs\n' > /start.sh \
+    && chmod +x /start.sh
 EXPOSE 3000
-CMD [ "node", ".output/server/index.mjs" ]
+CMD ["/start.sh"]
