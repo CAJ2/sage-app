@@ -1,13 +1,15 @@
-import { Args, ID, Query, Resolver } from '@nestjs/graphql'
+import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { LocationService } from '@src/geo/location.service'
+import { Region as RegionEntity } from '@src/geo/region.entity'
 import {
   CurrentRegion,
   Region,
   RegionsArgs,
+  RegionSearchWithinArgs,
   RegionsPage,
   RegionsSearchByPointArgs,
 } from '@src/geo/region.model'
@@ -60,6 +62,74 @@ export class RegionResolver {
       region: regionModel,
       regionHierarchy: hierarchyModels,
     }
+  }
+
+  private hierarchyParentID(
+    entity: RegionEntity,
+    preferred: number,
+    fallback: number,
+  ): string | null {
+    const hierarchy = entity.properties?.hierarchy ?? []
+    const entry =
+      hierarchy.find((h) => h.admin_level === preferred) ??
+      hierarchy.find((h) => h.admin_level === fallback)
+    return entry ? `wof_${entry.id}` : null
+  }
+
+  @ResolveField(() => Region, { nullable: true })
+  async county(@Parent() region: Region): Promise<Region | null> {
+    const entity = await this.regionService.findOneByID(region.id)
+    if (!entity) return null
+    const parentID = this.hierarchyParentID(entity, 6, 5)
+    if (!parentID) return null
+    const parent = await this.regionService.findOneByID(parentID)
+    if (!parent) return null
+    return this.transform.entityToModel(Region, parent)
+  }
+
+  @ResolveField(() => Region, { nullable: true })
+  async province(@Parent() region: Region): Promise<Region | null> {
+    const entity = await this.regionService.findOneByID(region.id)
+    if (!entity) return null
+    const parentID = this.hierarchyParentID(entity, 4, 3)
+    if (!parentID) return null
+    const parent = await this.regionService.findOneByID(parentID)
+    if (!parent) return null
+    return this.transform.entityToModel(Region, parent)
+  }
+
+  @ResolveField(() => Region, { nullable: true })
+  async country(@Parent() region: Region): Promise<Region | null> {
+    const entity = await this.regionService.findOneByID(region.id)
+    if (!entity) return null
+    const parentID = this.hierarchyParentID(entity, 2, 1)
+    if (!parentID) return null
+    const parent = await this.regionService.findOneByID(parentID)
+    if (!parent) return null
+    return this.transform.entityToModel(Region, parent)
+  }
+
+  @ResolveField(() => RegionsPage)
+  async searchWithin(
+    @Parent() region: Region,
+    @Args() args: RegionSearchWithinArgs,
+  ): Promise<RegionsPage> {
+    const entity = await this.regionService.findOneByID(region.id)
+    if (!entity)
+      return this.transform.objectsToPaginated(RegionsPage, { items: [], count: 0 }, true)
+    const cursor = await this.regionService.searchWithin(entity, args.query, {
+      adminLevel: args.adminLevel,
+      limit: args.limit,
+      offset: args.offset,
+    })
+    const models = await Promise.all(
+      cursor.items.map((e) => this.transform.entityToModel(Region, e)),
+    )
+    return this.transform.objectsToPaginated(
+      RegionsPage,
+      { items: models, count: cursor.count },
+      true,
+    )
   }
 
   @Query(() => RegionsPage, { name: 'searchRegionsByPoint' })

@@ -8,13 +8,13 @@ import { GraphQLTestClient } from '@test/graphql.utils'
 import { type Mock } from 'vitest'
 
 import { I18nService } from '@src/common/i18n.service'
-import { MeiliService } from '@src/common/meilisearch.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { TestVariantSeeder, VARIANT_IDS } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { MeiliService } from '@src/search/meilisearch.service'
 
 describe('SearchResolver (integration)', () => {
   let app: INestApplication
@@ -284,7 +284,7 @@ describe('SearchResolver (integration)', () => {
       { query: 'test', types: [SearchType.Category, SearchType.Item] },
     )
 
-    const calledIndexes = federatedSearchMock.mock.calls.at(-1)[0].map((q: any) => q.index)
+    const calledIndexes = (federatedSearchMock.mock.calls.at(-1)![0] as any[]).map((q) => q.index)
     expect(calledIndexes).toContain('categories_en') // fallback: de not available
     expect(calledIndexes).toContain('items_de') // no fallback: de is available
   })

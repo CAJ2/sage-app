@@ -5,15 +5,9 @@ test('/contribute topbar shows "Contribute"', async ({ page, goto }) => {
   await expect(page.getByRole('heading', { name: 'Contribute' })).toBeVisible()
 })
 
-test('/contribute has a "Changes" section heading', async ({ page, goto }) => {
+test('/contribute has a hero heading', async ({ page, goto }) => {
   await goto('/contribute', { waitUntil: 'hydration' })
-  await expect(page.getByRole('heading', { name: 'Changes' })).toBeVisible()
-})
-
-test('/contribute "Changes" heading links to /contribute/changes', async ({ page, goto }) => {
-  await goto('/contribute', { waitUntil: 'hydration' })
-  await page.getByRole('heading', { name: 'Changes' }).click()
-  await expect(page).toHaveURL(/\/contribute\/changes/)
+  await expect(page.getByRole('heading', { name: 'Help build the Sage database' })).toBeVisible()
 })
 
 test('/contribute/changes topbar shows "Changes"', async ({ page, goto }) => {
@@ -38,7 +32,7 @@ test('/contribute/changes back button navigates away from /contribute/changes', 
 }) => {
   // Navigate through the UI so router.back() has a history entry to return to
   await goto('/contribute', { waitUntil: 'hydration' })
-  await page.getByRole('heading', { name: 'Changes' }).click()
+  await page.goto('/contribute/changes')
   await expect(page).toHaveURL(/\/contribute\/changes/)
   await page
     .locator('button')

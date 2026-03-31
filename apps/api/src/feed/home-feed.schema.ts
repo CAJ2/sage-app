@@ -19,6 +19,7 @@ function buildShareText(
     [FeedFormat.ARTICLE]: '',
     [FeedFormat.EXTERNAL]: '',
     [FeedFormat.FEATURE]: 'Feature spotlight: ',
+    [FeedFormat.PROJECT]: 'Project: ',
     [FeedFormat.UPDATE]: 'Update: ',
   }
   let text = `${prefix[format]}${title}`

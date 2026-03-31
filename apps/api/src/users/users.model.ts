@@ -1,6 +1,7 @@
 import { ArgsType, Field, ObjectType } from '@nestjs/graphql'
 import { IsEmail, IsOptional, IsUrl, MaxLength } from 'class-validator'
 
+import { ChangesPage } from '@src/changes/change.model'
 import { IDCreatedUpdated } from '@src/graphql/base.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Org } from '@src/users/org.model'
@@ -41,6 +42,9 @@ export class User extends IDCreatedUpdated {
 
   @Field(() => UserOrgsPage, { description: 'Organizations this user belongs to' })
   orgs!: UserOrgsPage & {}
+
+  @Field(() => ChangesPage, { description: 'Changes this user is involved in' })
+  changes!: ChangesPage & {}
 }
 
 @ObjectType({ description: 'Membership of a user in an organization' })
@@ -60,5 +64,10 @@ export class UserOrgsPage extends Paginated(UserOrg) {}
 
 @ArgsType()
 export class UsersOrgsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
+export class UserChangesArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema
 }

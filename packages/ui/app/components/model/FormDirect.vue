@@ -1,6 +1,12 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="mb-10 w-full px-5">
+    <div class="relative mb-10 w-full px-5">
+      <div
+        v-if="isLoading"
+        class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-base-100/60"
+      >
+        <LoaderCircle class="animate-spin text-base-content/40" :size="32" />
+      </div>
       <FormChangeSaveStatus :status="saveStatus"></FormChangeSaveStatus>
       <FormJsonSchema
         v-if="jsonSchema && uiSchema"
@@ -17,6 +23,7 @@
 <script setup lang="ts">
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+import { LoaderCircle } from '@lucide/vue'
 import type { JSONSchemaType } from 'ajv'
 
 import { graphql } from '~/gql'
@@ -80,17 +87,19 @@ const uiSchema = computed(() => {
 const createData = ref<object | null>(null)
 const updateData = ref<object | null>(null)
 const editQuery = graphql(`
-  query DirectGetEdit($id: ID!) {
-    directEdit(id: $id) {
+  query DirectGetEdit($id: ID!, $entityName: String!) {
+    directEdit(id: $id, entityName: $entityName) {
       entityName
       id
       updateInput
     }
   }
 `)
+const entityName = createModelKey.charAt(0).toUpperCase() + createModelKey.slice(1)
 if (modelId !== 'new') {
   const { result, refetch } = useQuery(editQuery, {
     id: modelId,
+    entityName,
   })
   await refetch()
   watch(
@@ -109,6 +118,11 @@ if (modelId !== 'new') {
 
 const create = useMutation(createMutation)
 const update = useMutation(updateMutation)
+
+const isLoading = computed(() => {
+  if (modelId === 'new') return !jsonSchema.value || !uiSchema.value
+  return updateData.value === null
+})
 
 const saveStatus = ref<'saving' | 'saved' | 'not_saved' | 'error'>(
   modelId === 'new' ? 'not_saved' : 'saved',

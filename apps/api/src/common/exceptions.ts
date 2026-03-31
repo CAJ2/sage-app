@@ -20,6 +20,15 @@ export function BadRequestErr(message: string, info?: string): GraphQLError {
   })
 }
 
+export function InternalServerErr(message: string, info?: string): GraphQLError {
+  return new GraphQLError(message, {
+    extensions: {
+      code: 'INTERNAL_SERVER_ERROR',
+      info,
+    },
+  })
+}
+
 export function ConflictErr(message: string, info?: string): GraphQLError {
   return new GraphQLError(message, {
     extensions: {

@@ -4,20 +4,28 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+import { type Mock } from 'vitest'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { RegionSeeder } from '@src/db/seeds/RegionSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { MeiliService } from '@src/search/meilisearch.service'
 
 describe('RegionResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let searchMock: Mock<any>
 
   beforeAll(async () => {
+    searchMock = vi.fn().mockResolvedValue({ hits: [], totalHits: 0 })
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
-    }).compile()
+    })
+      .overrideProvider(MeiliService)
+      .useValue({ search: searchMock, getAvailableIndexes: vi.fn().mockResolvedValue([]) })
+      .compile()
 
     app = module.createNestApplication()
     await app.init()
@@ -98,6 +106,104 @@ describe('RegionResolver (integration)', () => {
     )
     expect(res.errors).toBeTruthy()
     expect(res.errors?.[0].message).toContain('Region not found')
+  })
+
+  describe('hierarchy fields', () => {
+    const hierarchyQuery = graphql(`
+      query RegionHierarchyFields($id: ID!) {
+        region(id: $id) {
+          id
+          county {
+            id
+          }
+          province {
+            id
+          }
+          country {
+            id
+          }
+        }
+      }
+    `)
+
+    test('SF county resolves province=California and country=USA', async () => {
+      const res = await gql.send(hierarchyQuery, { id: 'wof_102087579' })
+      expect(res.data?.region?.province?.id).toBe('wof_85688637')
+      expect(res.data?.region?.country?.id).toBe('wof_85633793')
+      expect(res.data?.region?.county).toBeNull()
+    })
+
+    test('California resolves country=USA, county and province are null', async () => {
+      const res = await gql.send(hierarchyQuery, { id: 'wof_85688637' })
+      expect(res.data?.region?.country?.id).toBe('wof_85633793')
+      expect(res.data?.region?.county).toBeNull()
+      expect(res.data?.region?.province).toBeNull()
+    })
+
+    test('USA has no ancestors — all hierarchy fields are null', async () => {
+      const res = await gql.send(hierarchyQuery, { id: 'wof_85633793' })
+      expect(res.data?.region?.county).toBeNull()
+      expect(res.data?.region?.province).toBeNull()
+      expect(res.data?.region?.country).toBeNull()
+    })
+  })
+
+  describe('searchWithin', () => {
+    beforeEach(() => {
+      searchMock.mockReset()
+      searchMock.mockResolvedValue({ hits: [], totalHits: 0 })
+    })
+
+    test('returns Meili hits hydrated from DB', async () => {
+      searchMock.mockResolvedValueOnce({ hits: [{ id: 'wof_102087579' }], totalHits: 1 })
+      const res = await gql.send(
+        graphql(`
+          query RegionSearchWithin($id: ID!) {
+            region(id: $id) {
+              searchWithin(query: "francisco") {
+                totalCount
+                nodes {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        { id: 'wof_85688637' },
+      )
+      expect(res.data?.region?.searchWithin?.totalCount).toBe(1)
+      expect(res.data?.region?.searchWithin?.nodes?.[0]?.id).toBe('wof_102087579')
+      expect(searchMock).toHaveBeenCalledWith(
+        expect.stringContaining('regions'),
+        'francisco',
+        expect.objectContaining({
+          filter: expect.arrayContaining([expect.stringContaining('_geoBoundingBox')]),
+        }),
+      )
+    })
+
+    test('passes adminLevel filter to Meili', async () => {
+      searchMock.mockResolvedValueOnce({ hits: [], totalHits: 0 })
+      await gql.send(
+        graphql(`
+          query RegionSearchWithinAdminLevel($id: ID!) {
+            region(id: $id) {
+              searchWithin(query: "city", adminLevel: 6) {
+                totalCount
+              }
+            }
+          }
+        `),
+        { id: 'wof_85633793' },
+      )
+      expect(searchMock).toHaveBeenCalledWith(
+        expect.any(String),
+        'city',
+        expect.objectContaining({
+          filter: expect.arrayContaining(['adminLevel = 6']),
+        }),
+      )
+    })
   })
 
   describe('currentRegion', () => {

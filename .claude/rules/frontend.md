@@ -1,6 +1,6 @@
 ---
 paths:
-  - "apps/frontend/**"
+  - 'apps/frontend/**'
 ---
 
 # Frontend App (`apps/frontend/`) — Agent Rules
@@ -67,8 +67,8 @@ nx generate:prod frontend         # Generate static (prod env)
 # Preview
 nx preview frontend               # Preview built app
 
-# GraphQL Code Generation
-nx codegen frontend               # Generate TypeScript types from GraphQL
+# GraphQL Code Generation (runs automatically as part of build)
+nx build frontend                 # Also regenerates GQL types from schema
 
 # Mobile Development (Tauri)
 nx android:dev frontend           # Start Android dev with hot reload
@@ -116,12 +116,14 @@ nx fmt:ci frontend                # Check formatting for CI
 ```
 
 **Composables:**
+
 - Export functions from `composables/*.ts`
 - Use `use` prefix: `useAuth`, `useProducts`
 - Auto-imported — no need to import manually
 - Return reactive state and functions
 
 **GraphQL Usage:**
+
 ```typescript
 import { graphql, useFragment, type FragmentType } from '~/gql'
 const somethingQuery = graphql(`
@@ -150,6 +152,7 @@ const somethingQuery = graphql(`
 - Test on actual devices for best results
 
 **Tauri build errors:**
+
 - Check Rust toolchain: `rustc --version`
 - Verify Android SDK is installed and configured
 - Check `src-tauri/Cargo.toml` for dependencies
@@ -164,6 +167,24 @@ const somethingQuery = graphql(`
 
 ## Internationalization
 
-- Translation files in `i18n/`
-- Use `$t()` in templates, `t()` in scripts
-- Configure locales in `nuxt.config.ts`
+Translation files live in `i18n/`. **Do not edit files in `i18n/` directly** — they are synced from Tolgee. To update translations, run:
+
+```bash
+nx i18n frontend
+```
+
+The namespace must always be co-located with the key — never set at the `useTranslate()` call site.
+
+**In templates — always prefer `<T />`:**
+```vue
+<T ns="frontend" key-name="some.key" />
+<T ns="common" key-name="other.key" />
+```
+
+**In scripts — use `useTranslate()` with no namespace arg, pass `{ ns }` inline:**
+```ts
+const { t } = useTranslate()
+const label = computed(() => t.value('some.key', { ns: 'frontend' }))
+```
+
+Never do `useTranslate('namespace')` — it hides the namespace from the Tolgee CLI extractor when multiple `useTranslate` calls exist in the same file.

@@ -1,5 +1,6 @@
 <template>
-  <li class="list-row">
+  <li class="list-row relative" :class="{ 'cursor-pointer hover:bg-base-200': !!href }">
+    <NuxtLink v-if="href" :to="href" class="absolute inset-0" />
     <div>
       <UiImage class="size-10" :src="variant.imageURL"></UiImage>
     </div>
@@ -12,6 +13,7 @@
     <ModelListActionButtons
       v-if="buttons && buttons.length"
       :id="variant.id"
+      class="relative z-10"
       :buttons="buttons"
       @button="(btn: string) => emits('button', btn, variant.id)"
     />
@@ -33,6 +35,7 @@ const ListVariantFragment = graphql(`
 const props = defineProps<{
   variant: FragmentType<typeof ListVariantFragment>
   buttons?: ('select' | 'edit' | 'delete')[]
+  href?: string
 }>()
 
 const emits = defineEmits<{

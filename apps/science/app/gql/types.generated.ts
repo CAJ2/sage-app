@@ -560,6 +560,36 @@ export type CreateOrgOutput = {
   org?: Maybe<Org>;
 };
 
+export type CreatePlaceInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  addressTr?: InputMaybe<Array<TranslatedInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  descTr?: InputMaybe<Array<TranslatedInput>>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<PlaceLocationInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameTr?: InputMaybe<Array<TranslatedInput>>;
+  org?: InputMaybe<PlaceOrgInput>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<PlaceTagsInput>>;
+};
+
+export type CreatePlaceOutput = {
+  __typename?: 'CreatePlaceOutput';
+  change?: Maybe<Change>;
+  place?: Maybe<Place>;
+};
+
 export type CreateProcessInput = {
   /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
@@ -707,6 +737,8 @@ export type Edit = {
   __typename?: 'Edit';
   /** The proposed state of the entity after this edit */
   changes?: Maybe<EditModel>;
+  /** The raw JSON of the proposed entity changes */
+  changesJSON?: Maybe<Scalars['JSONObject']['output']>;
   /** Input values for creating a new entity */
   createInput?: Maybe<Scalars['JSONObject']['output']>;
   /** The type name of the entity being edited (e.g. Item, Component) */
@@ -714,6 +746,8 @@ export type Edit = {
   id?: Maybe<Scalars['ID']['output']>;
   /** The state of the entity before this edit */
   original?: Maybe<EditModel>;
+  /** The raw JSON of the entity before this edit */
+  originalJSON?: Maybe<Scalars['JSONObject']['output']>;
   /** Current input values for updating an existing entity */
   updateInput?: Maybe<Scalars['JSONObject']['output']>;
 };
@@ -748,6 +782,7 @@ export enum FeedFormat {
   Article = 'ARTICLE',
   External = 'EXTERNAL',
   Feature = 'FEATURE',
+  Project = 'PROJECT',
   Update = 'UPDATE'
 }
 
@@ -1060,6 +1095,7 @@ export type Mutation = {
   createComponent?: Maybe<CreateComponentOutput>;
   createItem?: Maybe<CreateItemOutput>;
   createOrg?: Maybe<CreateOrgOutput>;
+  createPlace?: Maybe<CreatePlaceOutput>;
   createProcess?: Maybe<CreateProcessOutput>;
   createSource?: Maybe<CreateSourceOutput>;
   createTagDefinition?: Maybe<CreateTagDefinitionOutput>;
@@ -1082,6 +1118,7 @@ export type Mutation = {
   updateComponent?: Maybe<UpdateComponentOutput>;
   updateItem?: Maybe<UpdateItemOutput>;
   updateOrg?: Maybe<UpdateOrgOutput>;
+  updatePlace?: Maybe<UpdatePlaceOutput>;
   updateProcess?: Maybe<UpdateProcessOutput>;
   updateSource?: Maybe<UpdateSourceOutput>;
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
@@ -1111,6 +1148,11 @@ export type MutationCreateItemArgs = {
 
 export type MutationCreateOrgArgs = {
   input: CreateOrgInput;
+};
+
+
+export type MutationCreatePlaceArgs = {
+  input: CreatePlaceInput;
 };
 
 
@@ -1225,6 +1267,11 @@ export type MutationUpdateOrgArgs = {
 };
 
 
+export type MutationUpdatePlaceArgs = {
+  input: UpdatePlaceInput;
+};
+
+
 export type MutationUpdateProcessArgs = {
   input: UpdateProcessInput;
 };
@@ -1319,6 +1366,14 @@ export type OrgHistoryPage = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type OrgsPage = {
+  __typename?: 'OrgsPage';
+  edges?: Maybe<Array<OrgEdge>>;
+  nodes?: Maybe<Array<Org>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Scalars['String']['output']>;
@@ -1367,6 +1422,20 @@ export type PlaceLocation = {
   __typename?: 'PlaceLocation';
   latitude: Scalars['Float']['output'];
   longitude: Scalars['Float']['output'];
+};
+
+export type PlaceLocationInput = {
+  latitude: Scalars['Float']['input'];
+  longitude: Scalars['Float']['input'];
+};
+
+export type PlaceOrgInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type PlaceTagsInput = {
+  id: Scalars['ID']['input'];
+  meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
 export type PlacesPage = {
@@ -1533,7 +1602,10 @@ export type Query = {
   materials: MaterialsPage;
   me?: Maybe<User>;
   org?: Maybe<Org>;
+  orgSchema?: Maybe<ModelEditSchema>;
+  orgs: OrgsPage;
   place?: Maybe<Place>;
+  placeSchema?: Maybe<ModelEditSchema>;
   places: PlacesPage;
   process?: Maybe<Process>;
   processSchema?: Maybe<ModelEditSchema>;
@@ -1606,6 +1678,7 @@ export type QueryFeedArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  format?: InputMaybe<FeedFormat>;
   last?: InputMaybe<Scalars['Int']['input']>;
   regionId?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -1639,6 +1712,14 @@ export type QueryMaterialsArgs = {
 
 export type QueryOrgArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryOrgsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1765,6 +1846,8 @@ export type Region = {
   __typename?: 'Region';
   /** Bounding box as [minLon, minLat, maxLon, maxLat] */
   bbox?: Maybe<Array<Scalars['Float']['output']>>;
+  country?: Maybe<Region>;
+  county?: Maybe<Region>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   /** Minimum map zoom level at which this region should be displayed */
@@ -1772,7 +1855,18 @@ export type Region = {
   name?: Maybe<Scalars['String']['output']>;
   /** The type of geographic entity (e.g. country, region, locality) */
   placetype: Scalars['String']['output'];
+  province?: Maybe<Region>;
+  searchWithin: RegionsPage;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+
+/** A geographic region based on the Who's On First dataset */
+export type RegionSearchWithinArgs = {
+  adminLevel?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
 };
 
 export type RegionEdge = {
@@ -2175,6 +2269,41 @@ export type UpdateOrgOutput = {
   org?: Maybe<Org>;
 };
 
+export type UpdatePlaceInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  addTags?: InputMaybe<Array<PlaceTagsInput>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  addressTr?: InputMaybe<Array<TranslatedInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  descTr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<PlaceLocationInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameTr?: InputMaybe<Array<TranslatedInput>>;
+  org?: InputMaybe<PlaceOrgInput>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  removeTags?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tags?: InputMaybe<Array<PlaceTagsInput>>;
+};
+
+export type UpdatePlaceOutput = {
+  __typename?: 'UpdatePlaceOutput';
+  change?: Maybe<Change>;
+  /** The place as currently persisted in the database, before any pending change is merged */
+  currentPlace?: Maybe<Place>;
+  place?: Maybe<Place>;
+};
+
 export type UpdateProcessInput = {
   /** Sources to associate with this change */
   addSources?: InputMaybe<Array<SourceInput>>;
@@ -2294,6 +2423,8 @@ export type UpdateVariantOutput = {
 export type User = {
   __typename?: 'User';
   avatarURL?: Maybe<Scalars['String']['output']>;
+  /** Changes this user is involved in */
+  changes: ChangesPage;
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   emailVerified: Scalars['Boolean']['output'];
@@ -2306,6 +2437,15 @@ export type User = {
   profile?: Maybe<UserProfile>;
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
+};
+
+
+/** A registered user of the platform */
+export type UserChangesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

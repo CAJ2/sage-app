@@ -11,8 +11,11 @@ import { HomeFeed } from '@src/feed/home-feed.entity'
 export class HomeFeedService implements IEntityService<HomeFeed> {
   constructor(private readonly em: EntityManager) {}
 
-  async find(opts: CursorOptions<HomeFeed>, regionId?: string) {
-    const where: FilterQuery<HomeFeed> = regionId ? { region: regionId } : {}
+  async find(opts: CursorOptions<HomeFeed>, regionId?: string, format?: string) {
+    const where: FilterQuery<HomeFeed> = {
+      ...(regionId ? { region: regionId } : {}),
+      ...(format ? { format } : {}),
+    }
     const [items, count] = await this.em.findAndCount(HomeFeed, where, {
       orderBy: { rank: 'ASC' },
       limit: opts.options.limit,

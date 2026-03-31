@@ -440,6 +440,40 @@ type CreateOrgOutput {
   org: Org
 }
 
+input CreatePlaceInput {
+  """Sources to associate with this change"""
+  addSources: [SourceInput!]
+  address: String
+  addressTr: [TranslatedInput!]
+
+  """If true, immediately apply (merge) the change after creation"""
+  apply: Boolean
+
+  """Details for a new change to create for this edit"""
+  change: CreateChangeInput
+
+  """ID of an existing change to add this edit to"""
+  changeID: ID
+  desc: String
+  descTr: [TranslatedInput!]
+
+  """Language code for text input fields (BCP 47, e.g. "en")"""
+  lang: String
+  location: PlaceLocationInput
+  name: String
+  nameTr: [TranslatedInput!]
+  org: PlaceOrgInput
+
+  """IDs of sources to remove from this change"""
+  removeSources: [ID!]
+  tags: [PlaceTagsInput!]
+}
+
+type CreatePlaceOutput {
+  change: Change
+  place: Place
+}
+
 input CreateProcessInput {
   """Sources to associate with this change"""
   addSources: [SourceInput!]
@@ -594,6 +628,9 @@ type Edit {
   """The proposed state of the entity after this edit"""
   changes: EditModel
 
+  """The raw JSON of the proposed entity changes"""
+  changesJSON: JSONObject
+
   """Input values for creating a new entity"""
   createInput: JSONObject
 
@@ -603,6 +640,9 @@ type Edit {
 
   """The state of the entity before this edit"""
   original: EditModel
+
+  """The raw JSON of the entity before this edit"""
+  originalJSON: JSONObject
 
   """Current input values for updating an existing entity"""
   updateInput: JSONObject
@@ -636,6 +676,7 @@ enum FeedFormat {
   ARTICLE
   EXTERNAL
   FEATURE
+  PROJECT
   UPDATE
 }
 
@@ -851,6 +892,7 @@ type Mutation {
   createComponent(input: CreateComponentInput!): CreateComponentOutput
   createItem(input: CreateItemInput!): CreateItemOutput
   createOrg(input: CreateOrgInput!): CreateOrgOutput
+  createPlace(input: CreatePlaceInput!): CreatePlaceOutput
   createProcess(input: CreateProcessInput!): CreateProcessOutput
   createSource(input: CreateSourceInput!): CreateSourceOutput
   createTagDefinition(input: CreateTagDefinitionInput!): CreateTagDefinitionOutput
@@ -873,6 +915,7 @@ type Mutation {
   updateComponent(input: UpdateComponentInput!): UpdateComponentOutput
   updateItem(input: UpdateItemInput!): UpdateItemOutput
   updateOrg(input: UpdateOrgInput!): UpdateOrgOutput
+  updatePlace(input: UpdatePlaceInput!): UpdatePlaceOutput
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput
   updateSource(input: UpdateSourceInput!): UpdateSourceOutput
   updateTagDefinition(input: UpdateTagDefinitionInput!): UpdateTagDefinitionOutput
@@ -937,6 +980,13 @@ type OrgHistoryPage {
   totalCount: Int!
 }
 
+type OrgsPage {
+  edges: [OrgEdge!]
+  nodes: [Org!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type PageInfo {
   endCursor: String
   hasNextPage: Boolean!
@@ -983,6 +1033,20 @@ type PlaceEdge {
 type PlaceLocation {
   latitude: Float!
   longitude: Float!
+}
+
+input PlaceLocationInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+input PlaceOrgInput {
+  id: ID!
+}
+
+input PlaceTagsInput {
+  id: ID!
+  meta: JSONObject
 }
 
 type PlacesPage {
@@ -1123,7 +1187,7 @@ type Query {
   components(after: String, before: String, first: Int, last: Int): ComponentsPage!
   currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
-  feed(after: String, before: String, first: Int, last: Int, regionId: ID): FeedPage!
+  feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, regionId: ID): FeedPage!
   item(id: ID!): Item
   itemSchema: ModelEditSchema
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -1132,7 +1196,10 @@ type Query {
   materials(after: String, before: String, first: Int, last: Int): MaterialsPage!
   me: User
   org(id: ID!): Org
+  orgSchema: ModelEditSchema
+  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
   place(id: ID!): Place
+  placeSchema: ModelEditSchema
   places(after: String, before: String, first: Int, last: Int): PlacesPage!
   process(id: ID!): Process
   processSchema: ModelEditSchema
@@ -1174,6 +1241,8 @@ type RecyclingStream {
 type Region {
   """Bounding box as [minLon, minLat, maxLon, maxLat]"""
   bbox: [Float!]
+  country: Region
+  county: Region
   createdAt: DateTime!
   id: ID!
 
@@ -1183,6 +1252,8 @@ type Region {
 
   """The type of geographic entity (e.g. country, region, locality)"""
   placetype: String!
+  province: Region
+  searchWithin(adminLevel: Int, limit: Int, offset: Int, query: String!): RegionsPage!
   updatedAt: DateTime!
 }
 
@@ -1630,6 +1701,48 @@ type UpdateOrgOutput {
   org: Org
 }
 
+input UpdatePlaceInput {
+  """Sources to associate with this change"""
+  addSources: [SourceInput!]
+  addTags: [PlaceTagsInput!]
+  address: String
+  addressTr: [TranslatedInput!]
+
+  """If true, immediately apply (merge) the change after creation"""
+  apply: Boolean
+
+  """Details for a new change to create for this edit"""
+  change: CreateChangeInput
+
+  """ID of an existing change to add this edit to"""
+  changeID: ID
+  desc: String
+  descTr: [TranslatedInput!]
+  id: ID!
+
+  """Language code for text input fields (BCP 47, e.g. "en")"""
+  lang: String
+  location: PlaceLocationInput
+  name: String
+  nameTr: [TranslatedInput!]
+  org: PlaceOrgInput
+
+  """IDs of sources to remove from this change"""
+  removeSources: [ID!]
+  removeTags: [ID!]
+  tags: [PlaceTagsInput!]
+}
+
+type UpdatePlaceOutput {
+  change: Change
+
+  """
+  The place as currently persisted in the database, before any pending change is merged
+  """
+  currentPlace: Place
+  place: Place
+}
+
 input UpdateProcessInput {
   """Sources to associate with this change"""
   addSources: [SourceInput!]
@@ -1763,6 +1876,9 @@ type UpdateVariantOutput {
 """A registered user of the platform"""
 type User {
   avatarURL: String
+
+  """Changes this user is involved in"""
+  changes(after: String, before: String, first: Int, last: Int): ChangesPage!
   createdAt: DateTime!
   email: String!
   emailVerified: Boolean!

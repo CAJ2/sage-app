@@ -3,10 +3,10 @@
     <div class="p-3">
       <Button
         @click="
-          () => {
+          requireAuth(() => {
             editId = 'new'
             showEdit = true
-          }
+          })
         "
       >
         <Plus />
@@ -19,12 +19,22 @@
       :type="EditModelType.Component"
     >
       <template #default="{ node }">
-        <ModelListComponent :component="node.changes" :buttons="['edit']" @button="actionButton" />
+        <ModelListComponent
+          :component="node.changes"
+          :href="`/components/${node.changes.id}`"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
       </template>
     </GridModelChanges>
     <GridModel title="Components" :query="componentQuery" :query-name="'components'">
       <template #default="{ node }">
-        <ModelListComponent :component="node" :buttons="['edit']" @button="actionButton" />
+        <ModelListComponent
+          :component="node"
+          :href="`/components/${node.id}`"
+          :buttons="['edit']"
+          @button="actionButton"
+        />
       </template>
     </GridModel>
     <Dialog v-model:open="showEdit">
@@ -55,6 +65,8 @@ import { EditModelType } from '~/gql/graphql'
 
 const changeStore = useChangeStore()
 const { selectedChange } = storeToRefs(changeStore)
+
+const { requireAuth } = useRequireAuth()
 
 const actionButton = (btn: string, id: string) => {
   if (btn === 'edit') {

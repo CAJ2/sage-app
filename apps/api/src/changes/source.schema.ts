@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import jsonld from 'jsonld'
+import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { Source, SourceType } from '@src/changes/source.entity'
@@ -85,10 +86,13 @@ const ModelTransform = z.transform((input: TransformInput) => {
   const entity = input.input as Source
   const model = new SourceModel()
   model.id = entity.id
+  model.createdAt = DateTime.fromJSDate(entity.createdAt)
+  model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
   model.type = entity.type
   model.location = entity.location
   model.content = entity.content
   model.contentURL = expandCdnUrl(entity.contentURL)
+  model.processedAt = entity.processedAt ? DateTime.fromJSDate(entity.processedAt) : undefined
   model.metadata = entity.metadata
   return model
 })

@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common'
+import { ValidateFunction } from 'ajv'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
+import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
+import { BaseSchemaService, zToSchema } from '@src/common/base.schema'
+import { UISchemaElement } from '@src/common/ui.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { Org as OrgEntity, OrgHistory as OrgHistoryEntity } from '@src/users/org.entity'
-import { Org, OrgHistory } from '@src/users/org.model'
+import { CreateOrgInput, Org, OrgHistory, UpdateOrgInput } from '@src/users/org.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -15,7 +19,19 @@ export const OrgIDSchema = z.string().meta({
 
 @Injectable()
 export class OrgSchemaService {
-  constructor(private readonly zService: ZService) {
+  CreateSchema
+  CreateJSONSchema: z.core.JSONSchema.BaseSchema
+  CreateValidator: ValidateFunction
+  CreateUISchema: UISchemaElement
+  UpdateSchema
+  UpdateJSONSchema: z.core.JSONSchema.BaseSchema
+  UpdateValidator: ValidateFunction
+  UpdateUISchema: UISchemaElement
+
+  constructor(
+    private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
+  ) {
     const OrgTransform = z.transform((input: TransformInput) => {
       const entity = input.input as OrgEntity
       const model = new Org()
@@ -57,5 +73,54 @@ export class OrgSchemaService {
       return model
     })
     this.zService.registerEntityTransform(OrgHistoryEntity, OrgHistory, OrgHistoryTransform)
+
+    this.CreateSchema = ChangeInputWithLangSchema.extend({
+      name: z.string().max(1024),
+      slug: z.string().max(1024),
+      desc: z.string().max(100_000).optional(),
+      avatarURL: z.string().max(2048).optional(),
+      websiteURL: z.string().max(2048).optional(),
+    })
+    this.CreateJSONSchema = zToSchema(this.CreateSchema)
+    this.CreateUISchema = {
+      type: 'VerticalLayout',
+      elements: [
+        { type: 'Control', scope: '#/properties/name' },
+        { type: 'Control', scope: '#/properties/slug' },
+        { type: 'Control', scope: '#/properties/desc' },
+        { type: 'Control', scope: '#/properties/avatarURL' },
+        { type: 'Control', scope: '#/properties/websiteURL' },
+      ],
+    }
+
+    this.UpdateSchema = ChangeInputWithLangSchema.extend({
+      id: OrgIDSchema,
+      name: z.string().max(1024).optional(),
+      slug: z.string().max(1024).optional(),
+      desc: z.string().max(100_000).optional(),
+      avatarURL: z.string().max(2048).optional(),
+      websiteURL: z.string().max(2048).optional(),
+    })
+    this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
+    this.UpdateUISchema = {
+      type: 'VerticalLayout',
+      elements: [
+        { type: 'Control', scope: '#/properties/name' },
+        { type: 'Control', scope: '#/properties/slug' },
+        { type: 'Control', scope: '#/properties/desc' },
+        { type: 'Control', scope: '#/properties/avatarURL' },
+        { type: 'Control', scope: '#/properties/websiteURL' },
+      ],
+    }
+    this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
+    this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
+  }
+
+  async parseCreateInput(input: CreateOrgInput): Promise<CreateOrgInput> {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: UpdateOrgInput): Promise<UpdateOrgInput> {
+    return this.zService.parse(this.UpdateSchema, input)
   }
 }

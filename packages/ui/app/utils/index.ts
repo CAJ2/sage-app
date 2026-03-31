@@ -1,5 +1,3 @@
-import type { Translator } from '@jsonforms/core'
-import { useTranslate } from '@tolgee/vue'
 import Ajv, { type JSONSchemaType } from 'ajv/dist/2020'
 import { createAuthClient } from 'better-auth/vue'
 import { cloneDeep, isNull, omitBy } from 'lodash-es'
@@ -17,20 +15,6 @@ export const useAuthSession = () => {
     return authClient.getSession()
   })
   return data
-}
-
-export const formTranslate = (): Translator => {
-  const { t } = useTranslate('common')
-
-  return ((id: string, defaultMessage: string | undefined, values: object): string | undefined => {
-    if (!defaultMessage) {
-      return undefined
-    }
-    if (!values) {
-      return undefined
-    }
-    return t.value(id, defaultMessage)
-  }) as Translator
 }
 
 export const sanitizeFormData = <T, U extends object>(

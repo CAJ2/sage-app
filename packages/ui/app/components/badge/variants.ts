@@ -20,6 +20,10 @@ export const badgeVariants = cva(
         red: 'border-transparent bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400',
         yellow:
           'border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-400',
+        purple:
+          'border-transparent bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-400',
+        orange:
+          'border-transparent bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-400',
         plain: 'border-transparent bg-white/10 text-white',
       },
     },

@@ -8,7 +8,7 @@ import { Change } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { DeleteOutput } from '@src/graphql/base.model'
+import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Org as OrgEntity } from '@src/users/org.entity'
 import {
   CreateOrgInput,
@@ -17,10 +17,13 @@ import {
   OrgHistory,
   OrgHistoryArgs,
   OrgHistoryPage,
+  OrgsArgs,
+  OrgsPage,
   OrgUsersArgs,
   UpdateOrgInput,
   UpdateOrgOutput,
 } from '@src/users/org.model'
+import { OrgSchemaService } from '@src/users/org.schema'
 import { OrgService } from '@src/users/org.service'
 import { User, UserPage } from '@src/users/users.model'
 
@@ -29,7 +32,31 @@ export class OrgResolver {
   constructor(
     private readonly orgService: OrgService,
     private readonly transform: TransformService,
+    private readonly orgSchemaService: OrgSchemaService,
   ) {}
+
+  @Query(() => ModelEditSchema, { nullable: true })
+  @OptionalAuth()
+  async orgSchema(): Promise<ModelEditSchema> {
+    return {
+      create: {
+        schema: this.orgSchemaService.CreateJSONSchema,
+        uischema: this.orgSchemaService.CreateUISchema,
+      },
+      update: {
+        schema: this.orgSchemaService.UpdateJSONSchema,
+        uischema: this.orgSchemaService.UpdateUISchema,
+      },
+    }
+  }
+
+  @Query(() => OrgsPage, { name: 'orgs' })
+  @OptionalAuth()
+  async orgs(@Args() args: OrgsArgs): Promise<OrgsPage> {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(OrgsArgs, args)
+    const cursor = await this.orgService.find(filter)
+    return this.transform.entityToPaginated(Org, OrgsPage, cursor, parsedArgs)
+  }
 
   @Query(() => Org, { name: 'org', nullable: true })
   @OptionalAuth()

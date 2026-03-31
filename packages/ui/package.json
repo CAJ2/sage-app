@@ -8,7 +8,8 @@
   "type": "module",
   "scripts": {
     "build": "pnpm exec nuxi build",
-    "i18n:pull": "pnpm exec tolgee pull",
+    "codegen": "pnpm exec graphql-codegen --config codegen.ts",
+    "i18n": "tolgee -c .tolgeerc sync --yes",
     "lint": "pnpm exec oxlint --fix && pnpm exec eslint --fix",
     "lint:ci": "pnpm exec oxlint --deny-warnings && pnpm exec eslint . --max-warnings 0",
     "fmt": "pnpm exec oxfmt",

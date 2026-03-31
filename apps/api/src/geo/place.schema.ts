@@ -20,6 +20,7 @@ import {
   UpdatePlaceInput,
 } from '@src/geo/place.model'
 import { TagDefinitionIDSchema } from '@src/process/tag.model'
+import { Org } from '@src/users/org.model'
 import { OrgIDSchema } from '@src/users/org.schema'
 
 export const PlaceIDSchema = z.string().meta({
@@ -81,6 +82,10 @@ export class PlaceSchemaService {
         model.location = new PlaceLocation()
         model.location.latitude = entity.location.latitude
         model.location.longitude = entity.location.longitude
+      }
+      if (entity.org?.id) {
+        model.org = new Org()
+        model.org.id = entity.org.id
       }
       return model
     })

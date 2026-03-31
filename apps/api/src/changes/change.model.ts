@@ -34,6 +34,18 @@ export class Edit extends BaseModel {
 
   @Field(() => JSONObjectResolver, {
     nullable: true,
+    description: 'The raw JSON of the entity before this edit',
+  })
+  originalJSON?: JSONObject
+
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
+    description: 'The raw JSON of the proposed entity changes',
+  })
+  changesJSON?: JSONObject
+
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
     description: 'Input values for creating a new entity',
   })
   createInput?: JSONObject

@@ -1,6 +1,8 @@
+import type { FilterQuery } from '@mikro-orm/core'
 import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
+import { Change } from '@src/changes/change.entity'
 import { BadRequestErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { Org } from '@src/users/org.entity'
@@ -40,6 +42,16 @@ export class UsersService {
     }
     await this.em.persist(user).flush()
     return user
+  }
+
+  async changes(userID: string, opts: CursorOptions<Change>) {
+    const where: FilterQuery<Change> = {
+      ...opts.where,
+      $or: [{ user: userID }, { edits: { userID } }],
+    }
+    const items = await this.em.find(Change, where, opts.options)
+    const count = await this.em.count(Change, where)
+    return { items, count }
   }
 
   async orgs(userID: string, opts: CursorOptions<Org>) {

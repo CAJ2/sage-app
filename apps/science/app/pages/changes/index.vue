@@ -3,10 +3,10 @@
     <div class="p-3">
       <Button
         @click="
-          () => {
+          requireAuth(() => {
             editId = 'new'
             showEdit = true
-          }
+          })
         "
       >
         <Plus />
@@ -23,6 +23,7 @@
           <div v-for="(change, i) in changes" :key="i" class="list-item">
             <ModelListChange
               :change="change"
+              :href="`/changes/${(change as ListChangeFragmentFragment).id}`"
               :buttons="visibleButtons(change as ListChangeFragmentFragment)"
               @button="selectChange"
             />
@@ -50,6 +51,8 @@ import type { ListChangeFragmentFragment } from '~/gql/graphql'
 import { ChangeStatus } from '~/gql/types.generated'
 
 const { setChange } = useChangeStore()
+
+const { requireAuth } = useRequireAuth()
 
 const selectChange = (btn: string, id: string) => {
   if (btn === 'select') {

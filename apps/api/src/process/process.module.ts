@@ -20,6 +20,8 @@ import { TagResolver } from '@src/process/tag.resolver'
 import { TagSchemaService } from '@src/process/tag.schema'
 import { TagService } from '@src/process/tag.service'
 import { ImageSchemaService } from '@src/product/image.schema'
+import { VariantService } from '@src/product/variant.service'
+import { UsersModule } from '@src/users/users.module'
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { ImageSchemaService } from '@src/product/image.schema'
     ClsModule.forFeature(),
     EditsModule,
     GeoModule,
+    UsersModule,
   ],
   providers: [
     MaterialResolver,
@@ -47,6 +50,7 @@ import { ImageSchemaService } from '@src/product/image.schema'
     TagService,
     TagSchemaService,
     StreamService,
+    VariantService,
   ],
   exports: [
     TagService,

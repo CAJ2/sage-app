@@ -8,6 +8,8 @@ import { Change } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { Region } from '@src/geo/region.model'
+import { RegionService } from '@src/geo/region.service'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Component as ComponentEntity } from '@src/process/component.entity'
 import {
@@ -39,6 +41,7 @@ export class ComponentResolver {
     private readonly componentService: ComponentService,
     private readonly componentSchemaService: ComponentSchemaService,
     private readonly transform: TransformService,
+    private readonly regionService: RegionService,
   ) {}
 
   @Query(() => ComponentsPage, { name: 'components' })
@@ -76,6 +79,13 @@ export class ComponentResolver {
         uischema: this.componentSchemaService.UpdateUISchema,
       },
     }
+  }
+
+  @ResolveField(() => Region, { nullable: true })
+  async region(@Parent() component: Component) {
+    if (!component.region?.id) return null
+    const entity = await this.regionService.findOneByID(component.region.id)
+    return entity ? this.transform.entityToModel(Region, entity) : null
   }
 
   @ResolveField()

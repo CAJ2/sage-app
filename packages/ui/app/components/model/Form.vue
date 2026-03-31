@@ -1,6 +1,12 @@
 <template>
   <div class="flex flex-col justify-center">
-    <div class="mb-10 w-full px-5">
+    <div class="relative mb-10 w-full px-5">
+      <div
+        v-if="isLoading"
+        class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-base-100/60"
+      >
+        <LoaderCircle class="animate-spin text-base-content/40" :size="32" />
+      </div>
       <FormChangeSaveStatus v-if="!readOnly" :status="saveStatus"></FormChangeSaveStatus>
       <FormJsonSchema
         v-if="jsonSchema && uiSchema"
@@ -20,6 +26,7 @@
 <script setup lang="ts">
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
+import { LoaderCircle } from '@lucide/vue'
 import type { JSONSchemaType } from 'ajv'
 
 import { graphql } from '~/gql'
@@ -99,21 +106,30 @@ const editQuery = graphql(`
   }
 `)
 const directEditQuery = graphql(`
-  query DirectGetEdit($id: ID!) {
-    directEdit(id: $id) {
+  query DirectGetEdit($id: ID!, $entityName: String!) {
+    directEdit(id: $id, entityName: $entityName) {
       entityName
       id
       updateInput
     }
   }
 `)
+const entityName = createModelKey.charAt(0).toUpperCase() + createModelKey.slice(1)
 if (modelId !== 'new' && changeId) {
-  const { result } = useQuery(editQuery, {
+  const useDirect = ref(false)
+  const { result: changeResult, error: changeError } = useQuery(editQuery, {
     id: modelId,
     changeID: changeId,
   })
   watch(
-    result,
+    changeError,
+    (err) => {
+      if (err) useDirect.value = true
+    },
+    { immediate: true },
+  )
+  watch(
+    changeResult,
     (result) => {
       if (result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
         updateData.value = sanitizeFormData(
@@ -125,13 +141,27 @@ if (modelId !== 'new' && changeId) {
         changeStatus.value = result.change.status
       }
     },
-    {
-      immediate: true,
+    { immediate: true },
+  )
+  const { result: directResult } = useQuery(directEditQuery, { id: modelId, entityName }, () => ({
+    enabled: useDirect.value,
+  }))
+  watch(
+    directResult,
+    (result) => {
+      if (result?.directEdit?.updateInput) {
+        updateData.value = sanitizeFormData(
+          jsonSchema.value as JSONSchemaType<unknown>,
+          result.directEdit.updateInput,
+        )
+      }
     },
+    { immediate: true },
   )
 } else if (modelId !== 'new') {
   const { result } = useQuery(directEditQuery, {
     id: modelId,
+    entityName,
   })
   watch(
     result,
@@ -143,9 +173,7 @@ if (modelId !== 'new' && changeId) {
         )
       }
     },
-    {
-      immediate: true,
-    },
+    { immediate: true },
   )
 }
 const readOnly = computed<boolean | undefined>(() => {
@@ -153,6 +181,11 @@ const readOnly = computed<boolean | undefined>(() => {
     return
   }
   return true
+})
+
+const isLoading = computed(() => {
+  if (modelId === 'new') return !jsonSchema.value || !uiSchema.value
+  return updateData.value === null
 })
 
 const create = useMutation(createMutation)
