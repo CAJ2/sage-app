@@ -1,11 +1,12 @@
 import { BaseEntity, EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import type { Job as WmJob } from 'windmill-client'
 
 import { AuthUserService } from '@src/auth/authuser.service'
 import { CreateChangeInput } from '@src/changes/change-ext.model'
-import { Change, ChangeEdits, ChangeStatus } from '@src/changes/change.entity'
+import { Change, ChangeEdits, ChangeStatus, StoredJob } from '@src/changes/change.entity'
 import { EditModel as EditEnum, EditModelType } from '@src/changes/change.enum'
-import { DirectEdit, Edit as EditModel, UpdateChangeInput } from '@src/changes/change.model'
+import { DirectEdit, Edit as EditModel, Job, UpdateChangeInput } from '@src/changes/change.model'
 import { ChangeMapService } from '@src/changes/change_map.service'
 import { EditService } from '@src/changes/edit.service'
 import { Source } from '@src/changes/source.entity'
@@ -14,6 +15,42 @@ import { MetaService } from '@src/common/meta.service'
 import { CursorOptions, TransformService } from '@src/common/transform'
 import { ZService } from '@src/common/z.service'
 import { User } from '@src/users/users.entity'
+import { WindmillService } from '@src/windmill/windmill.service'
+
+const FLOW_NAMES: Record<string, string> = {
+  // Add flow path → human-readable name mappings here as Windmill flows are defined, e.g.:
+  'f/changes/review_change': 'Automatic Review',
+  // 'f/changes/apply_edits': 'Apply Edits',
+}
+
+function mapToJobModel(wmJob: WmJob, stored: StoredJob): Job {
+  const isCompleted = wmJob.type === 'CompletedJob'
+  let status: string
+  let progress: number
+
+  if (isCompleted) {
+    const completed = wmJob as WmJob & { type: 'CompletedJob' }
+    status = completed.success ? 'completed' : completed.canceled ? 'canceled' : 'failed'
+    progress = 100
+  } else {
+    const queued = wmJob as WmJob & { type: 'QueuedJob' }
+    status = queued.canceled ? 'canceled' : queued.running ? 'running' : 'queued'
+    if (queued.running && queued.flow_status) {
+      const { step, modules } = queued.flow_status
+      progress = modules.length > 0 ? Math.round((step / modules.length) * 100) : 50
+    } else {
+      progress = queued.running ? 50 : 0
+    }
+  }
+
+  const job = new Job()
+  job.id = wmJob.id
+  job.name = FLOW_NAMES[wmJob.script_path ?? 'Unknown'] ?? stored.type
+  job.status = status
+  job.type = stored.type
+  job.progress = progress
+  return job
+}
 
 @Injectable()
 export class ChangeService {
@@ -25,7 +62,20 @@ export class ChangeService {
     private readonly authUser: AuthUserService,
     private readonly editService: EditService,
     private readonly metaService: MetaService,
+    private readonly windmill: WindmillService,
   ) {}
+
+  private async triggerReviewJob(change: Change): Promise<void> {
+    const jobId = await this.windmill.runFlow('f/changes/review_change', { change_id: change.id })
+    const job: StoredJob = {
+      id: jobId,
+      type: 'REVIEW',
+      status: 'queued',
+      updatedAt: new Date().toISOString(),
+    }
+    change.metadata = { ...change.metadata, jobs: [...(change.metadata?.jobs ?? []), job] }
+    await this.em.persist(change).flush()
+  }
 
   async find(opts: CursorOptions<Change>) {
     const changes = await this.em.find(Change, opts.where, opts.options)
@@ -232,12 +282,30 @@ export class ChangeService {
     }
 
     await this.em.persist(change).flush()
+    if (input.status === ChangeStatus.PROPOSED) {
+      await this.triggerReviewJob(change)
+    }
     return change
   }
 
   async remove(id: string) {
     const change = await this.findOne(id)
     await this.em.remove(change).flush()
+  }
+
+  async jobs(changeId: string, active?: boolean): Promise<Job[]> {
+    const change = await this.em.findOne(Change, { id: changeId })
+    const stored = change?.metadata?.jobs ?? []
+    const jobs = await Promise.all(
+      stored.map(async (s) => {
+        const wmJob = await this.windmill.getJob(s.id)
+        return mapToJobModel(wmJob, s)
+      }),
+    )
+    if (active === true) {
+      return jobs.filter((j) => j.status === 'queued' || j.status === 'running')
+    }
+    return jobs
   }
 
   async discardEdit(changeID: string, editID: string) {

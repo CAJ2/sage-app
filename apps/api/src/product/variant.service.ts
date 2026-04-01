@@ -180,7 +180,7 @@ export class VariantService implements IEntityService<Variant> {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(variant, input, change)
     await this.editService.createEntityEdit(change, variant)
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { variant, change }
   }
@@ -229,7 +229,7 @@ export class VariantService implements IEntityService<Variant> {
       { id: input.id },
       { disableIdentityMap: true },
     )
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { variant, change, currentVariant: currentVariant ?? undefined }
   }

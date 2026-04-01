@@ -33,9 +33,24 @@ export interface Suggestion {
   description?: string
 }
 
+export interface StoredJob {
+  // Windmill job UUID
+  id: string
+  // Job type
+  type: 'REVIEW' | 'EDIT'
+  // Associated edit IDs, populated when type === 'EDIT'
+  editIds?: string[]
+  // Last-known status mirror
+  status: string
+  // ISO datetime of last update
+  updatedAt: string
+}
+
 export interface ChangeMetadata {
   // The last time the change was checked
   checkedAt?: string
+  // Windmill jobs associated with this change
+  jobs?: StoredJob[]
 }
 
 @Entity({ tableName: 'changes', schema: 'public' })

@@ -1,4 +1,4 @@
-import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { ArgsType, Field, ID, InputType, Int, ObjectType } from '@nestjs/graphql'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
@@ -9,6 +9,27 @@ import { type JSONObject } from '@src/common/z.schema'
 import { BaseModel, IDCreatedUpdated } from '@src/graphql/base.model'
 import { OrderDirection, Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User } from '@src/users/users.model'
+
+@ObjectType({ description: 'A background job' })
+export class Job {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String)
+  name!: string
+
+  @Field(() => String)
+  status!: string
+
+  @Field(() => String)
+  type!: string
+
+  @Field(() => Int)
+  progress!: number
+}
+
+@ObjectType()
+export class JobsPage extends Paginated(Job) {}
 
 @ObjectType({ description: 'A tracked edit to a single entity within a change' })
 export class Edit extends BaseModel {
@@ -100,6 +121,12 @@ export class Change extends IDCreatedUpdated {
 
   @Field(() => ChangeSourcesPage, { description: 'Source references supporting this change' })
   sources!: ChangeSourcesPage & {}
+
+  @Field(() => JobsPage, {
+    nullable: true,
+    description: 'Active and past jobs for this change',
+  })
+  jobs?: JobsPage
 }
 
 @ObjectType()
@@ -139,6 +166,19 @@ export class ChangesArgs extends PaginationBasicArgs {
 @ArgsType()
 export class ChangeSourcesArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
+export class ChangeJobsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema.extend({
+    active: z.boolean().optional(),
+  })
+
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'If true, return only queued or running jobs',
+  })
+  active?: boolean
 }
 
 @ArgsType()

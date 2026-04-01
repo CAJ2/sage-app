@@ -14,6 +14,8 @@ import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { ITEM_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { WindmillMockService } from '@src/windmill/windmill.mock.service'
+import { WindmillService } from '@src/windmill/windmill.service'
 
 describe('ItemResolver (integration)', () => {
   let app: INestApplication
@@ -23,7 +25,10 @@ describe('ItemResolver (integration)', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
-    }).compile()
+    })
+      .overrideProvider(WindmillService)
+      .useClass(WindmillMockService)
+      .compile()
 
     app = module.createNestApplication()
     await app.init()

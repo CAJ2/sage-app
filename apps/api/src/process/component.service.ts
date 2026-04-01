@@ -133,7 +133,7 @@ export class ComponentService implements IEntityService<Component> {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(component, input, change)
     await this.editService.createEntityEdit(change, component)
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
       component,
@@ -177,7 +177,7 @@ export class ComponentService implements IEntityService<Component> {
       { id: input.id },
       { disableIdentityMap: true },
     )
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
       component,

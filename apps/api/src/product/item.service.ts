@@ -126,7 +126,7 @@ export class ItemService implements IEntityService<Item> {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(item, input, change)
     await this.editService.createEntityEdit(change, item)
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { item, change }
   }
@@ -160,7 +160,7 @@ export class ItemService implements IEntityService<Item> {
     await this.setFields(item, input, change)
     await this.editService.updateEntityEdit(change, item)
     const currentItem = await this.em.findOne(Item, { id: input.id }, { disableIdentityMap: true })
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { item, change, currentItem: currentItem ?? undefined }
   }

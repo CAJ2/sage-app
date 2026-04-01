@@ -17,6 +17,8 @@ import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
 import { Process, ProcessIntent } from '@src/process/process.entity'
 import { Tag, TagCaveatLevel, TagType } from '@src/process/tag.entity'
+import { WindmillMockService } from '@src/windmill/windmill.mock.service'
+import { WindmillService } from '@src/windmill/windmill.service'
 
 describe('ComponentResolver (integration)', () => {
   let app: INestApplication
@@ -27,7 +29,10 @@ describe('ComponentResolver (integration)', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
-    }).compile()
+    })
+      .overrideProvider(WindmillService)
+      .useClass(WindmillMockService)
+      .compile()
 
     app = module.createNestApplication()
     await app.init()

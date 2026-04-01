@@ -160,6 +160,8 @@ export type Change = {
   /** The individual entity edits included in this change */
   edits: ChangeEditsPage;
   id: Scalars['ID']['output'];
+  /** Active and past jobs for this change */
+  jobs?: Maybe<JobsPage>;
   /** Source references supporting this change */
   sources: ChangeSourcesPage;
   status: ChangeStatus;
@@ -178,6 +180,16 @@ export type ChangeEditsArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
   type?: InputMaybe<EditModelType>;
+};
+
+
+/** A proposed or merged set of edits to one or more data models */
+export type ChangeJobsArgs = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -945,6 +957,30 @@ export type ItemsPage = {
   __typename?: 'ItemsPage';
   edges?: Maybe<Array<ItemEdge>>;
   nodes?: Maybe<Array<Item>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** A background job */
+export type Job = {
+  __typename?: 'Job';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  progress: Scalars['Int']['output'];
+  status: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
+export type JobEdge = {
+  __typename?: 'JobEdge';
+  cursor: Scalars['String']['output'];
+  node: Job;
+};
+
+export type JobsPage = {
+  __typename?: 'JobsPage';
+  edges?: Maybe<Array<JobEdge>>;
+  nodes?: Maybe<Array<Job>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };

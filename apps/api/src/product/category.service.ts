@@ -148,7 +148,7 @@ export class CategoryService implements IEntityService<Category> {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(category, input, change)
     await this.editService.createEntityEdit(change, category)
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
       change,
@@ -191,7 +191,7 @@ export class CategoryService implements IEntityService<Category> {
       { id: input.id },
       { disableIdentityMap: true },
     )
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
       change,

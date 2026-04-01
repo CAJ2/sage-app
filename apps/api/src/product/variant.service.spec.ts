@@ -22,6 +22,8 @@ import { GeoModule } from '@src/geo/geo.module'
 import { MIKRO_TEST_CONFIG } from '@src/mikro-orm-test.config'
 import { ProcessModule } from '@src/process/process.module'
 import { VariantService } from '@src/product/variant.service'
+import { WindmillMockService } from '@src/windmill/windmill.mock.service'
+import { WindmillService } from '@src/windmill/windmill.service'
 
 describe('VariantService', () => {
   let module: TestingModule
@@ -42,6 +44,8 @@ describe('VariantService', () => {
     })
       .overrideProvider(AuthUserService)
       .useValue(AUTH_USER_SERVICE_MOCK)
+      .overrideProvider(WindmillService)
+      .useClass(WindmillMockService)
       .compile()
 
     service = module.get<VariantService>(VariantService)
