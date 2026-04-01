@@ -15,6 +15,8 @@ import { TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { CATEGORY_ROOT } from '@src/product/category.entity'
+import { WindmillMockService } from '@src/windmill/windmill.mock.service'
+import { WindmillService } from '@src/windmill/windmill.service'
 
 describe('CategoryResolver (integration)', () => {
   let app: INestApplication
@@ -24,7 +26,10 @@ describe('CategoryResolver (integration)', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
-    }).compile()
+    })
+      .overrideProvider(WindmillService)
+      .useClass(WindmillMockService)
+      .compile()
 
     app = module.createNestApplication()
     await app.init()

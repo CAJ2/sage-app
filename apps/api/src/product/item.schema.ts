@@ -188,9 +188,17 @@ export class ItemSchemaService implements ISchemaService {
 
   async updateInputModel<E extends BaseEntity>(entity: E) {
     const e = entity as any
-    const data: Record<string, any> = stripNulls({ id: e.id, imageURL: e.imageURL })
+    const data: Record<string, any> = stripNulls({
+      id: e.id,
+      imageURL: e.files?.thumbnail ?? e.imageURL,
+    })
     this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
     this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
+    data.categories = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.itemCategories),
+      'item',
+      'category',
+    )
     data.tags = this.baseSchema.collectionToInput(
       this.baseSchema.safeCollectionItems(e.itemTags),
       'item',

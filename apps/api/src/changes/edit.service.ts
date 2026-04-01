@@ -20,12 +20,13 @@ import {
   IChangeInputWithLang,
   isUsingChange,
 } from '@src/changes/change-ext.model'
-import { Change, ChangeEdits, ChangeStatus } from '@src/changes/change.entity'
+import { Change, ChangeEdits, ChangeStatus, StoredJob } from '@src/changes/change.entity'
 import { MergeInput, UpdateChangeInput } from '@src/changes/change.model'
 import { Source } from '@src/changes/source.entity'
 import { BadRequestErr, NotFoundErr } from '@src/common/exceptions'
 import { MetaService } from '@src/common/meta.service'
 import { User } from '@src/users/users.entity'
+import { WindmillService } from '@src/windmill/windmill.service'
 
 export interface IEntityService {
   findOneByID<T extends BaseEntity>(id: string): Promise<T | null>
@@ -39,7 +40,31 @@ export class EditService {
     private readonly em: EntityManager,
     private readonly authUser: AuthUserService,
     private readonly metaService: MetaService,
+    private readonly windmill: WindmillService,
   ) {}
+
+  private async triggerReviewJob(change: Change): Promise<void> {
+    const jobId = await this.windmill.runFlow('f/changes/review_change', { change_id: change.id })
+    const job: StoredJob = {
+      id: jobId,
+      type: 'REVIEW',
+      status: 'queued',
+      updatedAt: new Date().toISOString(),
+    }
+    change.metadata = { ...change.metadata, jobs: [...(change.metadata?.jobs ?? []), job] }
+    await this.em.persist(change).flush()
+  }
+
+  /**
+   * Persists and flushes the change, then triggers a Windmill review job if the change
+   * is in an active state (not DRAFT or MERGED).
+   */
+  async persistAndMaybeTriggerReview(change: Change): Promise<void> {
+    await this.em.persist(change).flush()
+    if (change.status !== ChangeStatus.DRAFT && change.status !== ChangeStatus.MERGED) {
+      await this.triggerReviewJob(change)
+    }
+  }
 
   async findOne(id: string) {
     const change = await this.em.findOne(Change, { id }, { populate: ['user', 'sources', 'edits'] })
@@ -803,7 +828,7 @@ export class EditService {
       } else if (edit.changes) {
         edit.changes = undefined // Turn the edit into a delete
       }
-      await this.em.persist(change).flush()
+      await this.persistAndMaybeTriggerReview(change)
       return { id: input.id }
     }
     // If not, check if it exists in the database
@@ -818,7 +843,7 @@ export class EditService {
     newEdit.userID = userID
     newEdit.original = this.entityToChangePOJO(meta.name, entity as BaseEntity & { id: string })
     change.edits.add(newEdit)
-    await this.em.persist(change).flush()
+    await this.persistAndMaybeTriggerReview(change)
     return { id: input.id }
   }
 

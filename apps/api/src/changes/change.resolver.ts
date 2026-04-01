@@ -7,6 +7,7 @@ import {
   Change,
   ChangeEditsArgs,
   ChangeEditsPage,
+  ChangeJobsArgs,
   ChangesArgs,
   ChangeSourcesArgs,
   ChangesPage,
@@ -15,6 +16,7 @@ import {
   DirectEdit,
   DirectEditArgs,
   DiscardEditOutput,
+  JobsPage,
   MergeChangeOutput,
   UpdateChangeInput,
   UpdateChangeOutput,
@@ -142,5 +144,11 @@ export class ChangeResolver {
       return null
     }
     return this.transform.entityToModel(User, user)
+  }
+
+  @ResolveField(() => JobsPage, { nullable: true })
+  async jobs(@Parent() change: Change, @Args() args: ChangeJobsArgs): Promise<JobsPage> {
+    const jobs = await this.changeService.jobs(change.id, args.active)
+    return this.transform.objectsToPaginated(JobsPage, { items: jobs, count: jobs.length }, true)
   }
 }

@@ -65,7 +65,7 @@ export class OrgService implements IEntityService<Org> {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(org, input, change)
     await this.editService.createEntityEdit(change, org)
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { org, change }
   }
@@ -98,7 +98,7 @@ export class OrgService implements IEntityService<Org> {
     await this.setFields(org, input, change)
     await this.editService.updateEntityEdit(change, org)
     const currentOrg = await this.em.findOne(Org, { id: input.id }, { disableIdentityMap: true })
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { org, change, currentOrg: currentOrg ?? undefined }
   }

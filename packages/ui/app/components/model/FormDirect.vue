@@ -24,7 +24,6 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import { LoaderCircle } from '@lucide/vue'
-import type { JSONSchemaType } from 'ajv'
 
 import { graphql } from '~/gql'
 import type { Exact } from '~/gql/graphql'
@@ -106,10 +105,7 @@ if (modelId !== 'new') {
     result,
     (result) => {
       if (result?.directEdit?.id) {
-        updateData.value = sanitizeFormData(
-          jsonSchema.value as JSONSchemaType<unknown>,
-          result.directEdit.updateInput,
-        )
+        updateData.value = sanitizeFormData(result.directEdit.updateInput)
       }
     },
     { immediate: true },

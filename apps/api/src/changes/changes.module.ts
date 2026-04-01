@@ -15,6 +15,7 @@ import { GeoModule } from '@src/geo/geo.module'
 import { ProcessModule } from '@src/process/process.module'
 import { ProductModule } from '@src/product/product.module'
 import { UsersModule } from '@src/users/users.module'
+import { WindmillModule } from '@src/windmill/windmill.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UsersModule } from '@src/users/users.module'
     UsersModule,
     GeoModule,
     EditsModule,
+    WindmillModule,
   ],
   providers: [
     ChangeResolver,

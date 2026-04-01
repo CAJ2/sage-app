@@ -27,7 +27,6 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import type { JsonFormsChangeEvent } from '@jsonforms/vue'
 import { LoaderCircle } from '@lucide/vue'
-import type { JSONSchemaType } from 'ajv'
 
 import { graphql } from '~/gql'
 import { ChangeStatus, type Exact } from '~/gql/graphql'
@@ -132,10 +131,7 @@ if (modelId !== 'new' && changeId) {
     [changeResult, jsonSchema],
     ([result, schema]) => {
       if (schema && result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
-        updateData.value = sanitizeFormData(
-          schema as JSONSchemaType<unknown>,
-          result.change.edits.nodes[0]!.updateInput,
-        )
+        updateData.value = sanitizeFormData(result.change.edits.nodes[0]!.updateInput)
       }
       if (result?.change?.status) {
         changeStatus.value = result.change.status
@@ -150,10 +146,7 @@ if (modelId !== 'new' && changeId) {
     [directResult, jsonSchema],
     ([result, schema]) => {
       if (schema && result?.directEdit?.updateInput) {
-        updateData.value = sanitizeFormData(
-          schema as JSONSchemaType<unknown>,
-          result.directEdit.updateInput,
-        )
+        updateData.value = sanitizeFormData(result.directEdit.updateInput)
       }
     },
     { immediate: true },
@@ -167,10 +160,7 @@ if (modelId !== 'new' && changeId) {
     [result, jsonSchema],
     ([result, schema]) => {
       if (schema && result?.directEdit?.id) {
-        updateData.value = sanitizeFormData(
-          schema as JSONSchemaType<unknown>,
-          result.directEdit.updateInput,
-        )
+        updateData.value = sanitizeFormData(result.directEdit.updateInput)
       }
     },
     { immediate: true },

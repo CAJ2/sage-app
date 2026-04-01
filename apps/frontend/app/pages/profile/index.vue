@@ -91,8 +91,6 @@ import {
   UserIcon,
 } from '@lucide/vue'
 
-import { useAuthClient } from '~/utils'
-
 useTopbar(null)
 
 const auth = useAuthClient()

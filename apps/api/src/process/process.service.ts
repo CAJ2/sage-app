@@ -78,7 +78,7 @@ export class ProcessService implements IEntityService<Process> {
     const change = await this.editService.findOneOrCreate(input.changeID, input.change, userID)
     await this.setFields(process, input, change)
     await this.editService.createEntityEdit(change, process)
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
       process,
@@ -122,7 +122,7 @@ export class ProcessService implements IEntityService<Process> {
       { id: input.id },
       { disableIdentityMap: true },
     )
-    await this.em.persist(change).flush()
+    await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
       process,
