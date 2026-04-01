@@ -1,0 +1,30 @@
+[package]
+name = "sageleaf-scanleaf"
+description = "MLKit barcode scanning, OCR, and image labeling for Tauri on iOS and Android"
+version.workspace = true
+authors = ["Tauri Programme within The Commons Conservancy", "Sageleaf Contributors"]
+license = "Apache-2.0 OR MIT"
+repository.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+links = "sageleaf-scanleaf"
+
+[package.metadata.platforms.support]
+windows = { level = "none", notes = "" }
+linux = { level = "none", notes = "" }
+macos = { level = "none", notes = "" }
+android = { level = "full", notes = "" }
+ios = { level = "full", notes = "" }
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tauri = { workspace = true }
+log.workspace = true
+thiserror.workspace = true
+
+[target.'cfg(target_os = "ios")'.dependencies]
+tauri = { workspace = true, features = ["wry"] }

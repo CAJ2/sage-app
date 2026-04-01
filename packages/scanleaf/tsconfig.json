@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2021", "DOM"],
+    "module": "ESNext",
+    "target": "ES2021",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "declaration": true,
+    "declarationDir": "./dist-js",
+    "outDir": "./dist-js",
+    "skipLibCheck": true
+  },
+  "include": ["guest-js/**/*"]
+}

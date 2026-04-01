@@ -1,0 +1,18 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = """
+This permission set configures which scanleaf features are exposed by default.
+
+Grants access to all camera and scanning functionality.
+"""
+
+permissions = [
+  "allow-open-camera",
+  "allow-close-camera",
+  "allow-start-scan",
+  "allow-stop-scan",
+  "allow-check-permissions",
+  "allow-request-permissions",
+  "allow-open-app-settings",
+]

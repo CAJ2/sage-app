@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PermissionFile",
+  "description": "Permission file that can define a default permission, a set of permissions or a list of inlined permissions.",
+  "type": "object",
+  "properties": {
+    "default": {
+      "description": "The default permission set for the plugin",
+      "anyOf": [{ "$ref": "#/definitions/DefaultPermission" }, { "type": "null" }]
+    },
+    "set": {
+      "description": "A list of permissions sets defined",
+      "type": "array",
+      "items": { "$ref": "#/definitions/PermissionSet" }
+    },
+    "permission": {
+      "description": "A list of inlined permissions",
+      "default": [],
+      "type": "array",
+      "items": { "$ref": "#/definitions/Permission" }
+    }
+  },
+  "definitions": {
+    "DefaultPermission": {
+      "description": "The default permission set of the plugin.\n\nWorks similarly to a permission with the \"default\" identifier.",
+      "type": "object",
+      "required": ["permissions"],
+      "properties": {
+        "version": { "description": "The version of the permission.", "type": ["integer", "null"], "format": "uint64", "minimum": 1.0 },
+        "description": { "description": "Human-readable description of what the permission does.", "type": ["string", "null"] },
+        "permissions": { "description": "All permissions this set contains.", "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "PermissionSet": {
+      "description": "A set of direct permissions grouped together under a new name.",
+      "type": "object",
+      "required": ["description", "identifier", "permissions"],
+      "properties": {
+        "identifier": { "type": "string" },
+        "description": { "type": "string" },
+        "permissions": { "type": "array", "items": { "$ref": "#/definitions/PermissionKind" } }
+      }
+    },
+    "Permission": {
+      "description": "Descriptions of explicit privileges of commands.",
+      "type": "object",
+      "required": ["identifier"],
+      "properties": {
+        "version": { "type": ["integer", "null"], "format": "uint64", "minimum": 1.0 },
+        "identifier": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "commands": { "default": { "allow": [], "deny": [] }, "allOf": [{ "$ref": "#/definitions/Commands" }] },
+        "scope": { "allOf": [{ "$ref": "#/definitions/Scopes" }] },
+        "platforms": { "type": ["array", "null"], "items": { "$ref": "#/definitions/Target" } }
+      }
+    },
+    "Commands": {
+      "type": "object",
+      "properties": {
+        "allow": { "default": [], "type": "array", "items": { "type": "string" } },
+        "deny": { "default": [], "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "Scopes": {
+      "type": "object",
+      "properties": {
+        "allow": { "type": ["array", "null"], "items": { "$ref": "#/definitions/Value" } },
+        "deny": { "type": ["array", "null"], "items": { "$ref": "#/definitions/Value" } }
+      }
+    },
+    "Value": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "$ref": "#/definitions/Number" },
+        { "type": "string" },
+        { "type": "array", "items": { "$ref": "#/definitions/Value" } },
+        { "type": "object", "additionalProperties": { "$ref": "#/definitions/Value" } }
+      ]
+    },
+    "Number": {
+      "anyOf": [
+        { "description": "Represents an i64.", "type": "integer", "format": "int64" },
+        { "description": "Represents a f64.", "type": "number", "format": "double" }
+      ]
+    },
+    "Target": {
+      "oneOf": [
+        { "type": "string", "enum": ["macOS"] },
+        { "type": "string", "enum": ["windows"] },
+        { "type": "string", "enum": ["linux"] },
+        { "type": "string", "enum": ["android"] },
+        { "type": "string", "enum": ["iOS"] }
+      ]
+    },
+    "PermissionKind": {
+      "type": "string",
+      "oneOf": [
+        { "description": "Enables the open_camera command without any pre-configured scope.", "type": "string", "const": "allow-open-camera" },
+        { "description": "Denies the open_camera command without any pre-configured scope.", "type": "string", "const": "deny-open-camera" },
+        { "description": "Enables the close_camera command without any pre-configured scope.", "type": "string", "const": "allow-close-camera" },
+        { "description": "Denies the close_camera command without any pre-configured scope.", "type": "string", "const": "deny-close-camera" },
+        { "description": "Enables the start_scan command without any pre-configured scope.", "type": "string", "const": "allow-start-scan" },
+        { "description": "Denies the start_scan command without any pre-configured scope.", "type": "string", "const": "deny-start-scan" },
+        { "description": "Enables the stop_scan command without any pre-configured scope.", "type": "string", "const": "allow-stop-scan" },
+        { "description": "Denies the stop_scan command without any pre-configured scope.", "type": "string", "const": "deny-stop-scan" },
+        { "description": "Enables the check_permissions command without any pre-configured scope.", "type": "string", "const": "allow-check-permissions" },
+        { "description": "Denies the check_permissions command without any pre-configured scope.", "type": "string", "const": "deny-check-permissions" },
+        { "description": "Enables the request_permissions command without any pre-configured scope.", "type": "string", "const": "allow-request-permissions" },
+        { "description": "Denies the request_permissions command without any pre-configured scope.", "type": "string", "const": "deny-request-permissions" },
+        { "description": "Enables the open_app_settings command without any pre-configured scope.", "type": "string", "const": "allow-open-app-settings" },
+        { "description": "Denies the open_app_settings command without any pre-configured scope.", "type": "string", "const": "deny-open-app-settings" },
+        {
+          "description": "This permission set configures which scanleaf features are exposed by default.\n\n#### Granted Permissions\n\nGrants access to all camera lifecycle and scanning functionality.\n\n#### This default permission set includes:\n\n- `allow-open-camera`\n- `allow-close-camera`\n- `allow-start-scan`\n- `allow-stop-scan`\n- `allow-check-permissions`\n- `allow-request-permissions`\n- `allow-open-app-settings`",
+          "type": "string",
+          "const": "default"
+        }
+      ]
+    }
+  }
+}

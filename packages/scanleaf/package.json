@@ -1,0 +1,32 @@
+{
+  "name": "@sageleaf/scanleaf",
+  "version": "0.1.0",
+  "description": "Tauri plugin for barcode scanning, OCR and image labeling via MLKit",
+  "license": "Apache-2.0 OR MIT",
+  "files": [
+    "dist-js",
+    "guest-js"
+  ],
+  "type": "module",
+  "main": "./dist-js/index.cjs",
+  "module": "./dist-js/index.js",
+  "types": "./dist-js/index.d.ts",
+  "exports": {
+    "types": "./dist-js/index.d.ts",
+    "import": "./dist-js/index.js",
+    "require": "./dist-js/index.cjs"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.10.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "rollup": "^4.60.0",
+    "tslib": "^2.8.1",
+    "typescript": "^6.0.0"
+  }
+}

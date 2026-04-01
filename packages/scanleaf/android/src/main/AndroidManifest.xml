@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:hardwareAccelerated="true">
+
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <uses-feature android:name="android.hardware.camera.any"/>
+
+    <application>
+        <!-- Request install-time model downloads for all three unbundled MLKit
+             models so they are available immediately after install, without
+             waiting for the first inference call to trigger a download. -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode,ocr,ica"/>
+    </application>
+
+</manifest>
