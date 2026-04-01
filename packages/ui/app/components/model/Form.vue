@@ -129,11 +129,11 @@ if (modelId !== 'new' && changeId) {
     { immediate: true },
   )
   watch(
-    changeResult,
-    (result) => {
-      if (result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
+    [changeResult, jsonSchema],
+    ([result, schema]) => {
+      if (schema && result?.change?.edits.nodes && result.change.edits.nodes.length > 0) {
         updateData.value = sanitizeFormData(
-          jsonSchema.value as JSONSchemaType<unknown>,
+          schema as JSONSchemaType<unknown>,
           result.change.edits.nodes[0]!.updateInput,
         )
       }
@@ -147,11 +147,11 @@ if (modelId !== 'new' && changeId) {
     enabled: useDirect.value,
   }))
   watch(
-    directResult,
-    (result) => {
-      if (result?.directEdit?.updateInput) {
+    [directResult, jsonSchema],
+    ([result, schema]) => {
+      if (schema && result?.directEdit?.updateInput) {
         updateData.value = sanitizeFormData(
-          jsonSchema.value as JSONSchemaType<unknown>,
+          schema as JSONSchemaType<unknown>,
           result.directEdit.updateInput,
         )
       }
@@ -164,11 +164,11 @@ if (modelId !== 'new' && changeId) {
     entityName,
   })
   watch(
-    result,
-    (result) => {
-      if (result?.directEdit?.id) {
+    [result, jsonSchema],
+    ([result, schema]) => {
+      if (schema && result?.directEdit?.id) {
         updateData.value = sanitizeFormData(
-          jsonSchema.value as JSONSchemaType<unknown>,
+          schema as JSONSchemaType<unknown>,
           result.directEdit.updateInput,
         )
       }
