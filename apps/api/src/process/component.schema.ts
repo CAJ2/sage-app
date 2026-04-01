@@ -309,6 +309,7 @@ export class ComponentSchemaService implements ISchemaService {
       'tag',
     )
     if (e.primaryMaterial?.id) data.primaryMaterial = { id: e.primaryMaterial.id }
+    if (e.region?.id) data.region = { id: e.region.id }
     runAjvValidator(this.UpdateValidator, data)
     this.baseSchema.relToInput(data, 'primaryMaterial', ['materialFraction'])
     return this.zService.parse(this.UpdateSchema, data as any)

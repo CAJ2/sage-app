@@ -30,7 +30,7 @@
         type="button"
         @click="deleteClicked"
       >
-        🗙
+        <X :size="16" />
       </button>
     </div>
     <div :class="contentClasses">
@@ -40,6 +40,7 @@
 </template>
 
 <script lang="ts">
+import { X } from '@lucide/vue'
 import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
 
@@ -48,6 +49,7 @@ import { classes } from '../styles'
 
 const listItem = defineComponent({
   name: 'ArrayListElement',
+  components: { X },
   props: {
     initiallyExpanded: {
       required: false,

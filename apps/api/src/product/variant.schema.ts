@@ -336,6 +336,11 @@ export class VariantSchemaService implements ISchemaService {
       'variant',
       'component',
     )
+    if (e.regions?.length) {
+      data.regions = e.regions.map((id: string) => ({ id }))
+    } else if (e.region?.id) {
+      data.region = { id: e.region.id }
+    }
     runAjvValidator(this.UpdateValidator, data)
     return this.zService.parse(this.UpdateSchema, data as any)
   }
