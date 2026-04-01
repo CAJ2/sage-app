@@ -1,0 +1,27 @@
+apps/api/src/product/item.schema.ts
+  ab0695002d9c95a8 197-201
+apps/api/src/product/variant.schema.ts
+  ab0695002d9c95a8 339-343
+apps/api/src/process/component.schema.ts
+  ab0695002d9c95a8 312
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.3",
+  "base_commit_sha": "8fa94bdabf7e3385d47f645223f23f34f37d2b30",
+  "prompts": {
+    "ab0695002d9c95a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9f8e1e1-5161-4725-9f51-15663375040a",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 12,
+      "total_deletions": 1,
+      "accepted_lines": 11,
+      "overriden_lines": 1
+    }
+  }
+}
