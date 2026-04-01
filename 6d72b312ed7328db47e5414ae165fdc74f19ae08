@@ -1,0 +1,51 @@
+packages/scanleaf/rollup.config.js
+  75a964c831b7430d 1-2,4-28
+packages/scanleaf/android/settings.gradle
+  75a964c831b7430d 1-2
+pnpm-workspace.yaml
+  75a964c831b7430d 3
+packages/scanleaf/package.json
+  75a964c831b7430d 1-4,6-26,31-32
+packages/scanleaf/build.rs
+  75a964c831b7430d 1-21
+packages/scanleaf/ios/Sources/SageleafScanleaf/SageleafScanleafPlugin.swift
+  75a964c831b7430d 5,10-21,23-24,27,34,40-42,44-45,134,149,161,189,192,231-232,235-242,244-255,262-270,272,274,278-331,341,348-354,358-372,374-408,410-414,419-435,437-442,444-448,450-451,463,492-493,498-499,510,512-560,562-566,569,571-596
+packages/scanleaf/src/lib.rs
+  75a964c831b7430d 5-53
+packages/scanleaf/ios/Package.swift
+  75a964c831b7430d 2-8,10-17,22-26,32-35
+packages/scanleaf/tsconfig.json
+  75a964c831b7430d 1-14
+packages/scanleaf/ios/Sources/SageleafScanleaf/CameraView.swift
+  75a964c831b7430d 5-57
+packages/scanleaf/android/build.gradle.kts
+  75a964c831b7430d 1-41,45,48-49
+packages/scanleaf/Cargo.toml
+  75a964c831b7430d 1-4,7-30
+packages/scanleaf/permissions/default.toml
+  75a964c831b7430d 1-18
+packages/scanleaf/guest-js/index.ts
+  75a964c831b7430d 5-24,28,30-47,106,111-115,141-144,148-152,155,162-166,168-170,198-225,230,232-244,247-249,258-261,264-290
+packages/scanleaf/src/error.rs
+  75a964c831b7430d 5-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.3",
+  "base_commit_sha": "6d72b312ed7328db47e5414ae165fdc74f19ae08",
+  "prompts": {
+    "75a964c831b7430d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98718589-5289-4e5a-8e12-2e648fa5bb08",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 1426,
+      "total_deletions": 0,
+      "accepted_lines": 762,
+      "overriden_lines": 118
+    }
+  }
+}
