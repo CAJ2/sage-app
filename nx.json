@@ -50,7 +50,7 @@
       "dependsOn": ["^build"]
     }
   },
-  "nxCloudId": "67acadc6cdcfda5eba4a88e1",
+  "nxCloudId": "69cc5e5d4b3937b7e705fffb",
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
