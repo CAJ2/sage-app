@@ -184,12 +184,14 @@ export const configureAuth = (orm: MikroORM) => {
           'http://127.0.0.1:*',
           'https://tauri.localhost',
           'http://tauri.localhost',
+          'tauri://localhost',
         ]
       : [
           'http://localhost:*',
           'http://127.0.0.1:*',
           'https://tauri.localhost',
           'http://tauri.localhost',
+          'tauri://localhost',
         ],
     advanced: {
       cookiePrefix: 'sage',

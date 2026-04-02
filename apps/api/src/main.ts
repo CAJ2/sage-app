@@ -14,6 +14,7 @@ async function bootstrap() {
         'https://science.dev.sageleaf.app',
         'https://tauri.localhost',
         'http://tauri.localhost',
+        'tauri://localhost',
         /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE'],

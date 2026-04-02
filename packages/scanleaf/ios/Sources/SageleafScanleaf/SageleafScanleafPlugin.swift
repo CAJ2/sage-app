@@ -5,13 +5,8 @@
 import AVFoundation
 import Tauri
 import UIKit
+import Vision
 import WebKit
-#if canImport(MLKitBarcodeScanning)
-  import MLKitBarcodeScanning
-  import MLKitImageLabeling
-  import MLKitTextRecognition
-  import MLKitVision
-#endif
 
 // MARK: - Decodable arg types
 
@@ -25,170 +20,151 @@ struct ScanOptions: Decodable {
   var confidenceThreshold: Float?
 }
 
-// MARK: - Barcode format mapping (MLKit)
+// MARK: - Barcode format mapping (Vision)
 
 enum SupportedFormat: String, CaseIterable {
   case UPC_A, UPC_E, EAN_8, EAN_13
   case CODE_39, CODE_93, CODE_128
   case CODABAR, ITF, AZTEC, DATA_MATRIX, PDF_417, QR_CODE
 
-  var mlkitFormat: BarcodeFormat {
+  var visionSymbology: VNBarcodeSymbology {
     switch self {
-    case .QR_CODE:     return .qrCode
-    case .EAN_13:      return .EAN13
-    case .EAN_8:       return .EAN8
-    case .UPC_A:       return .UPCA
-    case .UPC_E:       return .UPCE
+    case .QR_CODE:     return .qr
+    case .EAN_13:      return .ean13
+    case .EAN_8:       return .ean8
+    case .UPC_A:       return .ean13  // UPC-A decoded as EAN-13 with leading zero in Vision
+    case .UPC_E:       return .upce
     case .CODE_39:     return .code39
     case .CODE_93:     return .code93
     case .CODE_128:    return .code128
-    case .ITF:         return .ITF
+    case .ITF:         return .itf14
     case .AZTEC:       return .aztec
     case .DATA_MATRIX: return .dataMatrix
-    case .PDF_417:     return .PDF417
-    case .CODABAR:     return .codaBar
+    case .PDF_417:     return .pdf417
+    case .CODABAR:
+      if #available(iOS 15.0, *) { return .codabar }
+      return .code128  // unreachable on iOS 15+ deployment target
     }
   }
 }
 
-func formatString(from format: BarcodeFormat) -> String {
-  switch format {
-  case .qrCode:     return "QR_CODE"
-  case .EAN13:      return "EAN_13"
-  case .EAN8:       return "EAN_8"
-  case .UPCA:       return "UPC_A"
-  case .UPCE:       return "UPC_E"
+func formatString(from symbology: VNBarcodeSymbology) -> String {
+  if #available(iOS 15.0, *), symbology == .codabar { return "CODABAR" }
+  switch symbology {
+  case .qr:         return "QR_CODE"
+  case .ean13:      return "EAN_13"
+  case .ean8:       return "EAN_8"
+  case .upce:       return "UPC_E"
   case .code39:     return "CODE_39"
   case .code93:     return "CODE_93"
   case .code128:    return "CODE_128"
-  case .ITF:        return "ITF"
+  case .itf14:      return "ITF"
   case .aztec:      return "AZTEC"
   case .dataMatrix: return "DATA_MATRIX"
-  case .PDF417:     return "PDF_417"
-  case .codaBar:    return "CODABAR"
+  case .pdf417:     return "PDF_417"
   default:          return "UNKNOWN"
   }
 }
 
-func valueTypeString(from type: BarcodeValueType) -> String {
-  switch type {
-  case .URL:                   return "url"
-  case .wiFi:                  return "wifi"
-  case .contactInfo:           return "contact"
-  case .email:                 return "email"
-  case .phone:                 return "phone"
-  case .SMS:                   return "sms"
-  case .geographicCoordinates: return "geo"
-  case .ISBN:                  return "isbn"
-  case .product:               return "product"
-  case .driverLicense:         return "driver-license"
-  case .calendarEvent:         return "calendar"
-  case .text:                  return "text"
-  case .unknown:               return "unknown"
-  @unknown default:            return "unknown"
-  }
-}
+// MARK: - Orientation
 
-/// Matches the MLKit iOS reference implementation from google-mlkit-swiftpm/Example.
-func imageOrientation(
+/// Map device orientation + camera position to CGImagePropertyOrientation for Vision.
+/// Mirrors the MLKit imageOrientation() mapping.
+func visionOrientation(
   deviceOrientation: UIDeviceOrientation,
   cameraPosition: AVCaptureDevice.Position
-) -> UIImage.Orientation {
+) -> CGImagePropertyOrientation {
   switch deviceOrientation {
   case .portrait:           return cameraPosition == .front ? .leftMirrored : .right
   case .landscapeLeft:      return cameraPosition == .front ? .downMirrored : .up
   case .portraitUpsideDown: return cameraPosition == .front ? .rightMirrored : .left
   case .landscapeRight:     return cameraPosition == .front ? .upMirrored : .down
-  case .faceDown, .faceUp, .unknown: return .up
-  @unknown default: return .up
+  default:                  return .right
   }
 }
 
-// MARK: - Serialization helpers
+// MARK: - Coordinate conversion
 
-/// Serialize an MLKit Barcode to a dictionary.
-/// MLKit provides pixel-space CGRect bounds (top-left origin) — no coordinate conversion needed.
-/// Structured fields (url, wifi, email, phone, sms, geo, contact) come from MLKit natively;
-/// no manual payload parsing required.
-func serializeBarcode(_ barcode: Barcode) -> [String: Any]? {
-  guard let rawValue = barcode.rawValue else { return nil }
-  let fmt = formatString(from: barcode.format)
+/// Vision bounding boxes use normalized coords with bottom-left origin.
+/// Convert to pixel-space with top-left origin to match MLKit output.
+func pixelBounds(from normalized: CGRect, imageWidth: Int, imageHeight: Int) -> [String: Any] {
+  let x = normalized.minX * CGFloat(imageWidth)
+  let y = (1.0 - normalized.maxY) * CGFloat(imageHeight)
+  let w = normalized.width * CGFloat(imageWidth)
+  let h = normalized.height * CGFloat(imageHeight)
+  return ["x": Double(x), "y": Double(y), "width": Double(w), "height": Double(h)]
+}
+
+// MARK: - Barcode value type + structured field parsing
+
+func detectValueType(_ raw: String) -> String {
+  let lower = raw.lowercased()
+  if lower.hasPrefix("http://") || lower.hasPrefix("https://") { return "url" }
+  if lower.hasPrefix("wifi:")                                   { return "wifi" }
+  if lower.hasPrefix("mailto:")                                 { return "email" }
+  if lower.hasPrefix("tel:")                                    { return "phone" }
+  if lower.hasPrefix("smsto:") || lower.hasPrefix("sms:")       { return "sms" }
+  if lower.hasPrefix("geo:")                                    { return "geo" }
+  if lower.hasPrefix("begin:vcard")                             { return "contact" }
+  return "text"
+}
+
+func serializeBarcode(_ obs: VNBarcodeObservation, imageWidth: Int, imageHeight: Int) -> [String: Any]? {
+  guard let rawValue = obs.payloadStringValue else { return nil }
+  let fmt = formatString(from: obs.symbology)
   guard fmt != "UNKNOWN" else { return nil }
 
-  let frame = barcode.frame
+  let valueType = detectValueType(rawValue)
   var result: [String: Any] = [
     "format": fmt,
     "rawValue": rawValue,
-    "displayValue": barcode.displayValue ?? rawValue,
-    "valueType": valueTypeString(from: barcode.valueType),
-    "bounds": [
-      "x": Double(frame.minX),
-      "y": Double(frame.minY),
-      "width": Double(frame.width),
-      "height": Double(frame.height),
-    ],
+    "displayValue": rawValue,
+    "valueType": valueType,
+    "bounds": pixelBounds(from: obs.boundingBox, imageWidth: imageWidth, imageHeight: imageHeight),
   ]
 
-  switch barcode.valueType {
-  case .URL:
-    if let url = barcode.url {
-      result["url"] = ["title": url.title ?? "", "url": url.url ?? ""]
-    }
-  case .wiFi:
-    if let wifi = barcode.wifi {
-      let enc: String
-      switch wifi.encryptionType {
-      case .open: enc = "open"
-      case .wpa:  enc = "wpa"
-      case .wep:  enc = "wep"
-      @unknown default: enc = "unknown"
+  switch valueType {
+  case "url":
+    result["url"] = ["title": "", "url": rawValue]
+
+  case "wifi":
+    // Format: WIFI:S:<ssid>;T:<auth>;P:<password>;H:<hidden>;;
+    var ssid = "", password = "", enc = "open"
+    for part in rawValue.dropFirst(5).components(separatedBy: ";") {
+      if part.hasPrefix("S:")      { ssid = String(part.dropFirst(2)) }
+      else if part.hasPrefix("P:") { password = String(part.dropFirst(2)) }
+      else if part.hasPrefix("T:") {
+        let t = part.dropFirst(2).lowercased()
+        enc = (t == "wpa" || t == "wpa2") ? "wpa" : t == "wep" ? "wep" : "open"
       }
-      result["wifi"] = [
-        "ssid": wifi.ssid ?? "",
-        "password": wifi.password ?? "",
-        "encryptionType": enc,
+    }
+    result["wifi"] = ["ssid": ssid, "password": password, "encryptionType": enc]
+
+  case "email":
+    let addr = rawValue.hasPrefix("mailto:") ? String(rawValue.dropFirst(7)) : rawValue
+    result["email"] = [
+      "address": addr.components(separatedBy: "?").first ?? addr,
+      "subject": "", "body": "",
+    ]
+
+  case "phone":
+    result["phone"] = ["number": rawValue.hasPrefix("tel:") ? String(rawValue.dropFirst(4)) : rawValue]
+
+  case "sms":
+    let body = rawValue.hasPrefix("smsto:") ? String(rawValue.dropFirst(6))
+             : rawValue.hasPrefix("sms:")   ? String(rawValue.dropFirst(4)) : rawValue
+    let parts = body.components(separatedBy: ":")
+    result["sms"] = ["phoneNumber": parts.first ?? "", "message": parts.dropFirst().joined(separator: ":")]
+
+  case "geo":
+    let coords = rawValue.dropFirst(4).components(separatedBy: ",")
+    if coords.count >= 2 {
+      result["geo"] = [
+        "latitude": Double(coords[0]) ?? 0,
+        "longitude": Double((coords[1].components(separatedBy: "?").first) ?? "") ?? 0,
       ]
     }
-  case .email:
-    if let email = barcode.email {
-      result["email"] = [
-        "address": email.address ?? "",
-        "subject": email.subject ?? "",
-        "body": email.body ?? "",
-      ]
-    }
-  case .phone:
-    if let phone = barcode.phone {
-      result["phone"] = ["number": phone.number ?? ""]
-    }
-  case .SMS:
-    if let sms = barcode.sms {
-      result["sms"] = ["phoneNumber": sms.phoneNumber ?? "", "message": sms.message ?? ""]
-    }
-  case .geographicCoordinates:
-    if let geo = barcode.geoPoint {
-      result["geo"] = ["latitude": geo.latitude, "longitude": geo.longitude]
-    }
-  case .contactInfo:
-    if let contact = barcode.contactInfo {
-      var contactDict: [String: Any] = [:]
-      if let name = contact.name {
-        contactDict["name"] = [
-          "first": name.first ?? "",
-          "last": name.last ?? "",
-          "middle": name.middle ?? "",
-          "prefix": name.prefix ?? "",
-          "suffix": name.suffix ?? "",
-          "formattedName": name.formattedName ?? "",
-        ]
-      }
-      contactDict["organization"] = contact.organization ?? ""
-      contactDict["jobTitle"] = contact.jobTitle ?? ""
-      contactDict["phones"] = contact.phones.map { ["number": $0.number ?? ""] }
-      contactDict["emails"] = contact.emails.map { ["address": $0.address ?? ""] }
-      contactDict["urls"] = contact.urls
-      result["contact"] = contactDict
-    }
+
   default:
     break
   }
@@ -196,40 +172,31 @@ func serializeBarcode(_ barcode: Barcode) -> [String: Any]? {
   return result
 }
 
-func serializeTextBlock(_ block: TextBlock) -> [String: Any] {
-  let frame = block.frame
-  return [
-    "text": block.text,
-    "bounds": [
-      "x": Double(frame.minX), "y": Double(frame.minY),
-      "width": Double(frame.width), "height": Double(frame.height),
-    ],
-    "languages": block.recognizedLanguages.compactMap { $0.languageCode }.filter { !$0.isEmpty },
-    "lines": block.lines.map { serializeTextLine($0) },
-  ]
-}
+// MARK: - Text serialization
+//
+// Vision gives one VNRecognizedTextObservation per text region.
+// We map each observation → one block → one line → one element,
+// matching MLKit's Block/Line/Element hierarchy shape.
 
-func serializeTextLine(_ line: TextLine) -> [String: Any] {
-  let frame = line.frame
-  return [
-    "text": line.text,
-    "bounds": [
-      "x": Double(frame.minX), "y": Double(frame.minY),
-      "width": Double(frame.width), "height": Double(frame.height),
-    ],
-    "elements": line.elements.map { serializeTextElement($0) },
-  ]
-}
+func serializeText(
+  _ observations: [VNRecognizedTextObservation],
+  imageWidth: Int,
+  imageHeight: Int
+) -> [String: Any]? {
+  let pairs: [(obs: VNRecognizedTextObservation, text: String)] = observations.compactMap {
+    guard let top = $0.topCandidates(1).first, !top.string.isEmpty else { return nil }
+    return ($0, top.string)
+  }
+  guard !pairs.isEmpty else { return nil }
 
-func serializeTextElement(_ element: TextElement) -> [String: Any] {
-  let frame = element.frame
-  return [
-    "text": element.text,
-    "bounds": [
-      "x": Double(frame.minX), "y": Double(frame.minY),
-      "width": Double(frame.width), "height": Double(frame.height),
-    ],
-  ]
+  let fullText = pairs.map { $0.text }.joined(separator: "\n")
+  let blocks: [[String: Any]] = pairs.map { pair in
+    let bounds = pixelBounds(from: pair.obs.boundingBox, imageWidth: imageWidth, imageHeight: imageHeight)
+    let element: [String: Any] = ["text": pair.text, "bounds": bounds]
+    let line: [String: Any] = ["text": pair.text, "bounds": bounds, "elements": [element]]
+    return ["text": pair.text, "bounds": bounds, "languages": [String](), "lines": [line]]
+  }
+  return ["fullText": fullText, "blocks": blocks]
 }
 
 // MARK: - Error types
@@ -257,10 +224,10 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
   var isScanning = false
   var cameraPosition: AVCaptureDevice.Position = .back
 
-  // MLKit detector instances — recreated in startScan when options change
-  var barcodeScanner: BarcodeScanner?
-  var textRecognizer: TextRecognizer?
-  var labeler: ImageLabeler?
+  // Vision requests — recreated in startScan when options change
+  var barcodeRequest: VNDetectBarcodesRequest?
+  var textRequest: VNRecognizeTextRequest?
+  var classifyRequest: VNClassifyImageRequest?
   var confidenceThreshold: Float = 0.7
 
   // Camera config
@@ -270,13 +237,13 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
   var backCamera: AVCaptureDevice?
   var previousBackgroundColor: UIColor? = UIColor.white
 
-  // Frame throttle (~10 fps) — plugin controls sampling rate, not the caller
+  // Frame throttle (~10 fps)
   var lastProcessedTime: TimeInterval = 0
   let throttleInterval: TimeInterval = 0.1
 
   // Background queues
   let sessionQueue = DispatchQueue(label: "app.sageleaf.scanleaf.session", qos: .userInitiated)
-  let visionQueue = DispatchQueue(label: "app.sageleaf.scanleaf.mlkit")
+  let visionQueue = DispatchQueue(label: "app.sageleaf.scanleaf.vision")
 
   public override func load(webview: WKWebView) {
     self.webView = webview
@@ -331,22 +298,19 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
 
     confidenceThreshold = args.confidenceThreshold ?? 0.7
 
-    // Build BarcodeFormat option set from the requested format strings
+    let req = VNDetectBarcodesRequest()
     let formats = args.barcodeFormats ?? []
-    let barcodeFormat: BarcodeFormat
-    if formats.isEmpty {
-      barcodeFormat = .all
-    } else {
-      barcodeFormat = formats
-        .compactMap { SupportedFormat(rawValue: $0)?.mlkitFormat }
-        .reduce(into: BarcodeFormat()) { $0.formUnion($1) }
+    if !formats.isEmpty {
+      req.symbologies = formats.compactMap { SupportedFormat(rawValue: $0)?.visionSymbology }
     }
+    barcodeRequest = req
 
-    barcodeScanner = BarcodeScanner.barcodeScanner(options: BarcodeScannerOptions(formats: barcodeFormat))
-    textRecognizer = TextRecognizer.textRecognizer(options: TextRecognizerOptions())
-    let labelerOptions = ImageLabelerOptions()
-    labelerOptions.confidenceThreshold = confidenceThreshold
-    labeler = ImageLabeler.imageLabeler(options: labelerOptions)
+    let textReq = VNRecognizeTextRequest()
+    textReq.recognitionLevel = .fast
+    textReq.usesLanguageCorrection = false
+    textRequest = textReq
+
+    classifyRequest = VNClassifyImageRequest()
 
     isScanning = true
     invoke.resolve()
@@ -354,9 +318,9 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
 
   @objc func stopScan(_ invoke: Invoke) {
     isScanning = false
-    barcodeScanner = nil
-    textRecognizer = nil
-    labeler = nil
+    barcodeRequest = nil
+    textRequest = nil
+    classifyRequest = nil
     invoke.resolve()
   }
 
@@ -414,9 +378,9 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
   private func dismantleCamera() {
     isScanning = false
     isOpen = false
-    barcodeScanner = nil
-    textRecognizer = nil
-    labeler = nil
+    barcodeRequest = nil
+    textRequest = nil
+    classifyRequest = nil
     sessionQueue.async { self.captureSession?.stopRunning() }
     cameraView?.removePreviewLayer()
     cameraView?.removeFromSuperview()
@@ -451,53 +415,45 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
     processFrame(sampleBuffer, timestamp: now)
   }
 
-  // MARK: - Unified frame processing (MLKit)
+  // MARK: - Frame processing (Vision)
+  //
+  // All three Vision requests run in a single VNImageRequestHandler per frame on visionQueue.
+  // alwaysDiscardsLateVideoFrames = true means frames arriving during processing are dropped —
+  // no external locking needed. Mirrors the MLKit parallel-detector pattern.
 
-  // All three MLKit detectors run synchronously per frame on visionQueue.
-  // alwaysDiscardsLateVideoFrames = true means frames arriving during processing
-  // are dropped automatically — no external locking needed.
-  // This is the MLKit-recommended pattern for video frame analysis.
   private func processFrame(_ sampleBuffer: CMSampleBuffer, timestamp: TimeInterval) {
-    guard let scanner = barcodeScanner,
-      let recognizer = textRecognizer,
-      let labeler = labeler
+    guard let barcodeReq = barcodeRequest,
+      let textReq = textRequest,
+      let classifyReq = classifyRequest
     else { return }
 
-    guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-    let imageWidth = CVPixelBufferGetWidth(imageBuffer)
-    let imageHeight = CVPixelBufferGetHeight(imageBuffer)
+    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+    let imageWidth = CVPixelBufferGetWidth(pixelBuffer)
+    let imageHeight = CVPixelBufferGetHeight(pixelBuffer)
 
-    let visionImage = VisionImage(buffer: sampleBuffer)
-    visionImage.orientation = imageOrientation(
+    let orientation = visionOrientation(
       deviceOrientation: UIDevice.current.orientation,
       cameraPosition: cameraPosition)
 
-    // Synchronous results(in:) — designed for use from captureOutput(_:didOutput:from:)
-    let rawBarcodes = (try? scanner.results(in: visionImage)) ?? []
-    let textResult = try? recognizer.results(in: visionImage)
-    let rawLabels = (try? labeler.results(in: visionImage)) ?? []
-
-    // ── Barcodes ──────────────────────────────────────────────────────────────
-    // MLKit barcode.frame is already in pixel-space top-left coordinates.
-    // Structured fields (url, wifi, email, etc.) come directly from the MLKit Barcode object.
-    let barcodes = rawBarcodes.compactMap { serializeBarcode($0) }
-
-    // ── Text ──────────────────────────────────────────────────────────────────
-    // MLKit gives the full TextBlock → TextLine → TextElement hierarchy with pixel bounds,
-    // plus per-block language detection — richer than Apple Vision.
-    var serializedText: [String: Any]? = nil
-    if let text = textResult, !text.text.isEmpty {
-      serializedText = [
-        "fullText": text.text,
-        "blocks": text.blocks.map { serializeTextBlock($0) },
-      ]
+    let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: orientation)
+    do {
+      try handler.perform([barcodeReq, textReq, classifyReq])
+    } catch {
+      return
     }
 
-    // ── Labels ────────────────────────────────────────────────────────────────
-    // confidenceThreshold is already applied at the ImageLabelerOptions level.
-    let labels: [[String: Any]] = rawLabels.prefix(10).map { label in
-      ["text": label.text, "confidence": Double(label.confidence), "index": label.index]
-    }
+    let barcodes = (barcodeReq.results ?? [])
+      .compactMap { serializeBarcode($0, imageWidth: imageWidth, imageHeight: imageHeight) }
+
+    let serializedText = serializeText(
+      textReq.results ?? [], imageWidth: imageWidth, imageHeight: imageHeight)
+
+    let threshold = self.confidenceThreshold
+    let labels: [[String: Any]] = (classifyReq.results ?? [])
+      .filter { $0.confidence >= threshold }
+      .prefix(10)
+      .enumerated()
+      .map { i, obs in ["text": obs.identifier, "confidence": Double(obs.confidence), "index": i] }
 
     guard !barcodes.isEmpty || serializedText != nil || !labels.isEmpty else { return }
 
@@ -513,7 +469,7 @@ class SageleafScanleafPlugin: Plugin, AVCaptureVideoDataOutputSampleBufferDelega
     guard let data = try? JSONSerialization.data(withJSONObject: frame),
       let str = String(data: data, encoding: .utf8)
     else { return }
-    self.trigger("detection", data: str)
+    try? self.trigger("detection", data: str)
   }
 
   // MARK: - Permissions

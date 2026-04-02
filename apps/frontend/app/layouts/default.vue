@@ -17,7 +17,10 @@
         :loading="topbar.loading"
       />
     </div>
-    <div :class="navbarVisible ? 'mb-[calc(5.625rem+env(safe-area-inset-bottom))]' : ''">
+    <div
+      class="min-h-dvh"
+      :class="navbarVisible ? 'mb-[calc(5.625rem+env(safe-area-inset-bottom))]' : ''"
+    >
       <slot />
     </div>
     <div v-if="navbarVisible" class="relative">
