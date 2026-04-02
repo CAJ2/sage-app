@@ -4,10 +4,11 @@
 
 import {
   invoke,
+  addPluginListener,
   requestPermissions as requestPermissions_,
   checkPermissions as checkPermissions_,
 } from '@tauri-apps/api/core'
-import { listen, type UnlistenFn } from '@tauri-apps/api/event'
+import type { UnlistenFn } from '@tauri-apps/api/event'
 
 export type { PermissionState } from '@tauri-apps/api/core'
 
@@ -260,9 +261,8 @@ export async function stopScan(): Promise<void> {
  * unlisten()
  */
 export async function onDetection(handler: (frame: ScanFrame) => void): Promise<UnlistenFn> {
-  return listen<ScanFrame>('plugin:sageleaf-scanleaf:detection', (event) => {
-    handler(event.payload)
-  })
+  const listener = await addPluginListener<ScanFrame>('sageleaf-scanleaf', 'detection', handler)
+  return () => listener.unregister()
 }
 
 // ─── Permissions ─────────────────────────────────────────────────────────────

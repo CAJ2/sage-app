@@ -1,5 +1,5 @@
 [workspace]
-members = ["apps/frontend/src-tauri"]
+members = ["apps/frontend/src-tauri", "packages/scanleaf"]
 resolver = "3"
 
 [workspace.package]
@@ -21,6 +21,7 @@ tauri-plugin = "2.5"
 tauri-utils = "2.8"
 tauri-plugin-log = "2.8"
 tauri-plugin-barcode-scanner = "2.4"
+sageleaf-scanleaf = { path = "packages/scanleaf" }
 tauri-plugin-geolocation = "2.3.2"
 tauri-plugin-sql = "2.3.2"
 

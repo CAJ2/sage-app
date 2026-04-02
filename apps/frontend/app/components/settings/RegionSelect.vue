@@ -262,7 +262,11 @@ async function requestGeolocation() {
         locationError.value = 'Location permission denied. Please enable it in settings.'
         return
       }
-      const pos = await getCurrentPosition()
+      const pos = await getCurrentPosition({
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 0,
+      })
       lat = pos.coords.latitude
       lon = pos.coords.longitude
     } else {
@@ -288,10 +292,21 @@ async function requestGeolocation() {
     } else {
       locationError.value = 'Could not determine your region. Please search manually.'
     }
-  } catch (e) {
+  } catch (e: unknown) {
     // oxlint-disable-next-line no-console
-    console.error('Geolocation error:', JSON.stringify(e, Object.getOwnPropertyNames(e as object)))
-    locationError.value = 'Could not get location. Please search manually.'
+    const gqlErrors = (e as { graphQLErrors?: { message: string }[] })?.graphQLErrors
+    if (gqlErrors?.length) {
+      // oxlint-disable-next-line no-console
+      console.error('Region API error:', gqlErrors.map((err) => err.message).join(', '))
+      locationError.value = 'Could not determine your region. Please search manually.'
+    } else {
+      // oxlint-disable-next-line no-console
+      console.error(
+        'Geolocation error:',
+        JSON.stringify(e, Object.getOwnPropertyNames(e as object)),
+      )
+      locationError.value = 'Could not get location. Please search manually.'
+    }
   } finally {
     locating.value = false
   }

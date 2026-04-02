@@ -37,9 +37,10 @@ export default defineNuxtPlugin(({ hook }) => {
 
   hook('apollo:error', (error) => {
     // oxlint-disable-next-line no-console
-    console.error(
-      'Apollo error:',
-      JSON.stringify(error, Object.getOwnPropertyNames(error as object)),
-    )
+    console.error('Apollo error:', {
+      graphQLErrors: error.graphQLErrors?.map((e: { message: string }) => e.message),
+      networkError: error.networkError?.message,
+      message: error.message,
+    })
   })
 })

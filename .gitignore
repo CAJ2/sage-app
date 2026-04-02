@@ -5,6 +5,7 @@ dist
 tmp
 out-tsc
 target
+dist-js
 
 # dependencies
 node_modules
@@ -37,6 +38,9 @@ testem.log
 /typings
 storybook-static
 *.tsbuildinfo
+
+# plugins .tauri directory
+/packages/*/.tauri
 
 # System Files
 .DS_Store

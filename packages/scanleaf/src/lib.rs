@@ -9,8 +9,6 @@ use tauri::{
     Manager, Runtime,
 };
 
-pub use models::*;
-
 mod error;
 mod models;
 

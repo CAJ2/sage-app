@@ -368,6 +368,9 @@ importers:
       '@posthog/nuxt':
         specifier: ^1.5.95
         version: 1.5.95(magicast@0.5.2)(rxjs@7.8.2)
+      '@sageleaf/scanleaf':
+        specifier: workspace:*
+        version: link:../../packages/scanleaf
       '@sageleaf/ui':
         specifier: workspace:*
         version: link:../../packages/ui

@@ -17,10 +17,10 @@
         :loading="topbar.loading"
       />
     </div>
-    <div class="mb-[calc(5.625rem+env(safe-area-inset-bottom))]">
+    <div :class="navbarVisible ? 'mb-[calc(5.625rem+env(safe-area-inset-bottom))]' : ''">
       <slot />
     </div>
-    <div class="relative">
+    <div v-if="navbarVisible" class="relative">
       <div class="fixed right-0 bottom-0 left-0 z-50">
         <NavTabs />
       </div>
@@ -29,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+const navbarVisible = useState<boolean>('navbar', () => true)
+
 const topbar = useState<{
   visible: boolean
   title?: string

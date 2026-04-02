@@ -3225,6 +3225,7 @@ name = "sageleaf-frontend"
 version = "0.1.0"
 dependencies = [
  "log",
+ "sageleaf-scanleaf",
  "serde",
  "serde_json",
  "tauri",
@@ -3233,6 +3234,18 @@ dependencies = [
  "tauri-plugin-geolocation",
  "tauri-plugin-log",
  "tauri-plugin-sql",
+]
+
+[[package]]
+name = "sageleaf-scanleaf"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

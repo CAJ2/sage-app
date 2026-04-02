@@ -3,6 +3,10 @@ import { fileURLToPath } from 'url'
 import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
+
+// Set by Tauri CLI when running on a real device over WiFi.
+// For emulators, Tauri uses `adb reverse` so localhost works — don't override.
+const tauriDevHost = process.env.TAURI_DEV_HOST
 export default defineNuxtConfig({
   devtools: { enabled: !process.env.TAURI_DEV_HOST },
 
@@ -45,6 +49,7 @@ export default defineNuxtConfig({
     envPrefix: ['VITE_', 'TAURI_'],
     server: {
       strictPort: true,
+      hmr: tauriDevHost ? { protocol: 'ws', host: tauriDevHost, port: 5173 } : undefined,
     },
     optimizeDeps: {
       entries: 'app/**/*.{ts,vue}',

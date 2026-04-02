@@ -38,6 +38,7 @@
     "@nuxt/kit": "^4.4.2",
     "@pinia/nuxt": "^0.11.3",
     "@posthog/nuxt": "^1.5.95",
+    "@sageleaf/scanleaf": "workspace:*",
     "@sageleaf/ui": "workspace:*",
     "@tailwindcss/vite": "~4.2.2",
     "@tanstack/vue-form": "^1.28.5",

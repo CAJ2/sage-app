@@ -15,4 +15,6 @@ permissions = [
   "allow-check-permissions",
   "allow-request-permissions",
   "allow-open-app-settings",
+  "allow-register-listener",
+  "allow-remove-listener",
 ]

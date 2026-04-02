@@ -50,12 +50,14 @@ import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import android.util.Log
 import java.util.Collections
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 private const val CAMERA_ALIAS = "camera"
+private const val TAG = "Scanleaf"
 
 @InvokeArg
 class CameraOptions {
@@ -135,8 +137,10 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
     fun openCamera(invoke: Invoke) {
         val args = invoke.parseArgs(CameraOptions::class.java)
         windowed = args.windowed
+        Log.d(TAG, "openCamera: facing=${args.facing ?: "back"} windowed=$windowed")
 
         if (getPermissionState(CAMERA_ALIAS) != PermissionState.GRANTED) {
+            Log.w(TAG, "openCamera: camera permission not granted")
             invoke.reject("Camera permission not granted. Call requestPermissions first.")
             return
         }
@@ -156,8 +160,10 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
                     bindCamera(provider, facingInt)
                     cameraProvider = provider
                     isOpen = true
+                    Log.d(TAG, "openCamera: camera bound and ready")
                     invoke.resolve()
                 } catch (e: Exception) {
+                    Log.e(TAG, "openCamera: failed to bind camera", e)
                     invoke.reject(e.message ?: "Failed to open camera")
                 }
             }, ContextCompat.getMainExecutor(activity))
@@ -166,6 +172,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
 
     @Command
     fun closeCamera(invoke: Invoke) {
+        Log.d(TAG, "closeCamera")
         dismantleCamera()
         invoke.resolve()
     }
@@ -175,6 +182,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
     @Command
     fun startScan(invoke: Invoke) {
         if (!isOpen) {
+            Log.w(TAG, "startScan: camera is not open")
             invoke.reject("Camera is not open. Call openCamera first.")
             return
         }
@@ -204,11 +212,13 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
         )
 
         isScanning = true
+        Log.d(TAG, "startScan: scanning started — formats=${formats.toList().ifEmpty { listOf("ALL") }} confidenceThreshold=$confidenceThreshold")
         invoke.resolve()
     }
 
     @Command
     fun stopScan(invoke: Invoke) {
+        Log.d(TAG, "stopScan")
         isScanning = false
         closeMLKitClients()
         invoke.resolve()
@@ -225,6 +235,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
         previewView = pv
         val parent = webView.parent as ViewGroup
         parent.addView(pv, 0)
+        Log.d(TAG, "setupPreviewView: added PreviewView to parent (windowed=$windowed)")
 
         if (windowed) {
             webView.bringToFront()
@@ -234,6 +245,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
     }
 
     private fun bindCamera(provider: ProcessCameraProvider, facing: Int) {
+        val facingLabel = if (facing == CameraSelector.LENS_FACING_FRONT) "front" else "back"
         val preview = Preview.Builder().build()
         val selector = CameraSelector.Builder().requireLensFacing(facing).build()
         preview.setSurfaceProvider(previewView?.surfaceProvider)
@@ -251,9 +263,11 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
             preview,
             analysis
         )
+        Log.d(TAG, "bindCamera: bound Preview + ImageAnalysis (facing=$facingLabel)")
     }
 
     private fun dismantleCamera() {
+        Log.d(TAG, "dismantleCamera: unbinding all use cases")
         isScanning = false
         isOpen = false
         closeMLKitClients()
@@ -283,6 +297,9 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
 
     // ─── ImageAnalysis.Analyzer ──────────────────────────────────────────────
 
+    // Throttled log counter — print one "frames flowing" message per 30 frames
+    @Volatile private var frameCount = 0L
+
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
         if (!isScanning) { image.close(); return }
@@ -291,8 +308,17 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
         if (now - lastProcessedMs < throttleMs) { image.close(); return }
         lastProcessedMs = now
 
+        val count = ++frameCount
+        if (count == 1L || count % 30 == 0L) {
+            Log.d(TAG, "analyze: processing frame #$count (${image.width}x${image.height} rot=${image.imageInfo.rotationDegrees}°)")
+        }
+
         val mediaImage = image.image
-        if (mediaImage == null) { image.close(); return }
+        if (mediaImage == null) {
+            Log.w(TAG, "analyze: mediaImage is null, skipping frame")
+            image.close()
+            return
+        }
 
         val inputImage = InputImage.fromMediaImage(mediaImage, image.imageInfo.rotationDegrees)
         processAllDetectors(inputImage, image, now)
@@ -317,14 +343,17 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
 
         barcodeScanner!!.process(inputImage)
             .addOnSuccessListener { barcodesRef.set(it) }
+            .addOnFailureListener { e -> Log.e(TAG, "barcode detector failed", e) }
             .addOnCompleteListener { done() }
 
         textRecognizer!!.process(inputImage)
             .addOnSuccessListener { textRef.set(it) }
+            .addOnFailureListener { e -> Log.e(TAG, "text recognizer failed", e) }
             .addOnCompleteListener { done() }
 
         imageLabeler!!.process(inputImage)
             .addOnSuccessListener { labelsRef.set(it) }
+            .addOnFailureListener { e -> Log.e(TAG, "image labeler failed", e) }
             .addOnCompleteListener { done() }
     }
 
@@ -452,12 +481,6 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
                     bb.put("height", rect.bottom - rect.top)
                     blockObj.put("bounds", bb)
                 }
-                // Language codes (e.g. "en", "zh")
-                if (block.recognizedLanguages.isNotEmpty()) {
-                    val langs = JSArray()
-                    block.recognizedLanguages.forEach { langs.put(it.languageCode) }
-                    blockObj.put("languages", langs)
-                }
                 val linesArray = JSArray()
                 for (line in block.lines) {
                     val lineObj = JSObject()
@@ -507,7 +530,9 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
         }
 
         // Only emit when at least one detector found something
-        if (barcodesArray.length() == 0 && textObj == null && labelsArray.length() == 0) return
+        val hasResults = barcodesArray.length() > 0 || textObj != null || labelsArray.length() > 0
+        Log.d(TAG, "buildAndEmitFrame: barcodes=${barcodesArray.length()} text=${textObj != null} labels=${labelsArray.length()} — ${if (hasResults) "emitting" else "skipping (empty)"}")
+        if (!hasResults) return
 
         val frame = JSObject()
         frame.put("barcodes", barcodesArray)

@@ -6,6 +6,8 @@ const COMMANDS: &[&str] = &[
     "check_permissions",
     "request_permissions",
     "open_app_settings",
+    "register_listener",
+    "remove_listener",
 ];
 
 fn main() {
