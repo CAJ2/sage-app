@@ -1,0 +1,23 @@
+packages/scanleaf/ios/Sources/SageleafScanleaf/SageleafScanleafPlugin.swift
+  75a964c831b7430d 9-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.4",
+  "base_commit_sha": "d171db5a8673f6158a3d32d29abdfa67000c796b",
+  "prompts": {
+    "75a964c831b7430d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98718589-5289-4e5a-8e12-2e648fa5bb08",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 9,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
