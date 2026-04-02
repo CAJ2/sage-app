@@ -1,0 +1,23 @@
+Dockerfile
+  75a964c831b7430d 16,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.4",
+  "base_commit_sha": "c391999a7f95af32a3c921126eda7100da829d5c",
+  "prompts": {
+    "75a964c831b7430d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98718589-5289-4e5a-8e12-2e648fa5bb08",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
