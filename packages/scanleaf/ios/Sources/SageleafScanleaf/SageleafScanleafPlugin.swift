@@ -3,13 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import AVFoundation
-import MLKitBarcodeScanning
-import MLKitImageLabeling
-import MLKitTextRecognition
-import MLKitVision
 import Tauri
 import UIKit
 import WebKit
+#if canImport(MLKitBarcodeScanning)
+  import MLKitBarcodeScanning
+  import MLKitImageLabeling
+  import MLKitTextRecognition
+  import MLKitVision
+#endif
 
 // MARK: - Decodable arg types
 
