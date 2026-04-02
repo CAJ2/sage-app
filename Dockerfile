@@ -13,6 +13,7 @@ COPY apps/api/package.json /usr/src/app/apps/api/
 COPY apps/frontend/package.json /usr/src/app/apps/frontend/
 COPY apps/science/package.json /usr/src/app/apps/science/
 COPY packages/ui/package.json /usr/src/app/packages/ui/
+COPY packages/scanleaf/package.json /usr/src/app/packages/scanleaf/
 WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
@@ -34,6 +35,7 @@ CMD [ "node", "dist/main" ]
 FROM build AS frontend-build
 COPY apps/frontend /usr/src/app/apps/frontend
 COPY packages/ui /usr/src/app/packages/ui/
+COPY packages/scanleaf /usr/src/app/packages/scanleaf/
 COPY apps/api/schema/schema.gql /usr/src/app/apps/api/schema/
 RUN pnpm --filter=@sageleaf/frontend exec nuxi prepare
 RUN nx run-many -p frontend -t build
