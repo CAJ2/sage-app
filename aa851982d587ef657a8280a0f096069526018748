@@ -1,0 +1,57 @@
+apps/frontend/src-tauri/tauri.conf.json
+  75a964c831b7430d 23
+packages/scanleaf/guest-js/index.ts
+  75a964c831b7430d 7,11,264-265
+apps/frontend/app/composables/useNavbar.ts
+  75a964c831b7430d 1-15
+apps/frontend/app/layouts/default.vue
+  75a964c831b7430d 20,23,32-33
+Cargo.toml
+  75a964c831b7430d 2,24
+apps/frontend/nuxt.config.ts
+  75a964c831b7430d 6-9,52
+apps/frontend/app/pages/search/scan.vue
+  75a964c831b7430d 4,7,24-30,32-43,46-50,64,70,122-133
+apps/frontend/app/plugins/apollo.ts
+  75a964c831b7430d 40-44
+apps/frontend/src-tauri/src/lib.rs
+  75a964c831b7430d 34-35
+apps/frontend/app/components/search/ScannerNative.vue
+  75a964c831b7430d 4-5,9,25-37,42-43,45-47,54-60,62,64,70-72,74-134,143-146,148,150-153,155-170,172-185
+packages/scanleaf/permissions/default.toml
+  75a964c831b7430d 18-19
+apps/frontend/app/plugins/posthog-env.client.ts
+  75a964c831b7430d 1-20
+packages/scanleaf/android/src/main/java/SageleafScanleafPlugin.kt
+  75a964c831b7430d 53,60,140,143,163,166,175,185,215,221,238,248,266,270,300-302,311-314,317-321,346,351,356,533-535
+apps/frontend/src-tauri/gen/android/app/src/main/AndroidManifest.xml
+  75a964c831b7430d 6-7
+apps/frontend/src-tauri/Cargo.toml
+  75a964c831b7430d 29
+apps/frontend/app/components/settings/RegionSelect.vue
+  75a964c831b7430d 265-267,269,295,297-303,309
+packages/scanleaf/build.rs
+  75a964c831b7430d 9-10
+apps/frontend/src-tauri/capabilities/mobile.json
+  75a964c831b7430d 8-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.4",
+  "base_commit_sha": "aa851982d587ef657a8280a0f096069526018748",
+  "prompts": {
+    "75a964c831b7430d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98718589-5289-4e5a-8e12-2e648fa5bb08",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 356,
+      "total_deletions": 115,
+      "accepted_lines": 292,
+      "overriden_lines": 5
+    }
+  }
+}
