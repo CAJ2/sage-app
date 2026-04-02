@@ -2,5 +2,13 @@
   "identifier": "mobile-capability",
   "platforms": ["android", "iOS"],
   "windows": ["main"],
-  "permissions": ["barcode-scanner:default", "sql:default", "sql:allow-execute"]
+  "permissions": [
+    "barcode-scanner:default",
+    "sql:default",
+    "sql:allow-execute",
+    "sageleaf-scanleaf:default",
+    "geolocation:allow-check-permissions",
+    "geolocation:allow-request-permissions",
+    "geolocation:allow-get-current-position"
+  ]
 }

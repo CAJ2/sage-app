@@ -81,6 +81,9 @@
             </li>
           </div>
 
+          <li v-if="error" class="list-row text-xs text-error">
+            {{ error.graphQLErrors?.[0]?.message || error.networkError?.message || error.message }}
+          </li>
           <li v-if="result?.search.nodes.length === 0 && searchInput.length > 0" class="list-row">
             No results found for "{{ searchInput }}"
           </li>
@@ -190,7 +193,7 @@ type SearchResult = {
   }
 }
 
-const { result, loading } = useQuery<SearchResult>(
+const { result, loading, error } = useQuery<SearchResult>(
   searchQuery,
   () => ({ query: debouncedSearch.value }),
   () => ({ enabled: debouncedSearch.value.length >= 2 }),
