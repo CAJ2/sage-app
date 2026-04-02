@@ -1,0 +1,33 @@
+packages/scanleaf/ios/Package.swift
+  75a964c831b7430d 6-27
+apps/api/src/main.ts
+  75a964c831b7430d 17
+apps/api/src/auth/auth.ts
+  75a964c831b7430d 187,194
+packages/scanleaf/ios/Sources/SageleafScanleaf/SageleafScanleafPlugin.swift
+  75a964c831b7430d 8,23,30,32-36,40,43-46,51-57,61,64,69,71-73,76,82,86,88-95,98-114,117,121-123,126-138,141-164,167,175-199,227-230,240,246,301,303-304,306,308-311,313,321-323,381-383,418-422,425-427,430-432,434,438-442,445-456,472
+apps/frontend/app/layouts/default.vue
+  75a964c831b7430d 20-23
+apps/frontend/app/pages/search/index.vue
+  75a964c831b7430d 85-86,196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.4",
+  "base_commit_sha": "b867ed6279d9951fcbcb8ee00b961fa411ee31ad",
+  "prompts": {
+    "75a964c831b7430d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98718589-5289-4e5a-8e12-2e648fa5bb08",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 212,
+      "total_deletions": 259,
+      "accepted_lines": 208,
+      "overriden_lines": 1
+    }
+  }
+}
