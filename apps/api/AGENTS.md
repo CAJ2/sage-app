@@ -1,8 +1,3 @@
----
-paths:
-  - 'apps/api/**'
----
-
 # API App (`apps/api/`) — Agent Rules
 
 **Package Name:** `@sageleaf/api`
