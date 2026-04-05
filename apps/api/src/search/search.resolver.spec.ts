@@ -22,6 +22,7 @@ describe('SearchResolver (integration)', () => {
   let searchMock: Mock<any>
   let federatedSearchMock: Mock<any>
   let getAvailableIndexesMock: Mock<any>
+  let getIndexEmbedderMock: Mock<any>
   let i18nService: I18nService
 
   const emptySearchResult = {
@@ -45,11 +46,13 @@ describe('SearchResolver (integration)', () => {
     searchMock = vi.fn().mockResolvedValue(emptySearchResult)
     federatedSearchMock = vi.fn().mockResolvedValue(emptyFederatedResult)
     getAvailableIndexesMock = vi.fn().mockResolvedValue([])
+    getIndexEmbedderMock = vi.fn().mockResolvedValue(null)
 
     const meiliService = {
       search: searchMock,
       federatedSearch: federatedSearchMock,
       getAvailableIndexes: getAvailableIndexesMock,
+      getIndexEmbedder: getIndexEmbedderMock,
     }
 
     const module: TestingModule = await Test.createTestingModule({

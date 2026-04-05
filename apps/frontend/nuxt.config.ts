@@ -123,6 +123,11 @@ export default defineNuxtConfig({
     serverBundle: {
       collections: ['material-symbols-light'],
     },
+    clientBundle: {
+      // Bundle all icons found in source files into the client JS so they
+      // resolve without a server request (required for Tauri/static builds).
+      scan: true,
+    },
     customCollections: [
       {
         prefix: 'sageleaf-app',

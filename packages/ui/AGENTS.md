@@ -1,8 +1,3 @@
----
-paths:
-  - "packages/ui/**"
----
-
 # UI Package (`packages/ui/`) — Agent Rules
 
 **Package Name:** `@sageleaf/ui`
@@ -14,6 +9,7 @@ Shared Vue component library used by both `apps/frontend` and `apps/science`. Bu
 ## Usage
 
 Import components using the package name from consuming apps:
+
 ```typescript
 import { Component } from '@sageleaf/ui'
 ```
@@ -33,24 +29,27 @@ Components are also auto-imported in consuming apps (configured in their `nuxt.c
 UI components must **never** call `t()` on string props. The namespace must travel with the key, and the UI package has no knowledge of which namespace a consuming app uses.
 
 **Wrong:**
+
 ```vue
 <!-- List.vue -->
-<p>{{ t(item.title) }}</p>  <!-- ❌ translating a prop inside a shared component -->
+<p>{{ t(item.title) }}</p>
+<!-- ❌ translating a prop inside a shared component -->
 ```
 
 **Right:** render the prop directly; the caller is responsible for passing translated text:
+
 ```vue
 <!-- List.vue -->
-<p>{{ item.title }}</p>  <!-- ✓ render as-is -->
+<p>{{ item.title }}</p>
+<!-- ✓ render as-is -->
 
 <!-- Caller -->
 <UiList :items="[{ title: t.value('some.key', { ns: 'frontend' }) }]" />
 ```
 
-See `frontend.md` for the full translation patterns (`<T />` vs `t()` with inline `{ ns }`).
+See `apps/frontend/AGENTS.md` for the full translation patterns (`<T />` vs `t()` with inline `{ ns }`).
 
 **Do not edit files in `i18n/` directly** — they are synced from Tolgee. Run `nx i18n ui` to update.
-
 
 ```bash
 nx build ui                       # Build the component library
@@ -61,6 +60,7 @@ nx fmt ui                         # Format with oxfmt
 ## After Changes
 
 After modifying UI components, consuming apps may need to rebuild:
+
 ```bash
 nx build frontend
 nx build science

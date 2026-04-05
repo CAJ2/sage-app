@@ -1,33 +1,27 @@
----
-paths:
-  - 'apps/science/**'
----
-
 # Science App (`apps/science/`) — Agent Rules
 
 **Package Name:** `@sageleaf/science`
 
 ## Overview
 
-Nuxt 3-based scientific/research frontend for the Sage platform. Focused on data analysis, visualization, and scientific tools. **Desktop only** — no mobile targets.
+Nuxt 3-based data management frontend for the Sage platform. Focused on data analysis, visualization, and tools. **Desktop only** — no mobile targets.
 
 ## Framework & Architecture
 
 Same stack as `apps/frontend/` (Nuxt 4.x, Vue 3, Apollo GraphQL, DaisyUI/Tailwind, Pinia) but without Tauri mobile integration.
 
-**Key difference from frontend:** Science is desktop-focused with an emphasis on scientific features and data visualization. Refer to `.claude/rules/frontend.md` for shared patterns (Vue/Nuxt component structure, composables, GraphQL usage, routing, state management, styling, i18n).
+**Key difference from frontend:** Science is desktop-focused with an emphasis on data visualization. Refer to `apps/frontend/AGENTS.md` for shared patterns (Vue/Nuxt component structure, composables, GraphQL usage, routing, state management, styling, i18n).
 
 ## Internationalization
 
-Follows the same patterns as `apps/frontend/` — see `.claude/rules/frontend.md`. Namespace is `science`. Always co-locate the namespace with the key:
+Follows the same patterns as `apps/frontend/` — see `apps/frontend/AGENTS.md`. Namespace is `science`. Always co-locate the namespace with the key:
 
 ```vue
 <!-- template -->
 <T ns="science" key-name="nav.dashboard" />
 
 <!-- script -->
-const { t } = useTranslate()
-t.value('nav.dashboard', { ns: 'science' })
+const { t } = useTranslate() t.value('nav.dashboard', { ns: 'science' })
 ```
 
 **Do not edit files in `i18n/` directly** — they are synced from Tolgee. Run `nx i18n science` to update.

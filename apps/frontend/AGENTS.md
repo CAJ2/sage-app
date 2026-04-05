@@ -1,8 +1,3 @@
----
-paths:
-  - 'apps/frontend/**'
----
-
 # Frontend App (`apps/frontend/`) — Agent Rules
 
 **Package Name:** `@sageleaf/frontend`
@@ -176,12 +171,14 @@ nx i18n frontend
 The namespace must always be co-located with the key — never set at the `useTranslate()` call site.
 
 **In templates — always prefer `<T />`:**
+
 ```vue
 <T ns="frontend" key-name="some.key" />
 <T ns="common" key-name="other.key" />
 ```
 
 **In scripts — use `useTranslate()` with no namespace arg, pass `{ ns }` inline:**
+
 ```ts
 const { t } = useTranslate()
 const label = computed(() => t.value('some.key', { ns: 'frontend' }))
