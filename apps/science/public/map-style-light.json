@@ -4,7 +4,7 @@
     "protomaps": {
       "type": "vector",
       "attribution": "<a href=\"https://github.com/protomaps/basemaps\">Protomaps</a> © <a href=\"https://openstreetmap.org\">OpenStreetMap</a>",
-      "url": "pmtiles://https://sage-leaf-assets.fra1.digitaloceanspaces.com/pmtiles/20250518.pmtiles"
+      "url": "pmtiles://https://assets.sageleaf.app/pmtiles/20250518.pmtiles"
     }
   },
   "layers": [
@@ -3727,6 +3727,6 @@
       }
     }
   ],
-  "sprite": "https://protomaps.github.io/basemaps-assets/sprites/v4/light",
-  "glyphs": "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf"
+  "sprite": "https://assets.sageleaf.app/sprites/v4/light",
+  "glyphs": "https://assets.sageleaf.app/fonts/{fontstack}/{range}.pbf"
 }
