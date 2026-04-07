@@ -20,6 +20,10 @@ import { User } from '@src/users/users.entity'
 export class SourceService {
   constructor(private readonly em: EntityManager) {}
 
+  async user(userID: string) {
+    return this.em.findOne(User, { id: userID })
+  }
+
   async find(opts: CursorOptions<Source>) {
     const sources = await this.em.find(Source, opts.where, opts.options)
     const count = await this.em.count(Source, opts.where)

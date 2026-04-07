@@ -1,4 +1,4 @@
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
@@ -20,6 +20,7 @@ import {
 import { SourceSchemaService } from '@src/changes/source.schema'
 import { SourceService } from '@src/changes/source.service'
 import { TransformService } from '@src/common/transform'
+import { User } from '@src/users/users.model'
 
 @Resolver(() => Source)
 export class SourceResolver {
@@ -101,5 +102,12 @@ export class SourceResolver {
     const result = await this.sourceService.unlink(parsed)
     const model = await this.transform.entityToModel(Source, result.source)
     return { source: model }
+  }
+
+  @ResolveField(() => User)
+  async user(@Parent() source: Source): Promise<User> {
+    const user = await this.sourceService.user(source.user.id)
+    if (!user) throw new Error(`User not found for source ${source.id}`)
+    return this.transform.entityToModel(User, user)
   }
 }

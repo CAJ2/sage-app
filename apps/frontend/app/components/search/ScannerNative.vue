@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ImageIcon, SwitchCameraIcon, CircleIcon, PlayIcon } from '@lucide/vue'
 import type { ScanFrame } from '@sageleaf/scanleaf'
 import type { UnlistenFn } from '@tauri-apps/api/event'
 import { onMounted, onBeforeUnmount, ref } from 'vue'
@@ -132,6 +131,8 @@ const onImagePicked = async (event: Event) => {
     },
   )
 }
+
+defineExpose({ toggleFreeze, flipCamera, pickImage, frozen })
 </script>
 
 <template>
@@ -151,34 +152,6 @@ const onImagePicked = async (event: Event) => {
       >
         Paused
       </div>
-    </div>
-
-    <!-- Camera controls -->
-    <div class="absolute inset-x-0 bottom-10 flex items-center justify-center gap-10">
-      <!-- Gallery / image picker -->
-      <button
-        class="flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm active:scale-95"
-        @click="pickImage"
-      >
-        <ImageIcon :size="22" />
-      </button>
-
-      <!-- Capture / resume button -->
-      <button
-        class="flex h-18 w-18 items-center justify-center rounded-full bg-white shadow-lg ring-4 ring-white/40 active:scale-95"
-        @click="toggleFreeze"
-      >
-        <PlayIcon v-if="frozen" :size="28" class="translate-x-0.5 text-black" />
-        <CircleIcon v-else :size="36" class="text-black" fill="black" />
-      </button>
-
-      <!-- Flip camera -->
-      <button
-        class="flex h-12 w-12 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm active:scale-95"
-        @click="flipCamera"
-      >
-        <SwitchCameraIcon :size="22" />
-      </button>
     </div>
 
     <!-- Hidden file input -->

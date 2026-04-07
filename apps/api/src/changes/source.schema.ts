@@ -94,6 +94,7 @@ const ModelTransform = z.transform((input: TransformInput) => {
   model.contentURL = expandCdnUrl(entity.contentURL)
   model.processedAt = entity.processedAt ? DateTime.fromJSDate(entity.processedAt) : undefined
   model.metadata = entity.metadata
+  model.user = { id: entity.user.id } as any
   return model
 })
 

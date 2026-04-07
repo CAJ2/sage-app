@@ -47,6 +47,9 @@ export default defineNuxtConfig({
     clearScreen: false,
     envDir: fileURLToPath(new URL('.', import.meta.url)),
     envPrefix: ['VITE_', 'TAURI_'],
+    css: {
+      devSourcemap: true,
+    },
     server: {
       strictPort: true,
       hmr: tauriDevHost ? { protocol: 'ws', host: tauriDevHost, port: 5173 } : undefined,

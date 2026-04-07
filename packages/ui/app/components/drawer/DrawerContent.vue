@@ -27,7 +27,7 @@ const forwardedProps = useForwardPropsEmits(delegatedProps, emits)
         )
       "
     >
-      <div class="mx-auto mt-4 h-2 w-[100px] rounded-full dark:bg-neutral-600"></div>
+      <div class="mx-auto mt-4 h-2 w-[100px] rounded-full bg-neutral-300 dark:bg-neutral-600"></div>
       <slot />
     </DrawerContent>
   </DrawerPortal>

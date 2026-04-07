@@ -23,6 +23,8 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -233,9 +235,11 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         previewView = pv
-        val parent = webView.parent as ViewGroup
-        parent.addView(pv, 0)
-        Log.d(TAG, "setupPreviewView: added PreviewView to parent (windowed=$windowed)")
+        // Add to the decor view (the window's root, full physical screen) so the camera
+        // feed covers the entire screen including the area behind the status bar.
+        val decorView = activity.window.decorView as ViewGroup
+        decorView.addView(pv, 0)
+        Log.d(TAG, "setupPreviewView: added PreviewView to decorView (windowed=$windowed)")
 
         if (windowed) {
             webView.bringToFront()
@@ -252,7 +256,11 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
 
         val analysis = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .setTargetResolution(Size(1280, 720))
+            .setResolutionSelector(
+                ResolutionSelector.Builder()
+                    .setResolutionStrategy(ResolutionStrategy(Size(1280, 720), ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER))
+                    .build()
+            )
             .build()
         analysis.setAnalyzer(analysisExecutor, this)
         imageAnalysis = analysis
@@ -273,7 +281,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
         closeMLKitClients()
         activity.runOnUiThread {
             cameraProvider?.unbindAll()
-            previewView?.let { (webView.parent as? ViewGroup)?.removeView(it) }
+            previewView?.let { (activity.window.decorView as? ViewGroup)?.removeView(it) }
             previewView = null
             cameraProvider = null
             imageAnalysis = null
@@ -585,7 +593,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
     }
 
     @ActivityCallback
-    private fun openSettingsResult(invoke: Invoke, result: ActivityResult) {
+    private fun openSettingsResult(invoke: Invoke, @Suppress("UNUSED_PARAMETER") result: ActivityResult) {
         invoke.resolve()
     }
 }

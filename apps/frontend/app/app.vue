@@ -1,7 +1,10 @@
 <template>
   <TolgeeProvider>
     <template #fallback><div /></template>
+    <!-- Status-bar background overlay. Hidden on full-screen pages (e.g. scanner)
+         via useStatusBarOverlay(false). -->
     <div
+      v-if="statusBarOverlay"
       class="pointer-events-none fixed top-0 right-0 left-0 z-[100] bg-base-200"
       style="height: env(safe-area-inset-top)"
       aria-hidden="true"
@@ -14,6 +17,7 @@
   </TolgeeProvider>
 </template>
 <script setup lang="ts">
+import { isTauri } from '@tauri-apps/api/core'
 import { TolgeeProvider } from '@tolgee/vue'
 import { useDark } from '@vueuse/core'
 
@@ -21,12 +25,32 @@ useHead({
   title: 'Sage',
   meta: [{ name: 'description', content: 'Circular economy information.' }],
 })
-useDark({
+
+const isDark = useDark({
   selector: 'html',
   attribute: 'data-theme',
   valueDark: 'dark',
   valueLight: 'light',
 })
+
+// Push the app's actual color scheme to the Android status bar icon controller.
+// The Kotlin side registers "AndroidStatusBar" via addJavascriptInterface so it
+// is available synchronously from the first render.
+type NativeStatusBar = { setLight(isLight: boolean): void }
+const nativeStatusBar =
+  import.meta.client && isTauri()
+    ? (window as Window & { AndroidStatusBar?: NativeStatusBar }).AndroidStatusBar
+    : undefined
+
+watch(
+  isDark,
+  (dark) => {
+    nativeStatusBar?.setLight(!dark)
+  },
+  { immediate: true },
+)
+
+const statusBarOverlay = useState<boolean>('statusBarOverlay', () => true)
 </script>
 
 <style>

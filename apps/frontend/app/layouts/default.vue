@@ -3,7 +3,7 @@
     <div ref="topbarWrapper">
       <div
         v-if="!topbar.visible"
-        class="h-[env(safe-area-inset-top)] bg-base-200"
+        class="sticky top-0 z-40 h-[env(safe-area-inset-top)] bg-base-100"
         aria-hidden="true"
       />
       <NavTopbar
@@ -48,13 +48,15 @@ const topbar = useState<{
 const topbarWrapper = useTemplateRef('topbarWrapper')
 
 onMounted(() => {
+  // Keep topbar height CSS variable in sync
   const el = topbarWrapper.value as HTMLElement | null
-  if (!el) return
-  const update = () =>
-    document.documentElement.style.setProperty('--topbar-h', `${el.offsetHeight}px`)
-  update()
-  const ro = new ResizeObserver(update)
-  ro.observe(el)
-  onUnmounted(() => ro.disconnect())
+  if (el) {
+    const update = () =>
+      document.documentElement.style.setProperty('--topbar-h', `${el.offsetHeight}px`)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    onUnmounted(() => ro.disconnect())
+  }
 })
 </script>
