@@ -16,7 +16,7 @@ open class BuildTask : DefaultTask() {
 
     @TaskAction
     fun assemble() {
-        val executable = """pnpm""";
+        val executable = resolvePnpm()
         try {
             runTauriCli(executable)
         } catch (e: Exception) {
@@ -42,6 +42,29 @@ open class BuildTask : DefaultTask() {
                 throw e;
             }
         }
+    }
+
+    /**
+     * Resolves the pnpm executable path.
+     *
+     * Gradle subprocesses may be spawned with a restricted PATH that omits version
+     * manager shim directories (e.g. Volta, nvm, fnm). We probe known locations so
+     * the build works regardless of how pnpm was installed.
+     */
+    fun resolvePnpm(): String {
+        val home = System.getProperty("user.home") ?: return "pnpm"
+        val candidates = listOf(
+            "$home/.volta/bin/pnpm",       // Volta
+            "$home/.local/share/pnpm/pnpm", // standalone pnpm install script
+            "/opt/homebrew/bin/pnpm",       // Homebrew (Apple Silicon)
+            "/usr/local/bin/pnpm",          // Homebrew (Intel) / manual install
+        )
+        for (candidate in candidates) {
+            if (File(candidate).canExecute()) {
+                return candidate
+            }
+        }
+        return "pnpm" // fall back to PATH lookup
     }
 
     fun runTauriCli(executable: String) {

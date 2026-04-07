@@ -20,9 +20,8 @@ tauri-build = "2.5"
 tauri-plugin = "2.5"
 tauri-utils = "2.8"
 tauri-plugin-log = "2.8"
-tauri-plugin-barcode-scanner = "2.4"
-sageleaf-scanleaf = { path = "packages/scanleaf" }
 tauri-plugin-geolocation = "2.3.2"
+sageleaf-scanleaf = { path = "packages/scanleaf" }
 tauri-plugin-sql = "2.3.2"
 
 [profile.dev]

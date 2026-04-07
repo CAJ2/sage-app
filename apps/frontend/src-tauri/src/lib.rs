@@ -30,8 +30,6 @@ pub fn run() {
             #[cfg(mobile)]
             let _ = app.handle().plugin(tauri_plugin_geolocation::init());
             #[cfg(mobile)]
-            let _ = app.handle().plugin(tauri_plugin_barcode_scanner::init());
-            #[cfg(mobile)]
             let _ = app.handle().plugin(sageleaf_scanleaf::init());
             if cfg!(debug_assertions) {
                 app.handle().plugin(

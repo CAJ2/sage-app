@@ -47,6 +47,15 @@ export default defineNuxtConfig({
     clearScreen: false,
     envDir: fileURLToPath(new URL('.', import.meta.url)),
     envPrefix: ['VITE_', 'TAURI_'],
+    build: {
+      rollupOptions: {
+        // @tailwindcss/vite intentionally skips sourcemaps on its CSS transform pass
+        onwarn(warning, warn) {
+          if (warning.message.includes('Sourcemap is likely to be incorrect')) return
+          warn(warning)
+        },
+      },
+    },
     server: {
       strictPort: true,
       hmr: tauriDevHost ? { protocol: 'ws', host: tauriDevHost, port: 5173 } : undefined,

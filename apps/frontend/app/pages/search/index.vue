@@ -20,7 +20,7 @@
     </div>
     <div class="flex justify-center">
       <div class="w-full max-w-2xl px-5 pt-4">
-        <div class="relative items-center">
+        <div ref="searchBar" class="relative items-center">
           <FormInput
             id="search"
             v-model="searchInput"
@@ -106,7 +106,7 @@ import {
   SearchIcon,
   TagsIcon,
 } from '@lucide/vue'
-import { watchDebounced } from '@vueuse/core'
+import { useIntersectionObserver, watchDebounced } from '@vueuse/core'
 import type { Component } from 'vue'
 
 useTopbar(null)
@@ -168,6 +168,16 @@ const searchQuery = gql`
 `
 const searchInput = shallowRef('')
 const debouncedSearch = shallowRef('')
+
+// Blur the keyboard when the search bar is scrolled out of view
+const searchBar = useTemplateRef('searchBar')
+useIntersectionObserver(
+  searchBar,
+  ([entry]: IntersectionObserverEntry[]) => {
+    if (entry && !entry.isIntersecting) (document.activeElement as HTMLElement | null)?.blur()
+  },
+  { threshold: 0.5 },
+)
 
 watchDebounced(
   searchInput,

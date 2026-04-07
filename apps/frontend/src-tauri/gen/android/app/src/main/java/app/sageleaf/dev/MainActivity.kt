@@ -2,6 +2,7 @@ package app.sageleaf.dev
 
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebView
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,5 +30,11 @@ class MainActivity : TauriActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
+  }
+
+  override fun onWebViewCreate(webView: WebView) {
+    // Disable native Android overscroll stretch/glow effect on the WebView.
+    // CSS overscroll-behavior does not affect the native EdgeEffect layer.
+    webView.overScrollMode = View.OVER_SCROLL_NEVER
   }
 }
