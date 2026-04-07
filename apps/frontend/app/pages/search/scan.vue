@@ -13,7 +13,7 @@
 
     <!-- Rainbow scanning border -->
     <Transition name="rainbow">
-      <div v-if="isSearching" class="scan-border pointer-events-none absolute inset-0">
+      <div v-if="isSearching" ref="scanBorder" class="scan-border pointer-events-none absolute inset-0">
         <div class="scan-border-spin" />
       </div>
     </Transition>
@@ -128,6 +128,21 @@ useNavbar(false)
 useStatusBarOverlay(false)
 
 const isNative = isTauri()
+
+// Screen corner radius — read from the native bridge (Android 12+) so the rainbow
+// border exactly matches the device's rounded corners. Falls back to 46px on web.
+const scanBorder = useTemplateRef<HTMLElement>('scanBorder')
+
+onMounted(() => {
+  const bridge = import.meta.client && isNative
+    ? (window as Window & { AndroidStatusBar?: { getScreenCornerRadiusPx(): number } })
+        .AndroidStatusBar
+    : undefined
+  const radius = bridge ? bridge.getScreenCornerRadiusPx() : 0
+  if (radius > 0) {
+    document.documentElement.style.setProperty('--screen-corner-radius', `${radius}px`)
+  }
+})
 
 // Scanner ref
 
@@ -255,9 +270,12 @@ const MAX_DEBUG_FRAMES = 20
 </script>
 
 <style scoped>
-/* Mask the interior so only the border ring (padding area) is visible */
+/* Mask the interior so only the border ring (padding area) is visible.
+   border-radius matches the device's rounded screen corners via --screen-corner-radius
+   (injected from native on Android 12+; falls back to 46px approximation on web). */
 .scan-border {
   padding: 3px;
+  border-radius: var(--screen-corner-radius, 46px);
   overflow: hidden;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,

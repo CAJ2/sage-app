@@ -50,6 +50,21 @@ class MainActivity : TauriActivity() {
       lastKnownLight = isLight
       runOnUiThread { applySystemBarsAppearanceForLight(isLight) }
     }
+
+    // Returns the screen's corner radius in CSS pixels (dp), so the rainbow scan
+    // border can match the device's rounded corners exactly. Returns 40 as fallback.
+    @JavascriptInterface
+    fun getScreenCornerRadiusPx(): Float {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val corner = windowManager.currentWindowMetrics
+          .windowInsets
+          .getRoundedCorner(android.view.RoundedCorner.POSITION_TOP_LEFT)
+        if (corner != null) {
+          return corner.radius / resources.displayMetrics.density
+        }
+      }
+      return 40f
+    }
   }
 
   // Uses the last value reported by Vue, falling back to system dark mode before

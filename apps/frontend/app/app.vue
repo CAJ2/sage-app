@@ -2,10 +2,10 @@
   <TolgeeProvider>
     <template #fallback><div /></template>
     <!-- Status-bar background overlay. Hidden on full-screen pages (e.g. scanner)
-         via useStatusBarOverlay(false). Color matches base-100 to avoid gray mismatch. -->
+         via useStatusBarOverlay(false). -->
     <div
       v-if="statusBarOverlay"
-      class="pointer-events-none fixed top-0 right-0 left-0 z-[100] bg-base-100"
+      class="pointer-events-none fixed top-0 right-0 left-0 z-[100] bg-base-200"
       style="height: env(safe-area-inset-top)"
       aria-hidden="true"
     />
