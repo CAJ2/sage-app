@@ -235,9 +235,11 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         previewView = pv
-        val parent = webView.parent as ViewGroup
-        parent.addView(pv, 0)
-        Log.d(TAG, "setupPreviewView: added PreviewView to parent (windowed=$windowed)")
+        // Add to the decor view (the window's root, full physical screen) so the camera
+        // feed covers the entire screen including the area behind the status bar.
+        val decorView = activity.window.decorView as ViewGroup
+        decorView.addView(pv, 0)
+        Log.d(TAG, "setupPreviewView: added PreviewView to decorView (windowed=$windowed)")
 
         if (windowed) {
             webView.bringToFront()
@@ -279,7 +281,7 @@ class SageleafScanleafPlugin(private val activity: Activity) : Plugin(activity),
         closeMLKitClients()
         activity.runOnUiThread {
             cameraProvider?.unbindAll()
-            previewView?.let { (webView.parent as? ViewGroup)?.removeView(it) }
+            previewView?.let { (activity.window.decorView as? ViewGroup)?.removeView(it) }
             previewView = null
             cameraProvider = null
             imageAnalysis = null

@@ -11,7 +11,7 @@ export type ScanQueryType = 'barcode' | 'text' | null
 export interface ScanSearchOptions {
   /** Wait at least this long after the first frame before issuing a text query. Default: 700 */
   initialWaitMs: number
-  /** Minimum ms between successive text queries. Default: 1000 */
+  /** Minimum ms between successive queries (both barcode and text). Default: 1000 */
   minIntervalMs: number
   /** Options forwarded to the text reducer. */
   reduce: Partial<TextReduceOptions>
@@ -29,9 +29,11 @@ const DEFAULTS: ScanSearchOptions = {
 /**
  * Accumulates ScanFrames and produces rate-limited search queries.
  *
- * - Barcode detections bypass all debouncing and fire immediately.
- * - Text/label queries are delayed by `initialWaitMs` after the first frame,
- *   then throttled to at most one per `minIntervalMs`.
+ * - Barcode detections fire immediately on first detection, then throttle to
+ *   at most one per `minIntervalMs`.
+ * - Text/label queries wait `initialWaitMs` after the first frame, then
+ *   throttle to at most one per `minIntervalMs`.
+ * - A single shared timer ensures at most one pending query at a time.
  */
 export function useScanSearch(options?: Partial<ScanSearchOptions>) {
   const opts = { ...DEFAULTS, ...options }
@@ -44,6 +46,30 @@ export function useScanSearch(options?: Partial<ScanSearchOptions>) {
   let firstFrameAt: number | null = null
   let lastQueryAt = 0
   let pendingTimer: ReturnType<typeof setTimeout> | null = null
+
+  // Shared throttle: fires a barcode query immediately if the throttle window has
+  // passed, otherwise defers to the end of the window (always using the latest code).
+  function scheduleBarcodeQuery(code: string) {
+    if (pendingTimer !== null) {
+      clearTimeout(pendingTimer)
+      pendingTimer = null
+    }
+
+    const throttleRemaining = Math.max(0, opts.minIntervalMs - (Date.now() - lastQueryAt))
+
+    if (throttleRemaining === 0) {
+      lastQueryAt = Date.now()
+      query.value = code
+      queryType.value = 'barcode'
+    } else {
+      pendingTimer = setTimeout(() => {
+        pendingTimer = null
+        lastQueryAt = Date.now()
+        query.value = code
+        queryType.value = 'barcode'
+      }, throttleRemaining)
+    }
+  }
 
   function scheduleTextQuery() {
     if (pendingTimer !== null) return
@@ -75,17 +101,10 @@ export function useScanSearch(options?: Partial<ScanSearchOptions>) {
     if (firstFrameAt === null) firstFrameAt = Date.now()
     buffer.push(frame)
 
-    // Barcode fast-path: bypass rate limiting
     for (const barcode of frame.barcodes) {
       const { valid, modifiedCode } = validateBarcode(barcode.rawValue)
       if (valid) {
-        if (pendingTimer !== null) {
-          clearTimeout(pendingTimer)
-          pendingTimer = null
-        }
-        lastQueryAt = Date.now()
-        query.value = modifiedCode
-        queryType.value = 'barcode'
+        scheduleBarcodeQuery(modifiedCode)
         return
       }
     }
@@ -96,13 +115,7 @@ export function useScanSearch(options?: Partial<ScanSearchOptions>) {
   function addBarcode(code: string) {
     const { valid, modifiedCode } = validateBarcode(code)
     if (!valid) return
-    if (pendingTimer !== null) {
-      clearTimeout(pendingTimer)
-      pendingTimer = null
-    }
-    lastQueryAt = Date.now()
-    query.value = modifiedCode
-    queryType.value = 'barcode'
+    scheduleBarcodeQuery(modifiedCode)
   }
 
   function reset() {

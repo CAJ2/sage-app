@@ -28,6 +28,9 @@ const isOpen = defineModel<boolean>('open', { default: false })
     :should-scale-background="false"
   >
     <DrawerContent class="pointer-events-auto flex max-h-[85vh] flex-col">
+      <DrawerHeader>
+        <DrawerTitle>Results</DrawerTitle>
+      </DrawerHeader>
       <div class="flex-1 overflow-y-auto px-4 pb-8">
         <!-- Exact match section -->
         <template v-if="exactMatches.length">

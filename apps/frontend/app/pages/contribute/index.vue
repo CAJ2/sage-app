@@ -127,22 +127,20 @@
 
       <!-- Bottom CTAs -->
       <div class="flex flex-col gap-3">
-        <a
-          href="https://github.com/sage-eco/sageleaf/discussions"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          class="btn w-full py-8 text-base btn-outline"
+          @click="openUrl('https://github.com/sage-eco/sageleaf/discussions')"
         >
-          <button class="btn w-full py-8 text-base btn-outline">
-            <MessageSquare class="h-4 w-4" />
-            <T ns="common" key-name="cta.feedback" />
-          </button>
-        </a>
-        <a href="https://github.com/sage-eco/sageleaf" target="_blank" rel="noopener noreferrer">
-          <button class="btn w-full py-8 text-base btn-outline">
-            <GitBranch class="h-4 w-4" />
-            GitHub
-          </button>
-        </a>
+          <MessageSquare class="h-4 w-4" />
+          <T ns="common" key-name="cta.feedback" />
+        </button>
+        <button
+          class="btn w-full py-8 text-base btn-outline"
+          @click="openUrl('https://github.com/sage-eco/sageleaf')"
+        >
+          <GitBranch class="h-4 w-4" />
+          GitHub
+        </button>
       </div>
     </div>
   </div>
@@ -159,6 +157,8 @@ import {
   MessageSquare,
   Pencil,
 } from '@lucide/vue'
+import { isTauri } from '@tauri-apps/api/core'
+import { openUrl as tauriOpenUrl } from '@tauri-apps/plugin-opener'
 import { T, useTranslate } from '@tolgee/vue'
 
 import { graphql } from '~/gql'
@@ -167,6 +167,15 @@ import { ChangeStatus, FeedFormat } from '~/gql/types.generated'
 const { t } = useTranslate()
 
 useTopbar({ title: computed(() => t.value('contribute.title', { ns: 'frontend' })) })
+
+// Opens a URL in the system browser on native; falls back to window.open on web
+async function openUrl(url: string) {
+  if (isTauri()) {
+    await tauriOpenUrl(url)
+  } else {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+}
 
 const projectFeedQuery = graphql(`
   query ContributeProjectFeed($format: FeedFormat) {

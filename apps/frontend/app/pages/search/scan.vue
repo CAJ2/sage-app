@@ -19,7 +19,9 @@
     </Transition>
 
     <!-- Top nav: search/scan tab switcher + camera controls -->
-    <div class="absolute top-0 right-0 left-0 z-10 flex flex-col items-center gap-2 px-5 pt-5">
+    <div
+      class="absolute top-0 right-0 left-0 z-10 flex flex-col items-center gap-2 px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)]"
+    >
       <div class="grid w-full max-w-2xl grid-cols-2 rounded-lg bg-base-200/80 p-1 backdrop-blur-sm">
         <NuxtLink to="/search">
           <button class="flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-sm">
@@ -119,9 +121,11 @@ import type { ScanFrame } from '@sageleaf/scanleaf'
 import { isTauri } from '@tauri-apps/api/core'
 
 import type { ScanVariant } from '~/components/search/ScanResultsDrawer.vue'
+import { useStatusBarOverlay } from '~/composables/useStatusBarOverlay'
 
 useTopbar(null)
 useNavbar(false)
+useStatusBarOverlay(false)
 
 const isNative = isTauri()
 

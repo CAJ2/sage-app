@@ -5,6 +5,7 @@
   "permissions": [
     "sql:default",
     "sql:allow-execute",
+    "opener:default",
     "sageleaf-scanleaf:default",
     "geolocation:allow-check-permissions",
     "geolocation:allow-request-permissions",

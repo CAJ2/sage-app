@@ -3,7 +3,7 @@
     <div ref="topbarWrapper">
       <div
         v-if="!topbar.visible"
-        class="sticky top-0 z-40 h-[env(safe-area-inset-top)] bg-base-200"
+        class="sticky top-0 z-40 h-[env(safe-area-inset-top)] bg-base-100"
         aria-hidden="true"
       />
       <NavTopbar
