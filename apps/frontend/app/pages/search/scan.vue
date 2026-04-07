@@ -13,7 +13,11 @@
 
     <!-- Rainbow scanning border -->
     <Transition name="rainbow">
-      <div v-if="isSearching" ref="scanBorder" class="scan-border pointer-events-none absolute inset-0">
+      <div
+        v-if="isSearching"
+        ref="scanBorder"
+        class="scan-border pointer-events-none absolute inset-0"
+      >
         <div class="scan-border-spin" />
       </div>
     </Transition>
@@ -134,10 +138,11 @@ const isNative = isTauri()
 const scanBorder = useTemplateRef<HTMLElement>('scanBorder')
 
 onMounted(() => {
-  const bridge = import.meta.client && isNative
-    ? (window as Window & { AndroidStatusBar?: { getScreenCornerRadiusPx(): number } })
-        .AndroidStatusBar
-    : undefined
+  const bridge =
+    import.meta.client && isNative
+      ? (window as Window & { AndroidStatusBar?: { getScreenCornerRadiusPx(): number } })
+          .AndroidStatusBar
+      : undefined
   const radius = bridge ? bridge.getScreenCornerRadiusPx() : 0
   if (radius > 0) {
     document.documentElement.style.setProperty('--screen-corner-radius', `${radius}px`)
