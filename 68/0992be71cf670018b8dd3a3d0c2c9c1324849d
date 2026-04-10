@@ -1,0 +1,45 @@
+apps/science/app/pages/sources/[id].vue
+  5c274cca74db7a0e 4,131
+apps/science/app/layouts/default.vue
+  5c274cca74db7a0e 114-123,249-263,265-271
+apps/science/app/pages/changes/[id].vue
+  5c274cca74db7a0e 4,174
+apps/science/app/pages/places/[id].vue
+  5c274cca74db7a0e 4,153
+apps/science/app/pages/items/[id].vue
+  5c274cca74db7a0e 4,120
+apps/science/app/pages/materials/[id].vue
+  5c274cca74db7a0e 4,92
+apps/science/app/pages/variants/[id].vue
+  5c274cca74db7a0e 4,182
+apps/science/app/pages/categories/[id].vue
+  5c274cca74db7a0e 4,137
+apps/science/app/pages/processes/[id].vue
+  5c274cca74db7a0e 4,165
+apps/science/app/pages/components/[id].vue
+  5c274cca74db7a0e 4,160
+apps/science/app/plugins/apollo.ts
+  5c274cca74db7a0e 12-13,21-28
+apps/science/app/pages/orgs/[id].vue
+  5c274cca74db7a0e 4,136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "680992be71cf670018b8dd3a3d0c2c9c1324849d",
+  "prompts": {
+    "5c274cca74db7a0e": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "0275661e-a028-4e20-8eb9-4f7d5747eea3",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 63,
+      "total_deletions": 25,
+      "accepted_lines": 63,
+      "overriden_lines": 1
+    }
+  }
+}
