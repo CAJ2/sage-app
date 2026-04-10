@@ -70,7 +70,7 @@ export class PlaceSchemaService {
             addr.street = parsed.street
             addr.city = parsed.city
             addr.region = parsed.region
-            addr.postalCode = parsed.postalCode
+            addr.postcode = parsed.postcode
             addr.country = parsed.country
             model.address = addr
           }

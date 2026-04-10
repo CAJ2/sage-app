@@ -1050,7 +1050,7 @@ type PlaceAddress {
   city: String
   country: String
   housenumber: String
-  postalCode: String
+  postcode: String
   region: String
   street: String
 }

@@ -14,52 +14,33 @@ import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { TestVariantSeeder, VARIANT_IDS } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-import { MeiliService } from '@src/search/meilisearch.service'
+import { SEARCH_BACKEND } from '@src/search/search.backend'
 
 describe('SearchResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
   let searchMock: Mock<any>
-  let federatedSearchMock: Mock<any>
-  let getAvailableIndexesMock: Mock<any>
-  let getIndexEmbedderMock: Mock<any>
+  let multiSearchMock: Mock<any>
   let i18nService: I18nService
 
   const emptySearchResult = {
     hits: [],
-    query: '',
-    processingTimeMs: 0,
-    limit: 11,
-    offset: 0,
-    estimatedTotalHits: 0,
-  }
-
-  const emptyFederatedResult = {
-    hits: [],
-    processingTimeMs: 0,
-    limit: 11,
-    offset: 0,
-    estimatedTotalHits: 0,
+    found: 0,
   }
 
   beforeAll(async () => {
-    searchMock = vi.fn().mockResolvedValue(emptySearchResult)
-    federatedSearchMock = vi.fn().mockResolvedValue(emptyFederatedResult)
-    getAvailableIndexesMock = vi.fn().mockResolvedValue([])
-    getIndexEmbedderMock = vi.fn().mockResolvedValue(null)
-
-    const meiliService = {
-      search: searchMock,
-      federatedSearch: federatedSearchMock,
-      getAvailableIndexes: getAvailableIndexesMock,
-      getIndexEmbedder: getIndexEmbedderMock,
-    }
+    searchMock = vi.fn()
+    multiSearchMock = vi.fn()
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
     })
-      .overrideProvider(MeiliService)
-      .useValue(meiliService)
+      .overrideProvider(SEARCH_BACKEND)
+      .useValue({
+        search: searchMock,
+        multiSearch: multiSearchMock,
+        listCollections: vi.fn().mockResolvedValue([]),
+      })
       .compile()
 
     app = module.createNestApplication()
@@ -82,28 +63,31 @@ describe('SearchResolver (integration)', () => {
     await gql.signIn('admin', 'password')
   })
 
+  beforeEach(() => {
+    searchMock.mockReset()
+    searchMock.mockImplementation(() => emptySearchResult)
+
+    multiSearchMock.mockReset()
+    multiSearchMock.mockImplementation(({ searches }: { searches: { collection: string }[] }) => ({
+      results: searches.map(() => emptySearchResult),
+    }))
+  })
+
   afterAll(async () => {
     await app.close()
   })
 
-  test('should hydrate variant from database via federated search', async () => {
+  test('should hydrate variant from database via cross-type search', async () => {
     const variantId = VARIANT_IDS[0]
-    federatedSearchMock.mockResolvedValueOnce({
-      hits: [
-        {
-          id: variantId,
-          _federation: {
-            indexUid: 'variants_en',
-            queriesPosition: 0,
-            weightedRankingScore: 1.0,
-          },
-        },
-      ],
-      processingTimeMs: 2,
-      limit: 11,
-      offset: 0,
-      estimatedTotalHits: 1,
-    })
+    searchMock.mockImplementation(({ collection }: { collection: string }) =>
+      collection === 'variants'
+        ? {
+            hits: [{ id: variantId, sourceCollection: 'variants', score: 42 }],
+            found: 1,
+          }
+        : emptySearchResult,
+    )
+
     const res = await gql.send(
       graphql(`
         query SearchResolverSearchAll($query: String!, $limit: Int) {
@@ -128,6 +112,7 @@ describe('SearchResolver (integration)', () => {
         limit: 10,
       },
     )
+
     expect(res.data?.search).toBeTruthy()
     expect(res.data?.search.totalCount).toBe(1)
     expect(res.data?.search.nodes?.[0]?.__typename).toBe('Variant')
@@ -135,14 +120,19 @@ describe('SearchResolver (integration)', () => {
   })
 
   test('should hydrate categories from database via single-index search', async () => {
-    searchMock.mockResolvedValueOnce({
-      hits: [{ id: CATEGORY_IDS[0] }, { id: CATEGORY_IDS[1] }, { id: CATEGORY_IDS[2] }],
-      query: 'packaging',
-      processingTimeMs: 3,
-      limit: 11,
-      offset: 0,
-      estimatedTotalHits: 3,
-    })
+    searchMock.mockImplementation(({ collection }: { collection: string }) =>
+      collection === 'categories'
+        ? {
+            hits: [
+              { id: CATEGORY_IDS[0], sourceCollection: 'categories', score: 30 },
+              { id: CATEGORY_IDS[1], sourceCollection: 'categories', score: 20 },
+              { id: CATEGORY_IDS[2], sourceCollection: 'categories', score: 10 },
+            ],
+            found: 3,
+          }
+        : emptySearchResult,
+    )
+
     const res = await gql.send(
       graphql(`
         query SearchResolverCategoryResults($query: String!, $types: [SearchType!], $limit: Int) {
@@ -164,6 +154,7 @@ describe('SearchResolver (integration)', () => {
         limit: 10,
       },
     )
+
     expect(res.data?.search).toBeTruthy()
     expect(res.data?.search.totalCount).toBe(3)
     const nodes = res.data?.search.nodes as any[]
@@ -196,6 +187,7 @@ describe('SearchResolver (integration)', () => {
         limit: 10,
       },
     )
+
     expect(res.data?.search).toBeTruthy()
     expect(Array.isArray(res.data?.search.nodes)).toBe(true)
   })
@@ -218,10 +210,11 @@ describe('SearchResolver (integration)', () => {
       `),
       {
         query: 'test',
-        latlong: [37.7749, -122.4194], // San Francisco coordinates
+        latlong: [37.7749, -122.4194],
         limit: 10,
       },
     )
+
     expect(res.data?.search).toBeTruthy()
     expect(Array.isArray(res.data?.search.nodes)).toBe(true)
   })
@@ -243,14 +236,14 @@ describe('SearchResolver (integration)', () => {
         limit: 10,
       },
     )
+
     expect(res.data?.search).toBeTruthy()
     expect(res.data?.search.totalCount).toBe(0)
     expect(res.data?.search.nodes?.length).toBe(0)
   })
 
-  test('should fall back to _en index when lang-specific index is unavailable (single-index)', async () => {
+  test('should keep using the base collection for non-English queries', async () => {
     vi.spyOn(i18nService, 'getLang').mockReturnValueOnce('de')
-    getAvailableIndexesMock.mockResolvedValueOnce(['categories_en', 'categories_fr'])
 
     await gql.send(
       graphql(`
@@ -266,12 +259,16 @@ describe('SearchResolver (integration)', () => {
       { query: 'test', types: [SearchType.Category] },
     )
 
-    expect(searchMock).toHaveBeenCalledWith('categories_en', expect.anything(), expect.anything())
+    expect(searchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'categories',
+        options: expect.objectContaining({ lang: 'de' }),
+      }),
+    )
   })
 
-  test('should fall back to _en index when lang-specific index is unavailable (federated)', async () => {
+  test('should pass the active language while querying base collections across types', async () => {
     vi.spyOn(i18nService, 'getLang').mockReturnValueOnce('de')
-    getAvailableIndexesMock.mockResolvedValueOnce(['categories_en', 'items_en', 'items_de'])
 
     await gql.send(
       graphql(`
@@ -287,9 +284,70 @@ describe('SearchResolver (integration)', () => {
       { query: 'test', types: [SearchType.Category, SearchType.Item] },
     )
 
-    const calledIndexes = (federatedSearchMock.mock.calls.at(-1)![0] as any[]).map((q) => q.index)
-    expect(calledIndexes).toContain('categories_en') // fallback: de not available
-    expect(calledIndexes).toContain('items_de') // no fallback: de is available
+    expect(multiSearchMock).not.toHaveBeenCalled()
+    expect(
+      searchMock.mock.calls.map(([request]) => ({
+        collection: request.collection,
+        lang: request.options?.lang,
+      })),
+    ).toEqual([
+      { collection: 'categories', lang: 'de' },
+      { collection: 'items', lang: 'de' },
+    ])
+  })
+
+  test('should parse configured query filters and only search matching collections when no text remains', async () => {
+    searchMock.mockImplementation(({ collection, query, options }: any) =>
+      collection === 'variants' && query === ''
+        ? {
+            hits: [
+              {
+                id: VARIANT_IDS[0],
+                sourceCollection: 'variants',
+                score: 50,
+              },
+            ],
+            found: 1,
+          }
+        : emptySearchResult,
+    )
+
+    const res = await gql.send(
+      graphql(`
+        query SearchResolverQueryFilters($query: String!, $limit: Int) {
+          search(query: $query, limit: $limit) {
+            nodes {
+              __typename
+              ... on Named {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      {
+        query: 'code:07731343',
+        limit: 10,
+      },
+    )
+
+    expect(res.data?.search.totalCount).toBe(1)
+    expect(searchMock.mock.calls.map(([request]) => request.collection)).toEqual(['variants'])
+    expect(searchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'variants',
+        query: '',
+        options: expect.objectContaining({
+          filters: [
+            {
+              type: 'raw',
+              expression: 'code:07731343',
+            },
+          ],
+        }),
+      }),
+    )
   })
 
   test('should search with pagination', async () => {
@@ -318,6 +376,7 @@ describe('SearchResolver (integration)', () => {
         offset: 0,
       },
     )
+
     expect(res.data?.search).toBeTruthy()
     expect(Array.isArray(res.data?.search.nodes)).toBe(true)
   })

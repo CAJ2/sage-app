@@ -1446,7 +1446,7 @@ export type PlaceAddress = {
   city?: Maybe<Scalars['String']['output']>;
   country?: Maybe<Scalars['String']['output']>;
   housenumber?: Maybe<Scalars['String']['output']>;
-  postalCode?: Maybe<Scalars['String']['output']>;
+  postcode?: Maybe<Scalars['String']['output']>;
   region?: Maybe<Scalars['String']['output']>;
   street?: Maybe<Scalars['String']['output']>;
 };

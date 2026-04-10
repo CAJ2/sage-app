@@ -45,8 +45,8 @@
             <div v-if="entity.address.street || entity.address.housenumber">
               {{ [entity.address.street, entity.address.housenumber].filter(Boolean).join(' ') }}
             </div>
-            <div v-if="entity.address.city || entity.address.postalCode">
-              {{ [entity.address.postalCode, entity.address.city].filter(Boolean).join(' ') }}
+            <div v-if="entity.address.city || entity.address.postcode">
+              {{ [entity.address.postcode, entity.address.city].filter(Boolean).join(' ') }}
             </div>
             <div v-if="entity.address.region">{{ entity.address.region }}</div>
             <div v-if="entity.address.country" class="font-medium">
@@ -165,7 +165,7 @@ const detailQuery = graphql(`
         street
         housenumber
         city
-        postalCode
+        postcode
         region
         country
       }
