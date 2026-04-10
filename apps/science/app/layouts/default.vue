@@ -26,20 +26,43 @@
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem v-for="item in menuItems" :key="item.url">
-                  <SidebarMenuButton
-                    as-child
-                    class="h-12 px-4 hover:bg-primary/30 hover:text-primary"
-                    :class="{
-                      'text-primary dark:text-accent': activeTab === item.url,
-                    }"
-                  >
-                    <NuxtLink :to="item.url" class="flex content-center items-center">
-                      <component :is="item.icon" class="size-5 shrink-0" />
-                      <span class="pl-2">{{ item.title }}</span>
-                    </NuxtLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <Collapsible
+                  v-for="item in menuItems"
+                  :key="item.url"
+                  as-child
+                  class="group/collapsible"
+                  :open="activeTab === item.url"
+                  @update:open="(isOpen: boolean) => handleAccordion(isOpen, item.url)"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger as-child>
+                      <SidebarMenuButton
+                        class="h-12 px-4 hover:bg-primary/30 hover:text-primary"
+                        :class="{
+                          'text-primary dark:text-accent': activeTab === item.url,
+                        }"
+                      >
+                        <div class="flex w-full items-center">
+                          <component :is="item.icon" class="size-5 shrink-0" />
+                          <span class="pl-2">{{ item.title }}</span>
+                          <ChevronDown
+                            v-if="item.subItems && item.subItems.length > 0"
+                            class="ml-auto size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180"
+                          />
+                        </div>
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem v-for="sub in item.subItems" :key="sub.url">
+                          <SidebarMenuSubButton as-child :is-active="route.path === sub.url">
+                            <NuxtLink :to="sub.url">{{ sub.title }}</NuxtLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -79,14 +102,28 @@
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
+        <SidebarRail />
       </Sidebar>
-      <main class="flex w-full flex-col bg-base-200">
-        <div class="flex h-12 w-full items-center">
+      <SidebarInset>
+        <header class="flex h-12 w-full items-center">
           <SidebarTrigger v-if="!sidebarOpen" class="ml-2 text-neutral-400" />
           <SearchDialog />
+          <div class="flex-grow"></div>
+          <NavRegionSelector />
+        </header>
+        <div v-if="breadcrumbs.length > 0" class="breadcrumbs px-6 py-2 text-sm">
+          <ul>
+            <li><NuxtLink to="/">Home</NuxtLink></li>
+            <li v-for="(crumb, index) in breadcrumbs" :key="crumb.url">
+              <NuxtLink v-if="index < breadcrumbs.length - 1" :to="crumb.url">
+                {{ crumb.name }}
+              </NuxtLink>
+              <span v-else class="opacity-60">{{ crumb.name }}</span>
+            </li>
+          </ul>
         </div>
         <slot />
-      </main>
+      </SidebarInset>
     </SidebarProvider>
     <Dialog v-model:open="showSignIn">
       <DialogContent class="sm:max-w-[425px]">
@@ -107,6 +144,7 @@ import {
   Blocks,
   Building2,
   ChevronsUpDown,
+  ChevronDown,
   Database,
   GitMerge,
   Layers,
@@ -126,23 +164,111 @@ const showSignIn = useShowSignIn()
 const { t } = useTranslate()
 
 const menuItems = computed(() => [
-  { title: t.value('nav.dashboard', { ns: 'science' }), url: '/dashboard', icon: LayoutDashboard },
-  { title: t.value('nav.categories', { ns: 'science' }), url: '/categories', icon: Shapes },
-  { title: t.value('nav.items', { ns: 'science' }), url: '/items', icon: List },
-  { title: t.value('nav.variants', { ns: 'science' }), url: '/variants', icon: LayoutGrid },
-  { title: t.value('nav.components', { ns: 'science' }), url: '/components', icon: Blocks },
-  { title: t.value('nav.materials', { ns: 'science' }), url: '/materials', icon: Layers },
-  { title: t.value('nav.processes', { ns: 'science' }), url: '/processes', icon: Workflow },
-  { title: t.value('nav.sources', { ns: 'science' }), url: '/sources', icon: Database },
-  { title: t.value('nav.orgs', { ns: 'science' }), url: '/orgs', icon: Building2 },
-  { title: t.value('nav.places', { ns: 'science' }), url: '/places', icon: MapPin },
-  { title: t.value('nav.changes', { ns: 'science' }), url: '/changes', icon: GitMerge },
+  {
+    title: t.value('nav.dashboard', { ns: 'science' }),
+    url: '/dashboard',
+    icon: LayoutDashboard,
+    subItems: [{ title: t.value('nav.dashboard.index', { ns: 'science' }), url: '/dashboard' }],
+  },
+  {
+    title: t.value('nav.categories', { ns: 'science' }),
+    url: '/categories',
+    icon: Shapes,
+    subItems: [
+      { title: t.value('nav.categories.index', { ns: 'science' }), url: '/categories' },
+      {
+        title: t.value('nav.categories.hierarchy', { ns: 'science' }),
+        url: '/categories/hierarchy',
+      },
+    ],
+  },
+  {
+    title: t.value('nav.items', { ns: 'science' }),
+    url: '/items',
+    icon: List,
+    subItems: [{ title: t.value('nav.items.index', { ns: 'science' }), url: '/items' }],
+  },
+  {
+    title: t.value('nav.variants', { ns: 'science' }),
+    url: '/variants',
+    icon: LayoutGrid,
+    subItems: [{ title: t.value('nav.variants.index', { ns: 'science' }), url: '/variants' }],
+  },
+  {
+    title: t.value('nav.components', { ns: 'science' }),
+    url: '/components',
+    icon: Blocks,
+    subItems: [{ title: t.value('nav.components.index', { ns: 'science' }), url: '/components' }],
+  },
+  {
+    title: t.value('nav.materials', { ns: 'science' }),
+    url: '/materials',
+    icon: Layers,
+    subItems: [{ title: t.value('nav.materials.index', { ns: 'science' }), url: '/materials' }],
+  },
+  {
+    title: t.value('nav.processes', { ns: 'science' }),
+    url: '/processes',
+    icon: Workflow,
+    subItems: [
+      { title: t.value('nav.processes.index', { ns: 'science' }), url: '/processes' },
+      { title: t.value('nav.processes.materials', { ns: 'science' }), url: '/processes/materials' },
+    ],
+  },
+  {
+    title: t.value('nav.sources', { ns: 'science' }),
+    url: '/sources',
+    icon: Database,
+    subItems: [{ title: t.value('nav.sources.index', { ns: 'science' }), url: '/sources' }],
+  },
+  {
+    title: t.value('nav.orgs', { ns: 'science' }),
+    url: '/orgs',
+    icon: Building2,
+    subItems: [{ title: t.value('nav.orgs.index', { ns: 'science' }), url: '/orgs' }],
+  },
+  {
+    title: t.value('nav.places', { ns: 'science' }),
+    url: '/places',
+    icon: MapPin,
+    subItems: [{ title: t.value('nav.places.index', { ns: 'science' }), url: '/places' }],
+  },
+  {
+    title: t.value('nav.changes', { ns: 'science' }),
+    url: '/changes',
+    icon: GitMerge,
+    subItems: [{ title: t.value('nav.changes.index', { ns: 'science' }), url: '/changes' }],
+  },
 ])
 
 const router = useRouter()
 const auth = useAuthClient()
 const session = useAuthSession()
 const route = useRoute()
+
+const breadcrumbs = computed(() => {
+  const fullPath = route.path
+  if (fullPath === '/' || fullPath === '/dashboard') return []
+
+  const segments = fullPath.split('/').filter(Boolean)
+  const paths: { name: string; url: string }[] = []
+  let currentPath = ''
+
+  for (const segment of segments) {
+    currentPath += `/${segment}`
+    // Filter for 21-character NanoIDs
+    const isId = /^[A-Za-z0-9_-]{21}$/.test(segment)
+    paths.push({
+      name: isId
+        ? 'Details'
+        : segment.charAt(0).toUpperCase() + segment.slice(1).replaceAll('-', ' '),
+      url: currentPath,
+    })
+  }
+
+  return paths
+})
+
 const activeTab = computed(() => {
   const currentPath = route.path
   const currentTab = menuItems.value.find((tab) => {
@@ -150,6 +276,12 @@ const activeTab = computed(() => {
   })
   return currentTab ? currentTab.url : null
 })
+
+const handleAccordion = (isOpen: boolean, url: string) => {
+  if (isOpen && route.path !== url && !route.path.startsWith(url + '/')) {
+    router.push(url)
+  }
+}
 
 const signIn = async () => {
   session.value = await auth.getSession()

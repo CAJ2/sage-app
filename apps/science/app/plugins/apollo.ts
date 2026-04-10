@@ -9,6 +9,8 @@ export default defineNuxtPlugin(({ hook }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultClient: ApolloClient<any> = (clients as any).default
 
+  const regionStore = useRegionStore()
+
   const ctxLink = setContext((_, { headers }) => {
     const { $tolgee } = useNuxtApp()
     const locale = ($tolgee as TolgeeInstance | undefined)?.getLanguage() ?? ''
@@ -16,7 +18,14 @@ export default defineNuxtPlugin(({ hook }) => {
     if (locale) {
       lang = locale + ',' + lang
     }
-    return { headers: { ...headers, 'Accept-Language': lang } }
+    const xLocation = regionStore.selectedRegionId
+    return {
+      headers: {
+        ...headers,
+        'Accept-Language': lang,
+        ...(xLocation ? { 'X-Location': xLocation } : {}),
+      },
+    }
   })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

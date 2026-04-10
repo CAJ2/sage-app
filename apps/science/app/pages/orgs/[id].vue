@@ -1,9 +1,8 @@
 <template>
   <div>
     <div class="flex items-start gap-3 p-3">
-      <Button variant="ghost" @click="navigateTo('/orgs')">
+      <Button variant="ghost" @click="router.back()">
         <ArrowLeft class="size-4" />
-        Organizations
       </Button>
       <div class="flex-1">
         <h1 class="text-xl font-bold">{{ entity?.name ?? id }}</h1>
@@ -134,6 +133,7 @@ import { ArrowLeft } from '@lucide/vue'
 import { graphql } from '~/gql'
 
 const route = useRoute()
+const router = useRouter()
 const id = route.params.id as string
 
 const detailQuery = graphql(`
