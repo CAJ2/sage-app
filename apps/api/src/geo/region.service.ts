@@ -6,7 +6,7 @@ import { BadRequestErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
-import { SearchIndex } from '@src/search/meilisearch.service'
+import { SearchIndex } from '@src/search/search.backend'
 import { SearchService } from '@src/search/search.service'
 
 @Injectable()

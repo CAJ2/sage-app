@@ -42,7 +42,7 @@ export class PlaceAddress {
   region?: string
 
   @Field(() => String, { nullable: true })
-  postalCode?: string
+  postcode?: string
 
   @Field(() => String, { nullable: true })
   country?: string

@@ -23,4 +23,11 @@ export default (): Record<string, unknown> => ({
   dragonfly: {
     url: process.env.DRAGONFLY_URL,
   },
+  typesense: {
+    host: process.env.TYPESENSE_HOST,
+    apiKey: process.env.TYPESENSE_API_KEY,
+  },
+  mistral: {
+    apiKey: process.env.MISTRAL_API_KEY,
+  },
 })

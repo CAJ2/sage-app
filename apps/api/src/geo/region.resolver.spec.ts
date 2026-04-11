@@ -10,7 +10,7 @@ import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { RegionSeeder } from '@src/db/seeds/RegionSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
-import { MeiliService } from '@src/search/meilisearch.service'
+import { SEARCH_BACKEND } from '@src/search/search.backend'
 
 describe('RegionResolver (integration)', () => {
   let app: INestApplication
@@ -18,13 +18,19 @@ describe('RegionResolver (integration)', () => {
   let searchMock: Mock<any>
 
   beforeAll(async () => {
-    searchMock = vi.fn().mockResolvedValue({ hits: [], totalHits: 0 })
+    searchMock = vi.fn().mockResolvedValue({ hits: [], found: 0 })
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
     })
-      .overrideProvider(MeiliService)
-      .useValue({ search: searchMock, getAvailableIndexes: vi.fn().mockResolvedValue([]) })
+      .overrideProvider(SEARCH_BACKEND)
+      .useValue({
+        search: searchMock,
+        multiSearch: vi.fn(({ searches }: { searches: unknown[] }) => ({
+          results: searches.map(() => ({ hits: [], found: 0 })),
+        })),
+        listCollections: vi.fn().mockResolvedValue([]),
+      })
       .compile()
 
     app = module.createNestApplication()
@@ -85,7 +91,7 @@ describe('RegionResolver (integration)', () => {
         }
       `),
       {
-        latlong: [37.7749, -122.4194], // San Francisco coordinates
+        latlong: [37.7749, -122.4194],
         first: 10,
       },
     )
@@ -140,7 +146,7 @@ describe('RegionResolver (integration)', () => {
       expect(res.data?.region?.province).toBeNull()
     })
 
-    test('USA has no ancestors — all hierarchy fields are null', async () => {
+    test('USA has no ancestors and all hierarchy fields are null', async () => {
       const res = await gql.send(hierarchyQuery, { id: 'wof_85633793' })
       expect(res.data?.region?.county).toBeNull()
       expect(res.data?.region?.province).toBeNull()
@@ -151,11 +157,14 @@ describe('RegionResolver (integration)', () => {
   describe('searchWithin', () => {
     beforeEach(() => {
       searchMock.mockReset()
-      searchMock.mockResolvedValue({ hits: [], totalHits: 0 })
+      searchMock.mockResolvedValue({ hits: [], found: 0 })
     })
 
-    test('returns Meili hits hydrated from DB', async () => {
-      searchMock.mockResolvedValueOnce({ hits: [{ id: 'wof_102087579' }], totalHits: 1 })
+    test('returns backend hits hydrated from DB', async () => {
+      searchMock.mockResolvedValueOnce({
+        hits: [{ id: 'wof_102087579', sourceCollection: 'regions', score: 100 }],
+        found: 1,
+      })
       const res = await gql.send(
         graphql(`
           query RegionSearchWithin($id: ID!) {
@@ -174,16 +183,20 @@ describe('RegionResolver (integration)', () => {
       expect(res.data?.region?.searchWithin?.totalCount).toBe(1)
       expect(res.data?.region?.searchWithin?.nodes?.[0]?.id).toBe('wof_102087579')
       expect(searchMock).toHaveBeenCalledWith(
-        expect.stringContaining('regions'),
-        'francisco',
         expect.objectContaining({
-          filter: expect.arrayContaining([expect.stringContaining('_geoBoundingBox')]),
+          collection: 'regions',
+          query: 'francisco',
+          options: expect.objectContaining({
+            geo: expect.objectContaining({
+              type: 'boundingBox',
+            }),
+          }),
         }),
       )
     })
 
-    test('passes adminLevel filter to Meili', async () => {
-      searchMock.mockResolvedValueOnce({ hits: [], totalHits: 0 })
+    test('passes adminLevel filter to the search backend', async () => {
+      searchMock.mockResolvedValueOnce({ hits: [], found: 0 })
       await gql.send(
         graphql(`
           query RegionSearchWithinAdminLevel($id: ID!) {
@@ -197,10 +210,11 @@ describe('RegionResolver (integration)', () => {
         { id: 'wof_85633793' },
       )
       expect(searchMock).toHaveBeenCalledWith(
-        expect.any(String),
-        'city',
         expect.objectContaining({
-          filter: expect.arrayContaining(['adminLevel = 6']),
+          query: 'city',
+          options: expect.objectContaining({
+            filters: [{ type: 'field', field: 'adminLevel', operator: '=', value: 6 }],
+          }),
         }),
       )
     })
@@ -249,7 +263,6 @@ describe('RegionResolver (integration)', () => {
       )
       expect(res.data?.currentRegion?.region?.id).toBe('wof_102087579')
       expect(res.data?.currentRegion?.region?.placetype).toBe('county')
-      // hierarchy: SF county first (adminLevel=6), then CA (4), then US (2)
       const hierarchy = res.data?.currentRegion?.regionHierarchy
       expect(hierarchy?.length).toBe(3)
       expect(hierarchy?.[0]?.id).toBe('wof_102087579')
@@ -275,7 +288,6 @@ describe('RegionResolver (integration)', () => {
           }
         `),
       )
-      // SF coordinates fall inside the SF county bbox — same hierarchy as the WoF ID test
       const hierarchy = res.data?.currentRegion?.regionHierarchy
       expect(res.data?.currentRegion?.region?.id).toBe('wof_102087579')
       expect(hierarchy?.length).toBe(3)

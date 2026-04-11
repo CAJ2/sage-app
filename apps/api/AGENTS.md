@@ -82,7 +82,7 @@ nx fmt:ci api              # Check formatting for CI
 - **Database:** @mikro-orm/core, @mikro-orm/postgresql
 - **Auth:** better-auth
 - **Validation:** class-transformer, zod
-- **Search:** meilisearch
+- **Search:** typesense
 - **Utilities:** lodash, luxon, nanoid
 
 ## NestJS Patterns

@@ -38,6 +38,7 @@
     "@mikro-orm/reflection": "^6.6.6",
     "@mikro-orm/seeder": "^6.6.6",
     "@mikro-orm/sql-highlighter": "^1.0.1",
+    "@mistralai/mistralai": "^2.2.0",
     "@nestjs/apollo": "^13.2.4",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.1.17",
@@ -66,7 +67,6 @@
     "kysely-knex": "^0.2.0",
     "lodash": "^4.17.23",
     "luxon": "^3.7.2",
-    "meilisearch": "^0.56.0",
     "nanoid": "^3.0.0",
     "nestjs-cls": "^6.2.0",
     "nestjs-i18n": "^10.5.1",
@@ -77,6 +77,7 @@
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.2",
     "sql-formatter": "^15.7.2",
+    "typesense": "^3.0.5",
     "windmill-client": "^1.666.0",
     "zod": "^4.3.6"
   },

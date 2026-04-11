@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 
 import { InternalServerErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
@@ -10,16 +10,26 @@ import { Material } from '@src/process/material.entity'
 import { Category } from '@src/product/category.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
-import { MeiliService, SearchIndex } from '@src/search/meilisearch.service'
+import { MistralService } from '@src/search/mistral.service'
+import {
+  SEARCH_BACKEND,
+  SearchBackendFilter,
+  SearchBackendGeoFilter,
+  SearchBackendHit,
+  SearchIndex,
+} from '@src/search/search.backend'
+import type { SearchBackend } from '@src/search/search.backend'
 import { SearchType } from '@src/search/search.model'
+import { parseSearchQuery } from '@src/search/search.query-filters'
 import { Org } from '@src/users/org.entity'
 
 @Injectable()
 export class SearchService {
   constructor(
-    private readonly meili: MeiliService,
+    @Inject(SEARCH_BACKEND) private readonly searchBackend: SearchBackend,
     private readonly i18n: I18nService,
     private readonly metaService: MetaService,
+    private readonly mistralService: MistralService,
   ) {}
 
   typeIndexMap: Record<SearchType, SearchIndex> = {
@@ -53,17 +63,9 @@ export class SearchService {
     return this.indexEntityClassMap[base]
   }
 
-  private resolveIndex(index: SearchIndex, lang: string, available: string[]): string {
-    const candidate = `${index}_${lang}`
-    if (lang === 'en') return candidate
-    return available.includes(candidate) ? candidate : `${index}_en`
-  }
-
-  private async hydrateHits(hits: any[], defaultEntityClass?: any) {
+  private async hydrateHits(hits: SearchBackendHit[], defaultEntityClass?: any) {
     const classByHit = hits.map((h) => {
-      const entityClass =
-        defaultEntityClass ??
-        (h._federation ? this.mapIndexToEntityClass(h._federation.indexUid) : null)
+      const entityClass = defaultEntityClass ?? this.mapIndexToEntityClass(h.sourceCollection)
       return { hit: h, entityClass }
     })
 
@@ -91,15 +93,64 @@ export class SearchService {
       const entity = entityByClassById.get(entityClass)?.get(hit.id)
       if (!entity) continue
       entity._type = entityClass.name
-      if (hit._geo) {
+      if (hit.geo) {
         entity.location = {
-          latitude: hit._geo.lat,
-          longitude: hit._geo.lng,
+          latitude: hit.geo.latitude,
+          longitude: hit.geo.longitude,
         }
       }
       result.push(entity)
     }
     return result
+  }
+
+  private buildGeoFilter(latLong?: number[]): SearchBackendGeoFilter | undefined {
+    if (!latLong || latLong.length < 2) {
+      return undefined
+    }
+
+    if (latLong.length === 2) {
+      return {
+        type: 'radius',
+        latitude: latLong[0],
+        longitude: latLong[1],
+        distanceMeters: 10000,
+      }
+    }
+
+    if (latLong.length === 3) {
+      return {
+        type: 'radius',
+        latitude: latLong[0],
+        longitude: latLong[1],
+        distanceMeters: latLong[2],
+      }
+    }
+
+    if (latLong.length === 4) {
+      return {
+        type: 'boundingBox',
+        topLeft: {
+          latitude: latLong[0],
+          longitude: latLong[1],
+        },
+        bottomRight: {
+          latitude: latLong[2],
+          longitude: latLong[3],
+        },
+      }
+    }
+
+    return undefined
+  }
+
+  private buildSearchKey(hit: SearchBackendHit) {
+    const entityClass = this.mapIndexToEntityClass(hit.sourceCollection)
+    return `${entityClass?.name || hit.sourceCollection}:${hit.id}`
+  }
+
+  private rankHits(hits: SearchBackendHit[]) {
+    return [...hits].sort((a, b) => b.score - a.score)
   }
 
   async searchWithin(
@@ -115,20 +166,50 @@ export class SearchService {
     if ([minLon, minLat, maxLon, maxLat].some((n) => isNaN(n))) {
       throw InternalServerErr(`Invalid bbox format for searchWithin: "${bbox}"`)
     }
-    const filters: string[] = [`_geoBoundingBox([${maxLat}, ${maxLon}], [${minLat}, ${minLon}])`]
+    const { textQuery, filtersByIndex } = parseSearchQuery(query, [index])
+    const filters: SearchBackendFilter[] = [...(filtersByIndex.get(index) || [])]
     if (opts.adminLevel !== undefined) {
-      filters.push(`adminLevel = ${opts.adminLevel}`)
+      filters.push({
+        type: 'field',
+        field: 'adminLevel',
+        operator: '=',
+        value: opts.adminLevel,
+      })
     }
     const lang = this.i18n.getLang()
-    const available = lang !== 'en' ? await this.meili.getAvailableIndexes() : []
-    const result = await this.meili.search(this.resolveIndex(index, lang, available), query, {
-      filter: filters,
-      limit: opts.limit ?? 10,
-      offset: opts.offset ?? 0,
+    const fetchLimit = (opts.limit ?? 10) + (opts.offset ?? 0)
+
+    const words = textQuery.trim().split(/\s+/)
+    let vector: number[] | undefined
+    if (words.length >= 2 && words[0] !== '') {
+      vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
+    }
+
+    const result = await this.searchBackend.search({
+      collection: index,
+      query: textQuery,
+      options: {
+        lang,
+        filters,
+        vector,
+        geo: {
+          type: 'boundingBox',
+          topLeft: {
+            latitude: maxLat,
+            longitude: maxLon,
+          },
+          bottomRight: {
+            latitude: minLat,
+            longitude: minLon,
+          },
+        },
+        limit: fetchLimit,
+      },
     })
     const entityClass = this.mapIndexToEntityClass(index)
-    const items = await this.hydrateHits(result.hits, entityClass)
-    return { items, count: result.totalHits ?? result.estimatedTotalHits ?? 0 }
+    const hits = result.hits.slice(opts.offset ?? 0, (opts.offset ?? 0) + (opts.limit ?? 10))
+    const items = await this.hydrateHits(hits, entityClass)
+    return { items, count: result.found }
   }
 
   async searchAll(
@@ -147,47 +228,65 @@ export class SearchService {
         SearchIndex.ORGS,
         SearchIndex.PLACES,
       ] as SearchIndex[])
-    if (!query && !idxs.find((i) => i === SearchIndex.PLACES)) {
+    const { textQuery, filtersByIndex } = parseSearchQuery(query, idxs)
+    const geo = this.buildGeoFilter(latLong)
+    const searchableIndexes = idxs.filter((idx) => {
+      const filters = filtersByIndex.get(idx) || []
+      return Boolean(textQuery || geo || filters.length > 0)
+    })
+
+    if (searchableIndexes.length === 0) {
       return null
     }
-    const filters = []
-    if (latLong && latLong.length === 2) {
-      const geoFilter = `_geoRadius(${latLong[0]}, ${latLong[1]}, 10000)`
-      filters.push(geoFilter)
-    } else if (latLong && latLong.length === 3) {
-      const geoFilter = `_geoRadius(${latLong[0]}, ${latLong[1]}, ${latLong[2]})`
-      filters.push(geoFilter)
-    } else if (latLong && latLong.length === 4) {
-      const geoFilter = `_geoBoundingBox([${latLong[0]}, ${latLong[1]}], [${latLong[2]}, ${latLong[3]}])`
-      filters.push(geoFilter)
+
+    const words = textQuery.trim().split(/\s+/)
+    let vector: number[] | undefined
+    if (words.length >= 2 && words[0] !== '') {
+      vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
     }
+
     const lang = this.i18n.getLang()
-    const available = lang !== 'en' ? await this.meili.getAvailableIndexes() : []
-    if (idxs.length === 1) {
-      const results = await this.meili.search(this.resolveIndex(idxs[0], lang, available), query, {
-        filter: filters.length > 0 ? filters : undefined,
-        limit: limit ? limit + 1 : 11,
-        offset,
-      })
-      const entityClass = this.mapIndexToEntityClass(idxs[0])
-      const items = await this.hydrateHits(results.hits, entityClass)
-      return {
-        items,
-        count: results.totalHits || results.estimatedTotalHits || 0,
+    const fetchLimit = (limit ? limit + 1 : 11) + (offset ?? 0)
+    const multiResult = await this.searchBackend.multiSearch({
+      searches: searchableIndexes.map((idx) => ({
+        collection: idx,
+        query: textQuery,
+        options: {
+          lang,
+          ...(filtersByIndex.get(idx)?.length ? { filters: filtersByIndex.get(idx) } : {}),
+          geo,
+          vector,
+          limit: fetchLimit,
+        },
+      })),
+    })
+    const results = multiResult.results
+
+    const combinedHits: SearchBackendHit[] = []
+    const seen = new Set<string>()
+    let count = 0
+
+    for (const result of results) {
+      count += result.found
+      for (const hit of result.hits) {
+        const key = this.buildSearchKey(hit)
+        if (seen.has(key)) {
+          continue
+        }
+        seen.add(key)
+        combinedHits.push(hit)
       }
     }
-    const results = await this.meili.federatedSearch(
-      idxs.map((idx) => ({
-        index: this.resolveIndex(idx, lang, available),
-        query,
-      })),
-      limit ? limit + 1 : 11,
-      offset,
+
+    const rankedHits = this.rankHits(combinedHits)
+    const windowedHits = rankedHits.slice(offset ?? 0, (offset ?? 0) + (limit ? limit + 1 : 11))
+    const items = await this.hydrateHits(
+      windowedHits,
+      searchableIndexes.length === 1 ? this.mapIndexToEntityClass(searchableIndexes[0]) : undefined,
     )
-    const items = await this.hydrateHits(results.hits.filter((h) => h._federation))
     return {
       items,
-      count: results.totalHits || results.estimatedTotalHits || 0,
+      count,
     }
   }
 }
