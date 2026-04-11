@@ -68,7 +68,7 @@ describe('SearchResolver (integration)', () => {
     searchMock.mockImplementation(() => emptySearchResult)
 
     multiSearchMock.mockReset()
-    multiSearchMock.mockImplementation(({ searches }: { searches: { collection: string }[] }) => ({
+    multiSearchMock.mockImplementation(({ searches }: any) => ({
       results: searches.map(() => emptySearchResult),
     }))
   })
@@ -79,7 +79,7 @@ describe('SearchResolver (integration)', () => {
 
   test('should hydrate variant from database via cross-type search', async () => {
     const variantId = VARIANT_IDS[0]
-    searchMock.mockImplementation(({ collection }: { collection: string }) =>
+    searchMock.mockImplementation(({ collection }: any) =>
       collection === 'variants'
         ? {
             hits: [{ id: variantId, sourceCollection: 'variants', score: 42 }],
@@ -120,7 +120,7 @@ describe('SearchResolver (integration)', () => {
   })
 
   test('should hydrate categories from database via single-index search', async () => {
-    searchMock.mockImplementation(({ collection }: { collection: string }) =>
+    searchMock.mockImplementation(({ collection }: any) =>
       collection === 'categories'
         ? {
             hits: [
@@ -286,7 +286,7 @@ describe('SearchResolver (integration)', () => {
 
     expect(multiSearchMock).not.toHaveBeenCalled()
     expect(
-      searchMock.mock.calls.map(([request]) => ({
+      searchMock.mock.calls.map(([request]: any) => ({
         collection: request.collection,
         lang: request.options?.lang,
       })),
@@ -333,7 +333,7 @@ describe('SearchResolver (integration)', () => {
     )
 
     expect(res.data?.search.totalCount).toBe(1)
-    expect(searchMock.mock.calls.map(([request]) => request.collection)).toEqual(['variants'])
+    expect(searchMock.mock.calls.map(([request]: any) => request.collection)).toEqual(['variants'])
     expect(searchMock).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'variants',
