@@ -102,13 +102,11 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
   }
 
   async search(request: SearchBackendSearchRequest): Promise<SearchBackendSearchResult> {
-    const schema = await this.getCollectionSchema(request.collection)
-    const searchResult = await this.requireClient()
-      .collections<TypesenseDocument>(request.collection)
-      .documents()
-      .search(this.buildSearchParams(request, schema))
+    const multiResult = await this.multiSearch({
+      searches: [request],
+    })
 
-    return this.normalizeSearchResponse(searchResult, request.collection)
+    return multiResult.results[0]
   }
 
   async multiSearch(
@@ -255,6 +253,9 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
     includeCollection = false,
   ) {
     const filterBy = this.buildFilterBy(request.options?.filters, request.options?.geo)
+    const vectorQuery = request.options?.vector
+      ? `embedding:([${request.options.vector.join(',')}])`
+      : undefined
 
     return {
       ...(includeCollection ? { collection: request.collection } : {}),
@@ -265,6 +266,7 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
       ...(request.options?.limit !== undefined ? { limit: request.options.limit } : {}),
       ...(request.options?.offset !== undefined ? { offset: request.options.offset } : {}),
       ...(filterBy ? { filter_by: filterBy } : {}),
+      ...(vectorQuery ? { vector_query: vectorQuery } : {}),
     }
   }
 

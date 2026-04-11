@@ -10,6 +10,7 @@ import { Material } from '@src/process/material.entity'
 import { Category } from '@src/product/category.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
+import { MistralService } from '@src/search/mistral.service'
 import {
   SEARCH_BACKEND,
   SearchBackendFilter,
@@ -28,6 +29,7 @@ export class SearchService {
     @Inject(SEARCH_BACKEND) private readonly searchBackend: SearchBackend,
     private readonly i18n: I18nService,
     private readonly metaService: MetaService,
+    private readonly mistralService: MistralService,
   ) {}
 
   typeIndexMap: Record<SearchType, SearchIndex> = {
@@ -176,12 +178,20 @@ export class SearchService {
     }
     const lang = this.i18n.getLang()
     const fetchLimit = (opts.limit ?? 10) + (opts.offset ?? 0)
+
+    const words = textQuery.trim().split(/\s+/)
+    let vector: number[] | undefined
+    if (words.length >= 2 && words[0] !== '') {
+      vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
+    }
+
     const result = await this.searchBackend.search({
       collection: index,
       query: textQuery,
       options: {
         lang,
         filters,
+        vector,
         geo: {
           type: 'boundingBox',
           topLeft: {
@@ -228,22 +238,29 @@ export class SearchService {
     if (searchableIndexes.length === 0) {
       return null
     }
+
+    const words = textQuery.trim().split(/\s+/)
+    let vector: number[] | undefined
+    if (words.length >= 2 && words[0] !== '') {
+      vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
+    }
+
     const lang = this.i18n.getLang()
     const fetchLimit = (limit ? limit + 1 : 11) + (offset ?? 0)
-    const results = await Promise.all(
-      searchableIndexes.map((idx) =>
-        this.searchBackend.search({
-          collection: idx,
-          query: textQuery,
-          options: {
-            lang,
-            ...(filtersByIndex.get(idx)?.length ? { filters: filtersByIndex.get(idx) } : {}),
-            geo,
-            limit: fetchLimit,
-          },
-        }),
-      ),
-    )
+    const multiResult = await this.searchBackend.multiSearch({
+      searches: searchableIndexes.map((idx) => ({
+        collection: idx,
+        query: textQuery,
+        options: {
+          lang,
+          ...(filtersByIndex.get(idx)?.length ? { filters: filtersByIndex.get(idx) } : {}),
+          geo,
+          vector,
+          limit: fetchLimit,
+        },
+      })),
+    })
+    const results = multiResult.results
 
     const combinedHits: SearchBackendHit[] = []
     const seen = new Set<string>()

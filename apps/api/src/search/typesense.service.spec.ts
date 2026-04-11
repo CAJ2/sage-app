@@ -138,7 +138,7 @@ describe('TypesenseSearchService', () => {
   })
 
   test('builds Typesense search params with geo and field filters', async () => {
-    const { service, mockSearch } = makeTypesenseSearchService()
+    const { service, mockMultiSearch } = makeTypesenseSearchService()
 
     await service.search({
       collection: 'places',
@@ -168,19 +168,27 @@ describe('TypesenseSearchService', () => {
       },
     })
 
-    expect(mockSearch).toHaveBeenCalledWith({
-      q: '*',
-      query_by: 'name_sv,desc_sv,name_en,desc_en',
-      include_fields: 'id,geo',
-      highlight_fields: 'none',
-      limit: 10,
-      offset: 2,
-      filter_by: 'geo:(48.86, 2.33, 5 km) && adminLevel:=4 && code:07731343',
-    })
+    expect(mockMultiSearch).toHaveBeenCalledWith(
+      {
+        searches: [
+          {
+            collection: 'places',
+            q: '*',
+            query_by: 'name_sv,desc_sv,name_en,desc_en',
+            include_fields: 'id,geo',
+            highlight_fields: 'none',
+            limit: 10,
+            offset: 2,
+            filter_by: 'geo:(48.86, 2.33, 5 km) && adminLevel:=4 && code:07731343',
+          },
+        ],
+      },
+      {},
+    )
   })
 
   test('derives query_by from cached collection schema fields', async () => {
-    const { service, mockCollectionRetrieve, mockSearch } = makeTypesenseSearchService()
+    const { service, mockCollectionRetrieve, mockMultiSearch } = makeTypesenseSearchService()
 
     await service.search({
       collection: 'variants',
@@ -190,12 +198,18 @@ describe('TypesenseSearchService', () => {
       },
     })
 
-    expect(mockSearch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        q: '07731343',
-        query_by: 'name_en,desc_en,code',
-        include_fields: 'id,geo',
-      }),
+    expect(mockMultiSearch).toHaveBeenCalledWith(
+      {
+        searches: [
+          expect.objectContaining({
+            collection: 'variants',
+            q: '07731343',
+            query_by: 'name_en,desc_en,code',
+            include_fields: 'id,geo',
+          }),
+        ],
+      },
+      {},
     )
     expect(mockCollectionRetrieve).not.toHaveBeenCalled()
   })

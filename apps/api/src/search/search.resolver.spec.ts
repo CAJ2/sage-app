@@ -14,6 +14,7 @@ import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { TestVariantSeeder, VARIANT_IDS } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { MistralService } from '@src/search/mistral.service'
 import { SEARCH_BACKEND } from '@src/search/search.backend'
 
 describe('SearchResolver (integration)', () => {
@@ -21,6 +22,7 @@ describe('SearchResolver (integration)', () => {
   let gql: GraphQLTestClient
   let searchMock: Mock<any>
   let multiSearchMock: Mock<any>
+  let mistralMock: Mock<any>
   let i18nService: I18nService
 
   const emptySearchResult = {
@@ -31,6 +33,7 @@ describe('SearchResolver (integration)', () => {
   beforeAll(async () => {
     searchMock = vi.fn()
     multiSearchMock = vi.fn()
+    mistralMock = vi.fn().mockResolvedValue([0.1, 0.2, 0.3])
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
@@ -40,6 +43,10 @@ describe('SearchResolver (integration)', () => {
         search: searchMock,
         multiSearch: multiSearchMock,
         listCollections: vi.fn().mockResolvedValue([]),
+      })
+      .overrideProvider(MistralService)
+      .useValue({
+        getEmbedding: mistralMock,
       })
       .compile()
 
@@ -69,7 +76,7 @@ describe('SearchResolver (integration)', () => {
 
     multiSearchMock.mockReset()
     multiSearchMock.mockImplementation(({ searches }: any) => ({
-      results: searches.map(() => emptySearchResult),
+      results: searches.map((search: any) => searchMock(search)),
     }))
   })
 
@@ -284,9 +291,9 @@ describe('SearchResolver (integration)', () => {
       { query: 'test', types: [SearchType.Category, SearchType.Item] },
     )
 
-    expect(multiSearchMock).not.toHaveBeenCalled()
+    expect(multiSearchMock).toHaveBeenCalled()
     expect(
-      searchMock.mock.calls.map(([request]: any) => ({
+      (multiSearchMock.mock.calls[0][0] as any).searches.map((request: any) => ({
         collection: request.collection,
         lang: request.options?.lang,
       })),

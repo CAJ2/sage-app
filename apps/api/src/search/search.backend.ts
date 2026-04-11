@@ -46,6 +46,7 @@ export interface SearchBackendSearchOptions {
   filters?: SearchBackendFilter[]
   geo?: SearchBackendGeoFilter
   lang?: string
+  vector?: number[]
 }
 
 export interface SearchBackendSearchRequest {
