@@ -60,8 +60,8 @@ const iconName = computed(() => {
 })
 
 const iconStyle = computed(() => ({
-  width: props.width ? `${props.width * 0.25}rem` : '100%',
-  height: props.height ? `${props.height * 0.25}rem` : '100%',
+  width: props.width ? `${props.width * 0.15}rem` : '100%',
+  height: props.height ? `${props.height * 0.15}rem` : '100%',
 }))
 
 const iconCustomize = computed(() => {

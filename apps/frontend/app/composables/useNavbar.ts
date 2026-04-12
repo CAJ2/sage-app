@@ -6,10 +6,22 @@ import { onUnmounted } from 'vue'
  */
 export function useNavbar(visible: boolean) {
   const state = useState<boolean>('navbar', () => true)
-  state.value = visible
-  if (!visible) {
+  const count = useState<number>('navbar_hide_count', () => 0)
+
+  if (visible) {
+    // If explicitly set to true, reset the counter too
+    count.value = 0
+    state.value = true
+  } else {
+    count.value++
+    state.value = false
+
     onUnmounted(() => {
-      state.value = true
+      count.value--
+      if (count.value <= 0) {
+        count.value = 0
+        state.value = true
+      }
     })
   }
 }

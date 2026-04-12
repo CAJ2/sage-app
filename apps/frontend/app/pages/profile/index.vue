@@ -1,32 +1,41 @@
 <template>
   <div>
     <div class="grid grid-cols-4 md:grid-cols-12">
-      <div class="col-span-4 bg-base-200 p-5 md:col-span-6 md:col-start-4">
-        <div v-if="session.data" class="flex justify-between">
-          <div class="flex-1">
-            <p><strong>Name:</strong> {{ session.data.user.name }}</p>
-            <p><strong>Email:</strong> {{ session.data.user.email }}</p>
+      <div class="col-span-4 bg-base-200 px-6 pt-10 pb-8 md:col-span-6 md:col-start-4">
+        <div class="flex items-center justify-between gap-4">
+          <div v-if="sessionData?.data" class="flex-1">
+            <h1 class="text-2xl font-bold tracking-tight">
+              Hello, {{ sessionData.data.user.name.split(' ')[0] }}
+            </h1>
+            <p class="text-sm opacity-50">{{ sessionData.data.user.email }}</p>
           </div>
-          <button class="btn btn-circle btn-ghost" @click="signOut">
-            <LogOutIcon class="size-5" />
-          </button>
-        </div>
-        <div v-if="session.isPending" class="flex w-52 flex-col gap-4">
-          <div class="flex items-center gap-4">
-            <div class="h-16 w-16 shrink-0 skeleton rounded-full" />
-            <div class="flex flex-col gap-4">
-              <div class="h-6 w-20 skeleton" />
-              <div class="h-6 w-28 skeleton" />
-            </div>
+          <div v-else-if="status === 'pending'" class="flex-1">
+            <div class="mb-2 h-8 w-48 skeleton" />
+            <div class="h-4 w-32 skeleton opacity-50" />
           </div>
-          <div class="h-18 w-full skeleton" />
-        </div>
-        <div v-if="!session.data && !session.isPending">
-          <h1 class="py-3 text-2xl">Sign in to your Account</h1>
-          <p class="py-3">Contribute to the project and save your settings.</p>
-          <button class="btn btn-block btn-primary">
-            <NuxtLink to="/profile/sign_in">Sign in with Email</NuxtLink>
-          </button>
+          <div v-else class="flex-1">
+            <h1 class="text-2xl font-bold tracking-tight">Welcome to Sageleaf</h1>
+            <p class="mt-1.5 max-w-xs text-sm leading-relaxed opacity-60">
+              Start contributing to the project and customize your local experience.
+            </p>
+          </div>
+
+          <div v-if="status !== 'pending'" class="-mr-2 shrink-0">
+            <NuxtLink v-if="!sessionData?.data" to="/profile/sign_in">
+              <button class="btn gap-2 px-3 opacity-30 btn-ghost btn-sm hover:opacity-100">
+                <LogInIcon class="size-4" />
+                <span class="text-xs font-bold tracking-wide uppercase">Sign In</span>
+              </button>
+            </NuxtLink>
+            <button
+              v-else
+              class="btn gap-2 px-3 opacity-30 btn-ghost btn-sm hover:opacity-100"
+              @click="signOut"
+            >
+              <LogOutIcon class="size-4" />
+              <span class="text-xs font-bold tracking-wide uppercase">Sign Out</span>
+            </button>
+          </div>
         </div>
       </div>
       <div class="col-span-4 flex flex-col gap-3 px-4 py-3 md:col-span-6 md:col-start-4">
@@ -40,8 +49,12 @@
                 <MapIcon class="size-5" />
               </div>
               <div class="flex flex-1 flex-col">
-                <h2 class="font-medium">Region</h2>
-                <p class="text-xs opacity-60">{{ region.regionName }}</p>
+                <span
+                  v-if="region.regionName"
+                  class="text-[10px] font-bold tracking-widest uppercase opacity-60"
+                  >Region</span
+                >
+                <h2 class="font-medium">{{ region.regionName || 'Set Region' }}</h2>
               </div>
               <ChevronRightIcon class="size-4 opacity-40" />
             </CardContent>
@@ -49,7 +62,7 @@
         </NuxtLink>
 
         <!-- Edit Profile (auth-gated) -->
-        <NuxtLink v-if="session.data" to="/profile/edit">
+        <NuxtLink v-if="isAuthenticated" to="/profile/edit">
           <Card class="bg-base-200">
             <CardContent
               class="flex items-center gap-4 px-5 py-4 transition-colors active:bg-base-300"
@@ -85,6 +98,7 @@
 <script setup lang="ts">
 import {
   ChevronRight as ChevronRightIcon,
+  LogInIcon,
   LogOutIcon,
   Map as MapIcon,
   Settings as SettingsIcon,
@@ -93,8 +107,7 @@ import {
 
 useTopbar(null)
 
-const auth = useAuthClient()
-const session = auth.useSession()
+const { client: auth, sessionData, status, isAuthenticated } = useAuth()
 const region = useRegionStore()
 region.load()
 

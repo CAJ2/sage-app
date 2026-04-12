@@ -144,8 +144,3 @@
 .array-list-item-content.expanded {
   display: block;
 }
-
-html,
-body {
-  overscroll-behavior: none;
-}

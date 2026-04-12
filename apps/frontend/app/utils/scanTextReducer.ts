@@ -9,7 +9,7 @@ export interface TextReduceOptions {
   maxClusters: number
   /** Whether to prepend image labels to the query. Default: true */
   includeLabels: boolean
-  /** Max number of distinct labels to include. Default: 5 */
+  /** Max number of distinct labels to include. Default: 1 */
   maxLabels: number
 }
 
@@ -18,7 +18,7 @@ const DEFAULTS: TextReduceOptions = {
   maxLength: 400,
   maxClusters: 8,
   includeLabels: true,
-  maxLabels: 5,
+  maxLabels: 1,
 }
 
 interface NormalizedBlock {
@@ -84,8 +84,9 @@ function clusterBlocks(blocks: NormalizedBlock[], radius: number): string[] {
  * 1. Collect all TextBlocks from all frames, normalizing positions using imageWidth/imageHeight
  * 2. Deduplicate blocks by trimmed text equality
  * 3. Cluster spatially close blocks, selecting the most-text block per cluster
- * 4. Optionally prepend image labels (deduplicated, highest confidence first)
- * 5. Truncate to maxLength
+ * 4. Join all representative text clusters
+ * 5. If OCR length > 4, return result. Optionally prepend the highest confidence label.
+ * 6. Never trigger just from image labels.
  */
 export function reduceScanFrames(
   frames: ScanFrame[],
@@ -115,6 +116,13 @@ export function reduceScanFrames(
   // Cluster spatially and pick representatives
   const representatives = clusterBlocks(allBlocks, opts.clusterRadius).slice(0, opts.maxClusters)
 
+  // Join all clusters to form the potential OCR query string
+  const ocrText = representatives.join(' ').replaceAll(/\s+/g, ' ').trim()
+
+  // Always search if OCR text > 4 characters long.
+  // Never trigger search just from image labels.
+  if (ocrText.length <= 4) return ''
+
   // Collect labels deduplicated across frames, sorted by confidence
   const labelMap = new Map<string, number>()
   for (const frame of frames) {
@@ -128,16 +136,16 @@ export function reduceScanFrames(
 
   const parts: string[] = []
 
-  // Only include labels when there's also OCR text — labels alone are too noisy
-  if (opts.includeLabels && labelMap.size > 0 && representatives.length > 0) {
-    const labels = [...labelMap.entries()]
+  // If searching with OCR > 4, include the top single-word label if available
+  if (opts.includeLabels && labelMap.size > 0) {
+    const bestLabel = [...labelMap.entries()]
       .sort((a, b) => b[1] - a[1])
-      .slice(0, opts.maxLabels)
-      .map(([text]) => text)
-    parts.push(labels.join(' '))
+      .find(([text]) => !text.includes(' '))?.[0]
+
+    if (bestLabel) parts.push(bestLabel)
   }
 
-  parts.push(...representatives)
+  parts.push(ocrText)
 
   const result = parts.join(' ').replaceAll(/\s+/g, ' ').trim()
   return result.length > opts.maxLength ? result.slice(0, opts.maxLength) : result

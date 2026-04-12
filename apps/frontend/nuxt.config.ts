@@ -1,8 +1,14 @@
+import { execSync } from 'child_process'
 import { fileURLToPath } from 'url'
 
 import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
+
+import { version } from './package.json'
+
+const gitSha = execSync('git rev-parse --short HEAD').toString().trim()
+const buildDate = new Date().toISOString()
 
 // Set by Tauri CLI when running on a real device over WiFi.
 // For emulators, Tauri uses `adb reverse` so localhost works — don't override.
@@ -114,6 +120,9 @@ export default defineNuxtConfig({
     public: {
       baseurl: 'https://dev.sageleaf.app',
       apiurl: 'https://api.dev.sageleaf.app',
+      appVersion: version,
+      buildDate,
+      gitSha,
     },
   },
 
