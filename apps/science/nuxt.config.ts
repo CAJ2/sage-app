@@ -1,8 +1,14 @@
+import { execSync } from 'child_process'
 import { fileURLToPath } from 'url'
 
 import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
+
+import { version } from './package.json'
+
+const gitSha = execSync('git rev-parse --short HEAD').toString().trim()
+const buildDate = new Date().toISOString()
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -67,6 +73,9 @@ export default defineNuxtConfig({
     public: {
       baseurl: 'https://science.dev.sageleaf.app',
       apiurl: 'https://api.dev.sageleaf.app',
+      appVersion: version,
+      buildDate,
+      gitSha,
     },
   },
 

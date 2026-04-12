@@ -140,8 +140,7 @@ const menuItems = computed(() => [
 ])
 
 const router = useRouter()
-const auth = useAuthClient()
-const session = useAuthSession()
+const { client: auth, sessionData: session } = useAuth()
 const route = useRoute()
 const activeTab = computed(() => {
   const currentPath = route.path

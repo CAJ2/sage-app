@@ -9,7 +9,7 @@
       style="height: env(safe-area-inset-top)"
       aria-hidden="true"
     />
-    <div style="overflow: hidden">
+    <div>
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>

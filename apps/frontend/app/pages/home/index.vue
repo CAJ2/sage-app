@@ -1,6 +1,13 @@
 <template>
   <div class="flex min-h-dvh flex-col">
     <NavHomeLogo />
+    <NuxtLink to="/profile/region">
+      <NavTitleBubble :title="regionStore.regionName || 'Set Region'">
+        <template #icon>
+          <MapPinIcon class="size-3.5 text-accent" />
+        </template>
+      </NavTitleBubble>
+    </NuxtLink>
     <UiPullToRefresh class="flex-1" @load="onRefresh">
       <div class="flex justify-center pt-20">
         <div class="flex w-full max-w-2xl flex-col gap-4 p-5">
@@ -52,7 +59,7 @@
 
 <script setup lang="ts">
 import { NuxtLink } from '#components'
-import { MessageCircleDashed } from '@lucide/vue'
+import { MapPinIcon, MessageCircleDashed } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 

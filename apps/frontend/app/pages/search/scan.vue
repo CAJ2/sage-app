@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-50 overflow-hidden">
+  <div class="fixed inset-0 z-50 h-dvh overflow-hidden overscroll-none">
     <!-- Camera layer -->
     <div class="absolute inset-0">
       <SearchScannerNative
@@ -74,17 +74,25 @@
         </button>
       </div>
 
-      <button
-        v-if="isDev && isNative"
-        class="rounded bg-black/40 px-2 py-0.5 font-mono text-[10px] text-white/70 backdrop-blur-sm"
-        @click="debugOpen = true"
-      >
-        debug ({{ debugFrames.length }})
-      </button>
+      <div v-if="debugStore.isDebugMode" class="flex gap-2">
+        <button
+          v-if="isNative"
+          class="rounded bg-black/40 px-2 py-0.5 font-mono text-[10px] text-white/70 backdrop-blur-sm"
+          @click="debugOpen = true"
+        >
+          frames ({{ debugFrames.length }})
+        </button>
+        <NuxtLink
+          to="/search/debug"
+          class="rounded bg-black/40 px-2 py-0.5 font-mono text-[10px] text-white/70 backdrop-blur-sm"
+        >
+          search log
+        </NuxtLink>
+      </div>
     </div>
 
     <!-- Debug drawer (dev only) -->
-    <Drawer v-if="isDev" v-model:open="debugOpen">
+    <Drawer v-if="debugStore.isDebugMode" v-model:open="debugOpen">
       <DrawerContent class="max-h-[70vh]">
         <DrawerHeader>
           <DrawerTitle>Scan frames</DrawerTitle>
@@ -125,7 +133,9 @@ import type { ScanFrame } from '@sageleaf/scanleaf'
 import { isTauri } from '@tauri-apps/api/core'
 
 import type { ScanVariant } from '~/components/search/ScanResultsDrawer.vue'
+import { useScanDebug } from '~/composables/useScanDebug'
 import { useStatusBarOverlay } from '~/composables/useStatusBarOverlay'
+import { useDebugStore } from '~/stores/debug_store'
 
 useTopbar(null)
 useNavbar(false)
@@ -138,6 +148,15 @@ const isNative = isTauri()
 const scanBorder = useTemplateRef<HTMLElement>('scanBorder')
 
 onMounted(() => {
+  // Lock document/body scroll to prevent Android notification bar issues
+  // and ensure the transparent UI doesn't have its own scrollbar.
+  document.documentElement.style.overflow = 'hidden'
+  document.documentElement.style.height = '100%'
+  document.body.style.overflow = 'hidden'
+  document.body.style.height = '100%'
+  document.body.style.position = 'fixed'
+  document.body.style.inset = '0'
+
   const bridge =
     import.meta.client && isNative
       ? (window as Window & { AndroidStatusBar?: { getScreenCornerRadiusPx(): number } })
@@ -160,17 +179,33 @@ const scanner = ref<{
 // Search pipeline
 
 const { addFrame, addBarcode, query, queryType, reset } = useScanSearch()
+const { addEntry, updateEntry } = useScanDebug()
+const debugStore = useDebugStore()
 
-onUnmounted(() => reset())
+onUnmounted(() => {
+  reset()
+  document.documentElement.style.removeProperty('overflow')
+  document.documentElement.style.removeProperty('height')
+  document.body.style.removeProperty('overflow')
+  document.body.style.removeProperty('height')
+  document.body.style.removeProperty('position')
+  document.body.style.removeProperty('inset')
+})
 
 // Apollo queries
 
 const scanSearchQuery = gql`
   query ScanSearchQuery($query: String!) {
-    search(query: $query, types: [VARIANT]) {
+    search(query: $query, types: [VARIANT, ITEM]) {
       nodes {
         __typename
         ... on Variant {
+          id
+          name
+          desc
+          imageURL
+        }
+        ... on Item {
           id
           name
           desc
@@ -187,14 +222,22 @@ type ScanSearchResult = {
 }
 
 // Barcode query — fires immediately when queryType === 'barcode'
-const { result: barcodeResult, loading: barcodeLoading } = useQuery<ScanSearchResult>(
+const {
+  result: barcodeResult,
+  loading: barcodeLoading,
+  error: barcodeError,
+} = useQuery<ScanSearchResult>(
   scanSearchQuery,
   () => ({ query: query.value }),
   () => ({ enabled: !!query.value && queryType.value === 'barcode' }),
 )
 
 // Text query — fires when queryType === 'text' (already rate-limited by composable)
-const { result: textResult, loading: textLoading } = useQuery<ScanSearchResult>(
+const {
+  result: textResult,
+  loading: textLoading,
+  error: textError,
+} = useQuery<ScanSearchResult>(
   scanSearchQuery,
   () => ({ query: query.value }),
   () => ({ enabled: !!query.value && queryType.value === 'text' }),
@@ -209,35 +252,68 @@ const possibleMatches = ref<ScanVariant[]>([])
 
 function mergeVariants(target: Ref<ScanVariant[]>, incoming: ScanVariant[]) {
   for (const v of incoming) {
-    if (!target.value.some((sv) => sv.id === v.id)) {
+    if (v.id && !target.value.some((sv) => sv.id === v.id)) {
       target.value.push(v)
     }
   }
 }
 
+const lastQueryId = ref<string | null>(null)
+
+watch(query, (q) => {
+  if (q) {
+    const entry = addEntry({
+      query: q,
+      queryType: queryType.value,
+      variables: { query: q },
+    })
+    lastQueryId.value = entry.id
+  }
+})
+
 watch(barcodeResult, (res) => {
-  const variants = (res?.search.nodes ?? []) as ScanVariant[]
+  if (lastQueryId.value) {
+    updateEntry(lastQueryId.value, { result: res })
+  }
+  const variants = (res?.search.nodes ?? []).filter((n) => n.id) as ScanVariant[]
   mergeVariants(exactMatches, variants)
-  if (variants.length > 0 && drawerOpen.value === false) openDrawerToPeek()
+  if (variants.length > 0) openDrawerToPeek()
+})
+
+watch(barcodeError, (err) => {
+  if (lastQueryId.value && err) {
+    updateEntry(lastQueryId.value, { error: err })
+  }
 })
 
 watch(textResult, (res) => {
-  const variants = (res?.search.nodes ?? []) as ScanVariant[]
+  if (lastQueryId.value) {
+    updateEntry(lastQueryId.value, { result: res })
+  }
+  const variants = (res?.search.nodes ?? []).filter((n) => n.id) as ScanVariant[]
   mergeVariants(possibleMatches, variants)
-  if (variants.length > 0 && drawerOpen.value === false) openDrawerToPeek()
+  if (variants.length > 0) openDrawerToPeek()
+})
+
+watch(textError, (err) => {
+  if (lastQueryId.value && err) {
+    updateEntry(lastQueryId.value, { error: err })
+  }
 })
 
 const totalResultCount = computed(() => exactMatches.value.length + possibleMatches.value.length)
 
 // Drawer state
 
-const SNAP_PEEK = 0.3
+const SNAP_PEEK = 0.45
 const drawerOpen = ref(false)
 const drawerSnap = ref<number>(0)
 
 function openDrawerToPeek() {
   drawerOpen.value = true
-  drawerSnap.value = SNAP_PEEK
+  if (drawerSnap.value < SNAP_PEEK) {
+    drawerSnap.value = SNAP_PEEK
+  }
 }
 
 function toggleResultsDrawer() {
@@ -258,7 +334,7 @@ const onScanDetected = (code: string) => {
 
 const onScanFrame = (frame: ScanFrame) => {
   addFrame(frame)
-  if (isDev) {
+  if (debugStore.isDebugMode) {
     debugFrames.value.unshift(frame)
     if (debugFrames.value.length > MAX_DEBUG_FRAMES) {
       debugFrames.value.length = MAX_DEBUG_FRAMES
@@ -268,7 +344,6 @@ const onScanFrame = (frame: ScanFrame) => {
 
 // Dev debug
 
-const isDev = import.meta.env.DEV
 const debugOpen = ref(false)
 const debugFrames = ref<ScanFrame[]>([])
 const MAX_DEBUG_FRAMES = 20

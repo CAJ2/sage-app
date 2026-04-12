@@ -59,13 +59,13 @@ export function useScanSearch(options?: Partial<ScanSearchOptions>) {
 
     if (throttleRemaining === 0) {
       lastQueryAt = Date.now()
-      query.value = code
+      query.value = `code:${code}`
       queryType.value = 'barcode'
     } else {
       pendingTimer = setTimeout(() => {
         pendingTimer = null
         lastQueryAt = Date.now()
-        query.value = code
+        query.value = `code:${code}`
         queryType.value = 'barcode'
       }, throttleRemaining)
     }

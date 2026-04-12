@@ -1,5 +1,24 @@
 <template>
   <div class="flex flex-col gap-4">
+    <!-- Selected Region display / Empty state -->
+    <SettingsRegionDisplay
+      v-if="regionStore.selectedRegion && regionStatus !== 'idle' && regionData?.region"
+      :name="regionData.region.name ?? ''"
+      :placetype="placeType"
+      :bbox="regionData.region.bbox"
+      :min-zoom="regionData.region.minZoom"
+      @clear="clearRegion"
+    />
+    <div v-else class="card bg-base-100 shadow-md">
+      <div class="card-body p-5 text-center">
+        <GlobeIcon class="mx-auto mb-2 size-8 opacity-20" />
+        <h3 class="font-bold">No Region Selected</h3>
+        <p class="text-sm opacity-60">
+          Search for a region below or enable your current location to get localized content.
+        </p>
+      </div>
+    </div>
+
     <!-- Use Current Location toggle -->
     <div class="card bg-base-100 shadow-md">
       <div class="card-body p-4">
@@ -16,16 +35,6 @@
         <p v-if="locationError" class="mt-1 text-sm text-error">{{ locationError }}</p>
       </div>
     </div>
-
-    <!-- Selected Region display -->
-    <SettingsRegionDisplay
-      v-if="regionStore.selectedRegion && regionStatus !== 'idle' && regionData?.region"
-      :name="regionData.region.name ?? ''"
-      :placetype="placeType"
-      :bbox="regionData.region.bbox"
-      :min-zoom="regionData.region.minZoom"
-      @clear="clearRegion"
-    />
 
     <!-- Divider + manual search (hidden when using current location) -->
     <template v-if="!locationLatLon">
@@ -85,13 +94,6 @@
           </li>
         </template>
       </ul>
-
-      <div
-        v-else-if="!regionStore.selectedRegion"
-        class="flex justify-center py-4 text-sm opacity-50"
-      >
-        Search for a region or use your location
-      </div>
     </template>
   </div>
 </template>

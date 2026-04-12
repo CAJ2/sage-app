@@ -2,7 +2,7 @@
   <div>
     <ModelCategoryChildren :status="status" :data="data?.category.children" />
     <UiList
-      v-if="sessionData && data"
+      v-if="isAuthenticated && data"
       :items="[
         {
           id: 'edit',
@@ -19,7 +19,7 @@
 import { SquarePen } from '@lucide/vue'
 
 const route = useRoute()
-const sessionData = useAuthSession()
+const { isAuthenticated } = useAuth()
 const categoriesQuery = gql`
   query CategoriesIDGetCategories($id: ID!) {
     category(id: $id) {

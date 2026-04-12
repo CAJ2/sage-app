@@ -13,8 +13,8 @@ defineProps<{
   possibleMatches: ScanVariant[]
 }>()
 
-// Snap points as fractions of viewport height: hidden, peek (~30%), expanded (~80%)
-const snapPoints = [0, 0.3, 0.8]
+// Snap points as fractions of viewport height: hidden, peek (~45%), expanded (~80%)
+const snapPoints = [0, 0.45, 0.8]
 const activeSnap = defineModel<number>('activeSnap', { default: 0 })
 const isOpen = defineModel<boolean>('open', { default: false })
 </script>

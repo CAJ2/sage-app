@@ -62,17 +62,75 @@
         </Card>
       </div>
     </div>
+
+    <!-- App Info / Secret Debug Section -->
+    <div
+      class="mt-12 mb-12 flex flex-col items-center justify-center gap-1.5 px-4"
+      @click="handleDebugTap"
+    >
+      <Icon name="sageleaf-app:logo" class="size-10 opacity-15" />
+      <div class="flex flex-col items-center opacity-25">
+        <p class="text-[10px] font-bold tracking-widest uppercase">Sageleaf</p>
+        <p class="font-mono text-[9px]">
+          v{{ version }} ({{ buildDate }})
+          <span v-if="gitSha" class="opacity-50">#{{ gitSha }}</span>
+        </p>
+      </div>
+      <div
+        v-if="debugStore.isDebugMode"
+        class="mt-2 rounded bg-error/10 px-2 py-0.5 text-[10px] font-bold text-error uppercase"
+      >
+        Debug Mode Active
+      </div>
+    </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ChevronDownIcon, GlobeIcon, SunMoonIcon } from '@lucide/vue'
 import { useTolgee } from '@tolgee/vue'
 import { useColorMode } from '@vueuse/core'
 import { DrawerTrigger } from 'vaul-vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+
+import { useDebugStore } from '~/stores/debug_store'
 
 useTopbar({ title: 'App Settings', back: 'true' })
+
+const config = useRuntimeConfig()
+const version = config.public.appVersion
+const buildDate = config.public.buildDate
+  ? new Date(config.public.buildDate).toLocaleDateString()
+  : ''
+const gitSha = config.public.gitSha
+
+const debugStore = useDebugStore()
+
+const tapCount = ref(0)
+let lastTap = 0
+let tapTimer: ReturnType<typeof setTimeout> | null = null
+
+function handleDebugTap() {
+  const now = Date.now()
+  if (now - lastTap > 5000) {
+    tapCount.value = 0
+  }
+
+  tapCount.value++
+  lastTap = now
+
+  if (tapTimer) clearTimeout(tapTimer)
+  tapTimer = setTimeout(() => {
+    tapCount.value = 0
+  }, 5000)
+
+  if (tapCount.value >= 7) {
+    debugStore.isDebugMode = !debugStore.isDebugMode
+    tapCount.value = 0
+    if (tapTimer) clearTimeout(tapTimer)
+
+    // Optional: add a small toast or haptic feedback here if available
+  }
+}
 
 const tolgee = useTolgee(['language'])
 const locale = computed(() => tolgee.value.getLanguage() ?? 'en')
