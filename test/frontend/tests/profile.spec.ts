@@ -1,19 +1,19 @@
 import { test, expect } from '@nuxt/test-utils/playwright'
 
-test('/profile shows "Sign in to your Account" when unauthenticated', async ({ page, goto }) => {
+test('/profile shows "Welcome to Sageleaf" when unauthenticated', async ({ page, goto }) => {
   await goto('/profile', { waitUntil: 'hydration' })
-  await expect(page.getByText('Sign in to your Account')).toBeVisible()
+  await expect(page.getByText('Welcome to Sageleaf')).toBeVisible()
 })
 
-test('/profile has "Sign in with Email" button', async ({ page, goto }) => {
+test('/profile has "Sign In" button', async ({ page, goto }) => {
   await goto('/profile', { waitUntil: 'hydration' })
-  await expect(page.getByRole('button', { name: 'Sign in with Email' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Sign In' })).toBeVisible()
 })
 
-test('/profile "Sign in with Email" button links to /profile/sign_in', async ({ page, goto }) => {
+test('/profile "Sign In" button links to /profile/sign_in', async ({ page, goto }) => {
   await goto('/profile', { waitUntil: 'hydration' })
-  const signInBtn = page.getByRole('button', { name: 'Sign in with Email' })
-  await expect(signInBtn).toBeVisible()
+  const signInBtn = page.getByRole('link', { name: 'Sign In' })
+  await expect(signInBtn).toHaveAttribute('href', '/profile/sign_in')
 })
 
 test('/profile has a "Region" list item', async ({ page, goto }) => {
