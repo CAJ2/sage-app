@@ -1,0 +1,23 @@
+test/frontend/tests/profile.spec.ts
+  326430156d0c01f3 3,5,8,10,13,15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "5a151e5cfccc38829b9dcad540ed532fdf1ec7cc",
+  "prompts": {
+    "326430156d0c01f3": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "71afaf2d-221c-4a84-8161-a37fbafdf4d1",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 7,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}
