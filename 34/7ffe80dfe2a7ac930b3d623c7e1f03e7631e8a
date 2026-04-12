@@ -1,0 +1,63 @@
+apps/science/nuxt.config.ts
+  4abecfb60ed19985 1,7-11,76-78
+apps/frontend/app/pages/profile/settings.vue
+  4abecfb60ed19985 65-73,75-85,93-95,99-134
+apps/frontend/app/utils/scanTextReducer.ts
+  4abecfb60ed19985 12,21,87-89,119-125,139-141,143-145,148
+apps/science/app/layouts/default.vue
+  4abecfb60ed19985 143
+apps/frontend/app/composables/useScanDebug.ts
+  4abecfb60ed19985 1-45
+apps/frontend/app/components/settings/RegionSelect.vue
+  4abecfb60ed19985 3-21
+apps/frontend/app/pages/explore/categories/[id]/index.vue
+  4abecfb60ed19985 5
+apps/frontend/nuxt.config.ts
+  4abecfb60ed19985 1,8-11,123-125
+apps/frontend/app/stores/debug_store.ts
+  4abecfb60ed19985 1-8
+apps/frontend/app/composables/useNavbar.ts
+  4abecfb60ed19985 9-18,20-24
+apps/frontend/app/pages/profile/index.vue
+  4abecfb60ed19985 4-10,12-22,24,26-31,33-37,52-57,65,101,110
+apps/frontend/app/pages/home/index.vue
+  4abecfb60ed19985 4-10,62
+apps/frontend/app/app.vue
+  4abecfb60ed19985 12
+apps/frontend/app/composables/useScanSearch.ts
+  4abecfb60ed19985 62,68
+apps/science/app/composables/auth.ts
+  4abecfb60ed19985 4,8
+packages/ui/app/composables/useAuth.ts
+  4abecfb60ed19985 12,16,20,22,30-31
+apps/frontend/app/components/search/ScanResultsDrawer.vue
+  4abecfb60ed19985 16-17
+apps/frontend/app/components/nav/HomeLogo.vue
+  4abecfb60ed19985 3
+apps/frontend/app/components/nav/TitleBubble.vue
+  4abecfb60ed19985 5-11
+apps/frontend/app/pages/search/debug.vue
+  4abecfb60ed19985 1-11,13-21,23-26,28-45,47-55,57-61,63-97
+apps/frontend/app/pages/search/scan.vue
+  4abecfb60ed19985 2,77-91,95,136,151-159,182-183,185-193,199,208-213,225-229,236-240,255,261-273,275-278,280-286,290-293,295-301,308,314-316,337
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "347ffe80dfe2a7ac930b3d623c7e1f03e7631e8a",
+  "prompts": {
+    "4abecfb60ed19985": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5d48c3ff-db9f-418f-943c-f8570e4907d7",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 703,
+      "total_deletions": 352,
+      "accepted_lines": 488,
+      "overriden_lines": 13
+    }
+  }
+}
