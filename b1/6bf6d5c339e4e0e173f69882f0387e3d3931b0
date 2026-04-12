@@ -1,0 +1,27 @@
+Dockerfile
+  326430156d0c01f3 8-9
+apps/frontend/nuxt.config.ts
+  326430156d0c01f3 10-19
+apps/science/nuxt.config.ts
+  326430156d0c01f3 10-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "b16bf6d5c339e4e0e173f69882f0387e3d3931b0",
+  "prompts": {
+    "326430156d0c01f3": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "71afaf2d-221c-4a84-8161-a37fbafdf4d1",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 2,
+      "accepted_lines": 22,
+      "overriden_lines": 0
+    }
+  }
+}
