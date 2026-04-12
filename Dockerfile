@@ -5,6 +5,8 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS build
+ARG APP_SHA
+ENV APP_SHA=$APP_SHA
 RUN npm install -g pnpm@latest-10
 RUN pnpm add -g nx@latest
 COPY package.json pnpm-*.yaml nx.json /usr/src/app/
