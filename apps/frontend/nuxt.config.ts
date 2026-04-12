@@ -7,7 +7,16 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 import { version } from './package.json'
 
-const gitSha = execSync('git rev-parse --short HEAD').toString().trim()
+const getGitSha = () => {
+  if (process.env.APP_SHA) return process.env.APP_SHA
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim()
+  } catch {
+    return ''
+  }
+}
+
+const gitSha = getGitSha()
 const buildDate = new Date().toISOString()
 
 // Set by Tauri CLI when running on a real device over WiFi.
