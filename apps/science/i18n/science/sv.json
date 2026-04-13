@@ -1,11 +1,10 @@
 {
   "nav.categories": "Kategorier",
-  "nav.changes": "Ändringar",
   "nav.components": "Komponenter",
   "nav.dashboard": "Instrumentpanel",
   "nav.items": "Föremål",
   "nav.materials": "Material",
-  "nav.orgs": "Organisationer",
+  "nav.orgs": "Orgs",
   "nav.places": "Platser",
   "nav.processes": "Processer",
   "nav.sources": "Källor",

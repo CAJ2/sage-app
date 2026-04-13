@@ -3,14 +3,14 @@ import { defineStore } from 'pinia'
 export const useRegionStore = defineStore(
   'region',
   () => {
-    const selectedRegion = ref('')
-    const isRegionSelected = computed(() => !!selectedRegion.value)
-    function setRegion(region: string) {
-      selectedRegion.value = region
+    const selectedRegionId = ref<string | undefined>(undefined)
+
+    function setRegion(id: string | undefined) {
+      selectedRegionId.value = id
     }
+
     return {
-      selectedRegion,
-      isRegionSelected,
+      selectedRegionId,
       setRegion,
     }
   },

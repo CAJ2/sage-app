@@ -1,13 +1,27 @@
 {
+  "materials.title": "Materials",
   "nav.categories": "Categories",
+  "nav.categories.hierarchy": "Hierarchy",
+  "nav.categories.index": "Categories",
   "nav.changes": "Changes",
+  "nav.changes.index": "Changes",
   "nav.components": "Components",
+  "nav.components.index": "Components",
   "nav.dashboard": "Dashboard",
+  "nav.dashboard.index": "Dashboard",
   "nav.items": "Items",
+  "nav.items.index": "Items",
   "nav.materials": "Materials",
+  "nav.materials.index": "Materials",
   "nav.orgs": "Orgs",
+  "nav.orgs.index": "Orgs",
   "nav.places": "Places",
+  "nav.places.index": "Places",
   "nav.processes": "Processes",
+  "nav.processes.index": "Processes",
+  "nav.processes.materials": "Materials Coverage",
   "nav.sources": "Sources",
-  "nav.variants": "Variants"
+  "nav.sources.index": "Sources",
+  "nav.variants": "Variants",
+  "nav.variants.index": "Variants"
 }
