@@ -2121,6 +2121,7 @@ export enum TagType {
   Org = 'ORG',
   Place = 'PLACE',
   Process = 'PROCESS',
+  Program = 'PROGRAM',
   Variant = 'VARIANT'
 }
 

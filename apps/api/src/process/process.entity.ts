@@ -20,6 +20,7 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
+import { Program } from '@src/process/program.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
@@ -240,6 +241,9 @@ export class Process extends IDCreatedUpdated {
 
   @OneToMany(() => ProcessSources, (pr) => pr.process)
   processSources = new Collection<ProcessSources>(this)
+
+  @ManyToMany({ entity: () => Program, mappedBy: 'processes' })
+  programs = new Collection<Program>(this)
 
   @ManyToOne()
   org?: Ref<Org>

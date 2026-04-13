@@ -1515,6 +1515,7 @@ enum TagType {
   ORG
   PLACE
   PROCESS
+  PROGRAM
   VARIANT
 }
 

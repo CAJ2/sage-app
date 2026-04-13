@@ -7,6 +7,7 @@ import { AjvTemplateSchema, JSONType, type Rank, ZTranslatedField } from '@src/c
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Component } from '@src/process/component.entity'
+import { Program } from '@src/process/program.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
 
@@ -16,6 +17,7 @@ export enum TagType {
   VARIANT = 'VARIANT',
   COMPONENT = 'COMPONENT',
   PROCESS = 'PROCESS',
+  PROGRAM = 'PROGRAM',
   ORG = 'ORG',
 }
 
@@ -107,6 +109,9 @@ export class Tag extends IDCreatedUpdated {
 
   @ManyToMany({ entity: () => Component, mappedBy: 'tags' })
   components = new Collection<Component>(this)
+
+  @ManyToMany({ entity: () => Program, mappedBy: 'tags' })
+  programs = new Collection<Program>(this)
 
   meta?: Record<string, any>
 }
