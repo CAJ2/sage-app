@@ -3,7 +3,7 @@ import { JSONSchemaType } from 'ajv/dist/2020'
 import { z } from 'zod/v4'
 
 import { type TranslatedField } from '@src/common/i18n'
-import { AjvTemplateSchema, JSONType, ZTranslatedField } from '@src/common/z.schema'
+import { AjvTemplateSchema, JSONType, type Rank, ZTranslatedField } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Component } from '@src/process/component.entity'
@@ -92,6 +92,9 @@ export class Tag extends IDCreatedUpdated {
 
   @Property({ type: 'json' })
   rules?: TagRules
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @ManyToMany({ entity: () => Place, mappedBy: 'tags' })
   places = new Collection<Place>(this)

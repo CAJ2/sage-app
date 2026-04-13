@@ -30,6 +30,9 @@ export class Material extends CreatedUpdated implements Named {
   @MaxLength(100_000)
   desc?: string
 
+  @Field(() => [String], { nullable: true })
+  synonyms?: string[]
+
   @Field(() => Boolean, {
     description: 'If true, this is an internal technical classification not shown to end-users',
   })

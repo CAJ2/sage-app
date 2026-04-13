@@ -13,6 +13,7 @@ import {
 import { z } from 'zod/v4'
 
 import { type TranslatedField } from '@src/common/i18n'
+import type { Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
 import { Category } from '@src/product/category.entity'
@@ -48,6 +49,9 @@ export class Item extends IDCreatedUpdated {
 
   @Property({ type: 'json' })
   links?: {}
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @ManyToMany({ entity: () => Category, pivotEntity: () => ItemsCategories })
   categories = new Collection<Category>(this)

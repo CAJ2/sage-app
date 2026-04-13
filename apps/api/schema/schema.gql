@@ -882,6 +882,7 @@ type Material implements Named {
 
   """The physical form or shape of the material (e.g. film, rigid, fibre)"""
   shape: String
+  synonyms: [String!]
 
   """
   If true, this is an internal technical classification not shown to end-users
@@ -1275,6 +1276,7 @@ type Region {
   country: Region
   county: Region
   createdAt: DateTime!
+  desc: String
   id: ID!
 
   """Minimum map zoom level at which this region should be displayed"""

@@ -38,6 +38,9 @@ export class Region extends IDCreatedUpdated {
   @Property({ type: 'json' })
   name!: TranslatedField
 
+  @Property({ type: 'json' })
+  desc?: TranslatedField
+
   @Property({ type: MultiPolygonType })
   geo?: MultiPolygon
 

@@ -342,6 +342,15 @@
           "nullable": true,
           "length": 255,
           "mappedType": "string"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "categories",
@@ -617,6 +626,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "items",
@@ -749,6 +767,15 @@
         },
         "desc": {
           "name": "desc",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "synonyms": {
+          "name": "synonyms",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
@@ -1080,6 +1107,15 @@
           "primary": false,
           "nullable": false,
           "mappedType": "json"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "orgs",
@@ -1198,6 +1234,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "places",
@@ -1284,6 +1329,15 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "mappedType": "json"
+        },
+        "desc": {
+          "name": "desc",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
           "mappedType": "json"
         },
         "geo": {
@@ -1585,6 +1639,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "components",
@@ -1820,6 +1883,15 @@
         },
         "rules": {
           "name": "rules",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "rank": {
+          "name": "rank",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
@@ -2237,6 +2309,15 @@
           "nullable": true,
           "length": 255,
           "mappedType": "string"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "users",
@@ -4215,6 +4296,15 @@
           "nullable": true,
           "length": 255,
           "mappedType": "string"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "variants",
@@ -4371,6 +4461,15 @@
         },
         "rules": {
           "name": "rules",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "rank": {
+          "name": "rank",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,

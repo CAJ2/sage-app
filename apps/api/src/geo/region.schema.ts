@@ -16,6 +16,7 @@ export class RegionSchemaService {
       model.createdAt = DateTime.fromJSDate(entity.createdAt)
       model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
+      model.desc = input.i18n.tr(entity.desc)
       model.placetype = entity.placetype
       if (entity.properties && entity.properties['geom:bbox']) {
         model.bbox = entity.properties['geom:bbox'].split(',').map(Number)

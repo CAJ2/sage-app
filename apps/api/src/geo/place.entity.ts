@@ -13,7 +13,7 @@ import {
 import type { Ref } from '@mikro-orm/core'
 
 import type { TranslatedField } from '@src/common/i18n'
-import { type JSONObject } from '@src/common/z.schema'
+import { type JSONObject, type Rank } from '@src/common/z.schema'
 import { CreatedUpdated } from '@src/db/base.entity'
 import { Point, PointType } from '@src/db/custom.types'
 import { Process } from '@src/process/process.entity'
@@ -44,6 +44,9 @@ export class Place extends CreatedUpdated {
 
   @Property({ type: 'json' })
   osm?: {}
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @ManyToMany({ entity: () => Tag, pivotEntity: () => PlacesTag })
   tags = new Collection<Tag>(this)

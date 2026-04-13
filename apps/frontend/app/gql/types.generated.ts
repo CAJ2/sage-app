@@ -1024,6 +1024,7 @@ export type Material = Named & {
   processes: ProcessPage;
   /** The physical form or shape of the material (e.g. film, rigid, fibre) */
   shape?: Maybe<Scalars['String']['output']>;
+  synonyms?: Maybe<Array<Scalars['String']['output']>>;
   /** If true, this is an internal technical classification not shown to end-users */
   technical: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -1885,6 +1886,7 @@ export type Region = {
   country?: Maybe<Region>;
   county?: Maybe<Region>;
   createdAt: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   /** Minimum map zoom level at which this region should be displayed */
   minZoom?: Maybe<Scalars['Float']['output']>;

@@ -15,6 +15,7 @@ import { z } from 'zod/v4'
 
 import { Source } from '@src/changes/source.entity'
 import type { TranslatedField } from '@src/common/i18n'
+import type { Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
@@ -230,6 +231,9 @@ export class Process extends IDCreatedUpdated {
   // Rules for matching materials/variants to this process.
   @Property({ type: 'json' })
   rules?: ProcessRules
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @ManyToMany({ entity: () => Source, pivotEntity: () => ProcessSources })
   sources = new Collection<Source>(this)

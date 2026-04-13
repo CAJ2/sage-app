@@ -14,7 +14,7 @@ import { z } from 'zod/v4'
 
 import { Source } from '@src/changes/source.entity'
 import type { TranslatedField } from '@src/common/i18n'
-import { type JSONObject } from '@src/common/z.schema'
+import { type JSONObject, type Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
@@ -96,6 +96,9 @@ export class Component extends IDCreatedUpdated {
 
   @Property({ type: 'json' })
   physical?: ComponentPhysical
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @ManyToMany({
     entity: () => Material,
