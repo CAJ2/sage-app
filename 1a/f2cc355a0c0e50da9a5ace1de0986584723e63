@@ -1,0 +1,31 @@
+apps/api/src/process/process.entity.ts
+  0d74e2af6e7c5ebb 23,245-247
+apps/api/src/process/tag.entity.ts
+  0d74e2af6e7c5ebb 10,20,113-114
+apps/api/src/users/org.entity.ts
+  0d74e2af6e7c5ebb 19,61-63
+apps/api/src/process/program.entity.ts
+  0d74e2af6e7c5ebb 1-130
+apps/api/src/geo/region.entity.ts
+  0d74e2af6e7c5ebb 21,67-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "1af2cc355a0c0e50da9a5ace1de0986584723e63",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 151,
+      "total_deletions": 4,
+      "accepted_lines": 150,
+      "overriden_lines": 0
+    }
+  }
+}
