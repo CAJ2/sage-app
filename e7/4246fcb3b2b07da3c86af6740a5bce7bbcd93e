@@ -1,0 +1,55 @@
+apps/api/src/common/i18n.service.ts
+  0d74e2af6e7c5ebb 34-39
+apps/api/src/users/users.entity.ts
+  0d74e2af6e7c5ebb 14,68
+apps/api/src/geo/region.model.ts
+  0d74e2af6e7c5ebb 17-19
+apps/api/src/users/org.entity.ts
+  0d74e2af6e7c5ebb 16,45-46
+apps/api/src/common/z.schema.ts
+  0d74e2af6e7c5ebb 17-21
+apps/api/src/process/tag.entity.ts
+  0d74e2af6e7c5ebb 97
+apps/api/src/process/component.entity.ts
+  0d74e2af6e7c5ebb 17,101
+apps/api/src/process/process.entity.ts
+  0d74e2af6e7c5ebb 236
+apps/api/src/geo/region.schema.ts
+  0d74e2af6e7c5ebb 19
+apps/api/src/geo/place.entity.ts
+  0d74e2af6e7c5ebb 16,50
+apps/api/src/process/material.model.ts
+  0d74e2af6e7c5ebb 33-34
+apps/api/src/process/material.entity.ts
+  0d74e2af6e7c5ebb 49-53,55-57,66-67
+apps/api/src/product/category.entity.ts
+  0d74e2af6e7c5ebb 37-38
+apps/api/src/product/item.entity.ts
+  0d74e2af6e7c5ebb 54
+apps/api/src/geo/region.entity.ts
+  0d74e2af6e7c5ebb 41-43
+apps/api/src/product/variant.entity.ts
+  0d74e2af6e7c5ebb 18
+apps/api/src/process/material.schema.ts
+  0d74e2af6e7c5ebb 20-22,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "e74246fcb3b2b07da3c86af6740a5bce7bbcd93e",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 338,
+      "total_deletions": 254,
+      "accepted_lines": 239,
+      "overriden_lines": 3
+    }
+  }
+}
