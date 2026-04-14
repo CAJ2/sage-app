@@ -181,7 +181,11 @@ export class SearchService {
 
     const words = textQuery.trim().split(/\s+/)
     let vector: number[] | undefined
-    if (words.length >= 2 && words[0] !== '') {
+    if (
+      words.length >= 2 &&
+      words[0] !== '' &&
+      (await this.searchBackend.supportsVectorSearch(index))
+    ) {
       vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
     }
 
@@ -241,21 +245,29 @@ export class SearchService {
 
     const words = textQuery.trim().split(/\s+/)
     let vector: number[] | undefined
-    if (words.length >= 2 && words[0] !== '') {
+    const indexesWithSupport = await Promise.all(
+      searchableIndexes.map(async (idx) => ({
+        idx,
+        supports: await this.searchBackend.supportsVectorSearch(idx),
+      })),
+    )
+    const hasAnySupport = indexesWithSupport.some((i) => i.supports)
+
+    if (words.length >= 2 && words[0] !== '' && hasAnySupport) {
       vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
     }
 
     const lang = this.i18n.getLang()
     const fetchLimit = (limit ? limit + 1 : 11) + (offset ?? 0)
     const multiResult = await this.searchBackend.multiSearch({
-      searches: searchableIndexes.map((idx) => ({
+      searches: indexesWithSupport.map(({ idx, supports }) => ({
         collection: idx,
         query: textQuery,
         options: {
           lang,
           ...(filtersByIndex.get(idx)?.length ? { filters: filtersByIndex.get(idx) } : {}),
           geo,
-          vector,
+          vector: supports ? vector : undefined,
           limit: fetchLimit,
         },
       })),

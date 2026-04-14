@@ -82,6 +82,7 @@ export interface SearchBackend {
   listCollections(): Promise<string[]>
   search(request: SearchBackendSearchRequest): Promise<SearchBackendSearchResult>
   multiSearch(request: SearchBackendMultiSearchRequest): Promise<SearchBackendMultiSearchResult>
+  supportsVectorSearch(collection: string): Promise<boolean>
 }
 
 export const SEARCH_BACKEND = Symbol('SEARCH_BACKEND')

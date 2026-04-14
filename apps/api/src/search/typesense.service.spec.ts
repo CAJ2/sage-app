@@ -262,4 +262,49 @@ describe('TypesenseSearchService', () => {
       ],
     })
   })
+
+  test('supports vector search only when "embedding" field is present', async () => {
+    const { service, mockCollectionsRetrieve } = makeTypesenseSearchService()
+    mockCollectionsRetrieve.mockResolvedValue([
+      { name: 'with-embedding', fields: [{ name: 'embedding', type: 'float[]' }] },
+      { name: 'with-image-embedding', fields: [{ name: 'image_embedding', type: 'float[]' }] },
+      { name: 'without-embedding', fields: [{ name: 'name', type: 'string' }] },
+    ])
+
+    expect(await service.supportsVectorSearch('with-embedding')).toBe(true)
+    expect(await service.supportsVectorSearch('with-image-embedding')).toBe(false)
+    expect(await service.supportsVectorSearch('without-embedding')).toBe(false)
+  })
+
+  test('includes vector_query in search params when vector is provided and supported', async () => {
+    const { service, mockCollectionsRetrieve, mockMultiSearch } = makeTypesenseSearchService()
+    mockCollectionsRetrieve.mockResolvedValue([
+      {
+        name: 'supported',
+        fields: [
+          { name: 'embedding', type: 'float[]' },
+          { name: 'name', type: 'string' },
+        ],
+      },
+    ])
+
+    await service.search({
+      collection: 'supported',
+      query: 'test',
+      options: {
+        vector: [0.1, 0.2, 0.3],
+      },
+    })
+
+    expect(mockMultiSearch).toHaveBeenCalledWith(
+      {
+        searches: [
+          expect.objectContaining({
+            vector_query: 'embedding:([0.1,0.2,0.3])',
+          }),
+        ],
+      },
+      {},
+    )
+  })
 })

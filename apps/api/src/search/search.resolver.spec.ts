@@ -43,6 +43,7 @@ describe('SearchResolver (integration)', () => {
         search: searchMock,
         multiSearch: multiSearchMock,
         listCollections: vi.fn().mockResolvedValue([]),
+        supportsVectorSearch: vi.fn().mockResolvedValue(true),
       })
       .overrideProvider(MistralService)
       .useValue({
