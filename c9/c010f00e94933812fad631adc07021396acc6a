@@ -1,0 +1,39 @@
+apps/api/src/process/program.resolver.ts
+  0d74e2af6e7c5ebb 1-104,106-140
+apps/api/src/process/program.model.ts
+  0d74e2af6e7c5ebb 1-27,29-251
+apps/api/src/process/program.schema.ts
+  0d74e2af6e7c5ebb 1-24,26-86,88-167,169-252,255-327
+apps/api/src/process/program.service.ts
+  0d74e2af6e7c5ebb 1-17,19-38,40-46,48-178,180-229,231-313
+apps/api/src/process/process.module.ts
+  0d74e2af6e7c5ebb 18-20,52-54,69-70
+apps/api/src/changes/change.enum.ts
+  0d74e2af6e7c5ebb 8,21-22,31
+apps/api/src/changes/change_map.service.ts
+  0d74e2af6e7c5ebb 9,32,39
+apps/api/src/process/program.resolver.spec.ts
+  0d74e2af6e7c5ebb 1-8,10-35,37-127
+apps/api/src/db/seeds/TestProgramSeeder.ts
+  0d74e2af6e7c5ebb 1-5,7-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "c9c010f00e94933812fad631adc07021396acc6a",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 1555,
+      "total_deletions": 345,
+      "accepted_lines": 1191,
+      "overriden_lines": 15
+    }
+  }
+}
