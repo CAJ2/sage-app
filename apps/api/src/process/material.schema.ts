@@ -17,6 +17,12 @@ export class MaterialSchemaService {
       model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
       model.name = input.i18n.tr(entity.name)
       model.desc = input.i18n.tr(entity.desc)
+
+      const synonymData = input.i18n.pick(entity.synonyms)
+      if (typeof synonymData === 'object' && synonymData !== null) {
+        model.synonyms = [...(synonymData.abbrev || []), ...(synonymData.full || [])]
+      }
+
       model.technical = entity.technical
       model.shape = entity.shape
       return model

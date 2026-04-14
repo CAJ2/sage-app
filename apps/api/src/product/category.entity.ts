@@ -13,6 +13,7 @@ import {
 import type { Ref } from '@mikro-orm/core'
 
 import type { TranslatedField } from '@src/common/i18n'
+import type { Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Item } from '@src/product/item.entity'
 import { User } from '@src/users/users.entity'
@@ -32,6 +33,9 @@ export class Category extends IDCreatedUpdated {
 
   @Property({ nullable: true })
   imageURL?: string
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @OneToMany({ entity: () => CategoryTree, mappedBy: 'ancestor' })
   ancestors = new Collection<CategoryTree>(this)

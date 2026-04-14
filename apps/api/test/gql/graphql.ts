@@ -640,6 +640,38 @@ export type CreateProcessOutput = {
   process?: Maybe<Process>;
 };
 
+export type CreateProgramInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  descTr?: InputMaybe<Array<TranslatedInput>>;
+  instructions?: InputMaybe<Scalars['JSONObject']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameTr?: InputMaybe<Array<TranslatedInput>>;
+  orgs?: InputMaybe<Array<ProgramOrgsInput>>;
+  processes?: InputMaybe<Array<ProgramProcessesInput>>;
+  region?: InputMaybe<Scalars['ID']['input']>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  social?: InputMaybe<Scalars['JSONObject']['input']>;
+  status: Scalars['String']['input'];
+  tags?: InputMaybe<Array<ProgramTagsInput>>;
+};
+
+export type CreateProgramOutput = {
+  __typename?: 'CreateProgramOutput';
+  change?: Maybe<Change>;
+  program?: Maybe<Program>;
+};
+
 export type CreateSourceInput = {
   content?: InputMaybe<Scalars['JSONObject']['input']>;
   contentURL?: InputMaybe<Scalars['String']['input']>;
@@ -774,7 +806,7 @@ export type EditEdge = {
   node: Edit;
 };
 
-export type EditModel = Category | Component | Item | Material | Org | Place | Process | Variant;
+export type EditModel = Category | Component | Item | Material | Org | Place | Process | Program | Variant;
 
 /** Type of the model being edited */
 export enum EditModelType {
@@ -785,6 +817,7 @@ export enum EditModelType {
   Org = 'Org',
   Place = 'Place',
   Process = 'Process',
+  Program = 'Program',
   Variant = 'Variant'
 }
 
@@ -1028,6 +1061,7 @@ export type Material = Named & {
   processes: ProcessPage;
   /** The physical form or shape of the material (e.g. film, rigid, fibre) */
   shape?: Maybe<Scalars['String']['output']>;
+  synonyms?: Maybe<Array<Scalars['String']['output']>>;
   /** If true, this is an internal technical classification not shown to end-users */
   technical: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -1137,6 +1171,7 @@ export type Mutation = {
   createOrg?: Maybe<CreateOrgOutput>;
   createPlace?: Maybe<CreatePlaceOutput>;
   createProcess?: Maybe<CreateProcessOutput>;
+  createProgram?: Maybe<CreateProgramOutput>;
   createSource?: Maybe<CreateSourceOutput>;
   createTagDefinition?: Maybe<CreateTagDefinitionOutput>;
   createVariant?: Maybe<CreateVariantOutput>;
@@ -1160,6 +1195,7 @@ export type Mutation = {
   updateOrg?: Maybe<UpdateOrgOutput>;
   updatePlace?: Maybe<UpdatePlaceOutput>;
   updateProcess?: Maybe<UpdateProcessOutput>;
+  updateProgram?: Maybe<UpdateProgramOutput>;
   updateSource?: Maybe<UpdateSourceOutput>;
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
@@ -1198,6 +1234,11 @@ export type MutationCreatePlaceArgs = {
 
 export type MutationCreateProcessArgs = {
   input: CreateProcessInput;
+};
+
+
+export type MutationCreateProgramArgs = {
+  input: CreateProgramInput;
 };
 
 
@@ -1314,6 +1355,11 @@ export type MutationUpdatePlaceArgs = {
 
 export type MutationUpdateProcessArgs = {
   input: UpdateProcessInput;
+};
+
+
+export type MutationUpdateProgramArgs = {
+  input: UpdateProgramInput;
 };
 
 
@@ -1620,6 +1666,116 @@ export type ProcessVariantInput = {
   id: Scalars['ID']['input'];
 };
 
+/** An administrative description of circular economy processes */
+export type Program = Named & {
+  __typename?: 'Program';
+  createdAt: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
+  /** Audit history of changes to this program */
+  history: ProgramHistoryPage;
+  /** The ID of the model */
+  id: Scalars['ID']['output'];
+  instructions?: Maybe<Scalars['JSONObject']['output']>;
+  name: Scalars['String']['output'];
+  /** Organizations involved in this program */
+  orgs: OrgsPage;
+  /** Processes run by this program */
+  processes: ProcessPage;
+  region?: Maybe<Region>;
+  social?: Maybe<Scalars['JSONObject']['output']>;
+  status: Scalars['String']['output'];
+  /** Metadata tags applied to this program */
+  tags: TagPage;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+
+/** An administrative description of circular economy processes */
+export type ProgramHistoryArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** An administrative description of circular economy processes */
+export type ProgramOrgsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** An administrative description of circular economy processes */
+export type ProgramProcessesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** An administrative description of circular economy processes */
+export type ProgramTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ProgramEdge = {
+  __typename?: 'ProgramEdge';
+  cursor: Scalars['String']['output'];
+  node: Program;
+};
+
+export type ProgramHistory = {
+  __typename?: 'ProgramHistory';
+  changes?: Maybe<Program>;
+  datetime: Scalars['DateTime']['output'];
+  original?: Maybe<Program>;
+  program: Program;
+  user: User;
+};
+
+export type ProgramHistoryEdge = {
+  __typename?: 'ProgramHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: ProgramHistory;
+};
+
+export type ProgramHistoryPage = {
+  __typename?: 'ProgramHistoryPage';
+  edges?: Maybe<Array<ProgramHistoryEdge>>;
+  nodes?: Maybe<Array<ProgramHistory>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ProgramOrgsInput = {
+  id: Scalars['ID']['input'];
+  role?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ProgramProcessesInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type ProgramTagsInput = {
+  id: Scalars['ID']['input'];
+  meta?: InputMaybe<Scalars['JSONObject']['input']>;
+};
+
+export type ProgramsPage = {
+  __typename?: 'ProgramsPage';
+  edges?: Maybe<Array<ProgramEdge>>;
+  nodes?: Maybe<Array<Program>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   categories: CategoriesPage;
@@ -1650,6 +1806,9 @@ export type Query = {
   process?: Maybe<Process>;
   processSchema?: Maybe<ModelEditSchema>;
   processes: ProcessPage;
+  program?: Maybe<Program>;
+  programSchema?: Maybe<ModelEditSchema>;
+  programs: ProgramsPage;
   region?: Maybe<Region>;
   regions: RegionsPage;
   search: SearchResultPage;
@@ -1791,6 +1950,19 @@ export type QueryProcessesArgs = {
 };
 
 
+export type QueryProgramArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryProgramsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryRegionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1889,6 +2061,7 @@ export type Region = {
   country?: Maybe<Region>;
   county?: Maybe<Region>;
   createdAt: Scalars['DateTime']['output'];
+  desc?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   /** Minimum map zoom level at which this region should be displayed */
   minZoom?: Maybe<Scalars['Float']['output']>;
@@ -2123,6 +2296,7 @@ export enum TagType {
   Org = 'ORG',
   Place = 'PLACE',
   Process = 'PROCESS',
+  Program = 'PROGRAM',
   Variant = 'VARIANT'
 }
 
@@ -2381,6 +2555,47 @@ export type UpdateProcessOutput = {
   currentProcess?: Maybe<Process>;
   /** The process including the proposed changes */
   process?: Maybe<Process>;
+};
+
+export type UpdateProgramInput = {
+  addOrgs?: InputMaybe<Array<ProgramOrgsInput>>;
+  addProcesses?: InputMaybe<Array<ProgramProcessesInput>>;
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  addTags?: InputMaybe<Array<ProgramTagsInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  descTr?: InputMaybe<Array<TranslatedInput>>;
+  id: Scalars['ID']['input'];
+  instructions?: InputMaybe<Scalars['JSONObject']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameTr?: InputMaybe<Array<TranslatedInput>>;
+  orgs?: InputMaybe<Array<ProgramOrgsInput>>;
+  processes?: InputMaybe<Array<ProgramProcessesInput>>;
+  region?: InputMaybe<Scalars['ID']['input']>;
+  removeOrgs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  removeProcesses?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+  removeTags?: InputMaybe<Array<Scalars['ID']['input']>>;
+  social?: InputMaybe<Scalars['JSONObject']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<ProgramTagsInput>>;
+};
+
+export type UpdateProgramOutput = {
+  __typename?: 'UpdateProgramOutput';
+  change?: Maybe<Change>;
+  /** The program as currently persisted in the database */
+  currentProgram?: Maybe<Program>;
+  program?: Maybe<Program>;
 };
 
 export type UpdateSourceInput = {
@@ -3950,6 +4165,7 @@ export type FlowCreateProcessMutation = { __typename?: 'Mutation', createProcess
             | { __typename?: 'Org' }
             | { __typename?: 'Place' }
             | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
+            | { __typename?: 'Program' }
             | { __typename?: 'Variant' }
            | null }> | null } } | null } | null };
 
@@ -3966,6 +4182,7 @@ export type FlowUpdateProcessMaterialMutation = { __typename?: 'Mutation', updat
             | { __typename?: 'Org' }
             | { __typename?: 'Place' }
             | { __typename: 'Process', id: string, name?: string | null, material?: { __typename?: 'Material', id: string } | null, org?: { __typename?: 'Org', id: string } | null }
+            | { __typename?: 'Program' }
             | { __typename?: 'Variant' }
            | null }> | null } } | null } | null };
 
@@ -4010,6 +4227,34 @@ export type FlowGetOrgQueryVariables = Exact<{
 
 
 export type FlowGetOrgQuery = { __typename?: 'Query', org?: { __typename?: 'Org', id: string, name: string, slug: string } | null };
+
+export type ProgramResolverListProgramsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type ProgramResolverListProgramsQuery = { __typename?: 'Query', programs: { __typename?: 'ProgramsPage', totalCount: number, nodes?: Array<{ __typename?: 'Program', id: string, name: string }> | null } };
+
+export type ProgramResolverGetProgramQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ProgramResolverGetProgramQuery = { __typename?: 'Query', program?: { __typename?: 'Program', id: string, name: string } | null };
+
+export type ProgramResolverCreateProgramMutationVariables = Exact<{
+  input: CreateProgramInput;
+}>;
+
+
+export type ProgramResolverCreateProgramMutation = { __typename?: 'Mutation', createProgram?: { __typename?: 'CreateProgramOutput', program?: { __typename?: 'Program', id: string, name: string, status: string } | null } | null };
+
+export type ProgramResolverUpdateProgramMutationVariables = Exact<{
+  input: UpdateProgramInput;
+}>;
+
+
+export type ProgramResolverUpdateProgramMutation = { __typename?: 'Mutation', updateProgram?: { __typename?: 'UpdateProgramOutput', program?: { __typename?: 'Program', id: string, name: string } | null } | null };
 
 export type TagResolverListTagsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -5145,6 +5390,10 @@ export const FlowApproveChangeDocument = {"kind":"Document","definitions":[{"kin
 export const FlowMergeChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FlowMergeChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mergeChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"change"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<FlowMergeChangeMutation, FlowMergeChangeMutationVariables>;
 export const FlowGetProcessDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FlowGetProcess"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"process"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"material"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"org"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<FlowGetProcessQuery, FlowGetProcessQueryVariables>;
 export const FlowGetOrgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FlowGetOrg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]} as unknown as DocumentNode<FlowGetOrgQuery, FlowGetOrgQueryVariables>;
+export const ProgramResolverListProgramsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ProgramResolverListPrograms"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"programs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<ProgramResolverListProgramsQuery, ProgramResolverListProgramsQueryVariables>;
+export const ProgramResolverGetProgramDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ProgramResolverGetProgram"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"program"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ProgramResolverGetProgramQuery, ProgramResolverGetProgramQueryVariables>;
+export const ProgramResolverCreateProgramDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ProgramResolverCreateProgram"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateProgramInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createProgram"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"program"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]} as unknown as DocumentNode<ProgramResolverCreateProgramMutation, ProgramResolverCreateProgramMutationVariables>;
+export const ProgramResolverUpdateProgramDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ProgramResolverUpdateProgram"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProgramInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProgram"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"program"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<ProgramResolverUpdateProgramMutation, ProgramResolverUpdateProgramMutationVariables>;
 export const TagResolverListTagsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TagResolverListTags"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tags"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}}]}}]}}]}}]} as unknown as DocumentNode<TagResolverListTagsQuery, TagResolverListTagsQueryVariables>;
 export const TagResolverCreateTagDefinitionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TagResolverCreateTagDefinition"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTagDefinitionInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTagDefinition"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tag"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<TagResolverCreateTagDefinitionMutation, TagResolverCreateTagDefinitionMutationVariables>;
 export const TagResolverGetTagDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TagResolverGetTag"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tag"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<TagResolverGetTagQuery, TagResolverGetTagQueryVariables>;

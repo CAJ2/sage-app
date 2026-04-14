@@ -18,6 +18,7 @@ import { IDCreatedUpdated } from '@src/db/base.entity'
 import { MultiPolygon, MultiPolygonType } from '@src/db/custom.types'
 import { Component } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
+import { Program } from '@src/process/program.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
 
@@ -37,6 +38,9 @@ export interface RegionProperties {
 export class Region extends IDCreatedUpdated {
   @Property({ type: 'json' })
   name!: TranslatedField
+
+  @Property({ type: 'json' })
+  desc?: TranslatedField
 
   @Property({ type: MultiPolygonType })
   geo?: MultiPolygon
@@ -58,6 +62,9 @@ export class Region extends IDCreatedUpdated {
 
   @OneToMany({ mappedBy: 'region' })
   processes = new Collection<Process>(this)
+
+  @OneToMany({ mappedBy: 'region' })
+  programs = new Collection<Program>(this)
 
   @OneToMany({ mappedBy: 'region' })
   history = new Collection<RegionHistory>(this)

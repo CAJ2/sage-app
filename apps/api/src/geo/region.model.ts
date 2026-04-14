@@ -14,6 +14,9 @@ export class Region extends CreatedUpdated {
   @Field(() => String, { nullable: true })
   name?: string
 
+  @Field(() => String, { nullable: true })
+  desc?: string
+
   @Field(() => String, {
     description: 'The type of geographic entity (e.g. country, region, locality)',
   })

@@ -31,6 +31,12 @@ export class I18nService {
 
   // Picks the appropriate translation for the current request language.
   tr(field: TranslatedField | string | undefined): string | undefined {
+    return this.pick(field) as string | undefined
+  }
+
+  // Generic helper to pick the appropriate localized value from a record
+  // based on the current request language preference.
+  pick<T>(field: Record<string, T> | string | undefined): T | string | undefined {
     if (typeof field === 'string') {
       return field
     }

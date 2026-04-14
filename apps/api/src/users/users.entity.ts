@@ -11,6 +11,7 @@ import type { Opt } from '@mikro-orm/core'
 
 import { Account } from '@src/auth/account.entity'
 import { Session } from '@src/auth/session.entity'
+import type { Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Org } from '@src/users/org.entity'
 
@@ -62,6 +63,9 @@ export class User extends IDCreatedUpdated {
 
   @Property()
   role?: string
+
+  @Property({ type: 'json' })
+  rank?: Rank
 
   @OneToMany({ mappedBy: 'user' })
   sessions = new Collection<Session>(this)

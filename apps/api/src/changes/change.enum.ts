@@ -5,6 +5,7 @@ import { Place } from '@src/geo/place.model'
 import { Component } from '@src/process/component.model'
 import { Material } from '@src/process/material.model'
 import { Process } from '@src/process/process.model'
+import { Program } from '@src/process/program.model'
 import { Category } from '@src/product/category.model'
 import { Item } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.model'
@@ -17,7 +18,8 @@ registerEnumType(ChangeStatus, {
 
 export const EditModel = createUnionType({
   name: 'EditModel',
-  types: () => [Place, Org, Component, Material, Process, Category, Item, Variant] as const,
+  types: () =>
+    [Place, Org, Component, Material, Process, Program, Category, Item, Variant] as const,
 })
 
 export enum EditModelType {
@@ -26,6 +28,7 @@ export enum EditModelType {
   Component = 'Component',
   Material = 'Material',
   Process = 'Process',
+  Program = 'Program',
   Category = 'Category',
   Item = 'Item',
   Variant = 'Variant',

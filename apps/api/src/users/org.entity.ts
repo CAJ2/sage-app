@@ -13,9 +13,10 @@ import {
 } from '@mikro-orm/core'
 
 import { defaultTranslatedField, type TranslatedField } from '@src/common/i18n'
-import { type JSONObject } from '@src/common/z.schema'
+import { type JSONObject, type Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Process } from '@src/process/process.entity'
+import { Program } from '@src/process/program.entity'
 import { Variant } from '@src/product/variant.entity'
 import { User } from '@src/users/users.entity'
 
@@ -42,6 +43,9 @@ export class Org extends IDCreatedUpdated {
   @Property({ fieldName: 'name_translations', type: 'json' })
   nameTr: TranslatedField = defaultTranslatedField()
 
+  @Property({ type: 'json' })
+  rank?: Rank
+
   @ManyToMany({ entity: () => User, mappedBy: 'orgs' })
   users = new Collection<User>(this)
 
@@ -53,6 +57,9 @@ export class Org extends IDCreatedUpdated {
 
   @OneToMany({ mappedBy: 'org' })
   processes = new Collection<Process>(this)
+
+  @ManyToMany({ entity: () => Program, mappedBy: 'orgs' })
+  programs = new Collection<Program>(this)
 
   @OneToMany({ mappedBy: 'org' })
   history = new Collection<OrgHistory>(this)

@@ -14,6 +14,11 @@ export type JSONObject = { [key: string]: JSONType }
 export const ZJSONObject = z.record(z.string(), z.json())
 export const ZTranslatedField = z.record(z.string(), z.string())
 
+export const RankSchema = z.object({
+  quality: z.number().optional(),
+})
+export type Rank = z.infer<typeof RankSchema>
+
 export const HTTPS_OR_ICON: core.$ZodURLParams = {
   protocol: /^https|icon$/,
 }

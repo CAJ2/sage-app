@@ -15,10 +15,12 @@ import { z } from 'zod/v4'
 
 import { Source } from '@src/changes/source.entity'
 import type { TranslatedField } from '@src/common/i18n'
+import type { Rank } from '@src/common/z.schema'
 import { IDCreatedUpdated } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
+import { Program } from '@src/process/program.entity'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 import { User } from '@src/users/users.entity'
@@ -231,11 +233,17 @@ export class Process extends IDCreatedUpdated {
   @Property({ type: 'json' })
   rules?: ProcessRules
 
+  @Property({ type: 'json' })
+  rank?: Rank
+
   @ManyToMany({ entity: () => Source, pivotEntity: () => ProcessSources })
   sources = new Collection<Source>(this)
 
   @OneToMany(() => ProcessSources, (pr) => pr.process)
   processSources = new Collection<ProcessSources>(this)
+
+  @ManyToMany({ entity: () => Program, mappedBy: 'processes' })
+  programs = new Collection<Program>(this)
 
   @ManyToOne()
   org?: Ref<Org>

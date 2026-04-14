@@ -46,6 +46,15 @@ export const MaterialShapeSchema = z
 
 export type MaterialShape = z.infer<typeof MaterialShapeSchema>
 
+export const MaterialSynonymsSchema = z.record(
+  z.string(),
+  z.object({
+    abbrev: z.array(z.string()).optional(),
+    full: z.array(z.string()).optional(),
+  }),
+)
+export type MaterialSynonyms = z.infer<typeof MaterialSynonymsSchema>
+
 @Entity({ tableName: 'materials', schema: 'public' })
 export class Material extends IDCreatedUpdated {
   @Property({ type: 'json' })
@@ -53,6 +62,9 @@ export class Material extends IDCreatedUpdated {
 
   @Property({ type: 'json' })
   desc?: TranslatedField
+
+  @Property({ type: 'json' })
+  synonyms?: MaterialSynonyms
 
   @Property({ type: 'json' })
   source!: JsonLdDocument

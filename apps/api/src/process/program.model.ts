@@ -1,0 +1,251 @@
+import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
+import { JSONObjectResolver } from 'graphql-scalars'
+import { DateTime } from 'luxon'
+
+import { ChangeInputWithLang } from '@src/changes/change-ext.model'
+import { Change } from '@src/changes/change.model'
+import { LuxonDateTimeResolver } from '@src/common/datetime.model'
+import { type JSONObject } from '@src/common/z.schema'
+import { Region } from '@src/geo/region.model'
+import {
+  BaseModel,
+  IDCreatedUpdated,
+  type ModelRef,
+  registerModel,
+  TranslatedInput,
+} from '@src/graphql/base.model'
+import { Named } from '@src/graphql/interfaces.model'
+import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
+import { ProcessPage } from '@src/process/process.model'
+import { ProgramStatus } from '@src/process/program.entity'
+import { TagPage } from '@src/process/tag.model'
+import { OrgsPage } from '@src/users/org.model'
+import { User as UserEntity } from '@src/users/users.entity'
+import { User } from '@src/users/users.model'
+
+@ObjectType({
+  implements: () => [Named],
+  description: 'An administrative description of circular economy processes',
+})
+export class Program extends IDCreatedUpdated implements Named {
+  @Field(() => String)
+  name!: string
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  social?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  instructions?: JSONObject
+
+  @Field(() => String)
+  status!: ProgramStatus
+
+  @Field(() => Region, { nullable: true })
+  region?: Region & {}
+
+  @Field(() => OrgsPage, { description: 'Organizations involved in this program' })
+  orgs!: OrgsPage & {}
+
+  @Field(() => ProcessPage, { description: 'Processes run by this program' })
+  processes!: ProcessPage & {}
+
+  @Field(() => TagPage, { description: 'Metadata tags applied to this program' })
+  tags!: TagPage & {}
+
+  @Field(() => ProgramHistoryPage, { description: 'Audit history of changes to this program' })
+  history!: ProgramHistoryPage & {}
+}
+registerModel('Program', Program)
+
+@ObjectType()
+export class ProgramHistory extends BaseModel {
+  @Field(() => Program)
+  program!: Program
+
+  @Field(() => LuxonDateTimeResolver)
+  datetime!: DateTime
+
+  @Field(() => User)
+  user!: ModelRef<User, UserEntity>
+
+  @Field(() => Program, { nullable: true })
+  original?: Program
+
+  @Field(() => Program, { nullable: true })
+  changes?: Program
+}
+
+@ObjectType()
+export class ProgramHistoryPage extends Paginated(ProgramHistory) {}
+
+@ObjectType()
+export class ProgramsPage extends Paginated(Program) {}
+
+@ArgsType()
+export class ProgramHistoryArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
+export class ProgramsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
+export class ProgramOrgsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
+export class ProgramProcessesArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@ArgsType()
+export class ProgramTagsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
+
+@InputType()
+export class ProgramOrgsInput {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  role?: string
+}
+
+@InputType()
+export class ProgramProcessesInput {
+  @Field(() => ID)
+  id!: string
+}
+
+@InputType()
+export class ProgramTagsInput {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  meta?: JSONObject
+}
+
+@InputType()
+export class CreateProgramInput extends ChangeInputWithLang {
+  @Field(() => String, { nullable: true })
+  name?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  nameTr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  descTr?: TranslatedInput[]
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  social?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  instructions?: JSONObject
+
+  @Field(() => String)
+  status!: ProgramStatus
+
+  @Field(() => ID, { nullable: true })
+  region?: string
+
+  @Field(() => [ProgramOrgsInput], { nullable: true })
+  orgs?: ProgramOrgsInput[]
+
+  @Field(() => [ProgramProcessesInput], { nullable: true })
+  processes?: ProgramProcessesInput[]
+
+  @Field(() => [ProgramTagsInput], { nullable: true })
+  tags?: ProgramTagsInput[]
+}
+
+@InputType()
+export class UpdateProgramInput extends ChangeInputWithLang {
+  @Field(() => ID)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  name?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  nameTr?: TranslatedInput[]
+
+  @Field(() => String, { nullable: true })
+  desc?: string
+
+  @Field(() => [TranslatedInput], { nullable: true })
+  descTr?: TranslatedInput[]
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  social?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  instructions?: JSONObject
+
+  @Field(() => String, { nullable: true })
+  status?: ProgramStatus
+
+  @Field(() => ID, { nullable: true })
+  region?: string
+
+  @Field(() => [ProgramOrgsInput], { nullable: true })
+  orgs?: ProgramOrgsInput[]
+
+  @Field(() => [ProgramOrgsInput], { nullable: true })
+  addOrgs?: ProgramOrgsInput[]
+
+  @Field(() => [ID], { nullable: true })
+  removeOrgs?: string[]
+
+  @Field(() => [ProgramProcessesInput], { nullable: true })
+  processes?: ProgramProcessesInput[]
+
+  @Field(() => [ProgramProcessesInput], { nullable: true })
+  addProcesses?: ProgramProcessesInput[]
+
+  @Field(() => [ID], { nullable: true })
+  removeProcesses?: string[]
+
+  @Field(() => [ProgramTagsInput], { nullable: true })
+  tags?: ProgramTagsInput[]
+
+  @Field(() => [ProgramTagsInput], { nullable: true })
+  addTags?: ProgramTagsInput[]
+
+  @Field(() => [ID], { nullable: true })
+  removeTags?: string[]
+}
+
+@ObjectType()
+export class CreateProgramOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Program, { nullable: true })
+  program?: Program
+}
+
+@ObjectType()
+export class UpdateProgramOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change & {}
+
+  @Field(() => Program, { nullable: true })
+  program?: Program
+
+  @Field(() => Program, {
+    nullable: true,
+    description: 'The program as currently persisted in the database',
+  })
+  currentProgram?: Program & {}
+}

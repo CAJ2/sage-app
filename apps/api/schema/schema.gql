@@ -522,6 +522,42 @@ type CreateProcessOutput {
   process: Process
 }
 
+input CreateProgramInput {
+  """Sources to associate with this change"""
+  addSources: [SourceInput!]
+
+  """If true, immediately apply (merge) the change after creation"""
+  apply: Boolean
+
+  """Details for a new change to create for this edit"""
+  change: CreateChangeInput
+
+  """ID of an existing change to add this edit to"""
+  changeID: ID
+  desc: String
+  descTr: [TranslatedInput!]
+  instructions: JSONObject
+
+  """Language code for text input fields (BCP 47, e.g. "en")"""
+  lang: String
+  name: String
+  nameTr: [TranslatedInput!]
+  orgs: [ProgramOrgsInput!]
+  processes: [ProgramProcessesInput!]
+  region: ID
+
+  """IDs of sources to remove from this change"""
+  removeSources: [ID!]
+  social: JSONObject
+  status: String!
+  tags: [ProgramTagsInput!]
+}
+
+type CreateProgramOutput {
+  change: Change
+  program: Program
+}
+
 input CreateSourceInput {
   content: JSONObject
   contentURL: String
@@ -663,7 +699,7 @@ type EditEdge {
   node: Edit!
 }
 
-union EditModel = Category | Component | Item | Material | Org | Place | Process | Variant
+union EditModel = Category | Component | Item | Material | Org | Place | Process | Program | Variant
 
 """Type of the model being edited"""
 enum EditModelType {
@@ -674,6 +710,7 @@ enum EditModelType {
   Org
   Place
   Process
+  Program
   Variant
 }
 
@@ -882,6 +919,7 @@ type Material implements Named {
 
   """The physical form or shape of the material (e.g. film, rigid, fibre)"""
   shape: String
+  synonyms: [String!]
 
   """
   If true, this is an internal technical classification not shown to end-users
@@ -925,6 +963,7 @@ type Mutation {
   createOrg(input: CreateOrgInput!): CreateOrgOutput
   createPlace(input: CreatePlaceInput!): CreatePlaceOutput
   createProcess(input: CreateProcessInput!): CreateProcessOutput
+  createProgram(input: CreateProgramInput!): CreateProgramOutput
   createSource(input: CreateSourceInput!): CreateSourceOutput
   createTagDefinition(input: CreateTagDefinitionInput!): CreateTagDefinitionOutput
   createVariant(input: CreateVariantInput!): CreateVariantOutput
@@ -948,6 +987,7 @@ type Mutation {
   updateOrg(input: UpdateOrgInput!): UpdateOrgOutput
   updatePlace(input: UpdatePlaceInput!): UpdatePlaceOutput
   updateProcess(input: UpdateProcessInput!): UpdateProcessOutput
+  updateProgram(input: UpdateProgramInput!): UpdateProgramOutput
   updateSource(input: UpdateSourceInput!): UpdateSourceOutput
   updateTagDefinition(input: UpdateTagDefinitionInput!): UpdateTagDefinitionOutput
   updateVariant(input: UpdateVariantInput!): UpdateVariantOutput
@@ -1206,6 +1246,79 @@ input ProcessVariantInput {
   id: ID!
 }
 
+"""An administrative description of circular economy processes"""
+type Program implements Named {
+  createdAt: DateTime!
+  desc: String
+
+  """Audit history of changes to this program"""
+  history(after: String, before: String, first: Int, last: Int): ProgramHistoryPage!
+
+  """The ID of the model"""
+  id: ID!
+  instructions: JSONObject
+  name: String!
+
+  """Organizations involved in this program"""
+  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+
+  """Processes run by this program"""
+  processes(after: String, before: String, first: Int, last: Int): ProcessPage!
+  region: Region
+  social: JSONObject
+  status: String!
+
+  """Metadata tags applied to this program"""
+  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  updatedAt: DateTime!
+}
+
+type ProgramEdge {
+  cursor: String!
+  node: Program!
+}
+
+type ProgramHistory {
+  changes: Program
+  datetime: DateTime!
+  original: Program
+  program: Program!
+  user: User!
+}
+
+type ProgramHistoryEdge {
+  cursor: String!
+  node: ProgramHistory!
+}
+
+type ProgramHistoryPage {
+  edges: [ProgramHistoryEdge!]
+  nodes: [ProgramHistory!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input ProgramOrgsInput {
+  id: ID!
+  role: String
+}
+
+input ProgramProcessesInput {
+  id: ID!
+}
+
+input ProgramTagsInput {
+  id: ID!
+  meta: JSONObject
+}
+
+type ProgramsPage {
+  edges: [ProgramEdge!]
+  nodes: [Program!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type Query {
   categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
   category(id: ID!): Category
@@ -1235,6 +1348,9 @@ type Query {
   process(id: ID!): Process
   processSchema: ModelEditSchema
   processes(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
+  program(id: ID!): Program
+  programSchema: ModelEditSchema
+  programs(after: String, before: String, first: Int, last: Int): ProgramsPage!
   region(id: ID!): Region
   regions(after: String, before: String, first: Int, last: Int): RegionsPage!
   search(latlong: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
@@ -1275,6 +1391,7 @@ type Region {
   country: Region
   county: Region
   createdAt: DateTime!
+  desc: String
   id: ID!
 
   """Minimum map zoom level at which this region should be displayed"""
@@ -1513,6 +1630,7 @@ enum TagType {
   ORG
   PLACE
   PROCESS
+  PROGRAM
   VARIANT
 }
 
@@ -1819,6 +1937,53 @@ type UpdateProcessOutput {
 
   """The process including the proposed changes"""
   process: Process
+}
+
+input UpdateProgramInput {
+  addOrgs: [ProgramOrgsInput!]
+  addProcesses: [ProgramProcessesInput!]
+
+  """Sources to associate with this change"""
+  addSources: [SourceInput!]
+  addTags: [ProgramTagsInput!]
+
+  """If true, immediately apply (merge) the change after creation"""
+  apply: Boolean
+
+  """Details for a new change to create for this edit"""
+  change: CreateChangeInput
+
+  """ID of an existing change to add this edit to"""
+  changeID: ID
+  desc: String
+  descTr: [TranslatedInput!]
+  id: ID!
+  instructions: JSONObject
+
+  """Language code for text input fields (BCP 47, e.g. "en")"""
+  lang: String
+  name: String
+  nameTr: [TranslatedInput!]
+  orgs: [ProgramOrgsInput!]
+  processes: [ProgramProcessesInput!]
+  region: ID
+  removeOrgs: [ID!]
+  removeProcesses: [ID!]
+
+  """IDs of sources to remove from this change"""
+  removeSources: [ID!]
+  removeTags: [ID!]
+  social: JSONObject
+  status: String
+  tags: [ProgramTagsInput!]
+}
+
+type UpdateProgramOutput {
+  change: Change
+
+  """The program as currently persisted in the database"""
+  currentProgram: Program
+  program: Program
 }
 
 input UpdateSourceInput {

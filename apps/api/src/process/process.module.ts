@@ -15,6 +15,9 @@ import { MaterialService } from '@src/process/material.service'
 import { ProcessHistoryResolver, ProcessResolver } from '@src/process/process.resolver'
 import { ProcessSchemaService } from '@src/process/process.schema'
 import { ProcessService } from '@src/process/process.service'
+import { ProgramResolver } from '@src/process/program.resolver'
+import { ProgramSchemaService } from '@src/process/program.schema'
+import { ProgramService } from '@src/process/program.service'
 import { StreamService } from '@src/process/stream.service'
 import { TagResolver } from '@src/process/tag.resolver'
 import { TagSchemaService } from '@src/process/tag.schema'
@@ -46,6 +49,9 @@ import { UsersModule } from '@src/users/users.module'
     ProcessService,
     ProcessSchemaService,
     ProcessHistoryResolver,
+    ProgramResolver,
+    ProgramService,
+    ProgramSchemaService,
     TagResolver,
     TagService,
     TagSchemaService,
@@ -60,6 +66,8 @@ import { UsersModule } from '@src/users/users.module'
     ComponentSchemaService,
     ProcessService,
     ProcessSchemaService,
+    ProgramService,
+    ProgramSchemaService,
     MaterialService,
     MaterialSchemaService,
   ],
