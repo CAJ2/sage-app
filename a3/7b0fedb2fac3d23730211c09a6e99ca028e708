@@ -1,0 +1,45 @@
+apps/api/src/search/search.backend.ts
+  0d74e2af6e7c5ebb 85
+apps/api/src/search/search.resolver.spec.ts
+  0d74e2af6e7c5ebb 46
+apps/api/src/search/typesense.service.spec.ts
+  f49017a7eb6a4913 265-309
+apps/api/src/search/typesense.service.ts
+  0d74e2af6e7c5ebb 104-105,107-108,262-265
+  f49017a7eb6a4913 106,261
+apps/api/src/search/search.service.ts
+  0d74e2af6e7c5ebb 184-188,248-256,263,270
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "a37b0fedb2fac3d23730211c09a6e99ca028e708",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 31,
+      "total_deletions": 7,
+      "accepted_lines": 29,
+      "overriden_lines": 0
+    },
+    "f49017a7eb6a4913": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "6556a4bc-13ea-4e2b-8532-ecaae067919a",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 48,
+      "total_deletions": 6,
+      "accepted_lines": 47,
+      "overriden_lines": 0
+    }
+  }
+}
