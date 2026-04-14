@@ -101,6 +101,11 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
     return (await this.getCollectionSchemas()).map((collection) => collection.name)
   }
 
+  async supportsVectorSearch(collection: string): Promise<boolean> {
+    const schema = await this.getCollectionSchema(collection)
+    return schema.fields.some((f) => f.name === 'embedding')
+  }
+
   async search(request: SearchBackendSearchRequest): Promise<SearchBackendSearchResult> {
     const multiResult = await this.multiSearch({
       searches: [request],
@@ -253,9 +258,11 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
     includeCollection = false,
   ) {
     const filterBy = this.buildFilterBy(request.options?.filters, request.options?.geo)
-    const vectorQuery = request.options?.vector
-      ? `embedding:([${request.options.vector.join(',')}])`
-      : undefined
+    const hasVectorField = schema.fields.some((f) => f.name === 'embedding')
+    const vectorQuery =
+      request.options?.vector && hasVectorField
+        ? `embedding:([${request.options.vector.join(',')}])`
+        : undefined
 
     return {
       ...(includeCollection ? { collection: request.collection } : {}),
