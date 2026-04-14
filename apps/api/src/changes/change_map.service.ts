@@ -6,6 +6,7 @@ import _ from 'lodash'
 import { BadRequestErr } from '@src/common/exceptions'
 import { ComponentService } from '@src/process/component.service'
 import { ProcessService } from '@src/process/process.service'
+import { ProgramService } from '@src/process/program.service'
 import { CategoryService } from '@src/product/category.service'
 import { ItemService } from '@src/product/item.service'
 import { VariantService } from '@src/product/variant.service'
@@ -28,12 +29,14 @@ export class ChangeMapService {
     private readonly variantService: VariantService,
     private readonly componentService: ComponentService,
     private readonly processService: ProcessService,
+    private readonly programService: ProgramService,
   ) {
     this.serviceMap['Category'] = this.categoryService as IEntityService
     this.serviceMap['Item'] = this.itemService as IEntityService
     this.serviceMap['Variant'] = this.variantService as IEntityService
     this.serviceMap['Component'] = this.componentService as IEntityService
     this.serviceMap['Process'] = this.processService as IEntityService
+    this.serviceMap['Program'] = this.programService as IEntityService
   }
 
   findEditServices(entityName?: string) {

@@ -188,6 +188,10 @@ type Documents = {
     "\n          mutation FlowMergeChange($id: ID!) {\n            mergeChange(id: $id) {\n              change {\n                id\n                status\n              }\n            }\n          }\n        ": typeof types.FlowMergeChangeDocument,
     "\n          query FlowGetProcess($id: ID!) {\n            process(id: $id) {\n              id\n              name\n              material {\n                id\n              }\n              org {\n                id\n              }\n            }\n          }\n        ": typeof types.FlowGetProcessDocument,
     "\n          query FlowGetOrg($id: ID!) {\n            org(id: $id) {\n              id\n              name\n              slug\n            }\n          }\n        ": typeof types.FlowGetOrgDocument,
+    "\n        query ProgramResolverListPrograms($first: Int) {\n          programs(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n          }\n        }\n      ": typeof types.ProgramResolverListProgramsDocument,
+    "\n        query ProgramResolverGetProgram($id: ID!) {\n          program(id: $id) {\n            id\n            name\n          }\n        }\n      ": typeof types.ProgramResolverGetProgramDocument,
+    "\n        mutation ProgramResolverCreateProgram($input: CreateProgramInput!) {\n          createProgram(input: $input) {\n            program {\n              id\n              name\n              status\n            }\n          }\n        }\n      ": typeof types.ProgramResolverCreateProgramDocument,
+    "\n        mutation ProgramResolverUpdateProgram($input: UpdateProgramInput!) {\n          updateProgram(input: $input) {\n            program {\n              id\n              name\n            }\n          }\n        }\n      ": typeof types.ProgramResolverUpdateProgramDocument,
     "\n        query TagResolverListTags($first: Int) {\n          tags(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n            pageInfo {\n              hasNextPage\n              hasPreviousPage\n            }\n          }\n        }\n      ": typeof types.TagResolverListTagsDocument,
     "\n        mutation TagResolverCreateTagDefinition($input: CreateTagDefinitionInput!) {\n          createTagDefinition(input: $input) {\n            tag {\n              id\n              name\n            }\n          }\n        }\n      ": typeof types.TagResolverCreateTagDefinitionDocument,
     "\n        query TagResolverGetTag($id: ID!) {\n          tag(id: $id) {\n            id\n            name\n          }\n        }\n      ": typeof types.TagResolverGetTagDocument,
@@ -487,6 +491,10 @@ const documents: Documents = {
     "\n          mutation FlowMergeChange($id: ID!) {\n            mergeChange(id: $id) {\n              change {\n                id\n                status\n              }\n            }\n          }\n        ": types.FlowMergeChangeDocument,
     "\n          query FlowGetProcess($id: ID!) {\n            process(id: $id) {\n              id\n              name\n              material {\n                id\n              }\n              org {\n                id\n              }\n            }\n          }\n        ": types.FlowGetProcessDocument,
     "\n          query FlowGetOrg($id: ID!) {\n            org(id: $id) {\n              id\n              name\n              slug\n            }\n          }\n        ": types.FlowGetOrgDocument,
+    "\n        query ProgramResolverListPrograms($first: Int) {\n          programs(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n          }\n        }\n      ": types.ProgramResolverListProgramsDocument,
+    "\n        query ProgramResolverGetProgram($id: ID!) {\n          program(id: $id) {\n            id\n            name\n          }\n        }\n      ": types.ProgramResolverGetProgramDocument,
+    "\n        mutation ProgramResolverCreateProgram($input: CreateProgramInput!) {\n          createProgram(input: $input) {\n            program {\n              id\n              name\n              status\n            }\n          }\n        }\n      ": types.ProgramResolverCreateProgramDocument,
+    "\n        mutation ProgramResolverUpdateProgram($input: UpdateProgramInput!) {\n          updateProgram(input: $input) {\n            program {\n              id\n              name\n            }\n          }\n        }\n      ": types.ProgramResolverUpdateProgramDocument,
     "\n        query TagResolverListTags($first: Int) {\n          tags(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n            pageInfo {\n              hasNextPage\n              hasPreviousPage\n            }\n          }\n        }\n      ": types.TagResolverListTagsDocument,
     "\n        mutation TagResolverCreateTagDefinition($input: CreateTagDefinitionInput!) {\n          createTagDefinition(input: $input) {\n            tag {\n              id\n              name\n            }\n          }\n        }\n      ": types.TagResolverCreateTagDefinitionDocument,
     "\n        query TagResolverGetTag($id: ID!) {\n          tag(id: $id) {\n            id\n            name\n          }\n        }\n      ": types.TagResolverGetTagDocument,
@@ -1322,6 +1330,22 @@ export function graphql(source: "\n          query FlowGetProcess($id: ID!) {\n 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n          query FlowGetOrg($id: ID!) {\n            org(id: $id) {\n              id\n              name\n              slug\n            }\n          }\n        "): (typeof documents)["\n          query FlowGetOrg($id: ID!) {\n            org(id: $id) {\n              id\n              name\n              slug\n            }\n          }\n        "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        query ProgramResolverListPrograms($first: Int) {\n          programs(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n          }\n        }\n      "): (typeof documents)["\n        query ProgramResolverListPrograms($first: Int) {\n          programs(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        query ProgramResolverGetProgram($id: ID!) {\n          program(id: $id) {\n            id\n            name\n          }\n        }\n      "): (typeof documents)["\n        query ProgramResolverGetProgram($id: ID!) {\n          program(id: $id) {\n            id\n            name\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation ProgramResolverCreateProgram($input: CreateProgramInput!) {\n          createProgram(input: $input) {\n            program {\n              id\n              name\n              status\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation ProgramResolverCreateProgram($input: CreateProgramInput!) {\n          createProgram(input: $input) {\n            program {\n              id\n              name\n              status\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation ProgramResolverUpdateProgram($input: UpdateProgramInput!) {\n          updateProgram(input: $input) {\n            program {\n              id\n              name\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation ProgramResolverUpdateProgram($input: UpdateProgramInput!) {\n          updateProgram(input: $input) {\n            program {\n              id\n              name\n            }\n          }\n        }\n      "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

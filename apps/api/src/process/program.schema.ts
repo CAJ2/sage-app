@@ -1,0 +1,327 @@
+import { BaseEntity } from '@mikro-orm/core'
+import { Injectable } from '@nestjs/common'
+import { ValidateFunction } from 'ajv'
+import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
+
+import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
+import { BaseSchemaService, RelMetaSchema, zToSchema } from '@src/common/base.schema'
+import { TrArraySchema } from '@src/common/i18n'
+import { I18nService } from '@src/common/i18n.service'
+import { ISchemaService, IsSchemaService } from '@src/common/meta.service'
+import { UISchemaElement } from '@src/common/ui.schema'
+import { TransformInput, ZService } from '@src/common/z.service'
+import { RegionIDSchema } from '@src/geo/region.model'
+import { ProcessIDSchema } from '@src/process/process.schema'
+import {
+  Program as ProgramEntity,
+  ProgramHistory as ProgramHistoryEntity,
+  ProgramStatus,
+} from '@src/process/program.entity'
+import {
+  CreateProgramInput,
+  Program,
+  ProgramHistory,
+  UpdateProgramInput,
+} from '@src/process/program.model'
+import { TagDefinitionIDSchema } from '@src/process/tag.model'
+import { OrgIDSchema } from '@src/users/org.schema'
+import { User } from '@src/users/users.model'
+
+export const ProgramIDSchema = z.string().meta({
+  id: 'Program',
+  name: 'Program ID',
+})
+
+@Injectable()
+@IsSchemaService(ProgramEntity)
+export class ProgramSchemaService implements ISchemaService {
+  OutputModel = Program
+  CreateInputModel = CreateProgramInput
+  UpdateInputModel = UpdateProgramInput
+
+  ProgramOrgsInputSchema
+  ProgramProcessesInputSchema
+  ProgramTagsInputSchema
+  CreateSchema
+  CreateJSONSchema: z.core.JSONSchema.BaseSchema
+  CreateValidator: ValidateFunction
+  CreateUISchema: UISchemaElement
+  UpdateSchema
+  UpdateJSONSchema: z.core.JSONSchema.BaseSchema
+  UpdateValidator: ValidateFunction
+  UpdateUISchema: UISchemaElement
+
+  constructor(
+    private readonly i18n: I18nService,
+    private readonly baseSchema: BaseSchemaService,
+    private readonly zService: ZService,
+  ) {
+    const ProgramTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ProgramEntity
+      const model = new Program()
+      model.id = entity.id
+      model.createdAt = DateTime.fromJSDate(entity.createdAt)
+      model.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+      model.name = input.i18n.tr(entity.name) as string
+      model.desc = input.i18n.tr(entity.desc)
+      model.social = entity.social
+      model.instructions = entity.instructions
+      model.status = entity.status
+      return model
+    })
+    this.zService.registerEntityTransform(ProgramEntity, Program, ProgramTransform)
+
+    const ProgramHistoryTransform = z.transform((input: TransformInput) => {
+      const entity = input.input as ProgramHistoryEntity
+      const model = new ProgramHistory()
+      model.datetime = DateTime.fromJSDate(entity.datetime)
+      model.user = entity.user as unknown as User & {}
+      model.original = entity.original as Program | undefined
+      model.changes = entity.changes as Program | undefined
+      return model
+    })
+    this.zService.registerEntityTransform(
+      ProgramHistoryEntity,
+      ProgramHistory,
+      ProgramHistoryTransform,
+    )
+
+    this.ProgramOrgsInputSchema = z.strictObject({
+      id: OrgIDSchema,
+      role: z.string().optional(),
+    })
+    this.ProgramProcessesInputSchema = z.strictObject({
+      id: ProcessIDSchema,
+    })
+    this.ProgramTagsInputSchema = z.strictObject({
+      id: TagDefinitionIDSchema,
+      meta: RelMetaSchema,
+    })
+
+    this.CreateSchema = ChangeInputWithLangSchema.extend({
+      name: z.string().min(1).max(1024).optional(),
+      nameTr: TrArraySchema,
+      desc: z.string().max(100_000).optional(),
+      descTr: TrArraySchema,
+      social: z.record(z.string(), z.any()).optional(),
+      instructions: z.record(z.string(), z.any()).optional(),
+      status: z.nativeEnum(ProgramStatus).default(ProgramStatus.ACTIVE),
+      region: RegionIDSchema.optional(),
+      orgs: z.array(this.ProgramOrgsInputSchema).optional(),
+      processes: z.array(this.ProgramProcessesInputSchema).optional(),
+      tags: z.array(this.ProgramTagsInputSchema).optional(),
+    })
+
+    this.CreateJSONSchema = zToSchema(this.CreateSchema)
+    this.CreateUISchema = {
+      type: 'VerticalLayout',
+      elements: [
+        {
+          type: 'Control',
+          scope: '#/properties/nameTr',
+          label: 'Name Translations',
+          options: this.baseSchema.trOptionsUISchema(),
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/descTr',
+          label: 'Description Translations',
+          options: this.baseSchema.trOptionsUISchema(),
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/status',
+          label: 'Status',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/region',
+          label: 'Region',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/orgs',
+          label: 'Organizations',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/processes',
+          label: 'Processes',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/tags',
+          label: 'Tags',
+        },
+      ],
+    }
+
+    this.UpdateSchema = ChangeInputWithLangSchema.extend({
+      id: ProgramIDSchema,
+      name: z.string().min(1).max(1024).optional(),
+      nameTr: TrArraySchema.optional(),
+      desc: z.string().max(100_000).optional(),
+      descTr: TrArraySchema.optional(),
+      social: z.record(z.string(), z.any()).optional(),
+      instructions: z.record(z.string(), z.any()).optional(),
+      status: z.enum(ProgramStatus).optional(),
+      region: RegionIDSchema.optional(),
+      orgs: z.array(this.ProgramOrgsInputSchema).optional(),
+      addOrgs: z.array(this.ProgramOrgsInputSchema).optional(),
+      removeOrgs: z.array(z.string()).optional(),
+      processes: z.array(this.ProgramProcessesInputSchema).optional(),
+      addProcesses: z.array(this.ProgramProcessesInputSchema).optional(),
+      removeProcesses: z.array(z.string()).optional(),
+      tags: z.array(this.ProgramTagsInputSchema).optional(),
+      addTags: z.array(this.ProgramTagsInputSchema).optional(),
+      removeTags: z.array(z.string()).optional(),
+    })
+    this.UpdateJSONSchema = zToSchema(this.UpdateSchema)
+    this.UpdateUISchema = {
+      type: 'VerticalLayout',
+      elements: [
+        {
+          type: 'Control',
+          scope: '#/properties/nameTr',
+          label: 'Name Translations',
+          options: this.baseSchema.trOptionsUISchema(),
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/descTr',
+          label: 'Description Translations',
+          options: this.baseSchema.trOptionsUISchema(),
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/status',
+          label: 'Status',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/region',
+          label: 'Region',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/orgs',
+          label: 'Organizations',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/addOrgs',
+          label: 'Add Organizations',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/removeOrgs',
+          label: 'Remove Organizations',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/processes',
+          label: 'Processes',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/addProcesses',
+          label: 'Add Processes',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/removeProcesses',
+          label: 'Remove Processes',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/tags',
+          label: 'Tags',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/addTags',
+          label: 'Add Tags',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/removeTags',
+          label: 'Remove Tags',
+        },
+      ],
+    }
+    this.CreateValidator = this.baseSchema.ajv.compile(this.CreateJSONSchema)
+    this.UpdateValidator = this.baseSchema.ajv.compile(this.UpdateJSONSchema)
+  }
+
+  async parseCreateInput(input: any) {
+    return this.zService.parse(this.CreateSchema, input)
+  }
+
+  async parseUpdateInput(input: any) {
+    return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async createInputModel<E extends BaseEntity>(entity: E): Promise<any> {
+    const e = entity as any
+    const data: Record<string, any> = {
+      status: e.status,
+      social: e.social,
+      instructions: e.instructions,
+    }
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
+    data.orgs = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.programOrgs),
+      'program',
+      'org',
+    )
+    data.processes = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.programProcesses),
+      'program',
+      'process',
+    )
+    data.tags = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.programTags),
+      'program',
+      'tag',
+    )
+    if (e.region?.id) {
+      data.region = e.region.id
+    }
+    this.CreateValidator(data)
+    return this.zService.parse(this.CreateSchema, data as any)
+  }
+
+  async updateInputModel<E extends BaseEntity>(entity: E): Promise<any> {
+    const e = entity as any
+    const data: Record<string, any> = {
+      id: e.id,
+      status: e.status,
+      social: e.social,
+      instructions: e.instructions,
+    }
+    this.baseSchema.applyTranslatedField(data, e.name, 'name', 'nameTr')
+    this.baseSchema.applyTranslatedField(data, e.desc, 'desc', 'descTr')
+    data.orgs = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.programOrgs),
+      'program',
+      'org',
+    )
+    data.processes = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.programProcesses),
+      'program',
+      'process',
+    )
+    data.tags = this.baseSchema.collectionToInput(
+      this.baseSchema.safeCollectionItems(e.programTags),
+      'program',
+      'tag',
+    )
+    if (e.region?.id) {
+      data.region = e.region.id
+    }
+    this.UpdateValidator(data)
+    return this.zService.parse(this.UpdateSchema, data as any)
+  }
+}
