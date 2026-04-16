@@ -47,6 +47,8 @@ export class PlaceResolver {
   @OptionalAuth()
   async places(@Args() args: PlacesArgs): Promise<PlacesPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(PlacesArgs, args)
+    if (args.org) filter.where.org = args.org
+
     const cursor = await this.placeService.find(filter)
     return this.transform.entityToPaginated(Place, PlacesPage, cursor, parsedArgs)
   }

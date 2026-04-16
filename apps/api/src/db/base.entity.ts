@@ -1,4 +1,4 @@
-import { BaseEntity, Loaded, PrimaryKey, Property } from '@mikro-orm/core'
+import { BaseEntity, EntityMetadata, Loaded, PrimaryKey, Property } from '@mikro-orm/core'
 import { DiscoveryService } from '@nestjs/core'
 import { nanoid } from 'nanoid'
 import { ClsServiceManager } from 'nestjs-cls'
@@ -21,6 +21,10 @@ export function generateID() {
   return nanoid()
 }
 
+export interface QueryField {
+  operators: string[]
+}
+
 /**
  * Marks a class as an entity service.
  * Used to dynamically discover entity services at runtime,
@@ -29,6 +33,8 @@ export function generateID() {
 export const IsEntityService = DiscoveryService.createDecorator()
 
 export interface IEntityService<E extends BaseEntity> {
+  queryFields(): Record<string, QueryField>
+
   /**
    * Finds an entity by its ID.
    * @param id The entity ID.

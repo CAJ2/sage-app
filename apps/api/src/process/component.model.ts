@@ -166,15 +166,15 @@ export class ComponentSourcesArgs extends PaginationBasicArgs {
 @ArgsType()
 export class ComponentsArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema.extend({
-    withChange: z.nanoid().optional(),
-    regionID: z.string().optional(),
+    region: z.string().optional(),
+    material: z.nanoid().optional(),
   })
 
   @Field(() => ID, { nullable: true })
-  withChange?: string
+  region?: string
 
   @Field(() => ID, { nullable: true })
-  regionID?: string
+  material?: string
 }
 
 @ArgsType()

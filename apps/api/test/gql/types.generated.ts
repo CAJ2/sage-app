@@ -1859,6 +1859,9 @@ export type QueryComponentsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  material?: InputMaybe<Scalars['String']['input']>;
+  regionID?: InputMaybe<Scalars['ID']['input']>;
+  withChange?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -1928,6 +1931,7 @@ export type QueryPlacesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  org?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -2138,6 +2142,17 @@ export type Source = {
   type: SourceType;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
+};
+
+
+/** A reference source used to support data changes, such as a URL, PDF, or image */
+export type SourceChangesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<ChangeStatus>;
+  userID?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type SourceEdge = {

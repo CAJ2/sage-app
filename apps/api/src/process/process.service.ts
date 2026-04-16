@@ -17,11 +17,6 @@ import { CreateProcessInput, UpdateProcessInput } from '@src/process/process.mod
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
 
-export interface FindProcessFilter {
-  region?: string
-  material?: string
-}
-
 @Injectable()
 @IsEntityService(Process)
 export class ProcessService implements IEntityService<Process> {
@@ -31,13 +26,7 @@ export class ProcessService implements IEntityService<Process> {
     private readonly i18n: I18nService,
   ) {}
 
-  async find(opts: CursorOptions<Process>, filter?: FindProcessFilter) {
-    if (filter?.region) {
-      opts.where.region = ref(Region, filter.region)
-    }
-    if (filter?.material) {
-      opts.where.material = ref(Material, filter.material)
-    }
+  async find(opts: CursorOptions<Process>) {
     const processes = await this.em.find(Process, opts.where, opts.options)
     const count = await this.em.count(Process, opts.where)
     return {

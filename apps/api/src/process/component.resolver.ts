@@ -17,7 +17,9 @@ import {
   ComponentHistory,
   ComponentHistoryArgs,
   ComponentHistoryPage,
+  ComponentMaterial,
   ComponentRecycleArgs,
+  ComponentsArgs,
   ComponentSource,
   ComponentSourcesArgs,
   ComponentSourcesPage,
@@ -30,7 +32,8 @@ import {
 } from '@src/process/component.model'
 import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
-import { ComponentsArgs, Material } from '@src/process/material.model'
+import { Material } from '@src/process/material.model'
+import { MaterialService } from '@src/process/material.service'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Image, ImagesArgs, ImagesPage } from '@src/product/image.model'
 import { User } from '@src/users/users.model'
@@ -42,23 +45,22 @@ export class ComponentResolver {
     private readonly componentSchemaService: ComponentSchemaService,
     private readonly transform: TransformService,
     private readonly regionService: RegionService,
+    private readonly materialService: MaterialService,
   ) {}
 
   @Query(() => ComponentsPage, { name: 'components' })
   @OptionalAuth()
   async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentsArgs, args)
+    if (args.material) filter.where.materials = args.material
+
     const cursor = await this.componentService.find(filter)
     return this.transform.entityToPaginated(Component, ComponentsPage, cursor, parsedArgs)
   }
 
   @Query(() => Component, { name: 'component', nullable: true })
   @OptionalAuth()
-  async component(
-    @Args('id', { type: () => ID }) id: string,
-    @Args('withChange', { type: () => ID, nullable: true })
-    withChange?: string,
-  ): Promise<Component> {
+  async component(@Args('id', { type: () => ID }) id: string): Promise<Component> {
     const component = await this.componentService.findOneByID(id)
     if (!component) {
       throw NotFoundErr('Component not found')
@@ -97,10 +99,15 @@ export class ComponentResolver {
     return this.transform.entityToModel(Material, material)
   }
 
-  @ResolveField()
+  @ResolveField(() => [ComponentMaterial])
   async materials(@Parent() component: Component) {
     const materials = await this.componentService.materials(component.id)
-    return this.transform.entitiesToModels(Material, materials)
+    return materials.map(async (m) => {
+      const model = new ComponentMaterial()
+      model.material = await this.transform.entityToModel(Material, m.material)
+      model.materialFraction = m.materialFraction
+      return model
+    })
   }
 
   @ResolveField(() => TagPage)
@@ -205,6 +212,24 @@ export class ComponentResolver {
       { items, count: cursor.count },
       true,
     )
+  }
+}
+
+@Resolver(() => ComponentMaterial)
+export class ComponentMaterialResolver {
+  constructor(
+    private readonly transform: TransformService,
+    private readonly materialService: MaterialService,
+  ) {}
+
+  @ResolveField(() => Material)
+  async material(@Parent() cm: ComponentMaterial): Promise<Material> {
+    if (cm.material instanceof Material) {
+      return cm.material
+    }
+    const material = await this.materialService.findOneByID((cm.material as any).id)
+    if (!material) throw new Error(`Material not found for component material`)
+    return this.transform.entityToModel(Material, material)
   }
 }
 

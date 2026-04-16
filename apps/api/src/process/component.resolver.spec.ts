@@ -85,6 +85,35 @@ describe('ComponentResolver (integration)', () => {
     expect(res.data?.components.totalCount).toBeGreaterThan(0)
   })
 
+  test('should filter components by material', async () => {
+    const materialId = MATERIAL_IDS[0]
+    const res = await gql.send(
+      graphql(`
+        query ComponentResolverFilterComponents($material: String) {
+          components(material: $material) {
+            nodes {
+              id
+              name
+              primaryMaterial {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      { material: materialId },
+    )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.components.nodes).toBeDefined()
+    expect(res.data?.components.nodes?.length).toBeGreaterThan(0)
+    for (const node of res.data?.components.nodes ?? []) {
+      // Note: In the query result we only check primaryMaterial, 
+      // but the filter uses the ManyToMany relationship which includes it.
+      expect(node.primaryMaterial.id).toBe(materialId)
+    }
+  })
+
   test('should query a single component', async () => {
     const res = await gql.send(
       graphql(`

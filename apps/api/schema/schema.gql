@@ -1326,9 +1326,9 @@ type Query {
   categorySchema: ModelEditSchema
   change(id: ID!): Change
   changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesPage!
-  component(id: ID!, withChange: ID): Component
+  component(id: ID!): Component
   componentSchema: ModelEditSchema
-  components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  components(after: String, before: String, first: Int, last: Int, material: ID, region: ID): ComponentsPage!
   currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
   feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, regionId: ID): FeedPage!
@@ -1344,7 +1344,7 @@ type Query {
   orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
   place(id: ID!): Place
   placeSchema: ModelEditSchema
-  places(after: String, before: String, first: Int, last: Int): PlacesPage!
+  places(after: String, before: String, first: Int, last: Int, org: String): PlacesPage!
   process(id: ID!): Process
   processSchema: ModelEditSchema
   processes(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
@@ -1447,7 +1447,7 @@ enum SearchType {
 A reference source used to support data changes, such as a URL, PDF, or image
 """
 type Source {
-  changes: ChangesPage!
+  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesPage!
 
   """Extracted or structured content from the source"""
   content: JSONObject

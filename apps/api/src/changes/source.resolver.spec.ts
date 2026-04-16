@@ -91,13 +91,33 @@ describe('SourceResolver (integration)', () => {
     expect(res.data?.sources.nodes?.every((node) => node.type === SourceType.File)).toBe(true)
   })
 
-  test('should query a single source', async () => {
+  test('should query a single source with changes and user', async () => {
     const res = await gql.send(
       graphql(`
-        query SourceResolverGetSource($id: ID!) {
+        query SourceResolverGetSourceDetail($id: ID!) {
           source(id: $id) {
             id
             type
+            contentURL
+            location
+            metadata
+            content
+            processedAt
+            createdAt
+            updatedAt
+            user {
+              id
+              name
+            }
+            changes {
+              nodes {
+                id
+                title
+                description
+                status
+              }
+              totalCount
+            }
           }
         }
       `),
@@ -106,6 +126,11 @@ describe('SourceResolver (integration)', () => {
     expect(res.errors).toBeUndefined()
     expect(res.data?.source).toBeDefined()
     expect(res.data?.source?.id).toBe(sourceID)
+    expect(res.data?.source?.user).toBeDefined()
+    expect(res.data?.source?.user.id).toBeDefined()
+    expect(res.data?.source?.changes).toBeDefined()
+    expect(res.data?.source?.changes.nodes).toBeDefined()
+    expect(Array.isArray(res.data?.source?.changes.nodes)).toBe(true)
   })
 
   test('should create a source', async () => {

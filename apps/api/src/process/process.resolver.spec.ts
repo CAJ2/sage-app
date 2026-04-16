@@ -8,6 +8,7 @@ import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TEST_REGION_ID, TestRegionSeeder } from '@src/db/seeds/TestRegionSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 
@@ -29,7 +30,7 @@ describe('ProcessResolver (integration)', () => {
     const orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder)
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestRegionSeeder)
 
     await gql.signIn('admin', 'password')
   })
@@ -61,6 +62,100 @@ describe('ProcessResolver (integration)', () => {
     expect(Array.isArray(res.data?.processes.nodes)).toBe(true)
     expect(typeof res.data?.processes.totalCount).toBe('number')
     expect(res.data?.processes.pageInfo.hasNextPage).toBe(false)
+  })
+
+  test('should filter processes by material', async () => {
+    const materialId = MATERIAL_IDS[0]
+    // First create a process with this material
+    await gql.send(
+      graphql(`
+        mutation CreateProcessWithMaterial($input: CreateProcessInput!) {
+          createProcess(input: $input) {
+            process {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Material Filter Process',
+          intent: 'RECYCLE',
+          material: { id: materialId },
+        },
+      },
+    )
+
+    const res = await gql.send(
+      graphql(`
+        query FilterProcessesByMaterial($material: String) {
+          processes(material: $material) {
+            nodes {
+              id
+              name
+              material {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      { material: materialId },
+    )
+
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.processes.nodes.length).toBeGreaterThan(0)
+    for (const node of res.data?.processes.nodes ?? []) {
+      expect(node.material?.id).toBe(materialId)
+    }
+  })
+
+  test('should filter processes by region', async () => {
+    const regionId = TEST_REGION_ID
+    // First create a process with this region
+    await gql.send(
+      graphql(`
+        mutation CreateProcessWithRegion($input: CreateProcessInput!) {
+          createProcess(input: $input) {
+            process {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Region Filter Process',
+          intent: 'RECYCLE',
+          region: { id: regionId },
+        },
+      },
+    )
+
+    const res = await gql.send(
+      graphql(`
+        query FilterProcessesByRegion($region: String) {
+          processes(region: $region) {
+            nodes {
+              id
+              name
+              region {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      { region: regionId },
+    )
+
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.processes.nodes.length).toBeGreaterThan(0)
+    for (const node of res.data?.processes.nodes ?? []) {
+      expect(node.region?.id).toBe(regionId)
+    }
   })
 
   test('should query process schema', async () => {

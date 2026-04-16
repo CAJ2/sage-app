@@ -2,6 +2,7 @@ import { ArgsType, Field, ID, InputType, ObjectType } from '@nestjs/graphql'
 import { IsLatitude, IsLongitude, IsNumber, IsOptional, MaxLength, Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
+import { z } from 'zod/v4'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.model'
@@ -105,7 +106,12 @@ export class PlacesPage extends Paginated(Place) {}
 
 @ArgsType()
 export class PlacesArgs extends PaginationBasicArgs {
-  static schema = PaginationBasicArgs.schema
+  static schema = PaginationBasicArgs.schema.extend({
+    org: z.string().optional(),
+  })
+
+  @Field(() => String, { nullable: true })
+  org?: string
 }
 
 @InputType()

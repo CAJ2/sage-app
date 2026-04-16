@@ -34,6 +34,14 @@ export class ComponentService implements IEntityService<Component> {
     private readonly streamService: StreamService,
   ) {}
 
+  queryFields() {
+    return {
+      material: {
+        operators: ['$eq'],
+      },
+    }
+  }
+
   async find(opts: CursorOptions<Component>) {
     const components = await this.em.find(Component, opts.where, opts.options)
     const count = await this.em.count(Component, opts.where)
@@ -47,7 +55,7 @@ export class ComponentService implements IEntityService<Component> {
     return this.em.find(Component, { id: { $in: ids } })
   }
 
-  async findOneByID(id: string, withChange?: string) {
+  async findOneByID(id: string) {
     return await this.em.findOne(
       Component,
       { id },
@@ -76,12 +84,15 @@ export class ComponentService implements IEntityService<Component> {
     const component = await this.em.findOne(
       Component,
       { id: componentId },
-      { populate: ['materials'] },
+      { populate: ['componentMaterials'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
-    return component.materials.getItems()
+    return component.componentMaterials.getItems().map((cm) => ({
+      material: cm.material,
+      materialFraction: cm.materialFraction,
+    }))
   }
 
   async tags(componentId: string, opts: CursorOptions<Tag>) {
@@ -294,6 +305,13 @@ export class ComponentService implements IEntityService<Component> {
         component.primaryMaterial = await this.editService.findRefWithChange(change, Material, {
           id: input.primaryMaterial.id,
         })
+      }
+      // Always ensure primary material is in the materials collection for filtering
+      if (!input.materials) {
+        input.materials = []
+      }
+      if (!input.materials.some((m) => m.id === input.primaryMaterial!.id)) {
+        input.materials.push({ id: input.primaryMaterial.id, materialFraction: 1.0 })
       }
     }
     if (input.materials) {

@@ -84,6 +84,7 @@ export class TestVariantSeeder extends Seeder {
       createdAt: new Date(),
       updatedAt: new Date(),
       primaryMaterial: em.getReference(Material, MATERIAL_IDS[0]),
+      materials: [em.getReference(Material, MATERIAL_IDS[0])],
     })
     em.create(Component, {
       id: COMPONENT_IDS[1],
@@ -98,6 +99,7 @@ export class TestVariantSeeder extends Seeder {
       createdAt: new Date(),
       updatedAt: new Date(),
       primaryMaterial: em.getReference(Material, MATERIAL_IDS[1]),
+      materials: [em.getReference(Material, MATERIAL_IDS[1])],
     })
     for (const id of VARIANT_IDS) {
       const variant = new Variant()
