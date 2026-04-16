@@ -1,0 +1,70 @@
+apps/api/src/geo/place.resolver.spec.ts
+  5e791836ab7a85b7 61-134
+apps/api/src/process/component.model.ts
+  5e791836ab7a85b7 170,174,177
+apps/api/src/process/component.service.ts
+  5e791836ab7a85b7 87,92-95,309-315
+apps/api/src/common/search-query.parser.ts
+  5e791836ab7a85b7 1-236,238-310
+apps/api/src/geo/place.resolver.ts
+  5e791836ab7a85b7 50-51
+apps/api/src/changes/source.service.ts
+  5e791836ab7a85b7 5,47-55
+apps/api/src/process/process.resolver.ts
+  5e791836ab7a85b7 59-61
+apps/api/src/db/seeds/TestRegionSeeder.ts
+  5e791836ab7a85b7 1-22
+apps/api/src/process/component.resolver.spec.ts
+  5e791836ab7a85b7 88-116
+apps/api/src/changes/source.resolver.ts
+  5e791836ab7a85b7 5,108-114,122
+apps/api/src/process/process.service.ts
+  5e791836ab7a85b7 29
+apps/api/src/changes/source.resolver.spec.ts
+  5e791836ab7a85b7 94,97,101-120,129-133
+apps/api/src/process/component.resolver.ts
+  5e791836ab7a85b7 20,22,35-36,48,55-56,63,102,106,108-110,218-232
+apps/api/src/common/search-query.spec.ts
+  5e791836ab7a85b7 1-113
+apps/api/src/process/process.resolver.spec.ts
+  5e791836ab7a85b7 11,33,67-160
+apps/api/src/common/search-query.translator.ts
+  5e791836ab7a85b7 1-114
+apps/api/src/geo/place.model.ts
+  5e791836ab7a85b7 5,109-114
+apps/api/src/db/seeds/TestVariantSeeder.ts
+  5e791836ab7a85b7 87,102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "d27991a313e8f2c4654a661d9f653f6c46aec8e2",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "5e791836ab7a85b7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ca6b5a4b-f84e-411c-8d4e-4acb1f7d7527",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 906,
+      "total_deletions": 46,
+      "accepted_lines": 861,
+      "overriden_lines": 4
+    }
+  }
+}
