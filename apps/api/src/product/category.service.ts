@@ -190,11 +190,9 @@ export class CategoryService implements IEntityService<Category> {
     await this.editService.beginUpdateEntityEdit(change, category)
     await this.setFields(category, input, change)
     await this.editService.updateEntityEdit(change, category)
-    const currentCategory = await this.em.findOne(
-      Category,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentCategory = await this.editService.findOneForChange(this.em, change, Category, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {

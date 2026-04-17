@@ -33,6 +33,7 @@ export interface IEntityService {
 }
 
 type PivotInput = { id: string; [key: string]: any } | { id: string; [key: string]: any }[]
+type ChangeRef<T extends BaseEntity & { id: string }> = { id: string } & Reference<Loaded<T>>
 
 @Injectable()
 export class EditService {
@@ -52,7 +53,8 @@ export class EditService {
       updatedAt: new Date().toISOString(),
     }
     change.metadata = { ...change.metadata, jobs: [...(change.metadata?.jobs ?? []), job] }
-    await this.em.persist(change).flush()
+    const fork = this.em.fork()
+    await fork.persist(change).flush()
   }
 
   /**
@@ -60,10 +62,33 @@ export class EditService {
    * is in an active state (not DRAFT or MERGED).
    */
   async persistAndMaybeTriggerReview(change: Change): Promise<void> {
-    await this.em.persist(change).flush()
+    const fork = this.em.fork()
+    await fork.persist(change).flush()
     if (change.status !== ChangeStatus.DRAFT && change.status !== ChangeStatus.MERGED) {
       await this.triggerReviewJob(change)
     }
+  }
+
+  /**
+   * Reads an entity in a way that avoids autoflushing staged edits during change-mode mutations.
+   *
+   * Use this in services when you need a "current DB state" snapshot while a `change` may still hold
+   * detached entities or pending pivot mutations in the primary entity manager.
+   */
+  async findOneForChange<T extends BaseEntity, H extends string = never>(
+    em: EntityManager,
+    change: Change | undefined,
+    model: EntityName<T>,
+    where: FilterQuery<T>,
+    options?: FindOneOptions<T, H, '*', never>,
+  ): Promise<Loaded<T, H, '*', never> | null> {
+    const reader = change ? em.fork() : em
+    return reader.findOne<T, H>(model, where as FilterQuery<T>, options) as Promise<Loaded<
+      T,
+      H,
+      '*',
+      never
+    > | null>
   }
 
   async findOne(id: string) {
@@ -186,10 +211,11 @@ export class EditService {
       if (Array.isArray(toSet)) {
         if (change) {
           const ids = toSet.map((item) => item.id)
+          const refs: ChangeRef<T>[] = []
           for (const id of ids) {
-            await this.findRefWithChange(change, entity as EntityName<BaseEntity>, { id } as any)
+            refs.push(await this.findRefWithChange(change, entity, { id } as any))
           }
-          collection.set(ids.map((id) => this.em.getReference(entity, id as any)))
+          collection.set(refs)
         } else {
           const foundItems = await this.em.find(
             entity,
@@ -209,14 +235,8 @@ export class EditService {
         }
       } else {
         if (change) {
-          await this.findRefWithChange(
-            change,
-            entity as EntityName<BaseEntity>,
-            {
-              id: toSet.id,
-            } as any,
-          )
-          collection.set([this.em.getReference(entity, toSet.id as any)])
+          const ref = await this.findRefWithChange(change, entity, { id: toSet.id } as any)
+          collection.set([ref])
         } else {
           const foundItem = await this.em.findOne(entity, { id: toSet.id } as any, {
             populate: false,
@@ -232,10 +252,11 @@ export class EditService {
       if (Array.isArray(toAdd)) {
         if (change) {
           const ids = toAdd.map((item) => item.id)
+          const refs: ChangeRef<T>[] = []
           for (const id of ids) {
-            await this.findRefWithChange(change, entity as EntityName<BaseEntity>, { id } as any)
+            refs.push(await this.findRefWithChange(change, entity, { id } as any))
           }
-          collection.add(ids.map((id) => this.em.getReference(entity, id as any)))
+          collection.add(refs)
         } else {
           const foundItems = await this.em.find(
             entity,
@@ -255,14 +276,8 @@ export class EditService {
         }
       } else {
         if (change) {
-          await this.findRefWithChange(
-            change,
-            entity as EntityName<BaseEntity>,
-            {
-              id: toAdd.id,
-            } as any,
-          )
-          collection.add(this.em.getReference(entity, toAdd.id as any))
+          const ref = await this.findRefWithChange(change, entity, { id: toAdd.id } as any)
+          collection.add(ref)
         } else {
           const foundItem = await this.em.findOne(entity, { id: toAdd.id } as any, {
             populate: false,
@@ -383,6 +398,8 @@ export class EditService {
         `Could not determine collection field or relation field for pivot entity: ${pivotEntityStr}`,
       )
     }
+    const createPivotRow = (data: Record<string, unknown>) =>
+      this.em.create(pivotEntity, data as any, { persist: false })
     if (toSet) {
       if (Array.isArray(toSet) && toSet.length > 0) {
         if (change) {
@@ -406,18 +423,11 @@ export class EditService {
           }
         }
         const toSetEntities = toSet.map((item) => {
-          const newEntity = this.em.create(
-            pivotEntity,
-            {
-              [collField]: id,
-              [relField]: item.id,
-              ..._.omit(item, 'id'),
-            } as any,
-            {
-              managed: !!change,
-              persist: !change,
-            },
-          )
+          const newEntity = createPivotRow({
+            [collField]: id,
+            [relField]: item.id,
+            ..._.omit(item, 'id'),
+          })
           if (!change) {
             this.em.persist(newEntity)
           }
@@ -445,18 +455,11 @@ export class EditService {
             throw NotFoundErr(`No ${relEntity} found for ID: ${toSet.id}`)
           }
         }
-        const toSetEntity = this.em.create(
-          pivotEntity,
-          {
-            [collField]: id,
-            [relField]: toSet.id,
-            ..._.omit(toSet, 'id'),
-          } as any,
-          {
-            managed: !!change,
-            persist: !change,
-          },
-        )
+        const toSetEntity = createPivotRow({
+          [collField]: id,
+          [relField]: toSet.id,
+          ..._.omit(toSet, 'id'),
+        })
         if (!change) {
           this.em.persist(toSetEntity)
         }
@@ -515,18 +518,11 @@ export class EditService {
             }
             continue
           }
-          const newEntity = this.em.create(
-            pivotEntity,
-            {
-              [collField]: id,
-              [relField]: item.id,
-              ..._.omit(item, 'id'),
-            } as any,
-            {
-              managed: !!change,
-              persist: !change,
-            },
-          )
+          const newEntity = createPivotRow({
+            [collField]: id,
+            [relField]: item.id,
+            ..._.omit(item, 'id'),
+          })
           if (!change) {
             this.em.persist(newEntity)
           }
@@ -559,18 +555,11 @@ export class EditService {
             this.em.assign(existing, extraFields as any)
           }
         } else {
-          const toAddEntity = this.em.create(
-            pivotEntity,
-            {
-              [collField]: id,
-              [relField]: toAdd.id,
-              ..._.omit(toAdd, 'id'),
-            } as any,
-            {
-              managed: !!change,
-              persist: !change,
-            },
-          )
+          const toAddEntity = createPivotRow({
+            [collField]: id,
+            [relField]: toAdd.id,
+            ..._.omit(toAdd, 'id'),
+          })
           if (!change) {
             this.em.persist(toAddEntity)
           }
@@ -689,12 +678,12 @@ export class EditService {
    * Use this in service `setFields` paths that must accept references created or updated in the same
    * change.
    */
-  async findRefWithChange<T extends BaseEntity>(
+  async findRefWithChange<T extends BaseEntity & { id: string }>(
     change: Change,
     model: EntityName<T>,
     where: FilterQuery<T> & { id: string },
     options?: FindOneOptions<T, never, '*', never>,
-  ): Promise<{ id: string } & Reference<Loaded<T>>> {
+  ): Promise<ChangeRef<T>> {
     // First check if it exists in the change
     const entityName = this.em.getMetadata().get(model).name
     const edit = change.edits.find((e) => {
@@ -709,15 +698,17 @@ export class EditService {
           `${entityName} with ID "${where.id}" is pending deletion in this change`,
         )
       }
-      return this.em.getReference(model, edit.entityID as any) as any
+      return this.em
+        .fork()
+        .getReference(model, edit.entityID as any, { wrapped: true }) as ChangeRef<T>
     }
     // If not, check if it exists in the database
-    const entity = await this.em.findOne<T>(model, where as FilterQuery<T>, options)
+    const fork = this.em.fork()
+    const entity = await fork.findOne<T>(model, where as FilterQuery<T>, options)
     if (!entity) {
       throw NotFoundErr(`${entityName} with ID "${where.id}" not found`)
     }
-    // TODO: Type this correctly?
-    return entity.toReference() as unknown as { id: string } & Reference<Loaded<T>>
+    return fork.getReference(model, where.id as any, { wrapped: true }) as ChangeRef<T>
   }
 
   /**
@@ -757,14 +748,15 @@ export class EditService {
         throw BadRequestErr(`${meta.name} with ID "${where.id}" is pending deletion in this change`)
       }
       if (edit.changes || edit.original) {
-        const entity = this.em.create(
-          model,
-          (edit.changes || edit.original) as RequiredEntityData<T>,
-          {
-            managed: true,
-            persist: false,
-          },
-        )
+        const entity = edit.original
+          ? this.em.create(model, (edit.changes || edit.original) as RequiredEntityData<T>, {
+              managed: true,
+              persist: false,
+            })
+          : await this.changePOJOToEntity(
+              model,
+              (edit.changes || edit.original) as Record<string, any>,
+            )
         return { entity: entity as Loaded<T>, change }
       } else {
         throw NotFoundErr(`Edit for entity "${meta.name}" with ID "${where.id}" not found`)
@@ -1591,9 +1583,29 @@ export class EditService {
       return assignedEntity
     }
 
+    const pivotFieldNames = new Set(flattenArrayRefs.map((r) => r.name))
+    const scalarData: Record<string, any> = {}
+    for (const [key, val] of Object.entries(restored)) {
+      if (pivotFieldNames.has(key)) continue
+      scalarData[key] = val
+    }
+
     // Entity not yet persisted (draft create) — create an in-memory instance from the POJO,
-    // bypassing the EM to avoid identity map conflicts with the constructor-generated PK.
-    const entity = this.em.create(meta.class, restored, { persist: false, managed: false })
+    // then hydrate pivot/tree collections with detached child rows as well.
+    const entity = this.em.create(meta.class, scalarData, { persist: false, managed: false })
+    for (const { name, targetMeta } of flattenArrayRefs) {
+      if (!(name in restored)) continue
+      const items = Array.isArray(restored[name])
+        ? restored[name]
+        : restored[name]
+          ? [restored[name]]
+          : []
+      const collection = (entity as any)[name] as Collection<any>
+      const detachedItems = items.map((item) =>
+        this.em.create(targetMeta.class, item, { persist: false, managed: false }),
+      )
+      collection.set(detachedItems)
+    }
     return entity
   }
 }

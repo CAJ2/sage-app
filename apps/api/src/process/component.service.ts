@@ -182,11 +182,9 @@ export class ComponentService implements IEntityService<Component> {
     await this.editService.beginUpdateEntityEdit(change, component)
     await this.setFields(component, input, change)
     await this.editService.updateEntityEdit(change, component)
-    const currentComponent = await this.em.findOne(
-      Component,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentComponent = await this.editService.findOneForChange(this.em, change, Component, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {

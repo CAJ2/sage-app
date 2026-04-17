@@ -1,10 +1,11 @@
-import { EntityManager } from '@mikro-orm/postgresql'
+import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { isUsingChange } from '@src/changes/change-ext.model'
 import { Change } from '@src/changes/change.entity'
 import { EditService } from '@src/changes/edit.service'
 import { mapOrderBy } from '@src/common/db.utils'
+import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
@@ -177,11 +178,9 @@ export class ProgramService implements IEntityService<Program> {
     await this.editService.beginUpdateEntityEdit(change, program)
     await this.setFields(program, input, change)
     await this.editService.updateEntityEdit(change, program)
-    const currentProgram = await this.em.findOne(
-      Program,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentProgram = await this.editService.findOneForChange(this.em, change, Program, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { program, change, currentProgram: currentProgram ?? undefined }
@@ -230,88 +229,87 @@ export class ProgramService implements IEntityService<Program> {
     }
 
     if (input.region !== undefined) {
-      program.region = input.region
-        ? (this.em.getReference(Region, input.region, { wrapped: true }) as any)
-        : undefined
-    }
-
-    if (input.orgs !== undefined) {
-      program.programOrgs.removeAll()
-      for (const org of input.orgs) {
-        const pOrg = new ProgramsOrgs()
-        pOrg.program = program
-        pOrg.org = this.em.getReference(Org, org.id)
-        if (org.role) pOrg.role = org.role
-        program.programOrgs.add(pOrg)
-      }
-    }
-    if ('addOrgs' in input && input.addOrgs) {
-      for (const org of input.addOrgs) {
-        const pOrg = new ProgramsOrgs()
-        pOrg.program = program
-        pOrg.org = this.em.getReference(Org, org.id)
-        if (org.role) pOrg.role = org.role
-        program.programOrgs.add(pOrg)
-      }
-    }
-    if ('removeOrgs' in input && input.removeOrgs) {
-      for (const po of program.programOrgs) {
-        if (input.removeOrgs.includes(po.org.id)) {
-          program.programOrgs.remove(po)
+      if (input.region) {
+        if (!change) {
+          const region = await this.em.findOne(Region, { id: input.region })
+          if (!region) {
+            throw NotFoundErr(`Region with ID "${input.region}" not found`)
+          }
+          program.region = ref(Region, region.id)
+        } else {
+          program.region = await this.editService.findRefWithChange(change, Region, {
+            id: input.region,
+          })
         }
+      } else {
+        program.region = undefined
       }
     }
 
-    if (input.processes !== undefined) {
-      program.programProcesses.removeAll()
-      for (const process of input.processes) {
-        const pProcess = new ProgramsProcesses()
-        pProcess.program = program
-        pProcess.process = this.em.getReference(Process, process.id)
-        program.programProcesses.add(pProcess)
-      }
+    if (input.orgs || input.addOrgs) {
+      program.programOrgs = await this.editService.setOrAddPivot(
+        program.id,
+        change,
+        program.programOrgs,
+        Program,
+        ProgramsOrgs,
+        input.orgs,
+        input.addOrgs,
+      )
     }
-    if ('addProcesses' in input && input.addProcesses) {
-      for (const process of input.addProcesses) {
-        const pProcess = new ProgramsProcesses()
-        pProcess.program = program
-        pProcess.process = this.em.getReference(Process, process.id)
-        program.programProcesses.add(pProcess)
-      }
-    }
-    if ('removeProcesses' in input && input.removeProcesses) {
-      for (const pp of program.programProcesses) {
-        if (input.removeProcesses.includes(pp.process.id)) {
-          program.programProcesses.remove(pp)
-        }
-      }
+    if (input.removeOrgs) {
+      program.programOrgs = await this.editService.removeFromPivot(
+        change,
+        program.programOrgs,
+        Program,
+        ProgramsOrgs,
+        input.removeOrgs,
+      )
     }
 
-    if (input.tags !== undefined) {
-      program.programTags.removeAll()
-      for (const tag of input.tags) {
-        const pTag = new ProgramsTags()
-        pTag.program = program
-        pTag.tag = this.em.getReference(Tag, tag.id)
-        pTag.meta = tag.meta
-        program.programTags.add(pTag)
-      }
+    if (input.processes || input.addProcesses) {
+      program.programProcesses = await this.editService.setOrAddPivot(
+        program.id,
+        change,
+        program.programProcesses,
+        Program,
+        ProgramsProcesses,
+        input.processes,
+        input.addProcesses,
+      )
     }
-    if ('addTags' in input && input.addTags) {
-      for (const tag of input.addTags) {
-        const pTag = new ProgramsTags()
-        pTag.program = program
-        pTag.tag = this.em.getReference(Tag, tag.id)
-        pTag.meta = tag.meta
-        program.programTags.add(pTag)
-      }
+    if (input.removeProcesses) {
+      program.programProcesses = await this.editService.removeFromPivot(
+        change,
+        program.programProcesses,
+        Program,
+        ProgramsProcesses,
+        input.removeProcesses,
+      )
     }
-    if ('removeTags' in input && input.removeTags) {
-      for (const pt of program.programTags) {
-        if (input.removeTags.includes(pt.tag.id)) {
-          program.programTags.remove(pt)
-        }
+
+    if (input.tags || input.addTags) {
+      for (const tag of input.tags || input.addTags || []) {
+        await this.tagService.validateTagInput(tag)
       }
+      program.programTags = await this.editService.setOrAddPivot(
+        program.id,
+        change,
+        program.programTags,
+        Program,
+        ProgramsTags,
+        input.tags,
+        input.addTags,
+      )
+    }
+    if (input.removeTags) {
+      program.programTags = await this.editService.removeFromPivot(
+        change,
+        program.programTags,
+        Program,
+        ProgramsTags,
+        input.removeTags,
+      )
     }
   }
 }

@@ -12,7 +12,7 @@ import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Category } from '@src/product/category.entity'
-import { Item, ItemHistory, ItemsTags } from '@src/product/item.entity'
+import { Item, ItemHistory, ItemsCategories, ItemsTags } from '@src/product/item.entity'
 import { CreateItemInput, UpdateItemInput } from '@src/product/item.model'
 import { Variant } from '@src/product/variant.entity'
 
@@ -31,15 +31,15 @@ export class ItemService implements IEntityService<Item> {
   }
 
   async findOneByID(id: string) {
-    return await this.em.findOne(Item, { id }, { populate: ['categories', 'itemTags'] })
+    return await this.em.findOne(Item, { id }, { populate: ['itemCategories', 'itemTags'] })
   }
 
   async findManyByID(ids: string[]) {
-    return this.em.find(Item, { id: { $in: ids } }, { populate: ['categories', 'itemTags'] })
+    return this.em.find(Item, { id: { $in: ids } }, { populate: ['itemCategories', 'itemTags'] })
   }
 
   async find(opts: CursorOptions<Item>) {
-    opts.options.populate = ['categories', 'itemTags']
+    opts.options.populate = ['itemCategories', 'itemTags']
     const items = await this.em.find(Item, opts.where, opts.options)
     const count = await this.em.count(Item, opts.where)
     return {
@@ -143,7 +143,7 @@ export class ItemService implements IEntityService<Item> {
       {
         id: input.id,
       },
-      { populate: ['categories', 'tags', 'itemTags'] },
+      { populate: ['itemCategories', 'tags', 'itemTags'] },
     )
     if (!item) {
       throw new Error('Item not found')
@@ -163,7 +163,9 @@ export class ItemService implements IEntityService<Item> {
     await this.editService.beginUpdateEntityEdit(change, item)
     await this.setFields(item, input, change)
     await this.editService.updateEntityEdit(change, item)
-    const currentItem = await this.em.findOne(Item, { id: input.id }, { disableIdentityMap: true })
+    const currentItem = await this.editService.findOneForChange(this.em, change, Item, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { item, change, currentItem: currentItem ?? undefined }
@@ -215,20 +217,23 @@ export class ItemService implements IEntityService<Item> {
       item.source = {}
     }
     if (input.categories || input.addCategories) {
-      item.categories = await this.editService.setOrAddCollection(
-        item.categories,
-        Category,
+      item.itemCategories = await this.editService.setOrAddPivot(
+        item.id,
+        change,
+        item.itemCategories,
+        Item,
+        ItemsCategories,
         input.categories,
         input.addCategories,
-        change,
       )
     }
     if (input.removeCategories) {
-      item.categories = await this.editService.removeFromCollection(
-        item.categories,
-        Category,
-        input.removeCategories,
+      item.itemCategories = await this.editService.removeFromPivot(
         change,
+        item.itemCategories,
+        Item,
+        ItemsCategories,
+        input.removeCategories,
       )
     }
     if (input.tags || input.addTags) {

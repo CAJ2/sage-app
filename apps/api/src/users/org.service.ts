@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/core'
+import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
@@ -101,7 +101,9 @@ export class OrgService implements IEntityService<Org> {
     await this.editService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
     await this.editService.updateEntityEdit(change, org)
-    const currentOrg = await this.em.findOne(Org, { id: input.id }, { disableIdentityMap: true })
+    const currentOrg = await this.editService.findOneForChange(this.em, change, Org, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { org, change, currentOrg: currentOrg ?? undefined }

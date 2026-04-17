@@ -114,11 +114,9 @@ export class ProcessService implements IEntityService<Process> {
     await this.editService.beginUpdateEntityEdit(change, process)
     await this.setFields(process, input, change)
     await this.editService.updateEntityEdit(change, process)
-    const currentProcess = await this.em.findOne(
-      Process,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentProcess = await this.editService.findOneForChange(this.em, change, Process, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {

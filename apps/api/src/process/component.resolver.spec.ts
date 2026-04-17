@@ -755,6 +755,62 @@ describe('ComponentResolver (integration)', () => {
       expect(changeRes.data?.updateComponent?.currentComponent?.name).toBe('Current DB Name')
       expect(changeRes.data?.updateComponent?.currentComponent?.id).toBe(testComponentID)
     })
+
+    test('should keep currentComponent region isolated while staging a new region in a change', async () => {
+      const directRes = await gql.send(
+        graphql(`
+          mutation ComponentSetCurrentRefs($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            region: { id: REGION_IDS[0] },
+          },
+        },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateComponentCurrentRefs($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                region {
+                  id
+                }
+              }
+              currentComponent {
+                id
+                region {
+                  id
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            region: { id: REGION_IDS[1] },
+            change: { title: 'current component refs' },
+          },
+        },
+      )
+
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateComponent?.component?.region?.id).toBe(REGION_IDS[1])
+      expect(changeRes.data?.updateComponent?.currentComponent?.region?.id).toBe(REGION_IDS[0])
+    })
   })
 
   describe('recycle caveats from tag rules', () => {

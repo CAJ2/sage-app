@@ -228,11 +228,9 @@ export class VariantService implements IEntityService<Variant> {
     await this.editService.beginUpdateEntityEdit(change, variant)
     await this.setFields(variant, input, change)
     await this.editService.updateEntityEdit(change, variant)
-    const currentVariant = await this.em.findOne(
-      Variant,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentVariant = await this.editService.findOneForChange(this.em, change, Variant, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { variant, change, currentVariant: currentVariant ?? undefined }
