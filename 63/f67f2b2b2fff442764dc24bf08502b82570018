@@ -1,0 +1,113 @@
+apps/api/src/geo/place.resolver.ts
+  5e791836ab7a85b7 8,51-56,58
+apps/api/src/process/component.resolver.spec.ts
+  5e791836ab7a85b7 92-93,105,111,117-195
+apps/frontend/app/pages/home/index.vue
+  5e791836ab7a85b7 69-70,92
+apps/api/src/process/process.service.ts
+  5e791836ab7a85b7 11,29-35
+apps/api/src/common/transform.ts
+  5e791836ab7a85b7 4-5,19-21,23,52-55,134-196,198-221
+apps/api/src/process/component.resolver.ts
+  5e791836ab7a85b7 55-60,62
+apps/api/src/geo/place.service.ts
+  5e791836ab7a85b7 12,28-32
+apps/frontend/app/gql/graphql.ts
+  5e791836ab7a85b7 1882,1935,1949-1950,2148-2158,3263,3501
+apps/api/test/gql/gql.ts
+  5e791836ab7a85b7 119,127,139-142,182,184,433,441,453-456,496,498,1070,1102,1150-1162,1322,1330
+apps/api/src/geo/place.model.ts
+  5e791836ab7a85b7 110,114
+apps/api/src/process/component.model.ts
+  5e791836ab7a85b7 169,172-173
+apps/api/src/process/program.service.ts
+  5e791836ab7a85b7 10,35-37
+apps/api/src/product/variant.service.ts
+  5e791836ab7a85b7 12,43-45
+apps/api/src/product/item.service.ts
+  5e791836ab7a85b7 11,29-31
+apps/api/src/feed/home-feed.resolver.spec.ts
+  5e791836ab7a85b7 72-73,82
+apps/api/src/common/search-query.spec.ts
+  5e791836ab7a85b7 12,39,46-56
+apps/api/src/db/base.entity.ts
+  5e791836ab7a85b7 27-29
+apps/api/src/users/org.service.ts
+  5e791836ab7a85b7 10,24-26
+apps/api/src/geo/place.resolver.spec.ts
+  5e791836ab7a85b7 112-113,125
+apps/api/src/feed/home-feed.service.ts
+  5e791836ab7a85b7 6,14-16
+apps/api/src/common/search-query.parser.ts
+  5e791836ab7a85b7 10-15,61,65-70,74,78,82,155,280-285,302
+apps/api/test/gql/graphql.ts
+  5e791836ab7a85b7 1882,1935,1949-1950,3723,3780,3859,3865-3885,4163,4177,5410,5418,5430-5433,5473,5475
+apps/api/src/db/seeds/TestVariantSeeder.ts
+  5e791836ab7a85b7 7,74,88-93,106-110
+apps/api/src/product/category.service.ts
+  5e791836ab7a85b7 10,30-32
+apps/api/src/process/component.service.ts
+  5e791836ab7a85b7 11,37,39-40
+apps/science/app/pages/processes/materials/[id].vue
+  5e791836ab7a85b7 189
+apps/api/src/geo/region.service.ts
+  5e791836ab7a85b7 7,20-22
+apps/api/src/process/process.resolver.spec.ts
+  5e791836ab7a85b7 91,138
+apps/science/app/pages/processes/materials/index.vue
+  5e791836ab7a85b7 142
+apps/science/app/gql/graphql.ts
+  5e791836ab7a85b7 1882,1935,1949-1950,2148-2158,3698-3699,3718-3721,4090,4093
+apps/api/src/common/search-query.translator.ts
+  5e791836ab7a85b7 8,45,50,59-60,62-63,67-69,71,73,75
+apps/api/src/changes/complex-merge.resolver.spec.ts
+  1d16d27bba1335ed 30,37,78-94,96-98,734,770,796,823,851,878,907,936
+apps/api/src/process/material.service.ts
+  5e791836ab7a85b7 5,15-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "63f67f2b2b2fff442764dc24bf08502b82570018",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "1d16d27bba1335ed": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "cd9cff7e-12bc-4cd2-aa67-88825d52efcd",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 0,
+      "accepted_lines": 30,
+      "overriden_lines": 1
+    },
+    "5e791836ab7a85b7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ca6b5a4b-f84e-411c-8d4e-4acb1f7d7527",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 466,
+      "total_deletions": 208,
+      "accepted_lines": 380,
+      "overriden_lines": 3
+    }
+  }
+}
