@@ -162,10 +162,10 @@ export class ProcessArgs extends PaginationBasicArgs {
     material: z.nanoid().optional(),
   })
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   region?: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   material?: string
 }
 

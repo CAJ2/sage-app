@@ -69,8 +69,8 @@ describe('HomeFeedResolver (integration)', () => {
   test('filters items by regionId', async () => {
     const res = await gql.send(
       graphql(`
-        query HomeFeedByRegion($regionId: ID, $first: Int) {
-          feed(regionId: $regionId, first: $first) {
+        query HomeFeedByRegion($region: ID, $first: Int) {
+          feed(region: $region, first: $first) {
             nodes {
               id
               format
@@ -79,7 +79,7 @@ describe('HomeFeedResolver (integration)', () => {
           }
         }
       `),
-      { regionId: REGION_IDS[2], first: 10 },
+      { region: REGION_IDS[2], first: 10 },
     )
     expect(res.errors).toBeUndefined()
     const nodes = res.data?.feed.nodes!

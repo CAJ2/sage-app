@@ -7,7 +7,7 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import {
   Category,
   CATEGORY_ROOT,
@@ -26,6 +26,10 @@ export class CategoryService implements IEntityService<Category> {
     private readonly editService: EditService,
     private readonly i18n: I18nService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async find(opts: CursorOptions<Category>) {
     const categories = await this.em.find(Category, opts.where, opts.options)

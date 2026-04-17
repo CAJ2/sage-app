@@ -139,7 +139,7 @@ const regionLevels = computed<RegionLevel[]>(() => {
 
 // 3. Fetch processes for the selected regions
 const processesQuery = graphql(`
-  query CoverageProcesses($r0: String, $r1: String, $r2: String, $r3: String) {
+  query CoverageProcesses($r0: ID, $r1: ID, $r2: ID, $r3: ID) {
     p0: processes(region: $r0, first: 1000) {
       nodes {
         id

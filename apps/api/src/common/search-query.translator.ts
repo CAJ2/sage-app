@@ -1,9 +1,11 @@
 import { FilterQuery } from '@mikro-orm/core'
+
 import { ASTNode, SearchQueryParser } from './search-query.parser'
 
 export interface SearchTranslationConfig {
   defaultSearchFields?: string[]
   fieldMap?: Record<string, string>
+  prefixFields?: string[]
 }
 
 export class SearchQueryTranslator {
@@ -40,12 +42,12 @@ export class SearchQueryTranslator {
         let value: any = node.value
 
         // Check for exists
-        if (node.comparator === ':' && value === '*' && !node.isString) {
+        if (node.comparator === 'SEARCH' && value === '*' && !node.isString) {
           return { [fieldName]: { $ne: null } }
         }
 
         // Check for wildcards
-        if (node.comparator === ':' && typeof value === 'string' && value.includes('*')) {
+        if (node.comparator === 'SEARCH' && typeof value === 'string' && value.includes('*')) {
           return { [fieldName]: { $ilike: value.replace(/\*/g, '%') } }
         }
 
@@ -54,19 +56,23 @@ export class SearchQueryTranslator {
           value = Number(value)
         }
 
+        const isPrefix = config.prefixFields && config.prefixFields.includes(node.field)
+
         switch (node.comparator) {
-          case ':':
-            if (typeof value === 'string') {
+          case 'SEARCH':
+            if (typeof value === 'string' && isPrefix) {
               return { [fieldName]: { $ilike: `%${value}%` } }
             }
             return { [fieldName]: value }
-          case ':<':
+          case 'EXACT':
+            return { [fieldName]: value }
+          case 'LT':
             return { [fieldName]: { $lt: value } }
-          case ':>':
+          case 'GT':
             return { [fieldName]: { $gt: value } }
-          case ':<=':
+          case 'LTE':
             return { [fieldName]: { $lte: value } }
-          case ':>=':
+          case 'GTE':
             return { [fieldName]: { $gte: value } }
           default:
             return { [fieldName]: value }

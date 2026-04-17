@@ -8,7 +8,7 @@ import { Source, SourceType } from '@src/changes/source.entity'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import {
   Component,
@@ -34,11 +34,10 @@ export class ComponentService implements IEntityService<Component> {
     private readonly streamService: StreamService,
   ) {}
 
-  queryFields() {
+  queryFields(): Record<string, QueryField> {
     return {
-      material: {
-        operators: ['$eq'],
-      },
+      material: { operators: ['SEARCH', 'EXACT'], dbField: 'materials' },
+      region: { operators: ['SEARCH', 'EXACT'], dbField: 'region' },
     }
   }
 
@@ -306,13 +305,18 @@ export class ComponentService implements IEntityService<Component> {
           id: input.primaryMaterial.id,
         })
       }
-      // Always ensure primary material is in the materials collection for filtering
-      if (!input.materials) {
-        input.materials = []
-      }
-      if (!input.materials.some((m) => m.id === input.primaryMaterial!.id)) {
-        input.materials.push({ id: input.primaryMaterial.id, materialFraction: 1.0 })
-      }
+      component.componentMaterials = await this.editService.setOrAddPivot(
+        component.id,
+        change,
+        component.componentMaterials,
+        Component,
+        ComponentsMaterials,
+        undefined,
+        {
+          id: input.primaryMaterial.id,
+          materialFraction: 1.0,
+        },
+      )
     }
     if (input.materials) {
       component.componentMaterials = await this.editService.setOrAddPivot(

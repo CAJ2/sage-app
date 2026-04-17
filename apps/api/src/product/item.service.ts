@@ -8,7 +8,7 @@ import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Tag } from '@src/process/tag.entity'
 import { TagService } from '@src/process/tag.service'
 import { Category } from '@src/product/category.entity'
@@ -25,6 +25,10 @@ export class ItemService implements IEntityService<Item> {
     private readonly tagService: TagService,
     private readonly i18n: I18nService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async findOneByID(id: string) {
     return await this.em.findOne(Item, { id }, { populate: ['categories', 'itemTags'] })

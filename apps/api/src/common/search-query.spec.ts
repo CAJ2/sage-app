@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+
 import { parseAndTranslateSearchQuery } from './search-query.translator'
 
 describe('parseAndTranslateSearchQuery', () => {
@@ -8,6 +9,7 @@ describe('parseAndTranslateSearchQuery', () => {
       orders_count: 'ordersCount',
       first_name: 'firstName',
     },
+    prefixFields: ['first_name', 'state', 'tag'],
   }
 
   test('translates basic default search term', () => {
@@ -34,10 +36,24 @@ describe('parseAndTranslateSearchQuery', () => {
     })
   })
 
-  test('translates single field search', () => {
+  test('translates single field search (prefix match)', () => {
     const result = parseAndTranslateSearchQuery('first_name:Bob', config)
     expect(result).toEqual({
       firstName: { $ilike: '%Bob%' },
+    })
+  })
+
+  test('translates single field search (exact match by default)', () => {
+    const result = parseAndTranslateSearchQuery('last_name:Bob', config)
+    expect(result).toEqual({
+      last_name: 'Bob',
+    })
+  })
+
+  test('translates EXACT operator (:=)', () => {
+    const result = parseAndTranslateSearchQuery('first_name:=Bob', config)
+    expect(result).toEqual({
+      firstName: 'Bob',
     })
   })
 
@@ -51,10 +67,7 @@ describe('parseAndTranslateSearchQuery', () => {
   test('translates range operators', () => {
     const result = parseAndTranslateSearchQuery('orders_count:>16 orders_count:<=30', config)
     expect(result).toEqual({
-      $and: [
-        { ordersCount: { $gt: 16 } },
-        { ordersCount: { $lte: 30 } },
-      ],
+      $and: [{ ordersCount: { $gt: 16 } }, { ordersCount: { $lte: 30 } }],
     })
   })
 
@@ -78,15 +91,15 @@ describe('parseAndTranslateSearchQuery', () => {
   })
 
   test('translates grouping with parentheses', () => {
-    const result = parseAndTranslateSearchQuery('state:disabled AND (tag:"sale shopper" OR tag:VIP)', config)
+    const result = parseAndTranslateSearchQuery(
+      'state:disabled AND (tag:"sale shopper" OR tag:VIP)',
+      config,
+    )
     expect(result).toEqual({
       $and: [
         { state: { $ilike: '%disabled%' } },
         {
-          $or: [
-            { tag: { $ilike: '%sale shopper%' } },
-            { tag: { $ilike: '%VIP%' } },
-          ],
+          $or: [{ tag: { $ilike: '%sale shopper%' } }, { tag: { $ilike: '%VIP%' } }],
         },
       ],
     })

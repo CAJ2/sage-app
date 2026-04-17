@@ -186,7 +186,7 @@ const topRegionId = computed(() => regionLevels.value.at(-1)?.id)
 
 // 3. Fetch all processes for the material in the top-level region
 const processesQuery = graphql(`
-  query ProcessesForMaterialDetails($materialId: String!, $regionId: String) {
+  query ProcessesForMaterialDetails($materialId: ID!, $regionId: ID) {
     processes(material: $materialId, region: $regionId, first: 1000) {
       nodes {
         id

@@ -1,7 +1,9 @@
-import { BaseEntity, EntityMetadata, Loaded, PrimaryKey, Property } from '@mikro-orm/core'
+import { BaseEntity, Loaded, PrimaryKey, Property } from '@mikro-orm/core'
 import { DiscoveryService } from '@nestjs/core'
 import { nanoid } from 'nanoid'
 import { ClsServiceManager } from 'nestjs-cls'
+
+import { TokenType } from '@src/common/search-query.parser'
 
 function isTestRequest() {
   if (process.env.NODE_ENV === 'production' && !process.env.IS_DEV) return false
@@ -22,7 +24,9 @@ export function generateID() {
 }
 
 export interface QueryField {
-  operators: string[]
+  operators: TokenType[]
+  dbField?: string
+  prefix?: boolean
 }
 
 /**

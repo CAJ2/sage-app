@@ -109,8 +109,8 @@ describe('PlaceResolver (integration)', () => {
     // 3. Query places with org filter
     const filterRes = await gql.send(
       graphql(`
-        query PlaceResolverFilterPlaces($org: String) {
-          places(org: $org) {
+        query PlaceResolverFilterPlaces($query: String) {
+          places(query: $query) {
             nodes {
               id
               name
@@ -122,7 +122,7 @@ describe('PlaceResolver (integration)', () => {
           }
         }
       `),
-      { org: orgId },
+      { query: `org:${orgId}` },
     )
 
     expect(filterRes.errors).toBeUndefined()

@@ -7,11 +7,12 @@ export type TokenType =
   | 'MINUS'
   | 'LPAREN'
   | 'RPAREN'
-  | 'COLON'
-  | 'COLON_LT'
-  | 'COLON_GT'
-  | 'COLON_LTE'
-  | 'COLON_GTE'
+  | 'SEARCH'
+  | 'EXACT'
+  | 'LT'
+  | 'GT'
+  | 'LTE'
+  | 'GTE'
   | 'EOF'
 
 export interface Token {
@@ -57,24 +58,28 @@ export function tokenize(input: string): Token[] {
 
     // Comparators
     if (char === ':') {
-      let type: TokenType = 'COLON'
+      let type: TokenType = 'SEARCH'
       let value = ':'
       let end = cursor + 1
 
-      if (input[cursor + 1] === '<' && input[cursor + 2] === '=') {
-        type = 'COLON_LTE'
+      if (input[cursor + 1] === '=') {
+        type = 'EXACT'
+        value = ':='
+        end = cursor + 2
+      } else if (input[cursor + 1] === '<' && input[cursor + 2] === '=') {
+        type = 'LTE'
         value = ':<='
         end = cursor + 3
       } else if (input[cursor + 1] === '>' && input[cursor + 2] === '=') {
-        type = 'COLON_GTE'
+        type = 'GTE'
         value = ':>='
         end = cursor + 3
       } else if (input[cursor + 1] === '<') {
-        type = 'COLON_LT'
+        type = 'LT'
         value = ':<'
         end = cursor + 2
       } else if (input[cursor + 1] === '>') {
-        type = 'COLON_GT'
+        type = 'GT'
         value = ':>'
         end = cursor + 2
       }
@@ -147,7 +152,7 @@ export type ASTNode =
   | { type: 'AND'; left: ASTNode; right: ASTNode }
   | { type: 'OR'; left: ASTNode; right: ASTNode }
   | { type: 'NOT'; node: ASTNode }
-  | { type: 'FIELD'; field: string; comparator: string; value: string; isString: boolean }
+  | { type: 'FIELD'; field: string; comparator: TokenType; value: string; isString: boolean }
   | { type: 'TERM'; value: string; isString: boolean }
 
 export class SearchQueryParser {
@@ -272,11 +277,12 @@ export class SearchQueryParser {
 
       if (
         nextToken &&
-        (nextToken.type === 'COLON' ||
-          nextToken.type === 'COLON_LT' ||
-          nextToken.type === 'COLON_GT' ||
-          nextToken.type === 'COLON_LTE' ||
-          nextToken.type === 'COLON_GTE')
+        (nextToken.type === 'SEARCH' ||
+          nextToken.type === 'EXACT' ||
+          nextToken.type === 'LT' ||
+          nextToken.type === 'GT' ||
+          nextToken.type === 'LTE' ||
+          nextToken.type === 'GTE')
       ) {
         this.advance() // consume name
         this.advance() // consume comparator
@@ -293,7 +299,7 @@ export class SearchQueryParser {
         return {
           type: 'FIELD',
           field: nameToken.value,
-          comparator: nextToken.value,
+          comparator: nextToken.type,
           value: valToken.value,
           isString,
         }

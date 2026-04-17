@@ -9,7 +9,7 @@ import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { generateID, IEntityService, IsEntityService } from '@src/db/base.entity'
+import { generateID, IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Point } from '@src/db/custom.types'
 import { Place, PlacesTag } from '@src/geo/place.entity'
 import { CreatePlaceInput, UpdatePlaceInput } from '@src/geo/place.model'
@@ -24,6 +24,12 @@ export class PlaceService implements IEntityService<Place> {
     private readonly editService: EditService,
     private readonly i18n: I18nService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {
+      org: { operators: ['SEARCH', 'EXACT'], dbField: 'org' },
+    }
+  }
 
   async find(opts: CursorOptions<Place>) {
     const places = await this.em.find(Place, opts.where, opts.options)

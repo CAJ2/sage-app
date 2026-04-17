@@ -9,7 +9,7 @@ import { mapOrderBy } from '@src/common/db.utils'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { LocationService } from '@src/geo/location.service'
 import { Region } from '@src/geo/region.entity'
 import { StreamScore, StreamScoreRating } from '@src/process/stream.model'
@@ -39,6 +39,10 @@ export class VariantService implements IEntityService<Variant> {
     private readonly i18n: I18nService,
     private readonly locationService: LocationService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async findOneByID(id: string) {
     return await this.em.findOne(

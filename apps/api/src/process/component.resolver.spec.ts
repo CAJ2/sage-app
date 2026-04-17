@@ -89,8 +89,8 @@ describe('ComponentResolver (integration)', () => {
     const materialId = MATERIAL_IDS[0]
     const res = await gql.send(
       graphql(`
-        query ComponentResolverFilterComponents($material: String) {
-          components(material: $material) {
+        query ComponentResolverFilterComponents($query: String) {
+          components(query: $query) {
             nodes {
               id
               name
@@ -102,16 +102,95 @@ describe('ComponentResolver (integration)', () => {
           }
         }
       `),
-      { material: materialId },
+      { query: `material:${materialId}` },
     )
     expect(res.errors).toBeUndefined()
     expect(res.data?.components.nodes).toBeDefined()
     expect(res.data?.components.nodes?.length).toBeGreaterThan(0)
     for (const node of res.data?.components.nodes ?? []) {
-      // Note: In the query result we only check primaryMaterial, 
+      // Note: In the query result we only check primaryMaterial,
       // but the filter uses the ManyToMany relationship which includes it.
       expect(node.primaryMaterial.id).toBe(materialId)
     }
+  })
+
+  test('should filter components by multiple materials (pivot table)', async () => {
+    // 1. Create a component with two materials
+    const m1 = MATERIAL_IDS[0]
+    const m2 = MATERIAL_IDS[1]
+    const m3 = MATERIAL_IDS[2]
+
+    const createRes1 = await gql.send(
+      graphql(`
+        mutation ComponentResolverCreateMultiMaterial1($input: CreateComponentInput!) {
+          createComponent(input: $input) {
+            component {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Multi Material Component',
+          primaryMaterial: { id: m1 },
+          materials: [
+            { id: m1, materialFraction: 0.5 },
+            { id: m2, materialFraction: 0.5 },
+          ],
+        },
+      },
+    )
+    expect(createRes1.errors).toBeUndefined()
+    const componentId1 = createRes1.data?.createComponent?.component?.id
+    expect(componentId1).toBeDefined()
+
+    // 2. Create another component with a different material (m3)
+    const createRes2 = await gql.send(
+      graphql(`
+        mutation ComponentResolverCreateMultiMaterial2($input: CreateComponentInput!) {
+          createComponent(input: $input) {
+            component {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Other Material Component',
+          primaryMaterial: { id: m3 },
+          materials: [{ id: m3, materialFraction: 1.0 }],
+        },
+      },
+    )
+    expect(createRes2.errors).toBeUndefined()
+    const componentId2 = createRes2.data?.createComponent?.component?.id
+    expect(componentId2).toBeDefined()
+
+    // 3. Query with both m1 AND m2
+    const filterRes = await gql.send(
+      graphql(`
+        query ComponentResolverFilterMultiMaterial($query: String) {
+          components(query: $query) {
+            nodes {
+              id
+              name
+            }
+            totalCount
+          }
+        }
+      `),
+      { query: `material:${m1} AND material:${m2}` },
+    )
+
+    expect(filterRes.errors).toBeUndefined()
+    const ids = filterRes.data?.components.nodes.map((n: any) => n.id) ?? []
+
+    // Component 1 should be present
+    expect(ids).toContain(componentId1)
+    // Component 2 should be filtered out
+    expect(ids).not.toContain(componentId2)
   })
 
   test('should query a single component', async () => {

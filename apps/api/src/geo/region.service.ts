@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common'
 
 import { BadRequestErr } from '@src/common/exceptions'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import { SearchIndex } from '@src/search/search.backend'
 import { SearchService } from '@src/search/search.service'
@@ -16,6 +16,10 @@ export class RegionService implements IEntityService<Region> {
     private readonly em: EntityManager,
     private readonly searchService: SearchService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async find(opts: CursorOptions<Region>) {
     const regions = await this.em.find(Region, opts.where, opts.options)

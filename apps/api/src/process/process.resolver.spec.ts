@@ -88,7 +88,7 @@ describe('ProcessResolver (integration)', () => {
 
     const res = await gql.send(
       graphql(`
-        query FilterProcessesByMaterial($material: String) {
+        query FilterProcessesByMaterial($material: ID) {
           processes(material: $material) {
             nodes {
               id
@@ -135,7 +135,7 @@ describe('ProcessResolver (integration)', () => {
 
     const res = await gql.send(
       graphql(`
-        query FilterProcessesByRegion($region: String) {
+        query FilterProcessesByRegion($region: ID) {
           processes(region: $region) {
             nodes {
               id

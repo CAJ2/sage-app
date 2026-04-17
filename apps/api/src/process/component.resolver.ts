@@ -52,9 +52,14 @@ export class ComponentResolver {
   @OptionalAuth()
   async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentsArgs, args)
-    if (args.material) filter.where.materials = args.material
+    const cursorOpts = await this.transform.applySearchQuery(
+      ComponentEntity,
+      filter,
+      this.componentService.queryFields(),
+      parsedArgs,
+    )
 
-    const cursor = await this.componentService.find(filter)
+    const cursor = await this.componentService.find(cursorOpts)
     return this.transform.entityToPaginated(Component, ComponentsPage, cursor, parsedArgs)
   }
 

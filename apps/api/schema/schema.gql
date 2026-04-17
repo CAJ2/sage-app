@@ -1328,10 +1328,10 @@ type Query {
   changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesPage!
   component(id: ID!): Component
   componentSchema: ModelEditSchema
-  components(after: String, before: String, first: Int, last: Int, material: ID, region: ID): ComponentsPage!
+  components(after: String, before: String, first: Int, last: Int, query: String): ComponentsPage!
   currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
-  feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, regionId: ID): FeedPage!
+  feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, region: ID): FeedPage!
   item(id: ID!): Item
   itemSchema: ModelEditSchema
   items(after: String, before: String, first: Int, last: Int): ItemsPage!
@@ -1344,10 +1344,10 @@ type Query {
   orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
   place(id: ID!): Place
   placeSchema: ModelEditSchema
-  places(after: String, before: String, first: Int, last: Int, org: String): PlacesPage!
+  places(after: String, before: String, first: Int, last: Int, query: String): PlacesPage!
   process(id: ID!): Process
   processSchema: ModelEditSchema
-  processes(after: String, before: String, first: Int, last: Int, material: String, region: String): ProcessPage!
+  processes(after: String, before: String, first: Int, last: Int, material: ID, region: ID): ProcessPage!
   program(id: ID!): Program
   programSchema: ModelEditSchema
   programs(after: String, before: String, first: Int, last: Int): ProgramsPage!

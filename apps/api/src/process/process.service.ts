@@ -8,7 +8,7 @@ import { Source } from '@src/changes/source.entity'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
@@ -25,6 +25,14 @@ export class ProcessService implements IEntityService<Process> {
     private readonly editService: EditService,
     private readonly i18n: I18nService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {
+      material: { operators: ['SEARCH', 'EXACT'], dbField: 'material' },
+      region: { operators: ['SEARCH', 'EXACT'], dbField: 'region' },
+      org: { operators: ['SEARCH', 'EXACT'], dbField: 'org' },
+    }
+  }
 
   async find(opts: CursorOptions<Process>) {
     const processes = await this.em.find(Process, opts.where, opts.options)

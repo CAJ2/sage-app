@@ -119,4 +119,3 @@ export class SourceResolver {
     return this.transform.entityToModel(User, user)
   }
 }
-
