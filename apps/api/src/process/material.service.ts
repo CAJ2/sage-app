@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Component } from '@src/process/component.entity'
 import { Material, MATERIAL_ROOT, MaterialEdge, MaterialTree } from '@src/process/material.entity'
 import { Process } from '@src/process/process.entity'
@@ -11,6 +11,10 @@ import { Process } from '@src/process/process.entity'
 @IsEntityService(Material)
 export class MaterialService implements IEntityService<Material> {
   constructor(private readonly em: EntityManager) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async find(opts: CursorOptions<Material>) {
     const materials = await this.em.find(Material, opts.where, opts.options)

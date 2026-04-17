@@ -56,6 +56,9 @@ export class ProcessResolver {
   @OptionalAuth()
   async processes(@Args() args: ProcessArgs): Promise<ProcessPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessArgs, args)
+    if (args.region) filter.where.region = args.region
+    if (args.material) filter.where.material = args.material
+
     const cursor = await this.processService.find(filter)
     return this.transform.entityToPaginated(Process, ProcessPage, cursor, parsedArgs)
   }

@@ -1,5 +1,4 @@
 import { ArgsType, Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { IsOptional } from 'class-validator'
 import { z } from 'zod/v4'
 
 import { IDCreatedUpdated, registerModel } from '@src/graphql/base.model'
@@ -64,15 +63,13 @@ export class FeedPage extends Paginated(FeedItem) {}
 @ArgsType()
 export class FeedArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema.extend({
-    regionId: z.string().optional(),
+    region: z.string().optional(),
     format: z.enum(FeedFormat).optional(),
   })
 
   @Field(() => ID, { nullable: true })
-  @IsOptional()
-  regionId?: string
+  region?: string
 
   @Field(() => FeedFormat, { nullable: true })
-  @IsOptional()
   format?: FeedFormat
 }

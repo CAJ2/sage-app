@@ -3,6 +3,8 @@ import { DiscoveryService } from '@nestjs/core'
 import { nanoid } from 'nanoid'
 import { ClsServiceManager } from 'nestjs-cls'
 
+import { TokenType } from '@src/common/search-query.parser'
+
 function isTestRequest() {
   if (process.env.NODE_ENV === 'production' && !process.env.IS_DEV) return false
   try {
@@ -21,6 +23,12 @@ export function generateID() {
   return nanoid()
 }
 
+export interface QueryField {
+  operators: TokenType[]
+  dbField?: string
+  prefix?: boolean
+}
+
 /**
  * Marks a class as an entity service.
  * Used to dynamically discover entity services at runtime,
@@ -29,6 +37,8 @@ export function generateID() {
 export const IsEntityService = DiscoveryService.createDecorator()
 
 export interface IEntityService<E extends BaseEntity> {
+  queryFields(): Record<string, QueryField>
+
   /**
    * Finds an entity by its ID.
    * @param id The entity ID.

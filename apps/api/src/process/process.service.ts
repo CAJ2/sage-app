@@ -8,7 +8,7 @@ import { Source } from '@src/changes/source.entity'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Place } from '@src/geo/place.entity'
 import { Region } from '@src/geo/region.entity'
 import { Material } from '@src/process/material.entity'
@@ -16,11 +16,6 @@ import { Process, ProcessHistory, ProcessSources } from '@src/process/process.en
 import { CreateProcessInput, UpdateProcessInput } from '@src/process/process.model'
 import { Variant } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.entity'
-
-export interface FindProcessFilter {
-  region?: string
-  material?: string
-}
 
 @Injectable()
 @IsEntityService(Process)
@@ -31,13 +26,15 @@ export class ProcessService implements IEntityService<Process> {
     private readonly i18n: I18nService,
   ) {}
 
-  async find(opts: CursorOptions<Process>, filter?: FindProcessFilter) {
-    if (filter?.region) {
-      opts.where.region = ref(Region, filter.region)
+  queryFields(): Record<string, QueryField> {
+    return {
+      material: { operators: ['SEARCH', 'EXACT'], dbField: 'material' },
+      region: { operators: ['SEARCH', 'EXACT'], dbField: 'region' },
+      org: { operators: ['SEARCH', 'EXACT'], dbField: 'org' },
     }
-    if (filter?.material) {
-      opts.where.material = ref(Material, filter.material)
-    }
+  }
+
+  async find(opts: CursorOptions<Process>) {
     const processes = await this.em.find(Process, opts.where, opts.options)
     const count = await this.em.count(Process, opts.where)
     return {
@@ -117,11 +114,9 @@ export class ProcessService implements IEntityService<Process> {
     await this.editService.beginUpdateEntityEdit(change, process)
     await this.setFields(process, input, change)
     await this.editService.updateEntityEdit(change, process)
-    const currentProcess = await this.em.findOne(
-      Process,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentProcess = await this.editService.findOneForChange(this.em, change, Process, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {

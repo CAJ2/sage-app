@@ -8,7 +8,7 @@ import { Source, SourceType } from '@src/changes/source.entity'
 import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Region } from '@src/geo/region.entity'
 import {
   Component,
@@ -34,6 +34,13 @@ export class ComponentService implements IEntityService<Component> {
     private readonly streamService: StreamService,
   ) {}
 
+  queryFields(): Record<string, QueryField> {
+    return {
+      material: { operators: ['SEARCH', 'EXACT'], dbField: 'materials' },
+      region: { operators: ['SEARCH', 'EXACT'], dbField: 'region' },
+    }
+  }
+
   async find(opts: CursorOptions<Component>) {
     const components = await this.em.find(Component, opts.where, opts.options)
     const count = await this.em.count(Component, opts.where)
@@ -47,7 +54,7 @@ export class ComponentService implements IEntityService<Component> {
     return this.em.find(Component, { id: { $in: ids } })
   }
 
-  async findOneByID(id: string, withChange?: string) {
+  async findOneByID(id: string) {
     return await this.em.findOne(
       Component,
       { id },
@@ -76,12 +83,15 @@ export class ComponentService implements IEntityService<Component> {
     const component = await this.em.findOne(
       Component,
       { id: componentId },
-      { populate: ['materials'] },
+      { populate: ['componentMaterials'] },
     )
     if (!component) {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
-    return component.materials.getItems()
+    return component.componentMaterials.getItems().map((cm) => ({
+      material: cm.material,
+      materialFraction: cm.materialFraction,
+    }))
   }
 
   async tags(componentId: string, opts: CursorOptions<Tag>) {
@@ -172,11 +182,9 @@ export class ComponentService implements IEntityService<Component> {
     await this.editService.beginUpdateEntityEdit(change, component)
     await this.setFields(component, input, change)
     await this.editService.updateEntityEdit(change, component)
-    const currentComponent = await this.em.findOne(
-      Component,
-      { id: input.id },
-      { disableIdentityMap: true },
-    )
+    const currentComponent = await this.editService.findOneForChange(this.em, change, Component, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return {
@@ -295,6 +303,18 @@ export class ComponentService implements IEntityService<Component> {
           id: input.primaryMaterial.id,
         })
       }
+      component.componentMaterials = await this.editService.setOrAddPivot(
+        component.id,
+        change,
+        component.componentMaterials,
+        Component,
+        ComponentsMaterials,
+        undefined,
+        {
+          id: input.primaryMaterial.id,
+          materialFraction: 1.0,
+        },
+      )
     }
     if (input.materials) {
       component.componentMaterials = await this.editService.setOrAddPivot(

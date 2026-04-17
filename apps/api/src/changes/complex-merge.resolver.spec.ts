@@ -7,6 +7,7 @@ import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 import { assertNoErrors } from '@test/helpers/gql'
 
+import { ChangeEdits } from '@src/changes/change.entity'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import {
@@ -26,12 +27,14 @@ import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
 import { Component, ComponentsMaterials } from '@src/process/component.entity'
 import { Process } from '@src/process/process.entity'
+import { Item } from '@src/product/item.entity'
 import {
   Variant,
   VariantsComponents,
   VariantsItems,
   VariantsOrgs,
 } from '@src/product/variant.entity'
+import { Org } from '@src/users/org.entity'
 
 describe('Complex Merge Resolver (integration)', () => {
   let app: INestApplication
@@ -70,6 +73,27 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(mergeRes)
     expect(mergeRes.data?.mergeChange?.change?.status).toBe('MERGED')
+  }
+
+  const expectEntityOnlyInChangeEdits = async (
+    changeID: string,
+    entityName: string,
+    entityID: string,
+    entityClass: any,
+  ) => {
+    const em = orm.em.fork()
+    const edit = await em.findOne(ChangeEdits, {
+      change: changeID,
+      entityName,
+      entityID,
+    })
+    expect(edit).toBeDefined()
+
+    // If it's a creation (no original state), it should NOT exist in the main table yet
+    if (!edit?.original) {
+      const entity = await em.findOne(entityClass, { id: entityID } as any)
+      expect(entity ? (entity as any).id : null).toBeNull()
+    }
   }
 
   beforeAll(async () => {
@@ -707,6 +731,7 @@ describe('Complex Merge Resolver (integration)', () => {
     const createdItemID = createItemRes.data?.createItem?.item?.id as string | undefined
     expect(changeID).toBeDefined()
     expect(createdItemID).toBeDefined()
+    await expectEntityOnlyInChangeEdits(changeID!, 'Item', createdItemID!, Item)
 
     const createComponentRes = await gql.send(
       graphql(`
@@ -742,6 +767,11 @@ describe('Complex Merge Resolver (integration)', () => {
     }
     expect(createdComponentID).toBeDefined()
     expect(createComponentRes.data?.createComponent?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Component', createdComponentID!, Component)
+    const componentCreateRows = await orm.em
+      .fork()
+      .count(ComponentsMaterials, { component: createdComponentID! } as any)
+    expect(componentCreateRows).toBe(0)
 
     const createVariantRes = await gql.send(
       graphql(`
@@ -767,6 +797,7 @@ describe('Complex Merge Resolver (integration)', () => {
     const createdVariantID = createVariantRes.data?.createVariant?.variant?.id as string | undefined
     expect(createdVariantID).toBeDefined()
     expect(createVariantRes.data?.createVariant?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Variant', createdVariantID!, Variant)
 
     const createOrgRes = await gql.send(
       graphql(`
@@ -793,6 +824,7 @@ describe('Complex Merge Resolver (integration)', () => {
     const createdOrgID = createOrgRes.data?.createOrg?.org?.id as string | undefined
     expect(createdOrgID).toBeDefined()
     expect(createOrgRes.data?.createOrg?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Org', createdOrgID!, Org)
 
     const updateCreatedVariantRes = await gql.send(
       graphql(`
@@ -820,6 +852,19 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(updateCreatedVariantRes)
     expect(updateCreatedVariantRes.data?.updateVariant?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Variant', createdVariantID!, Variant)
+    const preMergeCreatedVariantItems = await orm.em
+      .fork()
+      .count(VariantsItems, { variant: createdVariantID! } as any)
+    const preMergeCreatedVariantComponents = await orm.em
+      .fork()
+      .count(VariantsComponents, { variant: createdVariantID! } as any)
+    const preMergeCreatedVariantOrgs = await orm.em
+      .fork()
+      .count(VariantsOrgs, { variant: createdVariantID! } as any)
+    expect(preMergeCreatedVariantItems).toBe(0)
+    expect(preMergeCreatedVariantComponents).toBe(0)
+    expect(preMergeCreatedVariantOrgs).toBe(0)
 
     const updateVariantRes = await gql.send(
       graphql(`
@@ -846,6 +891,7 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(updateVariantRes)
     expect(updateVariantRes.data?.updateVariant?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Variant', VARIANT_IDS[1], Variant)
 
     const updateProcessRes = await gql.send(
       graphql(`
@@ -874,6 +920,7 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(updateProcessRes)
     expect(updateProcessRes.data?.updateProcess?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Process', PROCESS_IDS[0], Process)
 
     const updateCreatedComponentRes = await gql.send(
       graphql(`
@@ -902,6 +949,7 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(updateCreatedComponentRes)
     expect(updateCreatedComponentRes.data?.updateComponent?.change?.id).toBe(changeID)
+    await expectEntityOnlyInChangeEdits(changeID!, 'Component', createdComponentID!, Component)
 
     await approveAndMerge(changeID!)
 
@@ -1111,6 +1159,18 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(updateCreatedVariantRes)
     expect(updateCreatedVariantRes.data?.updateVariant?.change?.id).toBe(changeID)
+    const preMergeCreatedVariantItems = await orm.em
+      .fork()
+      .count(VariantsItems, { variant: createdVariantID! } as any)
+    const preMergeCreatedVariantComponents = await orm.em
+      .fork()
+      .count(VariantsComponents, { variant: createdVariantID! } as any)
+    const preMergeCreatedVariantOrgs = await orm.em
+      .fork()
+      .count(VariantsOrgs, { variant: createdVariantID! } as any)
+    expect(preMergeCreatedVariantItems).toBe(0)
+    expect(preMergeCreatedVariantComponents).toBe(0)
+    expect(preMergeCreatedVariantOrgs).toBe(0)
 
     const updateProcessRes = await gql.send(
       graphql(`
@@ -1224,6 +1284,10 @@ describe('Complex Merge Resolver (integration)', () => {
     )
     assertNoErrors(updateCreatedComponentRes)
     expect(updateCreatedComponentRes.data?.updateComponent?.change?.id).toBe(changeID)
+    const preMergeComponentMaterialRows = await orm.em
+      .fork()
+      .count(ComponentsMaterials, { component: createdComponentID! } as any)
+    expect(preMergeComponentMaterialRows).toBe(0)
 
     await approveAndMerge(changeID!)
 
@@ -1565,5 +1629,78 @@ describe('Complex Merge Resolver (integration)', () => {
     expect(createProcessRes.errors).toBeDefined()
     expect(createProcessRes.errors?.[0]?.extensions?.code).toBe('BAD_REQUEST')
     expect(createProcessRes.errors?.[0]?.message).toContain('pending deletion')
+  })
+
+  // Sequence H:
+  // 1) Create an otherwise unreferenced item directly.
+  // 2) In a change, stage a variant update that adds the item through a pivot relation.
+  // 3) Attempt to delete that item in the same change.
+  // 4) Verify delete is rejected because the staged pivot edit references it.
+  test('Sequence H: delete in change fails when staged variant items reference the target', async () => {
+    const createItemRes = await gql.send(
+      graphql(`
+        mutation ComplexMergeHCreateStandaloneItem($input: CreateItemInput!) {
+          createItem(input: $input) {
+            item {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Complex Merge H Standalone Item',
+        },
+      },
+    )
+    assertNoErrors(createItemRes)
+    const standaloneItemID = createItemRes.data?.createItem?.item?.id as string | undefined
+    expect(standaloneItemID).toBeDefined()
+
+    const seedChangeRes = await gql.send(
+      graphql(`
+        mutation ComplexMergeHSeedChange($input: UpdateVariantInput!) {
+          updateVariant(input: $input) {
+            change {
+              id
+            }
+            variant {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: VARIANT_IDS[5],
+          addItems: [{ id: standaloneItemID! }],
+          change: { title: 'Complex merge sequence H', status: ChangeStatus.Draft },
+        },
+      },
+    )
+    assertNoErrors(seedChangeRes)
+    const changeID = seedChangeRes.data?.updateVariant?.change?.id as string | undefined
+    expect(changeID).toBeDefined()
+
+    const deleteItemRes = await gql.send(
+      graphql(`
+        mutation ComplexMergeHDeleteItem($input: DeleteInput!) {
+          deleteItem(input: $input) {
+            success
+            id
+          }
+        }
+      `),
+      {
+        input: {
+          id: standaloneItemID!,
+          changeID,
+        },
+      },
+    )
+    expect(deleteItemRes.errors).toBeDefined()
+    expect(deleteItemRes.errors?.[0]?.extensions?.code).toBe('BAD_REQUEST')
+    expect(deleteItemRes.errors?.[0]?.message).toContain('Cannot delete Item')
+    expect(deleteItemRes.errors?.[0]?.message).toContain('references it')
   })
 })

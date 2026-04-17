@@ -66,8 +66,8 @@ import { graphql } from '~/gql'
 useTopbar(null)
 
 const homeFeedQuery = graphql(`
-  query HomeFeed($regionId: ID) {
-    feed(regionId: $regionId) {
+  query HomeFeed($region: ID) {
+    feed(region: $region) {
       nodes {
         id
         format
@@ -89,7 +89,7 @@ const homeFeedQuery = graphql(`
 const regionStore = useRegionStore()
 await regionStore.load()
 const { result: data, refetch } = useQuery(homeFeedQuery, () => ({
-  regionId: regionStore.selectedRegion || undefined,
+  region: regionStore.selectedRegion || undefined,
 }))
 
 async function onRefresh({ done }: { done: () => void }) {

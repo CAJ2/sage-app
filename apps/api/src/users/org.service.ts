@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/core'
+import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { DeleteInput, isUsingChange } from '@src/changes/change-ext.model'
@@ -7,7 +7,7 @@ import { EditService } from '@src/changes/edit.service'
 import { ConflictErr, NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { Org, OrgHistory } from '@src/users/org.entity'
 import { CreateOrgInput, UpdateOrgInput } from '@src/users/org.model'
 import { User } from '@src/users/users.entity'
@@ -20,6 +20,10 @@ export class OrgService implements IEntityService<Org> {
     private readonly editService: EditService,
     private readonly i18n: I18nService,
   ) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async find(opts: CursorOptions<Org>) {
     const items = await this.em.find(Org, opts.where, opts.options)
@@ -97,7 +101,9 @@ export class OrgService implements IEntityService<Org> {
     await this.editService.beginUpdateEntityEdit(change, org)
     await this.setFields(org, input, change)
     await this.editService.updateEntityEdit(change, org)
-    const currentOrg = await this.em.findOne(Org, { id: input.id }, { disableIdentityMap: true })
+    const currentOrg = await this.editService.findOneForChange(this.em, change, Org, {
+      id: input.id,
+    })
     await this.editService.persistAndMaybeTriggerReview(change)
     await this.editService.checkMerge(change, input)
     return { org, change, currentOrg: currentOrg ?? undefined }

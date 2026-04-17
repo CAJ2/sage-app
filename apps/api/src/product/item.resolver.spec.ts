@@ -14,12 +14,14 @@ import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { ITEM_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { Item, ItemsCategories, ItemsTags } from '@src/product/item.entity'
 import { WindmillMockService } from '@src/windmill/windmill.mock.service'
 import { WindmillService } from '@src/windmill/windmill.service'
 
 describe('ItemResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let orm: MikroORM
   let itemID: string
 
   beforeAll(async () => {
@@ -35,7 +37,7 @@ describe('ItemResolver (integration)', () => {
 
     gql = new GraphQLTestClient(app)
 
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
     await orm.seeder.seed(
@@ -694,6 +696,155 @@ describe('ItemResolver (integration)', () => {
       expect(changeRes.data?.updateItem?.item?.name).toBe('Proposed Name')
       expect(changeRes.data?.updateItem?.currentItem?.name).toBe('Current DB Name')
       expect(changeRes.data?.updateItem?.currentItem?.id).toBe(testItemID)
+    })
+  })
+
+  describe('change tracking for category and tag references', () => {
+    let changeID: string
+    let stagedItemID: string
+
+    test('creates an item in change mode without persisting main or pivot rows', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation CreateItemReferenceChange($input: CreateItemInput!) {
+            createItem(input: $input) {
+              item {
+                id
+                categories {
+                  nodes {
+                    id
+                  }
+                }
+                tags {
+                  nodes {
+                    id
+                  }
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Staged Item Refs',
+            categories: [{ id: CATEGORY_IDS[0] }],
+            tags: [{ id: TAG_IDS[0], meta: { score: 70 } }],
+            change: { title: 'Item refs change', status: ChangeStatus.Draft },
+          },
+        },
+      )
+
+      expect(res.errors).toBeUndefined()
+      stagedItemID = res.data!.createItem!.item!.id
+      changeID = res.data!.createItem!.change!.id
+
+      const em = orm.em.fork()
+      expect(await em.findOne(Item, { id: stagedItemID } as any)).toBeNull()
+      expect(await em.count(ItemsCategories, { item: stagedItemID } as any)).toBe(0)
+      expect(await em.count(ItemsTags, { item: stagedItemID } as any)).toBe(0)
+    })
+
+    test('updates staged item refs without leaking collection rows before merge', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation UpdateItemReferenceChange($input: UpdateItemInput!) {
+            updateItem(input: $input) {
+              item {
+                id
+                categories {
+                  nodes {
+                    id
+                  }
+                }
+                tags {
+                  nodes {
+                    id
+                  }
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: stagedItemID,
+            categories: [{ id: CATEGORY_IDS[1] }],
+            removeTags: [TAG_IDS[0]],
+            addTags: [{ id: TAG_IDS[0], meta: { score: 90 } }],
+            changeID,
+          },
+        },
+      )
+
+      expect(res.errors).toBeUndefined()
+      expect(res.data!.updateItem!.change!.id).toBe(changeID)
+
+      const em = orm.em.fork()
+      expect(await em.findOne(Item, { id: stagedItemID } as any)).toBeNull()
+      expect(await em.count(ItemsCategories, { item: stagedItemID } as any)).toBe(0)
+      expect(await em.count(ItemsTags, { item: stagedItemID } as any)).toBe(0)
+    })
+
+    test('merges staged item refs into the database correctly', async () => {
+      const approveRes = await gql.send(
+        graphql(`
+          mutation ApproveItemReferenceChange($input: UpdateChangeInput!) {
+            updateChange(input: $input) {
+              change {
+                status
+              }
+            }
+          }
+        `),
+        { input: { id: changeID, status: ChangeStatus.Approved } },
+      )
+      expect(approveRes.errors).toBeUndefined()
+
+      const mergeRes = await gql.send(
+        graphql(`
+          mutation MergeItemReferenceChange($id: ID!) {
+            mergeChange(id: $id) {
+              change {
+                status
+              }
+            }
+          }
+        `),
+        { id: changeID },
+      )
+      expect(mergeRes.errors).toBeUndefined()
+
+      const itemRes = await gql.send(
+        graphql(`
+          query GetMergedItemReferenceChange($id: ID!) {
+            item(id: $id) {
+              id
+              categories {
+                nodes {
+                  id
+                }
+              }
+              tags {
+                nodes {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        { id: stagedItemID },
+      )
+      expect(itemRes.errors).toBeUndefined()
+      expect(itemRes.data?.item?.categories?.nodes?.map((node) => node.id)).toEqual([
+        CATEGORY_IDS[1],
+      ])
+      expect(itemRes.data?.item?.tags?.nodes?.map((node) => node.id)).toEqual([TAG_IDS[0]])
     })
   })
 

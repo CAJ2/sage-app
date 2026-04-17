@@ -2,6 +2,7 @@ import { EntityManager, ref } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import jsonld from 'jsonld'
 
+import { Change } from '@src/changes/change.entity'
 import { Source } from '@src/changes/source.entity'
 import {
   CreateSourceInput,
@@ -41,6 +42,15 @@ export class SourceService {
     }
 
     return source
+  }
+
+  async changes(sourceID: string, opts: CursorOptions<Change>) {
+    opts.where.sources = this.em.getReference(Source, sourceID)
+    const [items, count] = await this.em.findAndCount(Change, opts.where, opts.options)
+    return {
+      items,
+      count,
+    }
   }
 
   async create(input: CreateSourceInput, userID: string) {

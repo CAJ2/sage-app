@@ -10,7 +10,7 @@ import { ChangeService } from '@src/changes/change.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
-import { PROCESS_IDS, TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
+import { ORG_IDS, PROCESS_IDS, TestProcessSeeder } from '@src/db/seeds/TestProcessSeeder'
 import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import {
   COMPONENT_IDS,
@@ -335,6 +335,7 @@ describe('DirectEdit (integration)', () => {
         userID: user.id,
         changes: {
           id: VARIANT_IDS[0],
+          variantOrgs: [{ variant: VARIANT_IDS[0], org: ORG_IDS[0] }],
           variantComponents: [
             { variant: VARIANT_IDS[0], component: COMPONENT_IDS[0], quantity: 3, unit: 'g' },
           ],
@@ -342,6 +343,18 @@ describe('DirectEdit (integration)', () => {
       })
       variantEdit.change = em.getReference(Change, changeID)
       em.persist(variantEdit)
+
+      const itemEdit = new ChangeEdits({
+        entityName: 'Item',
+        entityID: ITEM_IDS[0],
+        userID: user.id,
+        changes: {
+          id: ITEM_IDS[0],
+          itemTags: [{ item: ITEM_IDS[0], tag: TAG_IDS[1], meta: { time: 'moderate' } }],
+        },
+      })
+      itemEdit.change = em.getReference(Change, changeID)
+      em.persist(itemEdit)
 
       await em.flush()
     })
@@ -390,6 +403,33 @@ describe('DirectEdit (integration)', () => {
       expect(comp?.quantity).toBe(3)
       expect(comp?.unit).toBe('g')
       await expect(variantSchema.parseUpdateInput(updateInput as any)).resolves.toBeDefined()
+    })
+
+    it('preserves orgs on Variant orgs', async () => {
+      const res = await gql.send(DirectEditQuery, {
+        id: VARIANT_IDS[0],
+        entityName: 'Variant',
+        changeID,
+      })
+
+      expect(res.errors).toBeUndefined()
+      const updateInput = res.data?.directEdit?.updateInput
+      expect(updateInput?.orgs).toContainEqual({ id: ORG_IDS[0] })
+      await expect(variantSchema.parseUpdateInput(updateInput as any)).resolves.toBeDefined()
+    })
+
+    it('preserves meta on Item tags', async () => {
+      const res = await gql.send(DirectEditQuery, {
+        id: ITEM_IDS[0],
+        entityName: 'Item',
+        changeID,
+      })
+
+      expect(res.errors).toBeUndefined()
+      const updateInput = res.data?.directEdit?.updateInput
+      const tag = updateInput?.tags?.find((t: any) => t.id === TAG_IDS[1])
+      expect(tag?.meta).toEqual({ time: 'moderate' })
+      await expect(itemSchema.parseUpdateInput(updateInput as any)).resolves.toBeDefined()
     })
   })
 

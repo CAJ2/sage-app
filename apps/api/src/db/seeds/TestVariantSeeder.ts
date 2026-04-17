@@ -4,7 +4,7 @@ import { Seeder } from '@mikro-orm/seeder'
 import { Source, SourceType } from '@src/changes/source.entity'
 import { MATERIAL_IDS } from '@src/db/seeds/TestMaterialSeeder'
 import { NORMAL_USER_ID } from '@src/db/seeds/UserSeeder'
-import { Component } from '@src/process/component.entity'
+import { Component, ComponentsMaterials } from '@src/process/component.entity'
 import { Material } from '@src/process/material.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant, VariantsComponents, VariantsSources } from '@src/product/variant.entity'
@@ -71,7 +71,7 @@ export class TestVariantSeeder extends Seeder {
       updatedAt: new Date(),
       source: [{ id: SOURCE_IDS[1] }],
     })
-    em.create(Component, {
+    const c1 = em.create(Component, {
       id: COMPONENT_IDS[0],
       name: {
         en: 'Test Component',
@@ -85,7 +85,12 @@ export class TestVariantSeeder extends Seeder {
       updatedAt: new Date(),
       primaryMaterial: em.getReference(Material, MATERIAL_IDS[0]),
     })
-    em.create(Component, {
+    em.create(ComponentsMaterials, {
+      component: c1,
+      material: em.getReference(Material, MATERIAL_IDS[0]),
+      materialFraction: 1.0,
+    })
+    const c2 = em.create(Component, {
       id: COMPONENT_IDS[1],
       name: {
         en: 'Another Test Component',
@@ -98,6 +103,11 @@ export class TestVariantSeeder extends Seeder {
       createdAt: new Date(),
       updatedAt: new Date(),
       primaryMaterial: em.getReference(Material, MATERIAL_IDS[1]),
+    })
+    em.create(ComponentsMaterials, {
+      component: c2,
+      material: em.getReference(Material, MATERIAL_IDS[1]),
+      materialFraction: 1.0,
     })
     for (const id of VARIANT_IDS) {
       const variant = new Variant()

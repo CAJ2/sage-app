@@ -1,6 +1,8 @@
 import { BaseEntity } from '@mikro-orm/core'
 import type {
   EntityDTO,
+  EntityMetadata,
+  EntityName,
   FindOptions,
   Loaded,
   ObjectQuery,
@@ -14,7 +16,11 @@ import type { ClassConstructor, ClassTransformOptions, TransformFnParams } from 
 import { GraphQLError } from 'graphql'
 import _ from 'lodash'
 
+import { BadRequestErr } from '@src/common/exceptions'
+import { ASTNode, SearchQueryParser } from '@src/common/search-query.parser'
+import { SearchQueryTranslator } from '@src/common/search-query.translator'
 import { ZService } from '@src/common/z.service'
+import { QueryField } from '@src/db/base.entity'
 import { BaseModel, ModelRegistry } from '@src/graphql/base.model'
 import {
   DEFAULT_PAGE_SIZE,
@@ -43,7 +49,10 @@ export interface CursorOptions<T> {
 
 @Injectable()
 export class TransformService {
-  constructor(private readonly zService: ZService) {}
+  constructor(
+    private readonly zService: ZService,
+    private readonly em: EntityManager,
+  ) {}
 
   async entityToModel<T extends BaseEntity, S extends BaseModel>(
     model: (new () => S) | string,
@@ -120,6 +129,94 @@ export class TransformService {
       },
     }
     return [args, options]
+  }
+
+  async applySearchQuery<T extends object>(
+    entity: EntityName<T>,
+    cursorOpts: CursorOptions<T>,
+    queryFields: Record<string, QueryField>,
+    args: any,
+  ): Promise<CursorOptions<T>> {
+    if (!args.query) {
+      return cursorOpts
+    }
+
+    const parser = new SearchQueryParser()
+    const ast = parser.parse(args.query)
+
+    if (ast) {
+      const meta = this.em.getMetadata().get(typeof entity === 'string' ? entity : entity.name)
+      this.validateSearchAST(ast, queryFields, meta)
+      const translator = new SearchQueryTranslator()
+      const fieldMap = Object.keys(queryFields).reduce(
+        (acc, key) => {
+          const qf = queryFields[key]
+          if (qf.dbField) {
+            acc[key] = qf.dbField
+          }
+          return acc
+        },
+        {} as Record<string, string>,
+      )
+      const prefixFields = Object.keys(queryFields).filter((key) => queryFields[key].prefix)
+
+      const translated = translator.translate(ast, {
+        fieldMap,
+        prefixFields,
+      })
+
+      if (Object.keys(translated).length > 0) {
+        cursorOpts.where = {
+          $and: [cursorOpts.where, translated],
+        } as any
+      }
+    }
+
+    return cursorOpts
+  }
+
+  private validateSearchAST(
+    node: ASTNode,
+    queryFields: Record<string, QueryField>,
+    meta?: EntityMetadata,
+  ) {
+    if (node.type === 'AND' || node.type === 'OR') {
+      this.validateSearchAST(node.left, queryFields, meta)
+      this.validateSearchAST(node.right, queryFields, meta)
+    } else if (node.type === 'NOT') {
+      this.validateSearchAST(node.node, queryFields, meta)
+    } else if (node.type === 'TERM') {
+      throw BadRequestErr('Default free-text search is not supported')
+    } else if (node.type === 'FIELD') {
+      const qf = queryFields[node.field]
+      if (!qf) {
+        throw BadRequestErr(`Query field "${node.field}" is not supported`)
+      }
+      if (qf.operators && !qf.operators.includes(node.comparator)) {
+        throw BadRequestErr(
+          `Operator "${node.comparator}" is not supported for field "${node.field}"`,
+        )
+      }
+      if (meta && qf.dbField) {
+        const parts = qf.dbField.split('.')
+        let currentMeta = meta
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i]
+          const prop = currentMeta.properties[part]
+          if (!prop) {
+            throw BadRequestErr(
+              `Database field "${qf.dbField}" for query field "${node.field}" does not exist on ${currentMeta.className}`,
+            )
+          }
+          if (prop.ref && i < parts.length - 1) {
+            const targetMeta = this.em.getMetadata().get(prop.type)
+            if (targetMeta) {
+              currentMeta = targetMeta
+            }
+          }
+        }
+      }
+    }
   }
 
   async entityToPaginated<T extends BaseEntity, U extends BaseModel, S extends PaginatedType<U>>(

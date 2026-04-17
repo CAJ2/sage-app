@@ -3,13 +3,17 @@ import { EntityManager } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 
 import { CursorOptions } from '@src/common/transform'
-import { IEntityService, IsEntityService } from '@src/db/base.entity'
+import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { HomeFeed } from '@src/feed/home-feed.entity'
 
 @Injectable()
 @IsEntityService(HomeFeed)
 export class HomeFeedService implements IEntityService<HomeFeed> {
   constructor(private readonly em: EntityManager) {}
+
+  queryFields(): Record<string, QueryField> {
+    return {}
+  }
 
   async find(opts: CursorOptions<HomeFeed>, regionId?: string, format?: string) {
     const where: FilterQuery<HomeFeed> = {

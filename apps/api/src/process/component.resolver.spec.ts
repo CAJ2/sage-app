@@ -85,6 +85,114 @@ describe('ComponentResolver (integration)', () => {
     expect(res.data?.components.totalCount).toBeGreaterThan(0)
   })
 
+  test('should filter components by material', async () => {
+    const materialId = MATERIAL_IDS[0]
+    const res = await gql.send(
+      graphql(`
+        query ComponentResolverFilterComponents($query: String) {
+          components(query: $query) {
+            nodes {
+              id
+              name
+              primaryMaterial {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      { query: `material:${materialId}` },
+    )
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.components.nodes).toBeDefined()
+    expect(res.data?.components.nodes?.length).toBeGreaterThan(0)
+    for (const node of res.data?.components.nodes ?? []) {
+      // Note: In the query result we only check primaryMaterial,
+      // but the filter uses the ManyToMany relationship which includes it.
+      expect(node.primaryMaterial.id).toBe(materialId)
+    }
+  })
+
+  test('should filter components by multiple materials (pivot table)', async () => {
+    // 1. Create a component with two materials
+    const m1 = MATERIAL_IDS[0]
+    const m2 = MATERIAL_IDS[1]
+    const m3 = MATERIAL_IDS[2]
+
+    const createRes1 = await gql.send(
+      graphql(`
+        mutation ComponentResolverCreateMultiMaterial1($input: CreateComponentInput!) {
+          createComponent(input: $input) {
+            component {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Multi Material Component',
+          primaryMaterial: { id: m1 },
+          materials: [
+            { id: m1, materialFraction: 0.5 },
+            { id: m2, materialFraction: 0.5 },
+          ],
+        },
+      },
+    )
+    expect(createRes1.errors).toBeUndefined()
+    const componentId1 = createRes1.data?.createComponent?.component?.id
+    expect(componentId1).toBeDefined()
+
+    // 2. Create another component with a different material (m3)
+    const createRes2 = await gql.send(
+      graphql(`
+        mutation ComponentResolverCreateMultiMaterial2($input: CreateComponentInput!) {
+          createComponent(input: $input) {
+            component {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Other Material Component',
+          primaryMaterial: { id: m3 },
+          materials: [{ id: m3, materialFraction: 1.0 }],
+        },
+      },
+    )
+    expect(createRes2.errors).toBeUndefined()
+    const componentId2 = createRes2.data?.createComponent?.component?.id
+    expect(componentId2).toBeDefined()
+
+    // 3. Query with both m1 AND m2
+    const filterRes = await gql.send(
+      graphql(`
+        query ComponentResolverFilterMultiMaterial($query: String) {
+          components(query: $query) {
+            nodes {
+              id
+              name
+            }
+            totalCount
+          }
+        }
+      `),
+      { query: `material:${m1} AND material:${m2}` },
+    )
+
+    expect(filterRes.errors).toBeUndefined()
+    const ids = filterRes.data?.components.nodes.map((n: any) => n.id) ?? []
+
+    // Component 1 should be present
+    expect(ids).toContain(componentId1)
+    // Component 2 should be filtered out
+    expect(ids).not.toContain(componentId2)
+  })
+
   test('should query a single component', async () => {
     const res = await gql.send(
       graphql(`
@@ -646,6 +754,62 @@ describe('ComponentResolver (integration)', () => {
       expect(changeRes.data?.updateComponent?.component?.name).toBe('Proposed Name')
       expect(changeRes.data?.updateComponent?.currentComponent?.name).toBe('Current DB Name')
       expect(changeRes.data?.updateComponent?.currentComponent?.id).toBe(testComponentID)
+    })
+
+    test('should keep currentComponent region isolated while staging a new region in a change', async () => {
+      const directRes = await gql.send(
+        graphql(`
+          mutation ComponentSetCurrentRefs($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            region: { id: REGION_IDS[0] },
+          },
+        },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateComponentCurrentRefs($input: UpdateComponentInput!) {
+            updateComponent(input: $input) {
+              component {
+                id
+                region {
+                  id
+                }
+              }
+              currentComponent {
+                id
+                region {
+                  id
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: testComponentID,
+            region: { id: REGION_IDS[1] },
+            change: { title: 'current component refs' },
+          },
+        },
+      )
+
+      expect(changeRes.errors).toBeUndefined()
+      expect(changeRes.data?.updateComponent?.component?.region?.id).toBe(REGION_IDS[1])
+      expect(changeRes.data?.updateComponent?.currentComponent?.region?.id).toBe(REGION_IDS[0])
     })
   })
 

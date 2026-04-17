@@ -19,10 +19,12 @@ import {
 } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { Variant as VariantEntity } from '@src/product/variant.entity'
 
 describe('VariantResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let orm: MikroORM
   let variantID: string
 
   beforeAll(async () => {
@@ -35,7 +37,7 @@ describe('VariantResolver (integration)', () => {
 
     gql = new GraphQLTestClient(app)
 
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
     await orm.seeder.seed(
@@ -916,6 +918,321 @@ describe('VariantResolver (integration)', () => {
       expect(changeRes.data?.updateVariant?.variant?.name).toBe('Proposed Name')
       expect(changeRes.data?.updateVariant?.currentVariant?.name).toBe('Current DB Name')
       expect(changeRes.data?.updateVariant?.currentVariant?.id).toBe(testVariantID)
+    })
+
+    test('should keep currentVariant relation refs isolated while staging new item/component/org/region refs', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation CreateVariantForCurrentRefs($input: CreateVariantInput!) {
+            createVariant(input: $input) {
+              variant {
+                id
+              }
+            }
+          }
+        `),
+        { input: { name: 'Variant Current Refs' } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      const currentRefsVariantID = createRes.data!.createVariant!.variant!.id
+
+      const directRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantCurrentBaselineRefs($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: currentRefsVariantID,
+            items: [{ id: ITEM_IDS[1] }],
+            components: [{ id: COMPONENT_IDS[1], quantity: 2.5, unit: 'ml' }],
+            orgs: [{ id: ORG_IDS[0] }],
+            region: { id: REGION_IDS[0] },
+          },
+        },
+      )
+      expect(directRes.errors).toBeUndefined()
+
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantCurrentProposedRefs($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+                items {
+                  nodes {
+                    id
+                  }
+                }
+                components {
+                  nodes {
+                    component {
+                      id
+                    }
+                    quantity
+                    unit
+                  }
+                }
+                orgs {
+                  nodes {
+                    org {
+                      id
+                    }
+                  }
+                }
+                regions {
+                  nodes {
+                    id
+                  }
+                }
+              }
+              currentVariant {
+                id
+                items {
+                  nodes {
+                    id
+                  }
+                }
+                components {
+                  nodes {
+                    component {
+                      id
+                    }
+                    quantity
+                    unit
+                  }
+                }
+                orgs {
+                  nodes {
+                    org {
+                      id
+                    }
+                  }
+                }
+                regions {
+                  nodes {
+                    id
+                  }
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: currentRefsVariantID,
+            items: [{ id: ITEM_IDS[0] }],
+            components: [{ id: COMPONENT_IDS[0], quantity: 5, unit: 'g' }],
+            orgs: [{ id: ORG_IDS[1] }],
+            region: { id: REGION_IDS[1] },
+            change: { title: 'current variant refs' },
+          },
+        },
+      )
+
+      expect(changeRes.errors).toBeUndefined()
+      expect(
+        changeRes.data?.updateVariant?.currentVariant?.regions?.nodes?.map((node) => node.id),
+      ).toEqual([REGION_IDS[0]])
+
+      const changeID = changeRes.data!.updateVariant!.change!.id
+      const approveRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantApproveCurrentRefs($input: UpdateChangeInput!) {
+            updateChange(input: $input) {
+              change {
+                status
+              }
+            }
+          }
+        `),
+        { input: { id: changeID, status: ChangeStatus.Approved } },
+      )
+      expect(approveRes.errors).toBeUndefined()
+
+      const mergeRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantMergeCurrentRefs($id: ID!) {
+            mergeChange(id: $id) {
+              change {
+                status
+              }
+            }
+          }
+        `),
+        { id: changeID },
+      )
+      expect(mergeRes.errors).toBeUndefined()
+
+      const mergedVariant = await gql.send(
+        graphql(`
+          query UpdateVariantMergedCurrentRefs($id: ID!) {
+            variant(id: $id) {
+              id
+              items {
+                nodes {
+                  id
+                }
+              }
+              components {
+                nodes {
+                  component {
+                    id
+                  }
+                  quantity
+                  unit
+                }
+              }
+              orgs {
+                nodes {
+                  org {
+                    id
+                  }
+                }
+              }
+              regions {
+                nodes {
+                  id
+                }
+              }
+            }
+          }
+        `),
+        { id: currentRefsVariantID },
+      )
+      expect(mergedVariant.errors).toBeUndefined()
+      expect(mergedVariant.data?.variant?.items?.nodes?.map((node) => node.id)).toEqual([
+        ITEM_IDS[0],
+      ])
+      expect(mergedVariant.data?.variant?.components?.nodes).toEqual([
+        expect.objectContaining({
+          component: expect.objectContaining({ id: COMPONENT_IDS[0] }),
+          quantity: 5,
+          unit: 'g',
+        }),
+      ])
+      expect(mergedVariant.data?.variant?.orgs?.nodes?.map((node) => node.org.id)).toEqual([
+        ORG_IDS[1],
+      ])
+      expect(mergedVariant.data?.variant?.regions?.nodes?.map((node) => node.id)).toEqual([
+        REGION_IDS[0],
+        REGION_IDS[1],
+      ])
+    })
+
+    test('should keep primary region synchronized with staged regions after merge', async () => {
+      const createRes = await gql.send(
+        graphql(`
+          mutation CreateVariantForRegionSync($input: CreateVariantInput!) {
+            createVariant(input: $input) {
+              variant {
+                id
+              }
+            }
+          }
+        `),
+        { input: { name: 'Variant Region Sync' } },
+      )
+      expect(createRes.errors).toBeUndefined()
+      const regionSyncVariantID = createRes.data!.createVariant!.variant!.id
+
+      const baselineRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantBaselineRegion($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+              }
+            }
+          }
+        `),
+        { input: { id: regionSyncVariantID, region: { id: REGION_IDS[0] } } },
+      )
+      expect(baselineRes.errors).toBeUndefined()
+
+      const changeRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantRegionSync($input: UpdateVariantInput!) {
+            updateVariant(input: $input) {
+              variant {
+                id
+                regions {
+                  nodes {
+                    id
+                  }
+                }
+              }
+              currentVariant {
+                id
+                regions {
+                  nodes {
+                    id
+                  }
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            id: regionSyncVariantID,
+            region: { id: REGION_IDS[1] },
+            addRegions: [{ id: REGION_IDS[0] }],
+            change: { title: 'variant region sync' },
+          },
+        },
+      )
+      expect(changeRes.errors).toBeUndefined()
+      expect(
+        changeRes.data?.updateVariant?.currentVariant?.regions?.nodes?.map((node) => node.id),
+      ).toEqual([REGION_IDS[0]])
+
+      const changeID = changeRes.data!.updateVariant!.change!.id
+      const approveRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantApproveRegionSync($input: UpdateChangeInput!) {
+            updateChange(input: $input) {
+              change {
+                status
+              }
+            }
+          }
+        `),
+        { input: { id: changeID, status: ChangeStatus.Approved } },
+      )
+      expect(approveRes.errors).toBeUndefined()
+      const mergeRes = await gql.send(
+        graphql(`
+          mutation UpdateVariantMergeRegionSync($id: ID!) {
+            mergeChange(id: $id) {
+              change {
+                status
+              }
+            }
+          }
+        `),
+        { id: changeID },
+      )
+      expect(mergeRes.errors).toBeUndefined()
+
+      const variant = await orm.em
+        .fork()
+        .findOne(VariantEntity, { id: regionSyncVariantID } as any, {
+          populate: ['region'],
+        })
+      expect(variant?.region?.id).toBe(REGION_IDS[1])
+      expect(variant?.regions).toEqual([REGION_IDS[1], REGION_IDS[0]])
     })
 
     test('should add and remove tags', async () => {

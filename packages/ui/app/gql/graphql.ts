@@ -1854,7 +1854,6 @@ export type QueryChangesArgs = {
 
 export type QueryComponentArgs = {
   id: Scalars['ID']['input'];
-  withChange?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -1863,6 +1862,7 @@ export type QueryComponentsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1879,7 +1879,7 @@ export type QueryFeedArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   format?: InputMaybe<FeedFormat>;
   last?: InputMaybe<Scalars['Int']['input']>;
-  regionId?: InputMaybe<Scalars['ID']['input']>;
+  region?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -1932,6 +1932,7 @@ export type QueryPlacesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1945,8 +1946,8 @@ export type QueryProcessesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
-  material?: InputMaybe<Scalars['String']['input']>;
-  region?: InputMaybe<Scalars['String']['input']>;
+  material?: InputMaybe<Scalars['ID']['input']>;
+  region?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -2142,6 +2143,17 @@ export type Source = {
   type: SourceType;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
+};
+
+
+/** A reference source used to support data changes, such as a URL, PDF, or image */
+export type SourceChangesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<ChangeStatus>;
+  userID?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type SourceEdge = {

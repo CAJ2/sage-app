@@ -8,12 +8,16 @@ import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { MATERIAL_IDS, TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TEST_REGION_ID, TestRegionSeeder } from '@src/db/seeds/TestRegionSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { Place } from '@src/geo/place.entity'
+import { Region } from '@src/geo/region.entity'
 
 describe('ProcessResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let orm: MikroORM
   let processID: string
 
   beforeAll(async () => {
@@ -26,10 +30,10 @@ describe('ProcessResolver (integration)', () => {
 
     gql = new GraphQLTestClient(app)
 
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder)
+    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestRegionSeeder)
 
     await gql.signIn('admin', 'password')
   })
@@ -61,6 +65,100 @@ describe('ProcessResolver (integration)', () => {
     expect(Array.isArray(res.data?.processes.nodes)).toBe(true)
     expect(typeof res.data?.processes.totalCount).toBe('number')
     expect(res.data?.processes.pageInfo.hasNextPage).toBe(false)
+  })
+
+  test('should filter processes by material', async () => {
+    const materialId = MATERIAL_IDS[0]
+    // First create a process with this material
+    await gql.send(
+      graphql(`
+        mutation CreateProcessWithMaterial($input: CreateProcessInput!) {
+          createProcess(input: $input) {
+            process {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Material Filter Process',
+          intent: 'RECYCLE',
+          material: { id: materialId },
+        },
+      },
+    )
+
+    const res = await gql.send(
+      graphql(`
+        query FilterProcessesByMaterial($material: ID) {
+          processes(material: $material) {
+            nodes {
+              id
+              name
+              material {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      { material: materialId },
+    )
+
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.processes.nodes.length).toBeGreaterThan(0)
+    for (const node of res.data?.processes.nodes ?? []) {
+      expect(node.material?.id).toBe(materialId)
+    }
+  })
+
+  test('should filter processes by region', async () => {
+    const regionId = TEST_REGION_ID
+    // First create a process with this region
+    await gql.send(
+      graphql(`
+        mutation CreateProcessWithRegion($input: CreateProcessInput!) {
+          createProcess(input: $input) {
+            process {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Region Filter Process',
+          intent: 'RECYCLE',
+          region: { id: regionId },
+        },
+      },
+    )
+
+    const res = await gql.send(
+      graphql(`
+        query FilterProcessesByRegion($region: ID) {
+          processes(region: $region) {
+            nodes {
+              id
+              name
+              region {
+                id
+              }
+            }
+            totalCount
+          }
+        }
+      `),
+      { region: regionId },
+    )
+
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.processes.nodes.length).toBeGreaterThan(0)
+    for (const node of res.data?.processes.nodes ?? []) {
+      expect(node.region?.id).toBe(regionId)
+    }
   })
 
   test('should query process schema', async () => {
@@ -201,6 +299,215 @@ describe('ProcessResolver (integration)', () => {
     expect(changeRes.data?.updateProcess?.currentProcess?.id).toBe(processID)
   })
 
+  test('should keep currentProcess relation refs isolated while staging new refs in a change', async () => {
+    const extraRegionID = 'wof_process_current_alt'
+    const em = orm.em.fork()
+    em.create(Region, {
+      id: extraRegionID,
+      name: { en: 'Alt Region' },
+      placetype: 'country',
+      properties: { hierarchy: [] },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    await em.flush()
+
+    const baselineOrgRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentBaselineOrg($input: CreateOrgInput!) {
+          createOrg(input: $input) {
+            org {
+              id
+            }
+          }
+        }
+      `),
+      { input: { name: 'Baseline Process Org', slug: 'baseline-process-org' } },
+    )
+    const proposedOrgRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentProposedOrg($input: CreateOrgInput!) {
+          createOrg(input: $input) {
+            org {
+              id
+            }
+          }
+        }
+      `),
+      { input: { name: 'Proposed Process Org', slug: 'proposed-process-org' } },
+    )
+    const baselineVariantRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentBaselineVariant($input: CreateVariantInput!) {
+          createVariant(input: $input) {
+            variant {
+              id
+            }
+          }
+        }
+      `),
+      { input: { name: 'Baseline Process Variant' } },
+    )
+    const proposedVariantRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentProposedVariant($input: CreateVariantInput!) {
+          createVariant(input: $input) {
+            variant {
+              id
+            }
+          }
+        }
+      `),
+      { input: { name: 'Proposed Process Variant' } },
+    )
+
+    expect(baselineOrgRes.errors).toBeUndefined()
+    expect(proposedOrgRes.errors).toBeUndefined()
+    expect(baselineVariantRes.errors).toBeUndefined()
+    expect(proposedVariantRes.errors).toBeUndefined()
+
+    const baselineOrgID = baselineOrgRes.data!.createOrg!.org!.id
+    const proposedOrgID = proposedOrgRes.data!.createOrg!.org!.id
+    const baselineVariantID = baselineVariantRes.data!.createVariant!.variant!.id
+    const proposedVariantID = proposedVariantRes.data!.createVariant!.variant!.id
+
+    const baselinePlaceRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentBaselinePlace($input: CreatePlaceInput!) {
+          createPlace(input: $input) {
+            place {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Baseline Process Place',
+          location: { latitude: 59.3293, longitude: 18.0686 },
+          org: { id: baselineOrgID },
+        },
+      },
+    )
+    const proposedPlaceRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentProposedPlace($input: CreatePlaceInput!) {
+          createPlace(input: $input) {
+            place {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          name: 'Proposed Process Place',
+          location: { latitude: 40.7128, longitude: -74.006 },
+          org: { id: proposedOrgID },
+        },
+      },
+    )
+    expect(baselinePlaceRes.errors).toBeUndefined()
+    expect(proposedPlaceRes.errors).toBeUndefined()
+
+    const baselinePlaceID = baselinePlaceRes.data!.createPlace!.place!.id
+    const proposedPlaceID = proposedPlaceRes.data!.createPlace!.place!.id
+
+    const directRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentBaselineRefs($input: UpdateProcessInput!) {
+          updateProcess(input: $input) {
+            process {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: processID,
+          material: { id: MATERIAL_IDS[0] },
+          variant: { id: baselineVariantID },
+          org: { id: baselineOrgID },
+          region: { id: TEST_REGION_ID },
+          place: { id: baselinePlaceID },
+        },
+      },
+    )
+    expect(directRes.errors).toBeUndefined()
+
+    const changeRes = await gql.send(
+      graphql(`
+        mutation ProcessCurrentProposedRefs($input: UpdateProcessInput!) {
+          updateProcess(input: $input) {
+            process {
+              id
+              material {
+                id
+              }
+              variant {
+                id
+              }
+              org {
+                id
+              }
+              region {
+                id
+              }
+              place {
+                id
+              }
+            }
+            currentProcess {
+              id
+              material {
+                id
+              }
+              variant {
+                id
+              }
+              org {
+                id
+              }
+              region {
+                id
+              }
+              place {
+                id
+              }
+            }
+            change {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: processID,
+          material: { id: MATERIAL_IDS[1] },
+          variant: { id: proposedVariantID },
+          org: { id: proposedOrgID },
+          region: { id: extraRegionID },
+          place: { id: proposedPlaceID },
+          change: { title: 'current process refs' },
+        },
+      },
+    )
+
+    expect(changeRes.errors).toBeUndefined()
+    expect(changeRes.data?.updateProcess?.process?.material?.id).toBe(MATERIAL_IDS[1])
+    expect(changeRes.data?.updateProcess?.process?.variant?.id).toBe(proposedVariantID)
+    expect(changeRes.data?.updateProcess?.process?.org?.id).toBe(proposedOrgID)
+    expect(changeRes.data?.updateProcess?.process?.region?.id).toBe(extraRegionID)
+    expect(changeRes.data?.updateProcess?.process?.place?.id).toBe(proposedPlaceID)
+    expect(changeRes.data?.updateProcess?.currentProcess?.material?.id).toBe(MATERIAL_IDS[0])
+    expect(changeRes.data?.updateProcess?.currentProcess?.variant?.id).toBe(baselineVariantID)
+    expect(changeRes.data?.updateProcess?.currentProcess?.org?.id).toBe(baselineOrgID)
+    expect(changeRes.data?.updateProcess?.currentProcess?.region?.id).toBe(TEST_REGION_ID)
+    expect(changeRes.data?.updateProcess?.currentProcess?.place?.id).toBe(baselinePlaceID)
+  })
+
   test('should return error for non-existent process', async () => {
     const res = await gql.send(
       graphql(`
@@ -302,6 +609,7 @@ describe('ProcessResolver (integration)', () => {
     let changeID: string
     let flowProcessID: string
     let flowOrgID: string
+    let flowPlaceID: string
 
     test('step 1: create a process with a new change', async () => {
       const res = await gql.send(
@@ -454,13 +762,53 @@ describe('ProcessResolver (integration)', () => {
       expect(res.data!.createOrg!.change!.id).toBe(changeID)
     })
 
-    test('step 4: update the process adding the new org on the same change', async () => {
+    test('step 4: create a place on the same change without persisting it early', async () => {
       const res = await gql.send(
         graphql(`
-          mutation FlowUpdateProcessOrg($input: UpdateProcessInput!) {
+          mutation FlowCreatePlace($input: CreatePlaceInput!) {
+            createPlace(input: $input) {
+              place {
+                id
+                org {
+                  id
+                }
+              }
+              change {
+                id
+              }
+            }
+          }
+        `),
+        {
+          input: {
+            name: 'Flow Place',
+            location: { latitude: 59.33, longitude: 18.06 },
+            org: { id: flowOrgID },
+            changeID,
+          },
+        },
+      )
+      expect(res.errors).toBeUndefined()
+      flowPlaceID = res.data!.createPlace!.place!.id
+      expect(res.data!.createPlace!.change!.id).toBe(changeID)
+
+      const em = orm.em.fork()
+      expect(await em.findOne(Place, { id: flowPlaceID } as any)).toBeNull()
+    })
+
+    test('step 5: update the process adding the new org and place on the same change', async () => {
+      const res = await gql.send(
+        graphql(`
+          mutation FlowUpdateProcessOrgAndPlace($input: UpdateProcessInput!) {
             updateProcess(input: $input) {
               process {
                 id
+                org {
+                  id
+                }
+                place {
+                  id
+                }
               }
               change {
                 id
@@ -472,6 +820,7 @@ describe('ProcessResolver (integration)', () => {
           input: {
             id: flowProcessID,
             org: { id: flowOrgID },
+            place: { id: flowPlaceID },
             changeID,
           },
         },
@@ -480,7 +829,7 @@ describe('ProcessResolver (integration)', () => {
       expect(res.data!.updateProcess!.change!.id).toBe(changeID)
     })
 
-    test('step 5: approve and merge the change', async () => {
+    test('step 6: approve and merge the change', async () => {
       const approveRes = await gql.send(
         graphql(`
           mutation FlowApproveChange($input: UpdateChangeInput!) {
@@ -514,7 +863,7 @@ describe('ProcessResolver (integration)', () => {
       expect(mergeRes.data?.mergeChange?.change).toBeDefined()
     })
 
-    test('after merge: process is linked to material and org', async () => {
+    test('after merge: process is linked to material, org, and place', async () => {
       const res = await gql.send(
         graphql(`
           query FlowGetProcess($id: ID!) {
@@ -527,6 +876,9 @@ describe('ProcessResolver (integration)', () => {
               org {
                 id
               }
+              place {
+                id
+              }
             }
           }
         `),
@@ -536,6 +888,7 @@ describe('ProcessResolver (integration)', () => {
       expect(res.data?.process?.name).toBe('Flow Process')
       expect(res.data?.process?.material?.id).toBe(MATERIAL_IDS[0])
       expect(res.data?.process?.org?.id).toBe(flowOrgID)
+      expect(res.data?.process?.place?.id).toBe(flowPlaceID)
     })
 
     test('after merge: org exists and is queryable', async () => {
@@ -555,6 +908,27 @@ describe('ProcessResolver (integration)', () => {
       expect(res.data?.org?.id).toBe(flowOrgID)
       expect(res.data?.org?.name).toBe('Flow Org')
       expect(res.data?.org?.slug).toBe('flow-org')
+    })
+
+    test('after merge: place exists and is queryable', async () => {
+      const res = await gql.send(
+        graphql(`
+          query FlowGetPlace($id: ID!) {
+            place(id: $id) {
+              id
+              name
+              org {
+                id
+              }
+            }
+          }
+        `),
+        { id: flowPlaceID },
+      )
+      expect(res.errors).toBeUndefined()
+      expect(res.data?.place?.id).toBe(flowPlaceID)
+      expect(res.data?.place?.name).toBe('Flow Place')
+      expect(res.data?.place?.org?.id).toBe(flowOrgID)
     })
   })
 })

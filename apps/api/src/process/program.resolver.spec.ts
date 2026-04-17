@@ -5,17 +5,28 @@ import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
+import { ChangeStatus } from '@src/changes/change.entity'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
+import {
+  ORG_IDS,
+  PROCESS_IDS,
+  REGION_IDS,
+  TestProcessSeeder,
+} from '@src/db/seeds/TestProcessSeeder'
 import { PROGRAM_IDS, TestProgramSeeder } from '@src/db/seeds/TestProgramSeeder'
+import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { Program, ProgramsOrgs, ProgramsProcesses, ProgramsTags } from '@src/process/program.entity'
 import { WindmillMockService } from '@src/windmill/windmill.mock.service'
 import { WindmillService } from '@src/windmill/windmill.service'
 
 describe('ProgramResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
+  let orm: MikroORM
   let programID: string
+  let changeID: string
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,10 +41,16 @@ describe('ProgramResolver (integration)', () => {
 
     gql = new GraphQLTestClient(app)
 
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestProgramSeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestProgramSeeder,
+      TestProcessSeeder,
+      TestTagSeeder,
+    )
 
     await gql.signIn('admin', 'password')
 
@@ -123,5 +140,192 @@ describe('ProgramResolver (integration)', () => {
       },
     )
     expect(res.data?.updateProgram.program.name).toBe('Updated Program Name')
+  })
+
+  test('should keep currentProgram relation refs isolated while staging program relation changes', async () => {
+    const baselineRes = await gql.send(
+      graphql(`
+        mutation ProgramResolverSetBaselineRelations($input: UpdateProgramInput!) {
+          updateProgram(input: $input) {
+            program {
+              id
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: programID,
+          region: REGION_IDS[0],
+          orgs: [{ id: ORG_IDS[0], role: 'lead' }],
+          processes: [{ id: PROCESS_IDS[0] }, { id: PROCESS_IDS[1] }],
+          tags: [{ id: TAG_IDS[0], meta: { score: 10 } }],
+        },
+      },
+    )
+    expect(baselineRes.errors).toBeUndefined()
+
+    const changeRes = await gql.send(
+      graphql(`
+        mutation ProgramResolverStageRelationChange($input: UpdateProgramInput!) {
+          updateProgram(input: $input) {
+            change {
+              id
+            }
+            currentProgram {
+              id
+              region {
+                id
+              }
+              orgs {
+                nodes {
+                  id
+                }
+              }
+              processes {
+                nodes {
+                  id
+                }
+              }
+              tags {
+                nodes {
+                  id
+                }
+              }
+            }
+          }
+        }
+      `),
+      {
+        input: {
+          id: programID,
+          region: REGION_IDS[1],
+          addOrgs: [{ id: ORG_IDS[1], role: 'partner' }],
+          removeOrgs: [ORG_IDS[0]],
+          addProcesses: [{ id: PROCESS_IDS[2] }],
+          removeProcesses: [PROCESS_IDS[0]],
+          addTags: [{ id: TAG_IDS[3], meta: { level: 'high' } }],
+          removeTags: [TAG_IDS[0]],
+          change: { title: 'Program relation change', status: ChangeStatus.Draft },
+        },
+      },
+    )
+    expect(changeRes.errors).toBeUndefined()
+    changeID = changeRes.data!.updateProgram!.change!.id
+
+    expect(
+      changeRes.data?.updateProgram?.currentProgram?.orgs?.nodes?.map((node) => node.id),
+    ).toEqual([ORG_IDS[0]])
+    expect(
+      changeRes.data?.updateProgram?.currentProgram?.processes?.nodes
+        ?.map((node) => node.id)
+        .sort(),
+    ).toEqual([PROCESS_IDS[0], PROCESS_IDS[1]].sort())
+    expect(
+      changeRes.data?.updateProgram?.currentProgram?.tags?.nodes?.map((node) => node.id),
+    ).toEqual([TAG_IDS[0]])
+
+    const em = orm.em.fork()
+    const program = await em.findOne(Program, { id: programID } as any, {
+      populate: ['region', 'programOrgs.org', 'programProcesses.process', 'programTags.tag'],
+    })
+    expect(program?.region?.id).toBe(REGION_IDS[0])
+    expect(program?.programOrgs.getItems().map((row) => row.org.id)).toEqual([ORG_IDS[0]])
+    expect(program?.programProcesses.getItems().map((row) => row.process.id)).toEqual([
+      PROCESS_IDS[0],
+      PROCESS_IDS[1],
+    ])
+    expect(program?.programTags.getItems().map((row) => row.tag.id)).toEqual([TAG_IDS[0]])
+  })
+
+  test('should merge staged program relation changes into the database', async () => {
+    const approveRes = await gql.send(
+      graphql(`
+        mutation ProgramResolverApproveRelationChange($input: UpdateChangeInput!) {
+          updateChange(input: $input) {
+            change {
+              status
+            }
+          }
+        }
+      `),
+      { input: { id: changeID, status: ChangeStatus.APPROVED } },
+    )
+    expect(approveRes.errors).toBeUndefined()
+
+    const mergeRes = await gql.send(
+      graphql(`
+        mutation ProgramResolverMergeRelationChange($id: ID!) {
+          mergeChange(id: $id) {
+            change {
+              status
+            }
+          }
+        }
+      `),
+      { id: changeID },
+    )
+    expect(mergeRes.errors).toBeUndefined()
+
+    const programRes = await gql.send(
+      graphql(`
+        query ProgramResolverGetMergedRelations($id: ID!) {
+          program(id: $id) {
+            id
+            region {
+              id
+            }
+            orgs {
+              nodes {
+                id
+              }
+            }
+            processes {
+              nodes {
+                id
+              }
+            }
+            tags {
+              nodes {
+                id
+              }
+            }
+          }
+        }
+      `),
+      { id: programID },
+    )
+    expect(programRes.errors).toBeUndefined()
+    expect(programRes.data?.program?.orgs?.nodes?.map((node) => node.id)).toEqual([ORG_IDS[1]])
+    expect(programRes.data?.program?.processes?.nodes?.map((node) => node.id).sort()).toEqual(
+      [PROCESS_IDS[1], PROCESS_IDS[2]].sort(),
+    )
+    expect(programRes.data?.program?.tags?.nodes?.map((node) => node.id)).toEqual([TAG_IDS[3]])
+
+    const em = orm.em.fork()
+    const mergedProgram = await em.findOne(Program, { id: programID } as any, {
+      populate: ['region'],
+    })
+    expect(mergedProgram?.region?.id).toBe(REGION_IDS[1])
+
+    const orgRows = await em.find(ProgramsOrgs, { program: programID } as any, {
+      populate: ['org'],
+      orderBy: { org: 'ASC' },
+    })
+    expect(orgRows.map((row) => row.org.id)).toEqual([ORG_IDS[1]])
+    expect(orgRows[0]?.role).toBe('partner')
+
+    const processRows = await em.find(ProgramsProcesses, { program: programID } as any, {
+      populate: ['process'],
+      orderBy: { process: 'ASC' },
+    })
+    expect(processRows.map((row) => row.process.id)).toEqual([PROCESS_IDS[1], PROCESS_IDS[2]])
+
+    const tagRows = await em.find(ProgramsTags, { program: programID } as any, {
+      populate: ['tag'],
+      orderBy: { tag: 'ASC' },
+    })
+    expect(tagRows.map((row) => row.tag.id)).toEqual([TAG_IDS[3]])
+    expect(tagRows[0]?.meta).toEqual({ level: 'high' })
   })
 })

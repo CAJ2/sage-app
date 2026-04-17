@@ -5,6 +5,7 @@ import { OptionalAuth } from '@src/auth/decorators'
 import { Change } from '@src/changes/change.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { Place as PlaceEntity } from '@src/geo/place.entity'
 import {
   CreatePlaceInput,
   CreatePlaceOutput,
@@ -47,7 +48,14 @@ export class PlaceResolver {
   @OptionalAuth()
   async places(@Args() args: PlacesArgs): Promise<PlacesPage> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(PlacesArgs, args)
-    const cursor = await this.placeService.find(filter)
+    const cursorOpts = await this.transform.applySearchQuery(
+      PlaceEntity,
+      filter,
+      this.placeService.queryFields(),
+      parsedArgs,
+    )
+
+    const cursor = await this.placeService.find(cursorOpts)
     return this.transform.entityToPaginated(Place, PlacesPage, cursor, parsedArgs)
   }
 

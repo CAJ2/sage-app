@@ -2,6 +2,7 @@ import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nest
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
+import { Change as ChangeModel, ChangesArgs, ChangesPage } from '@src/changes/change.model'
 import {
   CreateSourceInput,
   CreateSourceOutput,
@@ -102,6 +103,13 @@ export class SourceResolver {
     const result = await this.sourceService.unlink(parsed)
     const model = await this.transform.entityToModel(Source, result.source)
     return { source: model }
+  }
+
+  @ResolveField(() => ChangesPage)
+  async changes(@Parent() source: Source, @Args() args: ChangesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ChangesArgs, args)
+    const cursor = await this.sourceService.changes(source.id, filter)
+    return this.transform.entityToPaginated(ChangeModel, ChangesPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => User)
