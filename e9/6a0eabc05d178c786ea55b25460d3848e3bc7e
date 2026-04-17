@@ -1,0 +1,34 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "e96a0eabc05d178c786ea55b25460d3848e3bc7e",
+  "prompts": {
+    "0d74e2af6e7c5ebb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "5920bfc5-a9e0-4484-91e5-9405fb26bcc2",
+        "model": "gemini-3.1-pro-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "5e791836ab7a85b7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ca6b5a4b-f84e-411c-8d4e-4acb1f7d7527",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
