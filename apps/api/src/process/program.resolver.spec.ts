@@ -3,9 +3,9 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { ChangeStatus } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
-import { ChangeStatus } from '@src/changes/change.entity'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import {
   ORG_IDS,
@@ -116,8 +116,9 @@ describe('ProgramResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.createProgram.program).toBeDefined()
-    expect(res.data?.createProgram.program.name).toBe('New Program')
+    const program = res.data?.createProgram?.program
+    expect(program).toBeDefined()
+    expect(program?.name).toBe('New Program')
   })
 
   test('should update a program', async () => {
@@ -139,7 +140,7 @@ describe('ProgramResolver (integration)', () => {
         },
       },
     )
-    expect(res.data?.updateProgram.program.name).toBe('Updated Program Name')
+    expect(res.data?.updateProgram?.program?.name).toBe('Updated Program Name')
   })
 
   test('should keep currentProgram relation refs isolated while staging program relation changes', async () => {
@@ -249,7 +250,7 @@ describe('ProgramResolver (integration)', () => {
           }
         }
       `),
-      { input: { id: changeID, status: ChangeStatus.APPROVED } },
+      { input: { id: changeID, status: ChangeStatus.Approved } },
     )
     expect(approveRes.errors).toBeUndefined()
 

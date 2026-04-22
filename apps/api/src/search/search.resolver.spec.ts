@@ -5,7 +5,6 @@ import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { SearchType } from '@test/gql/graphql'
 import { GraphQLTestClient } from '@test/graphql.utils'
-import { type Mock } from 'vitest'
 
 import { I18nService } from '@src/common/i18n.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -20,9 +19,9 @@ import { SEARCH_BACKEND } from '@src/search/search.backend'
 describe('SearchResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
-  let searchMock: Mock<any>
-  let multiSearchMock: Mock<any>
-  let mistralMock: Mock<any>
+  let searchMock: ReturnType<typeof vi.fn<(search: any) => any>>
+  let multiSearchMock: ReturnType<typeof vi.fn<(input: any) => any>>
+  let mistralMock: ReturnType<typeof vi.fn<() => Promise<number[]>>>
   let i18nService: I18nService
 
   const emptySearchResult = {
@@ -31,9 +30,9 @@ describe('SearchResolver (integration)', () => {
   }
 
   beforeAll(async () => {
-    searchMock = vi.fn()
-    multiSearchMock = vi.fn()
-    mistralMock = vi.fn().mockResolvedValue([0.1, 0.2, 0.3])
+    searchMock = vi.fn<(search: any) => any>()
+    multiSearchMock = vi.fn<(input: any) => any>()
+    mistralMock = vi.fn<() => Promise<number[]>>().mockResolvedValue([0.1, 0.2, 0.3])
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppTestModule],
