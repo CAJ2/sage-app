@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { z } from 'zod/v4'
 
-import { EditModelType } from '@src/changes/change.enum'
+import { EditModelType, RefModelType } from '@src/changes/change.enum'
 import { ChangeInputWithLangSchema } from '@src/changes/change.schema'
 import { type RefEditDefinition, resolveRefEditDefinition } from '@src/changes/ref-edit.registry'
 import { zToSchema } from '@src/common/base.schema'
@@ -11,7 +11,7 @@ import { type ModelSchema } from '@src/graphql/base.model'
 
 @Injectable()
 export class RefEditSchemaService {
-  getAddRefSchema(model: string, refModel: EditModelType, refField?: string): ModelSchema {
+  getAddRefSchema(model: string, refModel: RefModelType, refField?: string): ModelSchema {
     const definition = this.resolveDefinition(model, refModel, refField)
     return {
       schema: zToSchema(this.buildAddSchema(definition)),
@@ -19,7 +19,7 @@ export class RefEditSchemaService {
     }
   }
 
-  getRemoveRefSchema(model: string, refModel: EditModelType, refField?: string): ModelSchema {
+  getRemoveRefSchema(model: string, refModel: RefModelType, refField?: string): ModelSchema {
     const definition = this.resolveDefinition(model, refModel, refField)
     return {
       schema: zToSchema(this.buildRemoveSchema(definition)),
@@ -29,7 +29,7 @@ export class RefEditSchemaService {
 
   private resolveDefinition(
     model: string,
-    refModel: EditModelType,
+    refModel: RefModelType,
     refField?: string,
   ): RefEditDefinition {
     if (!Object.values(EditModelType).includes(model as EditModelType)) {

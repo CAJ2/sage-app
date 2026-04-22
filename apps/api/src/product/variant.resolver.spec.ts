@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { ChangeStatus, EditModelType } from '@test/gql/types.generated'
+import { ChangeStatus, RefModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -122,7 +122,7 @@ describe('VariantResolver (integration)', () => {
   test('should query variant addRef schema with component payload inputs', async () => {
     const res = await gql.send(
       graphql(`
-        query VariantResolverGetVariantComponentRefSchema($refModel: EditModelType!) {
+        query VariantResolverGetVariantComponentRefSchema($refModel: RefModelType!) {
           variantSchema {
             addRef(refModel: $refModel) {
               schema
@@ -131,7 +131,7 @@ describe('VariantResolver (integration)', () => {
           }
         }
       `),
-      { refModel: EditModelType.Component },
+      { refModel: RefModelType.Component },
     )
     expect(res.errors).toBeUndefined()
     const addSchema = res.data?.variantSchema?.addRef?.schema as any
@@ -140,6 +140,26 @@ describe('VariantResolver (integration)', () => {
     expect(addSchema?.properties?.inputs?.items?.properties?.quantity).toBeDefined()
     expect(addSchema?.properties?.inputs?.items?.properties?.unit).toBeDefined()
     expect(addSchema?.properties?.ref).toBeUndefined()
+  })
+
+  test('should query variant tag ref schema with payload inputs', async () => {
+    const res = await gql.send(
+      graphql(`
+        query VariantResolverGetVariantTagRefSchema($refModel: RefModelType!) {
+          variantSchema {
+            addRef(refModel: $refModel) {
+              schema
+            }
+          }
+        }
+      `),
+      { refModel: RefModelType.Tag },
+    )
+    expect(res.errors).toBeUndefined()
+    const addSchema = res.data?.variantSchema?.addRef?.schema as any
+    expect(addSchema?.properties?.refs).toBeDefined()
+    expect(addSchema?.properties?.inputs).toBeDefined()
+    expect(addSchema?.properties?.inputs?.items?.properties?.meta).toBeDefined()
   })
 
   test('should query variant items with pagination', async () => {

@@ -2,13 +2,13 @@ import { Field, ID, InputType } from '@nestjs/graphql'
 import { JSONObjectResolver } from 'graphql-scalars'
 
 import { ChangeInputWithLang } from '@src/changes/change-ext.model'
-import { EditModelType } from '@src/changes/change.enum'
+import { RefModelType } from '@src/changes/change.enum'
 import { type JSONObject } from '@src/common/z.schema'
 
 @InputType()
 export class AddRefInput extends ChangeInputWithLang {
-  @Field(() => EditModelType)
-  refModel!: EditModelType
+  @Field(() => RefModelType)
+  refModel!: RefModelType
 
   @Field(() => String, { nullable: true })
   refField?: string
@@ -28,8 +28,8 @@ export class AddRefInput extends ChangeInputWithLang {
 
 @InputType()
 export class RemoveRefInput extends ChangeInputWithLang {
-  @Field(() => EditModelType)
-  refModel!: EditModelType
+  @Field(() => RefModelType)
+  refModel!: RefModelType
 
   @Field(() => String, { nullable: true })
   refField?: string

@@ -49,6 +49,11 @@ export const ComponentMaterialInputSchema = z.strictObject({
   materialFraction: z.number().min(0.001).max(1).optional().default(1),
 })
 
+export const ComponentTagsInputSchema = z.strictObject({
+  id: TagDefinitionIDSchema,
+  meta: RelMetaSchema,
+})
+
 @Injectable()
 @IsSchemaService(ComponentEntity)
 export class ComponentSchemaService implements ISchemaService {
@@ -128,10 +133,7 @@ export class ComponentSchemaService implements ISchemaService {
       title: this.i18n.t('schemas.components.materials.item_title'),
     })
 
-    this.ComponentTagsInputSchema = z.strictObject({
-      id: TagDefinitionIDSchema,
-      meta: RelMetaSchema,
-    })
+    this.ComponentTagsInputSchema = ComponentTagsInputSchema
 
     this.ComponentRegionInputSchema = z.strictObject({
       id: RegionIDSchema,

@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { ChangeStatus, EditModelType } from '@test/gql/types.generated'
+import { ChangeStatus, RefModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -123,7 +123,7 @@ describe('ItemResolver (integration)', () => {
   test('should query item add/remove ref schema', async () => {
     const res = await gql.send(
       graphql(`
-        query ItemResolverGetItemRefSchema($refModel: EditModelType!) {
+        query ItemResolverGetItemRefSchema($refModel: RefModelType!) {
           itemSchema {
             addRef(refModel: $refModel) {
               schema
@@ -136,7 +136,7 @@ describe('ItemResolver (integration)', () => {
           }
         }
       `),
-      { refModel: EditModelType.Category },
+      { refModel: RefModelType.Category },
     )
     expect(res.errors).toBeUndefined()
     const addSchema = res.data?.itemSchema?.addRef?.schema as any
@@ -147,6 +147,26 @@ describe('ItemResolver (integration)', () => {
     expect(addSchema?.required).toContain('refs')
     expect(removeSchema?.properties?.refs).toBeDefined()
     expect(removeSchema?.properties?.ref).toBeUndefined()
+  })
+
+  test('should query item tag ref schema with payload inputs', async () => {
+    const res = await gql.send(
+      graphql(`
+        query ItemResolverGetItemTagRefSchema($refModel: RefModelType!) {
+          itemSchema {
+            addRef(refModel: $refModel) {
+              schema
+            }
+          }
+        }
+      `),
+      { refModel: RefModelType.Tag },
+    )
+    expect(res.errors).toBeUndefined()
+    const addSchema = res.data?.itemSchema?.addRef?.schema as any
+    expect(addSchema?.properties?.refs).toBeDefined()
+    expect(addSchema?.properties?.inputs).toBeDefined()
+    expect(addSchema?.properties?.inputs?.items?.properties?.meta).toBeDefined()
   })
 
   test('should query item categories with pagination', async () => {

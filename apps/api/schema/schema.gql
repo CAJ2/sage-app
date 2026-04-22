@@ -23,7 +23,7 @@ input AddRefInput {
   lang: String
   ref: ID
   refField: String
-  refModel: EditModelType!
+  refModel: RefModelType!
   refs: [ID!]
 
   """IDs of sources to remove from this change"""
@@ -977,10 +977,10 @@ type MergeChangeOutput {
 }
 
 type ModelEditSchema {
-  addRef(refField: String, refModel: EditModelType!): ModelSchema
+  addRef(refField: String, refModel: RefModelType!): ModelSchema
   create: ModelSchema
   delete: ModelSchema
-  removeRef(refField: String, refModel: EditModelType!): ModelSchema
+  removeRef(refField: String, refModel: RefModelType!): ModelSchema
   update: ModelSchema
 }
 
@@ -1420,6 +1420,20 @@ type RecyclingStream {
   scores: [StreamScore!]
 }
 
+"""Type of the referenced model in a relation edit"""
+enum RefModelType {
+  Category
+  Component
+  Item
+  Material
+  Org
+  Place
+  Process
+  Program
+  Tag
+  Variant
+}
+
 """A geographic region based on the Who's On First dataset"""
 type Region {
   """Bounding box as [minLon, minLat, maxLon, maxLat]"""
@@ -1470,7 +1484,7 @@ input RemoveRefInput {
   lang: String
   ref: ID
   refField: String
-  refModel: EditModelType!
+  refModel: RefModelType!
   refs: [ID!]
 
   """IDs of sources to remove from this change"""

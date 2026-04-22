@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { CreateChangeInput } from '@src/changes/change-ext.model'
-import { EditModelTypeSchema } from '@src/changes/change-type.schema'
+import { RefModelTypeSchema } from '@src/changes/change-type.schema'
 import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/change.entity'
 import { Change, Edit, UpdateChangeInput } from '@src/changes/change.model'
 import { AddRefInput, RemoveRefInput } from '@src/changes/ref-edit.model'
@@ -58,7 +58,7 @@ export const ChangeInputWithLangSchema = z.object({
 })
 
 export const AddRefInputSchema = ChangeInputWithLangSchema.extend({
-  refModel: EditModelTypeSchema,
+  refModel: RefModelTypeSchema,
   refField: z.string().optional(),
   ref: z.nanoid().optional(),
   refs: z.array(z.nanoid()).min(1).optional(),
@@ -120,7 +120,7 @@ export const AddRefInputSchema = ChangeInputWithLangSchema.extend({
 })
 
 export const RemoveRefInputSchema = ChangeInputWithLangSchema.extend({
-  refModel: EditModelTypeSchema,
+  refModel: RefModelTypeSchema,
   refField: z.string().optional(),
   ref: z.nanoid().optional(),
   refs: z.array(z.nanoid()).min(1).optional(),

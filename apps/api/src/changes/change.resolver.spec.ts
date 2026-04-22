@@ -3,13 +3,14 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { EditModelType } from '@test/gql/types.generated'
+import { EditModelType, RefModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { ChangeService } from '@src/changes/change.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
+import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
 import {
   COMPONENT_IDS,
   ITEM_IDS,
@@ -18,6 +19,7 @@ import {
 } from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { ItemsTags } from '@src/product/item.entity'
 import { User } from '@src/users/users.entity'
 
 const DirectEditQuery = graphql(`
@@ -43,6 +45,24 @@ const AddRefMutation = graphql(`
               id
             }
           }
+          variants(first: 20) {
+            nodes {
+              id
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+        ... on Category {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
         }
         ... on Variant {
           id
@@ -58,6 +78,11 @@ const AddRefMutation = graphql(`
               }
               quantity
               unit
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
             }
           }
         }
@@ -71,6 +96,24 @@ const AddRefMutation = graphql(`
               id
             }
           }
+          variants(first: 20) {
+            nodes {
+              id
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+        ... on Category {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
         }
         ... on Variant {
           id
@@ -86,6 +129,11 @@ const AddRefMutation = graphql(`
               }
               quantity
               unit
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
             }
           }
         }
@@ -131,6 +179,7 @@ describe('ChangeResolver (integration)', () => {
   let gql: GraphQLTestClient
   let changeService: ChangeService
   let changeID: string
+  let orm: MikroORM
   let user: User
 
   beforeAll(async () => {
@@ -144,7 +193,7 @@ describe('ChangeResolver (integration)', () => {
     gql = new GraphQLTestClient(app)
 
     changeService = module.get(ChangeService)
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
     await orm.seeder.seed(
@@ -152,6 +201,7 @@ describe('ChangeResolver (integration)', () => {
       UserSeeder,
       TestMaterialSeeder,
       TestCategorySeeder,
+      TestTagSeeder,
       TestVariantSeeder,
     )
 
@@ -307,7 +357,7 @@ describe('ChangeResolver (integration)', () => {
       model: EditModelType.Item,
       id: ITEM_IDS[0],
       input: {
-        refModel: EditModelType.Category,
+        refModel: RefModelType.Category,
         ref: CATEGORY_IDS[0],
       },
     })
@@ -335,7 +385,7 @@ describe('ChangeResolver (integration)', () => {
       id: VARIANT_IDS[0],
       input: {
         changeID: scopedChange.id,
-        refModel: EditModelType.Item,
+        refModel: RefModelType.Item,
         ref: ITEM_IDS[1],
       },
     })
@@ -365,7 +415,7 @@ describe('ChangeResolver (integration)', () => {
       model: EditModelType.Variant,
       id: VARIANT_IDS[0],
       input: {
-        refModel: EditModelType.Component,
+        refModel: RefModelType.Component,
         ref: COMPONENT_IDS[0],
         input: {
           quantity: 3.5,
@@ -384,12 +434,74 @@ describe('ChangeResolver (integration)', () => {
     expect(component?.unit).toBe('g')
   })
 
+  test('should add a direct Item -> Variant inverse reference', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Item,
+      id: ITEM_IDS[0],
+      input: {
+        refModel: RefModelType.Variant,
+        ref: VARIANT_IDS[2],
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentItemModel =
+      res.data?.addRef?.currentModel?.__typename === 'Item' ? res.data.addRef.currentModel : null
+    const variants = currentItemModel?.variants?.nodes?.map((node) => node.id)
+    expect(variants).toContain(VARIANT_IDS[2])
+  })
+
+  test('should add a direct Category -> Item inverse reference', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Category,
+      id: CATEGORY_IDS[0],
+      input: {
+        refModel: RefModelType.Item,
+        ref: ITEM_IDS[0],
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentCategoryModel =
+      res.data?.addRef?.currentModel?.__typename === 'Category'
+        ? res.data.addRef.currentModel
+        : null
+    const items = currentCategoryModel?.items?.nodes?.map((node) => node.id)
+    expect(items).toContain(ITEM_IDS[0])
+  })
+
+  test('should add a direct Item -> Tag reference with meta payload', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Item,
+      id: ITEM_IDS[0],
+      input: {
+        refModel: RefModelType.Tag,
+        ref: TAG_IDS[0],
+        input: {
+          meta: { score: 2 },
+        },
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentItemModel =
+      res.data?.addRef?.currentModel?.__typename === 'Item' ? res.data.addRef.currentModel : null
+    const tags = currentItemModel?.tags?.nodes?.map((node) => node.id)
+    expect(tags).toContain(TAG_IDS[0])
+
+    const persistedTag = await orm.em.fork().findOne(ItemsTags, {
+      item: ITEM_IDS[0],
+      tag: TAG_IDS[0],
+    })
+    expect(persistedTag?.meta).toEqual({ score: 2 })
+  })
+
   test('should reject unsupported reference combinations', async () => {
     const res = await gql.send(AddRefMutation, {
       model: EditModelType.Category,
       id: CATEGORY_IDS[0],
       input: {
-        refModel: EditModelType.Category,
+        refModel: RefModelType.Category,
         ref: CATEGORY_IDS[2],
       },
     })
@@ -403,7 +515,7 @@ describe('ChangeResolver (integration)', () => {
       model: EditModelType.Item,
       id: ITEM_IDS[0],
       input: {
-        refModel: EditModelType.Category,
+        refModel: RefModelType.Category,
         ref: 'ZZZZZZZZZZZZZZZZZZZZZ',
       },
     })

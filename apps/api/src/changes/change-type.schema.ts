@@ -11,3 +11,16 @@ export const EditModelTypeSchema = z.enum([
   'Item',
   'Variant',
 ])
+
+export const RefModelTypeSchema = z.enum([
+  'Place',
+  'Org',
+  'Component',
+  'Material',
+  'Process',
+  'Program',
+  'Category',
+  'Item',
+  'Variant',
+  'Tag',
+])

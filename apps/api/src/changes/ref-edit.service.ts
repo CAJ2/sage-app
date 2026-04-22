@@ -3,13 +3,14 @@ import { Injectable } from '@nestjs/common'
 
 import { type IChangeInputWithLang } from '@src/changes/change-ext.model'
 import { Change as ChangeEntity } from '@src/changes/change.entity'
-import { EditModelType } from '@src/changes/change.enum'
+import { EditModelType, RefModelType } from '@src/changes/change.enum'
 import { AddRefOutput, Change as ChangeModel, RemoveRefOutput } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { AddRefInput, RemoveRefInput } from '@src/changes/ref-edit.model'
 import { type RefEditDefinition, resolveRefEditDefinition } from '@src/changes/ref-edit.registry'
 import { BadRequestErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
+import { TagService } from '@src/process/tag.service'
 
 type EditEntity = BaseEntity & { id: string }
 type PivotRow = { id: string } & Record<string, unknown>
@@ -20,6 +21,7 @@ export class RefEditService {
     private readonly em: EntityManager,
     private readonly editService: EditService,
     private readonly transform: TransformService,
+    private readonly tagService: TagService,
   ) {}
 
   async addRef(
@@ -30,18 +32,47 @@ export class RefEditService {
   ): Promise<AddRefOutput> {
     const definition = this.resolveDefinition(model, input.refModel, input.refField)
     const addItems = this.normalizeAddItems(input)
+    await this.validateAddItems(definition, addItems)
     return this.executeMutation(definition, id, input, userID, async (entity, change) => {
-      const collection = this.getPivotCollection(entity, definition.pivotCollection)
-      await this.editService.setOrAddPivot(
-        entity.id,
-        change,
+      const collection = this.getRelationCollection(entity, definition.relationCollection)
+
+      if (definition.relationKind === 'pivot') {
+        await this.editService.setOrAddPivot(
+          entity.id,
+          change,
+          collection,
+          definition.entity,
+          definition.pivotEntity!,
+          undefined,
+          addItems,
+        )
+        return
+      }
+
+      await this.editService.setOrAddCollection(
         collection,
-        definition.entity,
-        definition.pivotEntity,
+        definition.targetEntity,
         undefined,
-        addItems,
+        addItems.map((item) => ({ id: item.id })),
+        change,
       )
     })
+  }
+
+  private async validateAddItems(
+    definition: RefEditDefinition,
+    addItems: PivotRow[],
+  ): Promise<void> {
+    if (definition.refModel !== RefModelType.Tag) {
+      return
+    }
+
+    for (const item of addItems) {
+      const validated = await this.tagService.validateTagInput(item)
+      if (validated.meta !== undefined) {
+        item.meta = validated.meta
+      }
+    }
   }
 
   async removeRef(
@@ -53,20 +84,31 @@ export class RefEditService {
     const definition = this.resolveDefinition(model, input.refModel, input.refField)
     const removeIDs = input.ref ? [input.ref] : (input.refs ?? [])
     return this.executeMutation(definition, id, input, userID, async (entity, change) => {
-      const collection = this.getPivotCollection(entity, definition.pivotCollection)
-      await this.editService.removeFromPivot(
-        change,
+      const collection = this.getRelationCollection(entity, definition.relationCollection)
+
+      if (definition.relationKind === 'pivot') {
+        await this.editService.removeFromPivot(
+          change,
+          collection,
+          definition.entity,
+          definition.pivotEntity!,
+          removeIDs,
+        )
+        return
+      }
+
+      await this.editService.removeFromCollection(
         collection,
-        definition.entity,
-        definition.pivotEntity,
+        definition.targetEntity,
         removeIDs,
+        change,
       )
     })
   }
 
   private resolveDefinition(
     model: EditModelType,
-    refModel: EditModelType,
+    refModel: RefModelType,
     refField?: string,
   ): RefEditDefinition {
     return resolveRefEditDefinition(model, refModel, refField)
@@ -93,7 +135,7 @@ export class RefEditService {
     return extras
   }
 
-  private getPivotCollection(entity: EditEntity, field: string): Collection<object> {
+  private getRelationCollection(entity: EditEntity, field: string): Collection<object> {
     const collection = Reflect.get(entity, field)
     if (!(collection instanceof Collection)) {
       throw BadRequestErr(

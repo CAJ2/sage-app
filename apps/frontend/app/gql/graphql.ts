@@ -37,7 +37,7 @@ export type AddRefInput = {
   lang?: InputMaybe<Scalars['String']['input']>;
   ref?: InputMaybe<Scalars['ID']['input']>;
   refField?: InputMaybe<Scalars['String']['input']>;
-  refModel: EditModelType;
+  refModel: RefModelType;
   refs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -1189,13 +1189,13 @@ export type ModelEditSchema = {
 
 export type ModelEditSchemaAddRefArgs = {
   refField?: InputMaybe<Scalars['String']['input']>;
-  refModel: EditModelType;
+  refModel: RefModelType;
 };
 
 
 export type ModelEditSchemaRemoveRefArgs = {
   refField?: InputMaybe<Scalars['String']['input']>;
-  refModel: EditModelType;
+  refModel: RefModelType;
 };
 
 export type ModelSchema = {
@@ -2112,6 +2112,20 @@ export type RecyclingStream = {
   scores?: Maybe<Array<StreamScore>>;
 };
 
+/** Type of the referenced model in a relation edit */
+export enum RefModelType {
+  Category = 'Category',
+  Component = 'Component',
+  Item = 'Item',
+  Material = 'Material',
+  Org = 'Org',
+  Place = 'Place',
+  Process = 'Process',
+  Program = 'Program',
+  Tag = 'Tag',
+  Variant = 'Variant'
+}
+
 /** A geographic region based on the Who's On First dataset */
 export type Region = {
   __typename?: 'Region';
@@ -2168,7 +2182,7 @@ export type RemoveRefInput = {
   lang?: InputMaybe<Scalars['String']['input']>;
   ref?: InputMaybe<Scalars['ID']['input']>;
   refField?: InputMaybe<Scalars['String']['input']>;
-  refModel: EditModelType;
+  refModel: RefModelType;
   refs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** IDs of sources to remove from this change */
   removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
