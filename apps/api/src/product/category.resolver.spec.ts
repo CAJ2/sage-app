@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { ChangeStatus } from '@test/gql/types.generated'
+import { ChangeStatus, RefModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -136,6 +136,25 @@ describe('CategoryResolver (integration)', () => {
     expect(res.data?.categorySchema).toBeDefined()
     expect(res.data?.categorySchema?.create).toBeDefined()
     expect(res.data?.categorySchema?.update).toBeDefined()
+  })
+
+  test('should query category item ref schema', async () => {
+    const res = await gql.send(
+      graphql(`
+        query CategoryResolverGetCategoryItemRefSchema($refModel: RefModelType!) {
+          categorySchema {
+            addRef(refModel: $refModel) {
+              schema
+            }
+          }
+        }
+      `),
+      { refModel: RefModelType.Item },
+    )
+    expect(res.errors).toBeUndefined()
+    const addSchema = res.data?.categorySchema?.addRef?.schema as any
+    expect(addSchema?.properties?.refs).toBeDefined()
+    expect(addSchema?.properties?.inputs).toBeUndefined()
   })
 
   test('should query category parents with pagination', async () => {

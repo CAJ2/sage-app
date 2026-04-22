@@ -18,6 +18,34 @@ export type Scalars = {
   JSONObject: { input: any; output: any; }
 };
 
+export type AddRefInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  input?: InputMaybe<Scalars['JSONObject']['input']>;
+  inputs?: InputMaybe<Array<Scalars['JSONObject']['input']>>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  ref?: InputMaybe<Scalars['ID']['input']>;
+  refField?: InputMaybe<Scalars['String']['input']>;
+  refModel: RefModelType;
+  refs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type AddRefOutput = {
+  __typename?: 'AddRefOutput';
+  change?: Maybe<Change>;
+  currentModel?: Maybe<EditModel>;
+  model?: Maybe<EditModel>;
+};
+
 export enum CacheControlScope {
   Private = 'PRIVATE',
   Public = 'PUBLIC'
@@ -1147,9 +1175,23 @@ export type MergeChangeOutput = {
 
 export type ModelEditSchema = {
   __typename?: 'ModelEditSchema';
+  addRef?: Maybe<ModelSchema>;
   create?: Maybe<ModelSchema>;
   delete?: Maybe<ModelSchema>;
+  removeRef?: Maybe<ModelSchema>;
   update?: Maybe<ModelSchema>;
+};
+
+
+export type ModelEditSchemaAddRefArgs = {
+  refField?: InputMaybe<Scalars['String']['input']>;
+  refModel: RefModelType;
+};
+
+
+export type ModelEditSchemaRemoveRefArgs = {
+  refField?: InputMaybe<Scalars['String']['input']>;
+  refModel: RefModelType;
 };
 
 export type ModelSchema = {
@@ -1160,6 +1202,7 @@ export type ModelSchema = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addRef?: Maybe<AddRefOutput>;
   createCategory?: Maybe<CreateCategoryOutput>;
   createChange?: Maybe<CreateChangeOutput>;
   createComponent?: Maybe<CreateComponentOutput>;
@@ -1183,6 +1226,7 @@ export type Mutation = {
   linkSource: LinkSourceOutput;
   markSourceProcessed?: Maybe<MarkSourceProcessedOutput>;
   mergeChange?: Maybe<MergeChangeOutput>;
+  removeRef?: Maybe<RemoveRefOutput>;
   unlinkSource: UnlinkSourceOutput;
   updateCategory?: Maybe<UpdateCategoryOutput>;
   updateChange?: Maybe<UpdateChangeOutput>;
@@ -1195,6 +1239,13 @@ export type Mutation = {
   updateSource?: Maybe<UpdateSourceOutput>;
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
+};
+
+
+export type MutationAddRefArgs = {
+  id: Scalars['ID']['input'];
+  input: AddRefInput;
+  model: EditModelType;
 };
 
 
@@ -1311,6 +1362,13 @@ export type MutationMarkSourceProcessedArgs = {
 
 export type MutationMergeChangeArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveRefArgs = {
+  id: Scalars['ID']['input'];
+  input: RemoveRefInput;
+  model: EditModelType;
 };
 
 
@@ -2050,6 +2108,20 @@ export type RecyclingStream = {
   scores?: Maybe<Array<StreamScore>>;
 };
 
+/** Type of the referenced model in a relation edit */
+export enum RefModelType {
+  Category = 'Category',
+  Component = 'Component',
+  Item = 'Item',
+  Material = 'Material',
+  Org = 'Org',
+  Place = 'Place',
+  Process = 'Process',
+  Program = 'Program',
+  Tag = 'Tag',
+  Variant = 'Variant'
+}
+
 /** A geographic region based on the Who's On First dataset */
 export type Region = {
   __typename?: 'Region';
@@ -2091,6 +2163,32 @@ export type RegionsPage = {
   nodes?: Maybe<Array<Region>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type RemoveRefInput = {
+  /** Sources to associate with this change */
+  addSources?: InputMaybe<Array<SourceInput>>;
+  /** If true, immediately apply (merge) the change after creation */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Details for a new change to create for this edit */
+  change?: InputMaybe<CreateChangeInput>;
+  /** ID of an existing change to add this edit to */
+  changeID?: InputMaybe<Scalars['ID']['input']>;
+  /** Language code for text input fields (BCP 47, e.g. "en") */
+  lang?: InputMaybe<Scalars['String']['input']>;
+  ref?: InputMaybe<Scalars['ID']['input']>;
+  refField?: InputMaybe<Scalars['String']['input']>;
+  refModel: RefModelType;
+  refs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** IDs of sources to remove from this change */
+  removeSources?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type RemoveRefOutput = {
+  __typename?: 'RemoveRefOutput';
+  change?: Maybe<Change>;
+  currentModel?: Maybe<EditModel>;
+  model?: Maybe<EditModel>;
 };
 
 export type SearchResultItem = Category | Component | Item | Material | Org | Place | Region | Variant;

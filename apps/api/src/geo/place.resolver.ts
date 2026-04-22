@@ -33,6 +33,7 @@ export class PlaceResolver {
   @OptionalAuth()
   async placeSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Place',
       create: {
         schema: this.placeSchemaService.CreateJSONSchema,
         uischema: this.placeSchemaService.CreateUISchema,

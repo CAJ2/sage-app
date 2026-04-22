@@ -143,8 +143,9 @@ describe('PlaceResolver (integration)', () => {
     )
 
     expect(filterRes.errors).toBeUndefined()
-    expect(filterRes.data?.places.nodes.length).toBeGreaterThan(0)
-    for (const node of filterRes.data?.places.nodes ?? []) {
+    const placeNodes = filterRes.data?.places.nodes ?? []
+    expect(placeNodes.length).toBeGreaterThan(0)
+    for (const node of placeNodes) {
       expect(node.org?.id).toBe(orgId)
     }
   })

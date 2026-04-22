@@ -3,21 +3,184 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
+import { EditModelType, RefModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { ChangeService } from '@src/changes/change.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
+import { CATEGORY_IDS, TestCategorySeeder } from '@src/db/seeds/TestCategorySeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
-import { TestVariantSeeder, VARIANT_IDS } from '@src/db/seeds/TestVariantSeeder'
+import { TAG_IDS, TestTagSeeder } from '@src/db/seeds/TestTagSeeder'
+import {
+  COMPONENT_IDS,
+  ITEM_IDS,
+  TestVariantSeeder,
+  VARIANT_IDS,
+} from '@src/db/seeds/TestVariantSeeder'
 import { UserSeeder } from '@src/db/seeds/UserSeeder'
 import { clearDatabase } from '@src/db/test.utils'
+import { ItemsTags } from '@src/product/item.entity'
 import { User } from '@src/users/users.entity'
+
+const DirectEditQuery = graphql(`
+  query ChangeResolverDirectEdit($id: ID, $entityName: String, $changeID: ID) {
+    directEdit(id: $id, entityName: $entityName, changeID: $changeID) {
+      updateInput
+    }
+  }
+`)
+
+const AddRefMutation = graphql(`
+  mutation ChangeResolverAddRef($model: EditModelType!, $id: ID!, $input: AddRefInput!) {
+    addRef(model: $model, id: $id, input: $input) {
+      change {
+        id
+      }
+      model {
+        __typename
+        ... on Item {
+          id
+          categories(first: 20) {
+            nodes {
+              id
+            }
+          }
+          variants(first: 20) {
+            nodes {
+              id
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+        ... on Category {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+        ... on Variant {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
+          components(first: 20) {
+            nodes {
+              component {
+                id
+              }
+              quantity
+              unit
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+      }
+      currentModel {
+        __typename
+        ... on Item {
+          id
+          categories(first: 20) {
+            nodes {
+              id
+            }
+          }
+          variants(first: 20) {
+            nodes {
+              id
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+        ... on Category {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+        ... on Variant {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
+          components(first: 20) {
+            nodes {
+              component {
+                id
+              }
+              quantity
+              unit
+            }
+          }
+          tags(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+`)
+
+const RemoveRefMutation = graphql(`
+  mutation ChangeResolverRemoveRef($model: EditModelType!, $id: ID!, $input: RemoveRefInput!) {
+    removeRef(model: $model, id: $id, input: $input) {
+      change {
+        id
+      }
+      model {
+        __typename
+        ... on Variant {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+      }
+      currentModel {
+        __typename
+        ... on Variant {
+          id
+          items(first: 20) {
+            nodes {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+`)
 
 describe('ChangeResolver (integration)', () => {
   let app: INestApplication
   let gql: GraphQLTestClient
   let changeService: ChangeService
   let changeID: string
+  let orm: MikroORM
+  let user: User
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,14 +193,21 @@ describe('ChangeResolver (integration)', () => {
     gql = new GraphQLTestClient(app)
 
     changeService = module.get(ChangeService)
-    const orm = module.get<MikroORM>(MikroORM)
+    orm = module.get<MikroORM>(MikroORM)
 
     await clearDatabase(orm, 'public', ['users'])
-    await orm.seeder.seed(BaseSeeder, UserSeeder, TestMaterialSeeder, TestVariantSeeder)
+    await orm.seeder.seed(
+      BaseSeeder,
+      UserSeeder,
+      TestMaterialSeeder,
+      TestCategorySeeder,
+      TestTagSeeder,
+      TestVariantSeeder,
+    )
 
-    const user = await orm.em.findOne(User, {
+    user = (await orm.em.findOne(User, {
       username: 'admin',
-    })
+    })) as User
     if (!user) {
       throw new Error('Admin user not found')
     }
@@ -180,6 +350,178 @@ describe('ChangeResolver (integration)', () => {
     expect(body?.change?.edits?.nodes?.length).toEqual(1)
     expect(body?.change?.edits?.nodes?.[0]?.id).toBe(VARIANT_IDS[0])
     expect(body?.change?.edits?.nodes?.[0]?.entityName).toBe('Variant')
+  })
+
+  test('should add a direct Item -> Category reference', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Item,
+      id: ITEM_IDS[0],
+      input: {
+        refModel: RefModelType.Category,
+        ref: CATEGORY_IDS[0],
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const itemModel = res.data?.addRef?.model?.__typename === 'Item' ? res.data.addRef.model : null
+    const currentItemModel =
+      res.data?.addRef?.currentModel?.__typename === 'Item' ? res.data.addRef.currentModel : null
+    const categories = itemModel?.categories?.nodes?.map((node) => node.id)
+    const currentCategories = currentItemModel?.categories?.nodes?.map((node) => node.id)
+    expect(categories).toContain(CATEGORY_IDS[0])
+    expect(currentCategories).toContain(CATEGORY_IDS[0])
+  })
+
+  test('should remove a Variant -> Item reference through a change and preserve currentModel', async () => {
+    const scopedChange = await changeService.create(
+      {
+        title: 'Variant remove item ref',
+      },
+      user.id,
+    )
+
+    const res = await gql.send(RemoveRefMutation, {
+      model: EditModelType.Variant,
+      id: VARIANT_IDS[0],
+      input: {
+        changeID: scopedChange.id,
+        refModel: RefModelType.Item,
+        ref: ITEM_IDS[1],
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    expect(res.data?.removeRef?.change?.id).toBe(scopedChange.id)
+    const currentVariantModel =
+      res.data?.removeRef?.currentModel?.__typename === 'Variant'
+        ? res.data.removeRef.currentModel
+        : null
+    const currentItems = currentVariantModel?.items?.nodes?.map((node) => node.id)
+    expect(currentItems).toEqual(expect.arrayContaining([ITEM_IDS[0], ITEM_IDS[1]]))
+
+    const directEdit = await gql.send(DirectEditQuery, {
+      id: VARIANT_IDS[0],
+      entityName: 'Variant',
+      changeID: scopedChange.id,
+    })
+    expect(directEdit.errors).toBeUndefined()
+    expect(
+      directEdit.data?.directEdit?.updateInput?.items?.map((item: { id: string }) => item.id),
+    ).toEqual([ITEM_IDS[0]])
+  })
+
+  test('should update pivot payload when adding an existing Variant -> Component reference directly', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Variant,
+      id: VARIANT_IDS[0],
+      input: {
+        refModel: RefModelType.Component,
+        ref: COMPONENT_IDS[0],
+        input: {
+          quantity: 3.5,
+          unit: 'g',
+        },
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentVariantModel =
+      res.data?.addRef?.currentModel?.__typename === 'Variant' ? res.data.addRef.currentModel : null
+    const component = currentVariantModel?.components?.nodes?.find(
+      (node) => node.component.id === COMPONENT_IDS[0],
+    )
+    expect(component?.quantity).toBe(3.5)
+    expect(component?.unit).toBe('g')
+  })
+
+  test('should add a direct Item -> Variant inverse reference', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Item,
+      id: ITEM_IDS[0],
+      input: {
+        refModel: RefModelType.Variant,
+        ref: VARIANT_IDS[2],
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentItemModel =
+      res.data?.addRef?.currentModel?.__typename === 'Item' ? res.data.addRef.currentModel : null
+    const variants = currentItemModel?.variants?.nodes?.map((node) => node.id)
+    expect(variants).toContain(VARIANT_IDS[2])
+  })
+
+  test('should add a direct Category -> Item inverse reference', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Category,
+      id: CATEGORY_IDS[0],
+      input: {
+        refModel: RefModelType.Item,
+        ref: ITEM_IDS[0],
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentCategoryModel =
+      res.data?.addRef?.currentModel?.__typename === 'Category'
+        ? res.data.addRef.currentModel
+        : null
+    const items = currentCategoryModel?.items?.nodes?.map((node) => node.id)
+    expect(items).toContain(ITEM_IDS[0])
+  })
+
+  test('should add a direct Item -> Tag reference with meta payload', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Item,
+      id: ITEM_IDS[0],
+      input: {
+        refModel: RefModelType.Tag,
+        ref: TAG_IDS[0],
+        input: {
+          meta: { score: 2 },
+        },
+      },
+    })
+
+    expect(res.errors).toBeUndefined()
+    const currentItemModel =
+      res.data?.addRef?.currentModel?.__typename === 'Item' ? res.data.addRef.currentModel : null
+    const tags = currentItemModel?.tags?.nodes?.map((node) => node.id)
+    expect(tags).toContain(TAG_IDS[0])
+
+    const persistedTag = await orm.em.fork().findOne(ItemsTags, {
+      item: ITEM_IDS[0],
+      tag: TAG_IDS[0],
+    })
+    expect(persistedTag?.meta).toEqual({ score: 2 })
+  })
+
+  test('should reject unsupported reference combinations', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Category,
+      id: CATEGORY_IDS[0],
+      input: {
+        refModel: RefModelType.Category,
+        ref: CATEGORY_IDS[2],
+      },
+    })
+
+    expect(res.errors).toBeDefined()
+    expect(res.errors?.[0]?.message).toContain('Unsupported reference from Category to Category')
+  })
+
+  test('should reject missing referenced entities', async () => {
+    const res = await gql.send(AddRefMutation, {
+      model: EditModelType.Item,
+      id: ITEM_IDS[0],
+      input: {
+        refModel: RefModelType.Category,
+        ref: 'ZZZZZZZZZZZZZZZZZZZZZ',
+      },
+    })
+
+    expect(res.errors).toBeDefined()
+    expect(res.errors?.[0]?.message).toContain('No Category found for IDs: ZZZZZZZZZZZZZZZZZZZZZ')
   })
 
   test('should discard an edit', async () => {

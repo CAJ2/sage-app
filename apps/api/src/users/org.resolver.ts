@@ -39,6 +39,7 @@ export class OrgResolver {
   @OptionalAuth()
   async orgSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Org',
       create: {
         schema: this.orgSchemaService.CreateJSONSchema,
         uischema: this.orgSchemaService.CreateUISchema,

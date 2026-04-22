@@ -38,3 +38,21 @@ registerEnumType(EditModelType, {
   name: 'EditModelType',
   description: 'Type of the model being edited',
 })
+
+export enum RefModelType {
+  Place = 'Place',
+  Org = 'Org',
+  Component = 'Component',
+  Material = 'Material',
+  Process = 'Process',
+  Program = 'Program',
+  Category = 'Category',
+  Item = 'Item',
+  Variant = 'Variant',
+  Tag = 'Tag',
+}
+
+registerEnumType(RefModelType, {
+  name: 'RefModelType',
+  description: 'Type of the referenced model in a relation edit',
+})

@@ -74,6 +74,7 @@ export class VariantResolver {
   @OptionalAuth()
   async variantSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Variant',
       create: {
         schema: this.variantSchemaService.CreateJSONSchema,
         uischema: this.variantSchemaService.CreateUISchema,

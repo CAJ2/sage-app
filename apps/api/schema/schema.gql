@@ -4,6 +4,38 @@
 
 directive @cacheControl(inheritMaxAge: Boolean, maxAge: Int, scope: CacheControlScope) on FIELD_DEFINITION | INTERFACE | OBJECT | UNION
 
+input AddRefInput {
+  """Sources to associate with this change"""
+  addSources: [SourceInput!]
+
+  """If true, immediately apply (merge) the change after creation"""
+  apply: Boolean
+
+  """Details for a new change to create for this edit"""
+  change: CreateChangeInput
+
+  """ID of an existing change to add this edit to"""
+  changeID: ID
+  input: JSONObject
+  inputs: [JSONObject!]
+
+  """Language code for text input fields (BCP 47, e.g. "en")"""
+  lang: String
+  ref: ID
+  refField: String
+  refModel: RefModelType!
+  refs: [ID!]
+
+  """IDs of sources to remove from this change"""
+  removeSources: [ID!]
+}
+
+type AddRefOutput {
+  change: Change
+  currentModel: EditModel
+  model: EditModel
+}
+
 enum CacheControlScope {
   PRIVATE
   PUBLIC
@@ -945,8 +977,10 @@ type MergeChangeOutput {
 }
 
 type ModelEditSchema {
+  addRef(refField: String, refModel: RefModelType!): ModelSchema
   create: ModelSchema
   delete: ModelSchema
+  removeRef(refField: String, refModel: RefModelType!): ModelSchema
   update: ModelSchema
 }
 
@@ -956,6 +990,7 @@ type ModelSchema {
 }
 
 type Mutation {
+  addRef(id: ID!, input: AddRefInput!, model: EditModelType!): AddRefOutput
   createCategory(input: CreateCategoryInput!): CreateCategoryOutput
   createChange(input: CreateChangeInput!): CreateChangeOutput
   createComponent(input: CreateComponentInput!): CreateComponentOutput
@@ -979,6 +1014,7 @@ type Mutation {
   linkSource(input: LinkSourceInput!): LinkSourceOutput!
   markSourceProcessed(id: ID!): MarkSourceProcessedOutput
   mergeChange(id: ID!): MergeChangeOutput
+  removeRef(id: ID!, input: RemoveRefInput!, model: EditModelType!): RemoveRefOutput
   unlinkSource(input: UnlinkSourceInput!): UnlinkSourceOutput!
   updateCategory(input: UpdateCategoryInput!): UpdateCategoryOutput
   updateChange(input: UpdateChangeInput!): UpdateChangeOutput
@@ -1384,6 +1420,20 @@ type RecyclingStream {
   scores: [StreamScore!]
 }
 
+"""Type of the referenced model in a relation edit"""
+enum RefModelType {
+  Category
+  Component
+  Item
+  Material
+  Org
+  Place
+  Process
+  Program
+  Tag
+  Variant
+}
+
 """A geographic region based on the Who's On First dataset"""
 type Region {
   """Bounding box as [minLon, minLat, maxLon, maxLat]"""
@@ -1415,6 +1465,36 @@ type RegionsPage {
   nodes: [Region!]
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+input RemoveRefInput {
+  """Sources to associate with this change"""
+  addSources: [SourceInput!]
+
+  """If true, immediately apply (merge) the change after creation"""
+  apply: Boolean
+
+  """Details for a new change to create for this edit"""
+  change: CreateChangeInput
+
+  """ID of an existing change to add this edit to"""
+  changeID: ID
+
+  """Language code for text input fields (BCP 47, e.g. "en")"""
+  lang: String
+  ref: ID
+  refField: String
+  refModel: RefModelType!
+  refs: [ID!]
+
+  """IDs of sources to remove from this change"""
+  removeSources: [ID!]
+}
+
+type RemoveRefOutput {
+  change: Change
+  currentModel: EditModel
+  model: EditModel
 }
 
 union SearchResultItem = Category | Component | Item | Material | Org | Place | Region | Variant

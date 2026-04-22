@@ -60,6 +60,7 @@ export class ProgramResolver {
   @OptionalAuth()
   async programSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Program',
       create: {
         schema: this.programSchemaService.CreateJSONSchema,
         uischema: this.programSchemaService.CreateUISchema,

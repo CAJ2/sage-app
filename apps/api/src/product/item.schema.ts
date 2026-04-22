@@ -30,6 +30,15 @@ export const ItemIDSchema = z.string().meta({
   name: 'Item ID',
 })
 
+export const ItemCategoriesInputSchema = z.strictObject({
+  id: CategoryIDSchema,
+})
+
+export const ItemTagsInputSchema = z.strictObject({
+  id: TagDefinitionIDSchema,
+  meta: RelMetaSchema,
+})
+
 @Injectable()
 @IsSchemaService(ItemEntity)
 export class ItemSchemaService implements ISchemaService {
@@ -77,13 +86,8 @@ export class ItemSchemaService implements ISchemaService {
     })
     this.zService.registerEntityTransform(ItemHistoryEntity, ItemHistory, ItemHistoryTransform)
 
-    this.ItemCategoriesInputSchema = z.strictObject({
-      id: CategoryIDSchema,
-    })
-    this.ItemTagsInputSchema = z.strictObject({
-      id: TagDefinitionIDSchema,
-      meta: RelMetaSchema,
-    })
+    this.ItemCategoriesInputSchema = ItemCategoriesInputSchema
+    this.ItemTagsInputSchema = ItemTagsInputSchema
 
     this.CreateSchema = ChangeInputWithLangSchema.extend({
       name: z.string().min(1).max(100).optional(),

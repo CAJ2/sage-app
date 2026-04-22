@@ -3,8 +3,11 @@ import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
 import { CreateChangeInput } from '@src/changes/change-ext.model'
+import { RefModelTypeSchema } from '@src/changes/change-type.schema'
 import { ChangeEdits, Change as ChangeEntity, ChangeStatus } from '@src/changes/change.entity'
 import { Change, Edit, UpdateChangeInput } from '@src/changes/change.model'
+import { AddRefInput, RemoveRefInput } from '@src/changes/ref-edit.model'
+import { ZJSONObject } from '@src/common/z.schema'
 import { TransformInput, ZService } from '@src/common/z.service'
 import { LangSchema } from '@src/graphql/base.model'
 import { User } from '@src/users/users.model'
@@ -54,10 +57,99 @@ export const ChangeInputWithLangSchema = z.object({
   lang: LangSchema,
 })
 
+export const AddRefInputSchema = ChangeInputWithLangSchema.extend({
+  refModel: RefModelTypeSchema,
+  refField: z.string().optional(),
+  ref: z.nanoid().optional(),
+  refs: z.array(z.nanoid()).min(1).optional(),
+  input: ZJSONObject.optional(),
+  inputs: z.array(ZJSONObject).min(1).optional(),
+}).superRefine((input, ctx) => {
+  const hasRef = !!input.ref
+  const hasRefs = !!input.refs?.length
+
+  if (!hasRef && !hasRefs) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['ref'],
+      message: 'Provide either ref or refs',
+    })
+  }
+  if (hasRef && hasRefs) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['ref'],
+      message: 'Provide either ref or refs, not both',
+    })
+  }
+  if (input.input && !hasRef) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['input'],
+      message: 'input can only be used together with ref',
+    })
+  }
+  if (input.inputs && !hasRefs) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['inputs'],
+      message: 'inputs can only be used together with refs',
+    })
+  }
+  if (hasRef && input.inputs) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['inputs'],
+      message: 'inputs cannot be used together with ref',
+    })
+  }
+  if (hasRefs && input.input) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['input'],
+      message: 'input cannot be used together with refs',
+    })
+  }
+  if (input.refs && input.inputs && input.refs.length !== input.inputs.length) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['inputs'],
+      message: 'inputs must have the same length as refs',
+    })
+  }
+})
+
+export const RemoveRefInputSchema = ChangeInputWithLangSchema.extend({
+  refModel: RefModelTypeSchema,
+  refField: z.string().optional(),
+  ref: z.nanoid().optional(),
+  refs: z.array(z.nanoid()).min(1).optional(),
+}).superRefine((input, ctx) => {
+  const hasRef = !!input.ref
+  const hasRefs = !!input.refs?.length
+
+  if (!hasRef && !hasRefs) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['ref'],
+      message: 'Provide either ref or refs',
+    })
+  }
+  if (hasRef && hasRefs) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['ref'],
+      message: 'Provide either ref or refs, not both',
+    })
+  }
+})
+
 @Injectable()
 export class ChangeSchemaService {
   CreateSchema = CreateChangeInputSchema
   UpdateSchema = UpdateChangeInputSchema
+  AddRefSchema = AddRefInputSchema
+  RemoveRefSchema = RemoveRefInputSchema
 
   constructor(private readonly zService: ZService) {
     const ChangeTransform = z.transform((input: TransformInput) => {
@@ -104,5 +196,15 @@ export class ChangeSchemaService {
 
   async parseUpdateInput(input: UpdateChangeInput): Promise<UpdateChangeInput> {
     return this.zService.parse(this.UpdateSchema, input)
+  }
+
+  async parseAddRefInput(input: AddRefInput): Promise<AddRefInput> {
+    // TS enum and Zod enum don't seem to work well
+    return (await this.zService.parse(this.AddRefSchema, input)) as AddRefInput
+  }
+
+  async parseRemoveRefInput(input: RemoveRefInput): Promise<RemoveRefInput> {
+    // TS enum and Zod enum don't seem to work well
+    return (await this.zService.parse(this.RemoveRefSchema, input)) as RemoveRefInput
   }
 }

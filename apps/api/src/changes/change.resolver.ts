@@ -3,7 +3,9 @@ import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nest
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
 import { CreateChangeInput } from '@src/changes/change-ext.model'
+import { EditModelType } from '@src/changes/change.enum'
 import {
+  AddRefOutput,
   Change,
   ChangeEditsArgs,
   ChangeEditsPage,
@@ -18,12 +20,15 @@ import {
   DiscardEditOutput,
   JobsPage,
   MergeChangeOutput,
+  RemoveRefOutput,
   UpdateChangeInput,
   UpdateChangeOutput,
 } from '@src/changes/change.model'
 import { ChangeSchemaService } from '@src/changes/change.schema'
 import { ChangeService } from '@src/changes/change.service'
 import { EditService } from '@src/changes/edit.service'
+import { AddRefInput, RemoveRefInput } from '@src/changes/ref-edit.model'
+import { RefEditService } from '@src/changes/ref-edit.service'
 import { Source, SourcesPage } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
@@ -36,6 +41,7 @@ export class ChangeResolver {
     private readonly transform: TransformService,
     private readonly changeSchemaService: ChangeSchemaService,
     private readonly editService: EditService,
+    private readonly refEditService: RefEditService,
   ) {}
 
   @Query(() => ChangesPage)
@@ -118,6 +124,28 @@ export class ChangeResolver {
       throw NotFoundErr('Edit not found or already discarded')
     }
     return { success: true, id: result }
+  }
+
+  @Mutation(() => AddRefOutput, { nullable: true })
+  async addRef(
+    @Args('model', { type: () => EditModelType }) model: EditModelType,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: AddRefInput,
+    @AuthUser() user: ReqUser,
+  ): Promise<AddRefOutput> {
+    input = await this.changeSchemaService.parseAddRefInput(input)
+    return this.refEditService.addRef(model, id, input, user.id)
+  }
+
+  @Mutation(() => RemoveRefOutput, { nullable: true })
+  async removeRef(
+    @Args('model', { type: () => EditModelType }) model: EditModelType,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: RemoveRefInput,
+    @AuthUser() user: ReqUser,
+  ): Promise<RemoveRefOutput> {
+    input = await this.changeSchemaService.parseRemoveRefInput(input)
+    return this.refEditService.removeRef(model, id, input, user.id)
   }
 
   @ResolveField(() => ChangeEditsPage, { nullable: true })

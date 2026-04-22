@@ -108,8 +108,9 @@ describe('ProcessResolver (integration)', () => {
     )
 
     expect(res.errors).toBeUndefined()
-    expect(res.data?.processes.nodes.length).toBeGreaterThan(0)
-    for (const node of res.data?.processes.nodes ?? []) {
+    const processNodes = res.data?.processes.nodes ?? []
+    expect(processNodes.length).toBeGreaterThan(0)
+    for (const node of processNodes) {
       expect(node.material?.id).toBe(materialId)
     }
   })
@@ -155,8 +156,9 @@ describe('ProcessResolver (integration)', () => {
     )
 
     expect(res.errors).toBeUndefined()
-    expect(res.data?.processes.nodes.length).toBeGreaterThan(0)
-    for (const node of res.data?.processes.nodes ?? []) {
+    const processNodes = res.data?.processes.nodes ?? []
+    expect(processNodes.length).toBeGreaterThan(0)
+    for (const node of processNodes) {
       expect(node.region?.id).toBe(regionId)
     }
   })

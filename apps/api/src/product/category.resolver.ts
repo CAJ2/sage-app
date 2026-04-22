@@ -70,6 +70,7 @@ export class CategoryResolver {
   @OptionalAuth()
   async categorySchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Category',
       create: {
         schema: this.categorySchemaService.CreateJSONSchema,
         uischema: this.categorySchemaService.CreateUISchema,

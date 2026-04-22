@@ -185,7 +185,7 @@ describe('ComponentResolver (integration)', () => {
     )
 
     expect(filterRes.errors).toBeUndefined()
-    const ids = filterRes.data?.components.nodes.map((n: any) => n.id) ?? []
+    const ids = filterRes.data?.components.nodes?.map((node) => node.id) ?? []
 
     // Component 1 should be present
     expect(ids).toContain(componentId1)

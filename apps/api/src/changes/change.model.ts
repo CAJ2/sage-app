@@ -2,6 +2,7 @@ import { ArgsType, Field, ID, InputType, Int, ObjectType } from '@nestjs/graphql
 import { JSONObjectResolver } from 'graphql-scalars'
 import { z } from 'zod/v4'
 
+import { EditModelTypeSchema } from '@src/changes/change-type.schema'
 import { ChangeStatus } from '@src/changes/change.entity'
 import { EditModel, EditModelType } from '@src/changes/change.enum'
 import { Source } from '@src/changes/source.model'
@@ -185,7 +186,7 @@ export class ChangeJobsArgs extends PaginationBasicArgs {
 export class ChangeEditsArgs extends PaginationBasicArgs {
   static schema = PaginationBasicArgs.schema.extend({
     id: z.string().optional(),
-    type: z.enum(EditModelType).optional(),
+    type: EditModelTypeSchema.optional(),
   })
 
   @Field(() => ID, { nullable: true })
@@ -262,6 +263,30 @@ export class DiscardEditOutput {
 
   @Field(() => ID, { nullable: true })
   id?: string
+}
+
+@ObjectType()
+export class AddRefOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change
+
+  @Field(() => EditModel, { nullable: true })
+  model?: typeof EditModel
+
+  @Field(() => EditModel, { nullable: true })
+  currentModel?: typeof EditModel
+}
+
+@ObjectType()
+export class RemoveRefOutput {
+  @Field(() => Change, { nullable: true })
+  change?: Change
+
+  @Field(() => EditModel, { nullable: true })
+  model?: typeof EditModel
+
+  @Field(() => EditModel, { nullable: true })
+  currentModel?: typeof EditModel
 }
 
 export interface MergeInput {
