@@ -977,8 +977,10 @@ type MergeChangeOutput {
 }
 
 type ModelEditSchema {
+  addRef(refField: String, refModel: EditModelType!): ModelSchema
   create: ModelSchema
   delete: ModelSchema
+  removeRef(refField: String, refModel: EditModelType!): ModelSchema
   update: ModelSchema
 }
 

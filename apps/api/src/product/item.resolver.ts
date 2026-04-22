@@ -63,6 +63,7 @@ export class ItemResolver {
   @OptionalAuth()
   async itemSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Item',
       create: {
         schema: this.itemSchemaService.CreateJSONSchema,
         uischema: this.itemSchemaService.CreateUISchema,

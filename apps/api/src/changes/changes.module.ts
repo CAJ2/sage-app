@@ -7,6 +7,8 @@ import { ChangeSchemaService } from '@src/changes/change.schema'
 import { ChangeService } from '@src/changes/change.service'
 import { ChangeMapService } from '@src/changes/change_map.service'
 import { EditsModule } from '@src/changes/edits.module'
+import { ModelEditSchemaResolver } from '@src/changes/model-edit-schema.resolver'
+import { RefEditSchemaService } from '@src/changes/ref-edit-schema.service'
 import { RefEditService } from '@src/changes/ref-edit.service'
 import { SourceResolver } from '@src/changes/source.resolver'
 import { SourceSchemaService } from '@src/changes/source.schema'
@@ -32,6 +34,7 @@ import { WindmillModule } from '@src/windmill/windmill.module'
   ],
   providers: [
     ChangeResolver,
+    ModelEditSchemaResolver,
     SourceResolver,
     ChangeService,
     SourceService,
@@ -39,6 +42,7 @@ import { WindmillModule } from '@src/windmill/windmill.module'
     SourceSchemaService,
     ChangeMapService,
     RefEditService,
+    RefEditSchemaService,
   ],
   exports: [
     ChangeService,
@@ -47,6 +51,7 @@ import { WindmillModule } from '@src/windmill/windmill.module'
     SourceSchemaService,
     ChangeMapService,
     RefEditService,
+    RefEditSchemaService,
   ],
 })
 export class ChangesModule {}

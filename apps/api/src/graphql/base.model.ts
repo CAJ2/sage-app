@@ -54,6 +54,8 @@ export class ModelSchema {
 
 @ObjectType()
 export class ModelEditSchema {
+  model?: string
+
   @Field(() => ModelSchema, { nullable: true })
   create?: ModelSchema
 
@@ -62,6 +64,12 @@ export class ModelEditSchema {
 
   @Field(() => ModelSchema, { nullable: true })
   delete?: ModelSchema
+
+  @Field(() => ModelSchema, { nullable: true })
+  addRef?: ModelSchema
+
+  @Field(() => ModelSchema, { nullable: true })
+  removeRef?: ModelSchema
 }
 
 @ObjectType({ description: 'A translated text value for a specific language' })

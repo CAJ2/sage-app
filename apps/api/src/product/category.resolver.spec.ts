@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { ChangeStatus } from '@test/gql/types.generated'
+import { ChangeStatus, EditModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -136,6 +136,22 @@ describe('CategoryResolver (integration)', () => {
     expect(res.data?.categorySchema).toBeDefined()
     expect(res.data?.categorySchema?.create).toBeDefined()
     expect(res.data?.categorySchema?.update).toBeDefined()
+  })
+
+  test('should reject unsupported category addRef schema lookups', async () => {
+    const res = await gql.send(
+      graphql(`
+        query CategoryResolverGetUnsupportedRefSchema($refModel: EditModelType!) {
+          categorySchema {
+            addRef(refModel: $refModel) {
+              schema
+            }
+          }
+        }
+      `),
+      { refModel: EditModelType.Item },
+    )
+    expect(res.errors?.[0]?.message).toContain('Unsupported reference from Category to Item')
   })
 
   test('should query category parents with pagination', async () => {

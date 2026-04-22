@@ -1179,9 +1179,23 @@ export type MergeChangeOutput = {
 
 export type ModelEditSchema = {
   __typename?: 'ModelEditSchema';
+  addRef?: Maybe<ModelSchema>;
   create?: Maybe<ModelSchema>;
   delete?: Maybe<ModelSchema>;
+  removeRef?: Maybe<ModelSchema>;
   update?: Maybe<ModelSchema>;
+};
+
+
+export type ModelEditSchemaAddRefArgs = {
+  refField?: InputMaybe<Scalars['String']['input']>;
+  refModel: EditModelType;
+};
+
+
+export type ModelEditSchemaRemoveRefArgs = {
+  refField?: InputMaybe<Scalars['String']['input']>;
+  refModel: EditModelType;
 };
 
 export type ModelSchema = {

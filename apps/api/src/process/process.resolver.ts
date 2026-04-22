@@ -77,6 +77,7 @@ export class ProcessResolver {
   @OptionalAuth()
   async processSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Process',
       create: {
         schema: this.processSchemaService.CreateJSONSchema,
         uischema: this.processSchemaService.CreateUISchema,

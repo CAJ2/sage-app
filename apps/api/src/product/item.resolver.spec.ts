@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { ChangeStatus } from '@test/gql/types.generated'
+import { ChangeStatus, EditModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -118,6 +118,35 @@ describe('ItemResolver (integration)', () => {
     expect(res.data?.itemSchema).toBeDefined()
     expect(res.data?.itemSchema?.create).toBeDefined()
     expect(res.data?.itemSchema?.update).toBeDefined()
+  })
+
+  test('should query item add/remove ref schema', async () => {
+    const res = await gql.send(
+      graphql(`
+        query ItemResolverGetItemRefSchema($refModel: EditModelType!) {
+          itemSchema {
+            addRef(refModel: $refModel) {
+              schema
+              uischema
+            }
+            removeRef(refModel: $refModel) {
+              schema
+              uischema
+            }
+          }
+        }
+      `),
+      { refModel: EditModelType.Category },
+    )
+    expect(res.errors).toBeUndefined()
+    const addSchema = res.data?.itemSchema?.addRef?.schema as any
+    const removeSchema = res.data?.itemSchema?.removeRef?.schema as any
+    expect(addSchema?.properties?.refs).toBeDefined()
+    expect(addSchema?.properties?.ref).toBeUndefined()
+    expect(addSchema?.properties?.inputs).toBeUndefined()
+    expect(addSchema?.required).toContain('refs')
+    expect(removeSchema?.properties?.refs).toBeDefined()
+    expect(removeSchema?.properties?.ref).toBeUndefined()
   })
 
   test('should query item categories with pagination', async () => {

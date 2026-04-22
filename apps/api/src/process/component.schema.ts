@@ -44,6 +44,11 @@ export const ComponentIDSchema = z.string().meta({
   name: 'Component ID',
 })
 
+export const ComponentMaterialInputSchema = z.strictObject({
+  id: MaterialIDSchema,
+  materialFraction: z.number().min(0.001).max(1).optional().default(1),
+})
+
 @Injectable()
 @IsSchemaService(ComponentEntity)
 export class ComponentSchemaService implements ISchemaService {
@@ -119,14 +124,9 @@ export class ComponentSchemaService implements ISchemaService {
       ComponentSourceTransform,
     )
 
-    this.ComponentMaterialInputSchema = z
-      .strictObject({
-        id: MaterialIDSchema,
-        materialFraction: z.number().min(0.000001).max(1).optional().default(1),
-      })
-      .meta({
-        title: this.i18n.t('schemas.components.materials.item_title'),
-      })
+    this.ComponentMaterialInputSchema = ComponentMaterialInputSchema.meta({
+      title: this.i18n.t('schemas.components.materials.item_title'),
+    })
 
     this.ComponentTagsInputSchema = z.strictObject({
       id: TagDefinitionIDSchema,

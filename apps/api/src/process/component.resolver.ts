@@ -77,6 +77,7 @@ export class ComponentResolver {
   @OptionalAuth()
   async componentSchema(): Promise<ModelEditSchema> {
     return {
+      model: 'Component',
       create: {
         schema: this.componentSchemaService.CreateJSONSchema,
         uischema: this.componentSchemaService.CreateUISchema,

@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
-import { ChangeStatus } from '@test/gql/types.generated'
+import { ChangeStatus, EditModelType } from '@test/gql/types.generated'
 import { GraphQLTestClient } from '@test/graphql.utils'
 
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
@@ -117,6 +117,29 @@ describe('VariantResolver (integration)', () => {
     expect(res.data?.variantSchema).toBeDefined()
     expect(res.data?.variantSchema?.create).toBeDefined()
     expect(res.data?.variantSchema?.update).toBeDefined()
+  })
+
+  test('should query variant addRef schema with component payload inputs', async () => {
+    const res = await gql.send(
+      graphql(`
+        query VariantResolverGetVariantComponentRefSchema($refModel: EditModelType!) {
+          variantSchema {
+            addRef(refModel: $refModel) {
+              schema
+              uischema
+            }
+          }
+        }
+      `),
+      { refModel: EditModelType.Component },
+    )
+    expect(res.errors).toBeUndefined()
+    const addSchema = res.data?.variantSchema?.addRef?.schema as any
+    expect(addSchema?.properties?.refs).toBeDefined()
+    expect(addSchema?.properties?.inputs).toBeDefined()
+    expect(addSchema?.properties?.inputs?.items?.properties?.quantity).toBeDefined()
+    expect(addSchema?.properties?.inputs?.items?.properties?.unit).toBeDefined()
+    expect(addSchema?.properties?.ref).toBeUndefined()
   })
 
   test('should query variant items with pagination', async () => {

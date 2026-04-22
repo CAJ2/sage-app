@@ -33,6 +33,15 @@ export const ProgramIDSchema = z.string().meta({
   name: 'Program ID',
 })
 
+export const ProgramOrgsInputSchema = z.strictObject({
+  id: OrgIDSchema,
+  role: z.string().optional(),
+})
+
+export const ProgramProcessesInputSchema = z.strictObject({
+  id: ProcessIDSchema,
+})
+
 @Injectable()
 @IsSchemaService(ProgramEntity)
 export class ProgramSchemaService implements ISchemaService {
@@ -87,13 +96,8 @@ export class ProgramSchemaService implements ISchemaService {
       ProgramHistoryTransform,
     )
 
-    this.ProgramOrgsInputSchema = z.strictObject({
-      id: OrgIDSchema,
-      role: z.string().optional(),
-    })
-    this.ProgramProcessesInputSchema = z.strictObject({
-      id: ProcessIDSchema,
-    })
+    this.ProgramOrgsInputSchema = ProgramOrgsInputSchema
+    this.ProgramProcessesInputSchema = ProgramProcessesInputSchema
     this.ProgramTagsInputSchema = z.strictObject({
       id: TagDefinitionIDSchema,
       meta: RelMetaSchema,
