@@ -72,7 +72,7 @@ const bgColor = computed(() => {
       <PopoverAnchor class="w-full" as-child>
         <ProgressIndicator
           ref="indicator"
-          class="ease-[cubic-bezier(0.65, 0, 0.35, 1)] after:animate-progress indicator relative block h-full w-full overflow-hidden rounded-full transition-transform duration-[660ms] after:absolute after:inset-0 after:bg-[length:30px_30px] after:content-['']"
+          class="ease-[cubic-bezier(0.65, 0, 0.35, 1)] after:animate-progress indicator relative block h-full w-full overflow-hidden rounded-full transition-transform duration-660 after:absolute after:inset-0 after:bg-size-[30px_30px] after:content-['']"
           :class="[bgColor]"
           :style="{
             transform: `translateX(-${100 - progressValue}%)`,

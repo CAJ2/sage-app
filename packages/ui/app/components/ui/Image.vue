@@ -1,13 +1,9 @@
 <template>
-  <div :class="cn('flex items-center justify-center p-1', props.class)">
-    <NuxtPicture
-      v-if="src && srcType === 'img'"
-      :src="src"
-      :alt="alt"
-      :fit="fit"
-      placeholder
-      :img-attrs="{ class: 'object-contain', style: widthHeightStyle }"
-    />
+  <div :class="cn('flex h-full items-center justify-center', props.class)">
+    <picture v-if="src && srcType === 'img'">
+      <source :src="src" />
+      <img srcset="" :src="src" :alt="alt" :class="imgClass" :style="widthHeightStyle" />
+    </picture>
     <Icon
       v-if="src && srcType === 'icon'"
       :name="iconName"
@@ -108,6 +104,17 @@ const widthHeightStyle = computed(() => {
   return {
     width: '100%',
     height: '100%',
+  }
+})
+
+const imgClass = computed(() => {
+  switch (props.fit) {
+    case 'cover':
+      return 'object-cover'
+    case 'contain':
+      return 'object-contain'
+    default:
+      return 'object-scale-down'
   }
 })
 </script>

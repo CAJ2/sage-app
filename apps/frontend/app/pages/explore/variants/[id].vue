@@ -1,107 +1,84 @@
 <template>
-  <div>
-    <NavBackBubble />
-    <NavTitleBubble :title="data?.variant?.name ?? undefined" :subtitle="orgSubtitle" />
+  <div class="relative min-h-screen bg-base-100">
+    <!-- Fixed Top Bar -->
+    <div class="fixed inset-x-0 top-0 z-50 flex flex-col bg-base-100/80 backdrop-blur-md">
+      <div class="relative flex h-16 items-center px-4">
+        <NavBackBubble class="static!" />
 
-    <!-- Full-bleed image carousel -->
-    <div class="relative h-64 bg-base-200">
-      <Carousel
-        v-if="carouselImages.length > 0"
-        class="h-full w-full"
-        :opts="{ loop: true, dragFree: false, align: 'start' }"
-      >
-        <CarouselContent class="h-full" :style="{ marginLeft: '0' }">
-          <CarouselItem
-            v-for="(img, i) in carouselImages"
-            :key="i"
-            class="h-64 basis-full"
-            :style="{ paddingLeft: '0' }"
-          >
-            <img :src="img" class="block h-full w-full object-cover" alt="" />
-          </CarouselItem>
-        </CarouselContent>
-      </Carousel>
-      <div v-else class="flex h-full items-center justify-center">
-        <ImageIcon :size="64" class="opacity-20" />
+        <TabsIntentSelector v-model="activeTab" :tabs="tabs" />
       </div>
     </div>
 
-    <!-- Sheet overlapping carousel -->
-    <div class="relative z-0 -mt-8 rounded-t-3xl bg-base-100 pb-4 shadow-xl">
-      <!-- Name & desc -->
-      <div class="px-4 pt-5 pb-2">
-        <h1 class="text-xl font-bold">{{ data?.variant?.name }}</h1>
-        <p v-if="data?.variant?.desc" class="mt-1 text-sm text-base-content/70">
-          {{ data?.variant?.desc }}
-        </p>
-      </div>
-
-      <!-- Sticky scroll nav -->
-      <div class="sticky top-0 z-1 bg-base-100">
-        <VariantScrollNav v-model="activeTab" :tabs="tabs" />
-      </div>
-
-      <!-- Tab content -->
-      <div class="mt-2">
-        <!-- Reuse -->
-        <div v-if="activeTab === 'reuse'" class="px-4 py-4 text-center text-sm opacity-60">
-          No suggestions available.
-        </div>
-
-        <!-- Recycle -->
-        <div v-if="activeTab === 'recycle'">
-          <div v-if="recyclingResult" class="px-4 pb-2">
-            <ScoreBar size="medium" :score="recyclingResult.variant?.recycleScore?.score" />
-          </div>
-
-          <div v-if="loadingRecycling" class="space-y-3 px-4">
-            <div class="h-4 w-28 skeleton" />
-            <div class="h-4 w-full skeleton" />
-            <div class="h-4 w-full skeleton" />
-          </div>
-
+    <!-- Scrollable Content -->
+    <div class="pt-20">
+      <!-- Variant Cards Carousel -->
+      <div class="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto pt-2 pb-6">
+        <!-- Main Variant Card -->
+        <div class="w-[75%] shrink-0 snap-center pr-2 pl-4">
           <div
-            v-else-if="recyclingResult?.variant?.components.nodes?.length"
-            class="space-y-3 px-3"
+            class="flex w-full flex-col rounded-3xl border border-base-200 bg-base-100 p-5 shadow-[inset_0_4px_12px_rgba(0,0,0,0.15)]"
           >
-            <div
-              v-for="vc in recyclingResult.variant.components.nodes"
-              :key="vc.component.id"
-              class="rounded-box bg-base-200 p-3 shadow-sm"
-            >
-              <div class="mb-3 flex items-center gap-3">
-                <UiImage
-                  class="size-10 shrink-0 rounded-box"
-                  :src="vc.component.imageURL || undefined"
+            <!-- Top Row: Image and ScoreGauge horizontally aligned -->
+            <div class="flex items-center gap-6">
+              <UiImageStack :images="allImages" />
+
+              <!-- ScoreGauge horizontally in line with image -->
+              <div class="h-20 w-20 shrink-0">
+                <div v-if="loadingRecycling" class="size-16 skeleton rounded-full"></div>
+                <ScoreGauge
+                  v-else-if="recyclingResult"
+                  class="origin-top-left"
+                  :score="recyclingResult.variant?.recycleScore?.score"
+                  :rating="recyclingResult.variant?.recycleScore?.rating"
+                  :rating-f="recyclingResult.variant?.recycleScore?.ratingF"
                 />
-                <div>
-                  <div class="text-sm font-semibold">{{ vc.component.name }}</div>
-                  <div class="line-clamp-2 text-xs opacity-60">{{ vc.component.desc }}</div>
-                </div>
-              </div>
-              <template v-if="vc.component.recycle?.length">
-                <RecycleContainer
-                  v-for="recycle in vc.component.recycle"
-                  :key="recycle.stream?.name || undefined"
-                  :image="vc.component.imageURL"
-                  :recycle="recycle"
-                />
-              </template>
-              <div v-else class="mt-2 flex items-center gap-3 rounded-box bg-base-100 p-3">
-                <CircleHelpIcon :size="24" class="shrink-0 opacity-40" />
-                <div>
-                  <div class="text-sm font-medium">Instructions Unknown</div>
-                  <div class="text-xs opacity-60">
-                    No recycling data available for this component.
-                  </div>
-                </div>
               </div>
             </div>
-          </div>
 
-          <p v-else-if="!loadingRecycling" class="px-4 py-4 text-center text-sm opacity-60">
-            Recycling instructions are currently not available.
+            <!-- Bottom Row: Title Area (Aligned with left side of image) -->
+            <div class="mt-4 space-y-1">
+              <h1 class="line-clamp-2 text-base leading-tight font-bold">
+                {{ data?.variant?.name }}
+              </h1>
+              <p v-if="orgSubtitle" class="line-clamp-1 text-sm opacity-50">
+                {{ orgSubtitle }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Variant Card (25% width) -->
+        <div class="w-[25%] shrink-0 snap-center pr-4 pl-2">
+          <div
+            class="flex h-full min-h-44 w-full items-center justify-center rounded-3xl border-2 border-dashed border-base-300 bg-base-100/50 text-base-content/30 transition-colors hover:bg-base-200/50 hover:text-base-content/50"
+          >
+            <PlusIcon :size="32" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="relative z-0 bg-base-100 pb-4">
+        <!-- Name & desc (optional below cards) -->
+        <div v-if="data?.variant?.desc" class="px-4 pb-4">
+          <p class="text-sm text-base-content/70">
+            {{ data?.variant?.desc }}
           </p>
+        </div>
+
+        <!-- Tab content -->
+        <div>
+          <!-- Reuse -->
+          <div v-if="activeTab === 'reuse'">
+            <ComponentReuseStreams />
+          </div>
+          <!-- Recycle -->
+          <div v-if="activeTab === 'recycle'">
+            <ComponentRecycleStreams
+              :loading="loadingRecycling"
+              :components="recyclingResult?.variant?.components"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -109,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { CircleHelp as CircleHelpIcon, Image as ImageIcon } from '@lucide/vue'
+import { Plus as PlusIcon, RefreshCw as RefreshCwIcon, Recycle as RecycleIcon } from '@lucide/vue'
 
 import { graphql } from '~/gql'
 
@@ -117,8 +94,8 @@ const route = useRoute()
 
 const activeTab = ref<'reuse' | 'recycle'>('recycle')
 const tabs = [
-  { id: 'reuse', label: 'Reuse' },
-  { id: 'recycle', label: 'Recycle' },
+  { id: 'reuse', label: 'Reuse', icon: RefreshCwIcon },
+  { id: 'recycle', label: 'Recycle', icon: RecycleIcon },
 ]
 
 const variantQuery = graphql(`
@@ -167,50 +144,7 @@ const variantRecycling = graphql(`
         ratingF
       }
       components {
-        nodes {
-          component {
-            id
-            name
-            desc
-            imageURL
-            recycleScore {
-              score
-              rating
-              ratingF
-            }
-            recycle {
-              context {
-                key
-                desc
-              }
-              stream {
-                name
-                desc
-                score {
-                  score
-                  rating
-                  ratingF
-                }
-                container {
-                  type
-                  access
-                  shape {
-                    width
-                    height
-                    depth
-                  }
-                  color
-                  image
-                  imageEntryPoint {
-                    x
-                    y
-                    side
-                  }
-                }
-              }
-            }
-          }
-        }
+        ...VariantRecycleStreams
       }
     }
   }
@@ -222,11 +156,12 @@ const vars = {
 
 const { result: data } = useQuery(variantQuery, vars)
 
-const carouselImages = computed<string[]>(() => {
+const allImages = computed<string[]>(() => {
   const nodes = data.value?.variant?.images?.nodes
-  if (nodes && nodes.length > 0) return nodes.map((n) => n.url)
-  if (data.value?.variant?.imageURL) return [data.value.variant.imageURL]
-  return []
+  if (nodes && nodes.length > 0) {
+    return nodes.map((n) => n.url).filter((url): url is string => !!url)
+  }
+  return data.value?.variant?.imageURL ? [data.value.variant.imageURL] : []
 })
 
 const orgSubtitle = computed(

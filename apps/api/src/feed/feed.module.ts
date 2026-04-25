@@ -4,9 +4,10 @@ import { CommonModule } from '@src/common/common.module'
 import { HomeFeedResolver } from '@src/feed/home-feed.resolver'
 import { HomeFeedSchemaService } from '@src/feed/home-feed.schema'
 import { HomeFeedService } from '@src/feed/home-feed.service'
+import { GeoModule } from '@src/geo/geo.module'
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, GeoModule],
   providers: [HomeFeedResolver, HomeFeedService, HomeFeedSchemaService],
   exports: [HomeFeedService],
 })

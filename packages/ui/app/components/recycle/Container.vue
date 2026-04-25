@@ -1,15 +1,16 @@
 <template>
-  <div v-if="recycle.stream && recycle.stream.container" class="m-3">
+  <div v-if="recycle.stream && recycle.stream.container" class="m-1">
     <Card class="bg-base-200 shadow-lg">
-      <CardHeader class="items-center p-4 pb-2">
-        <CardTitle class="text-md mb-3 text-center">{{ recycle.stream.name }}</CardTitle>
-        <div class="w-full px-3 pb-2">
-          <ScoreBar
-            size="small"
-            :score="recycle.stream?.score?.score"
-            :rating="recycle.stream?.score?.rating"
-            :rating-fmt="recycle.stream?.score?.ratingF"
-          ></ScoreBar>
+      <CardHeader class="flex flex-row items-center">
+        <ScoreGauge
+          class="size-24 p-1"
+          :score="recycle.stream?.score?.score"
+          :rating="recycle.stream?.score?.rating"
+          :rating-f="recycle.stream?.score?.ratingF"
+        />
+        <div class="mr-2 ml-4 flex-1">
+          <CardTitle class="text-md text-left font-normal">{{ recycle.stream.name }}</CardTitle>
+          <CardDescription class="text-left text-sm">{{ recycle.stream.desc }}</CardDescription>
         </div>
       </CardHeader>
       <CardContent class="flex flex-col items-center justify-center px-4 pb-3">
@@ -27,17 +28,16 @@
           <div
             v-if="recycle.stream.container.image"
             ref="compImage"
-            class="absolute rounded-xl border-2 bg-base-100 shadow-md shadow-base-content"
+            class="absolute rounded-xl bg-base-100 shadow-md shadow-base-content"
             :style="{
               top: `${compPercs.y}%`,
               left: `${compPercs.x}%`,
               'border-color': recycle.stream.container.color || '#000',
             }"
           >
-            <UiImage :src="image || ''" :width="12" :height="12" />
+            <UiImage :src="image || ''" :width="20" :height="20" />
           </div>
         </div>
-        <span class="line-clamp-3 text-xs">{{ recycle.stream.desc }}</span>
       </CardContent>
     </Card>
   </div>

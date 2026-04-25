@@ -7,7 +7,7 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "pnpm exec nuxi build",
+    "build": "pnpm exec nuxi typecheck && pnpm run codegen",
     "codegen": "pnpm exec graphql-codegen --config codegen.ts",
     "i18n": "tolgee -c .tolgeerc sync --yes",
     "lint": "pnpm exec oxlint --fix && pnpm exec eslint --fix",

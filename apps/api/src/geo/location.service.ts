@@ -12,12 +12,12 @@ export class LocationService {
     private readonly redisService: RedisService,
   ) {}
 
-  async resolveLocation(): Promise<string[] | null> {
-    if (this.cls.get('regions') !== undefined) {
+  async resolveLocation(regionID?: string): Promise<string[] | null> {
+    if (!regionID && this.cls.get('regions') !== undefined) {
       return this.cls.get('regions') as string[] | null
     }
 
-    const raw = this.cls.get<string | undefined>('x-location')
+    const raw = regionID ?? this.cls.get<string | undefined>('x-location')
     if (!raw) return null
 
     const cacheKey = this.buildCacheKey(raw)
@@ -25,7 +25,7 @@ export class LocationService {
     const cached = await this.redisService.get(cacheKey)
     if (cached !== null) {
       const parsed = JSON.parse(cached) as string[]
-      this.cls.set('regions', parsed)
+      if (!regionID) this.cls.set('regions', parsed)
       return parsed
     }
 
@@ -33,28 +33,27 @@ export class LocationService {
     const ids = result ?? []
 
     await this.redisService.set(cacheKey, JSON.stringify(ids), 86400)
-    this.cls.set('regions', ids)
+    if (!regionID) this.cls.set('regions', ids)
 
     return ids
   }
 
+  private isCoordinate(raw: string): boolean {
+    return /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(raw)
+  }
+
   private buildCacheKey(raw: string): string {
-    if (/^wof_\d+$/.test(raw)) {
-      return `loc:wof:${raw}`
+    if (this.isCoordinate(raw)) {
+      const parts = raw.split(',')
+      const lat = parseFloat(parts[0]).toFixed(4)
+      const lng = parseFloat(parts[1]).toFixed(4)
+      return `loc:pt:${lat}:${lng}`
     }
-    const parts = raw.split(',')
-    const lat = parseFloat(parts[0]).toFixed(4)
-    const lng = parseFloat(parts[1]).toFixed(4)
-    return `loc:pt:${lat}:${lng}`
+    return `loc:${raw}`
   }
 
   private async lookupRegion(raw: string): Promise<string[] | null> {
-    if (/^wof_\d+$/.test(raw)) {
-      const region = await this.regionService.findOneByID(raw)
-      return region ? region.hierarchyIDs() : []
-    }
-
-    if (/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(raw)) {
+    if (this.isCoordinate(raw)) {
       const [latStr, lngStr] = raw.split(',')
       const region = await this.regionService.findMostSpecificByPoint({
         latitude: parseFloat(latStr),
@@ -63,6 +62,7 @@ export class LocationService {
       return region ? region.hierarchyIDs() : []
     }
 
-    return null
+    const region = await this.regionService.findOneByID(raw)
+    return region ? region.hierarchyIDs() : []
   }
 }
