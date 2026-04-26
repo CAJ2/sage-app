@@ -77,6 +77,12 @@ export class Edit extends BaseModel {
     description: 'Current input values for updating an existing entity',
   })
   updateInput?: JSONObject
+
+  @Field(() => JSONObjectResolver, {
+    nullable: true,
+    description: 'Input values for creating a new entity, copying existing values',
+  })
+  copyInput?: JSONObject
 }
 
 @ObjectType()
@@ -92,6 +98,9 @@ export class DirectEdit {
 
   @Field(() => JSONObjectResolver, { nullable: true })
   updateInput?: JSONObject
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  copyInput?: JSONObject
 
   // Not exposed in GraphQL
   original?: typeof EditModel

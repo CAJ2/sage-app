@@ -796,6 +796,7 @@ export type DeleteSourceOutput = {
 
 export type DirectEdit = {
   __typename?: 'DirectEdit';
+  copyInput?: Maybe<Scalars['JSONObject']['output']>;
   createInput?: Maybe<Scalars['JSONObject']['output']>;
   entityName: Scalars['String']['output'];
   id?: Maybe<Scalars['ID']['output']>;
@@ -815,6 +816,8 @@ export type Edit = {
   changes?: Maybe<EditModel>;
   /** The raw JSON of the proposed entity changes */
   changesJSON?: Maybe<Scalars['JSONObject']['output']>;
+  /** Input values for creating a new entity, copying existing values */
+  copyInput?: Maybe<Scalars['JSONObject']['output']>;
   /** Input values for creating a new entity */
   createInput?: Maybe<Scalars['JSONObject']['output']>;
   /** The type name of the entity being edited (e.g. Item, Component) */
