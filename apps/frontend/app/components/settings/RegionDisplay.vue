@@ -1,15 +1,10 @@
 <template>
   <div class="card bg-base-100 shadow-md">
     <div class="card-body p-4">
-      <div class="flex items-start justify-between gap-2">
-        <div class="flex flex-col gap-0.5">
-          <p class="text-xs opacity-60">Selected Region</p>
-          <h3 class="text-lg leading-tight font-bold">{{ name }}</h3>
-          <p class="text-sm opacity-70">{{ placetype }}</p>
-        </div>
-        <button class="btn btn-square shrink-0 btn-ghost btn-sm" @click="emit('clear')">
-          <XIcon class="size-4" />
-        </button>
+      <div class="flex flex-col gap-0.5 p-2">
+        <p class="pb-2 text-xs opacity-60">Selected Region</p>
+        <h3 class="text-lg leading-tight font-bold">{{ name }}</h3>
+        <p v-if="desc" class="mt-1 text-xs opacity-50">{{ desc }}</p>
       </div>
 
       <!-- Static map -->
@@ -29,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, PlusIcon, XIcon } from '@lucide/vue'
+import { MinusIcon, PlusIcon } from '@lucide/vue'
 import maplibregl, { Map } from 'maplibre-gl'
 import { Protocol } from 'pmtiles'
 import type { ShallowRef } from 'vue'
@@ -39,13 +34,9 @@ maplibregl.addProtocol('pmtiles', protocol.tile)
 
 const props = defineProps<{
   name: string
-  placetype: string
+  desc?: string
   bbox?: number[]
   minZoom?: number
-}>()
-
-const emit = defineEmits<{
-  clear: []
 }>()
 
 const mapContainer: ShallowRef<HTMLElement | null> = shallowRef(null)

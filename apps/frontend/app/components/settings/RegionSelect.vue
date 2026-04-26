@@ -1,13 +1,11 @@
 <template>
   <div class="flex flex-col gap-4">
-    <!-- Selected Region display / Empty state -->
     <SettingsRegionDisplay
       v-if="regionStore.selectedRegion && regionStatus !== 'idle' && regionData?.region"
       :name="regionData.region.name ?? ''"
-      :placetype="placeType"
+      :desc="regionData.region.desc"
       :bbox="regionData.region.bbox"
       :min-zoom="regionData.region.minZoom"
-      @clear="clearRegion"
     />
     <div v-else class="card bg-base-100 shadow-md">
       <div class="card-body p-5 text-center">
@@ -83,7 +81,7 @@
             </span>
             <div class="flex min-w-0 flex-col">
               <span class="truncate font-medium">{{ res.name }}</span>
-              <span class="text-sm opacity-60">{{ formatPlaceType(res.placetype) }}</span>
+              <span v-if="res.desc" class="truncate text-xs opacity-50">{{ res.desc }}</span>
             </div>
             <button class="btn shrink-0 btn-sm btn-primary" @click.stop="selectRegion(res.id)">
               Select
@@ -112,6 +110,7 @@ const regionQuery = gql`
     region(id: $id) {
       id
       name
+      desc
       placetype
       bbox
       minZoom
@@ -122,6 +121,7 @@ type RegionResult = {
   region: {
     id: string
     name?: string
+    desc?: string
     placetype: string
     bbox?: number[]
     minZoom?: number
@@ -134,6 +134,7 @@ const currentRegionQuery = gql`
       region {
         id
         name
+        desc
         placetype
         bbox
         minZoom
@@ -146,6 +147,7 @@ type CurrentRegionResult = {
     region: {
       id: string
       name?: string
+      desc?: string
       placetype: string
       bbox?: number[]
       minZoom?: number
@@ -161,6 +163,7 @@ const searchQuery = gql`
         ... on Region {
           id
           name
+          desc
           placetype
         }
       }
@@ -174,6 +177,7 @@ type SearchResult = {
       __typename: string
       id: string
       name?: string
+      desc?: string
       placetype: string
     }[]
     totalCount: number
@@ -183,6 +187,18 @@ type SearchResult = {
 const regionStore = useRegionStore()
 await regionStore.load()
 const { locationLatLon } = storeToRefs(regionStore)
+
+const { clients } = useApollo()
+const apollo = clients!.default!
+
+const invalidateCache = async () => {
+  try {
+    await apollo.clearStore()
+  } catch (e) {
+    // oxlint-disable-next-line no-console
+    console.error('Failed to clear Apollo store:', e)
+  }
+}
 
 const usingLocation = computed({
   get: () => locationLatLon.value !== null,
@@ -227,16 +243,8 @@ const selectRegion = async (regionId: string) => {
   })
   regionData.value = data.value
   regionStatus.value = status.value
-  regionStore.setRegion(regionId, {
-    name: data.value?.region.name,
-    placetype: data.value?.region.placetype,
-  })
-}
-
-const clearRegion = () => {
-  regionStore.clearLocation()
-  regionData.value = null
-  regionStatus.value = 'idle'
+  regionStore.setRegion(regionId)
+  await invalidateCache()
 }
 
 async function onLocationToggle(checked: boolean) {
@@ -281,6 +289,7 @@ async function requestGeolocation() {
 
     const latLon = `${lat},${lon}`
     regionStore.setCurrentLocation(latLon)
+    await invalidateCache()
 
     const { data } = await useAsyncQuery<CurrentRegionResult>(currentRegionQuery)
     const region = data.value?.currentRegion?.region
@@ -290,7 +299,7 @@ async function requestGeolocation() {
       })
       regionData.value = rd.value
       regionStatus.value = rs.value
-      regionStore.setRegion(region.id, { name: region.name, placetype: region.placetype })
+      regionStore.setRegion(region.id)
     } else {
       locationError.value = 'Could not determine your region. Please search manually.'
     }
@@ -313,19 +322,4 @@ async function requestGeolocation() {
     locating.value = false
   }
 }
-
-const placetypeMap: Record<string, string> = {
-  neighbourhood: 'Neighbourhood',
-  localadmin: 'Local Admin',
-  locality: 'Locality',
-  county: 'County',
-  region: 'Region',
-}
-
-const formatPlaceType = (type: string) => placetypeMap[type] || type
-
-const placeType = computed(() => {
-  const placetype = regionData.value?.region.placetype
-  return placetype ? formatPlaceType(placetype) : ''
-})
 </script>
