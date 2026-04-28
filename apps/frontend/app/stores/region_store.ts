@@ -4,8 +4,6 @@ const STORAGE_KEY = 'region_store'
 
 export const useRegionStore = defineStore('region', () => {
   const selectedRegion = ref('')
-  const regionName = ref('')
-  const regionPlacetype = ref('')
   const useCurrentLocation = ref(false)
   const locationLatLon = ref<string | null>(null)
   const loaded = ref(false)
@@ -18,8 +16,6 @@ export const useRegionStore = defineStore('region', () => {
     if (raw) {
       const state = JSON.parse(raw)
       selectedRegion.value = state.selectedRegion ?? ''
-      regionName.value = state.regionName ?? ''
-      regionPlacetype.value = state.regionPlacetype ?? ''
       useCurrentLocation.value = state.useCurrentLocation ?? false
       locationLatLon.value = state.locationLatLon ?? null
     }
@@ -31,18 +27,14 @@ export const useRegionStore = defineStore('region', () => {
       STORAGE_KEY,
       JSON.stringify({
         selectedRegion: selectedRegion.value,
-        regionName: regionName.value,
-        regionPlacetype: regionPlacetype.value,
         useCurrentLocation: useCurrentLocation.value,
         locationLatLon: locationLatLon.value,
       }),
     )
   }
 
-  async function setRegion(id: string, info?: { name?: string; placetype?: string }) {
+  async function setRegion(id: string) {
     selectedRegion.value = id
-    if (info?.name !== undefined) regionName.value = info.name ?? ''
-    if (info?.placetype !== undefined) regionPlacetype.value = info.placetype ?? ''
     await persist()
   }
 
@@ -61,8 +53,6 @@ export const useRegionStore = defineStore('region', () => {
 
   return {
     selectedRegion,
-    regionName,
-    regionPlacetype,
     useCurrentLocation,
     locationLatLon,
     isRegionSelected,

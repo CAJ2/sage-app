@@ -30,13 +30,15 @@ const [useProvideCarousel, useInjectCarousel] = createInjectionState(
     }
 
     onMounted(() => {
-      if (!emblaApi.value) return
+      watch(emblaApi, (api) => {
+        if (!api) return
 
-      emblaApi.value?.on('slidesinview', onSelect)
-      emblaApi.value?.on('reinit', onSelect)
-      emblaApi.value?.on('select', onSelect)
+        api.on('slidesinview', onSelect)
+        api.on('reinit', onSelect)
+        api.on('select', onSelect)
 
-      emits('init-api', emblaApi.value)
+        emits('init-api', api)
+      })
     })
 
     return {

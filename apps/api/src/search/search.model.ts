@@ -69,7 +69,7 @@ registerEnumType(SearchType, {
 export const SearchArgsSchema = z.object({
   query: z.string(),
   types: z.array(z.enum(SearchType)).optional(),
-  latlong: z.array(z.number()).length(2).optional(),
+  latlong: z.array(z.number()).min(2).max(4).optional(),
   limit: z.number().int().positive().optional(),
   offset: z.number().int().min(0).optional(),
 })

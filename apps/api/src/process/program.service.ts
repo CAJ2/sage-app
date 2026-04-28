@@ -9,6 +9,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
+import { LocationService } from '@src/geo/location.service'
 import { Region } from '@src/geo/region.entity'
 import { Process } from '@src/process/process.entity'
 import {
@@ -31,6 +32,7 @@ export class ProgramService implements IEntityService<Program> {
     private readonly editService: EditService,
     private readonly tagService: TagService,
     private readonly i18n: I18nService,
+    private readonly locationService: LocationService,
   ) {}
 
   queryFields(): Record<string, QueryField> {
@@ -54,6 +56,12 @@ export class ProgramService implements IEntityService<Program> {
   }
 
   async find(opts: CursorOptions<Program>) {
+    if (opts.where.region && typeof opts.where.region === 'string') {
+      const regionSearch = await this.locationService.resolveLocation(opts.where.region)
+      if (regionSearch) {
+        opts.where.region = { $in: regionSearch }
+      }
+    }
     opts.options.populate = ['region', 'programOrgs', 'programProcesses', 'programTags']
     const programs = await this.em.find(Program, opts.where, opts.options)
     const count = await this.em.count(Program, opts.where)

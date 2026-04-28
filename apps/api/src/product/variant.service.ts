@@ -59,6 +59,12 @@ export class VariantService implements IEntityService<Variant> {
   }
 
   async find(opts: CursorOptions<Variant>) {
+    if (opts.where.region && typeof opts.where.region === 'string') {
+      const regionSearch = await this.locationService.resolveLocation(opts.where.region)
+      if (regionSearch) {
+        opts.where.region = { $in: regionSearch }
+      }
+    }
     const variants = await this.em.find(Variant, opts.where, opts.options)
     const count = await this.em.count(Variant, opts.where)
     return {
@@ -140,16 +146,9 @@ export class VariantService implements IEntityService<Variant> {
     if (!variant) {
       throw new Error(`Variant with ID "${variantID}" not found`)
     }
-    if (regionID) {
-      const region = await this.em.findOne(Region, { id: regionID })
-      if (!region) {
-        throw new Error(`Region with ID "${regionID}" not found`)
-      }
-    } else {
-      const ids = await this.locationService.resolveLocation()
-      if (!ids || ids.length === 0) {
-        return null
-      }
+    const regionSearch = await this.locationService.resolveLocation(regionID)
+    if (!regionSearch || regionSearch.length === 0) {
+      return null
     }
     if (variant.components.getItems().length === 0) {
       return new StreamScore()

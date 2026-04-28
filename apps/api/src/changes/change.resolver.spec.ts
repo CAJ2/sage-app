@@ -350,6 +350,31 @@ describe('ChangeResolver (integration)', () => {
     expect(body?.change?.edits?.nodes?.length).toEqual(1)
     expect(body?.change?.edits?.nodes?.[0]?.id).toBe(VARIANT_IDS[0])
     expect(body?.change?.edits?.nodes?.[0]?.entityName).toBe('Variant')
+
+    // Verify copyInput on Edit node
+    const editRes = await gql.send(
+      graphql(`
+        query ChangeResolverEditCopyInput($id: ID!) {
+          change(id: $id) {
+            edits(first: 10) {
+              nodes {
+                id
+                entityName
+                updateInput
+                copyInput
+              }
+            }
+          }
+        }
+      `),
+      { id: changeID },
+    )
+    const editNode = editRes.data?.change?.edits?.nodes?.[0]
+    expect(editNode?.copyInput).toBeDefined()
+    expect(editNode?.copyInput?.id).toBeUndefined()
+    expect(editNode?.copyInput?.name).toBe('Updated Name')
+    expect(editNode?.copyInput?.createdAt).toBeUndefined()
+    expect(editNode?.copyInput?.updatedAt).toBeUndefined()
   })
 
   test('should add a direct Item -> Category reference', async () => {

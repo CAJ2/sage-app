@@ -2,7 +2,10 @@
   <div class="flex min-h-dvh flex-col">
     <NavHomeLogo />
     <NuxtLink to="/profile/region">
-      <NavTitleBubble :title="regionStore.regionName || 'Set Region'">
+      <NavTitleBubble
+        :title="currentRegion?.name || 'Set Region'"
+        :subtitle="currentRegion?.desc || undefined"
+      >
         <template #icon>
           <MapPinIcon class="size-3.5 text-accent" />
         </template>
@@ -88,12 +91,28 @@ const homeFeedQuery = graphql(`
 
 const regionStore = useRegionStore()
 await regionStore.load()
+
+const currentRegionQuery = graphql(`
+  query CurrentRegionHome {
+    currentRegion {
+      region {
+        id
+        name
+        desc
+      }
+    }
+  }
+`)
+
+const { result: currentRegionData, refetch: refetchRegion } = useQuery(currentRegionQuery)
+const currentRegion = computed(() => currentRegionData.value?.currentRegion?.region)
+
 const { result: data, refetch } = useQuery(homeFeedQuery, () => ({
   region: regionStore.selectedRegion || undefined,
 }))
 
 async function onRefresh({ done }: { done: () => void }) {
-  await refetch()
+  await Promise.all([refetch(), refetchRegion()])
   done()
 }
 </script>

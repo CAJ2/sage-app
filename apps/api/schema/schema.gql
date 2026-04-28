@@ -690,6 +690,7 @@ type DeleteSourceOutput {
 }
 
 type DirectEdit {
+  copyInput: JSONObject
   createInput: JSONObject
   entityName: String!
   id: ID
@@ -708,6 +709,9 @@ type Edit {
 
   """The raw JSON of the proposed entity changes"""
   changesJSON: JSONObject
+
+  """Input values for creating a new entity, copying existing values"""
+  copyInput: JSONObject
 
   """Input values for creating a new entity"""
   createInput: JSONObject

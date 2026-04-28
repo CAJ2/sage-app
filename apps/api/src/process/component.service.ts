@@ -9,6 +9,7 @@ import { NotFoundErr } from '@src/common/exceptions'
 import { I18nService } from '@src/common/i18n.service'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
+import { LocationService } from '@src/geo/location.service'
 import { Region } from '@src/geo/region.entity'
 import {
   Component,
@@ -32,6 +33,7 @@ export class ComponentService implements IEntityService<Component> {
     private readonly tagService: TagService,
     private readonly i18n: I18nService,
     private readonly streamService: StreamService,
+    private readonly locationService: LocationService,
   ) {}
 
   queryFields(): Record<string, QueryField> {
@@ -42,6 +44,12 @@ export class ComponentService implements IEntityService<Component> {
   }
 
   async find(opts: CursorOptions<Component>) {
+    if (opts.where.region && typeof opts.where.region === 'string') {
+      const regionSearch = await this.locationService.resolveLocation(opts.where.region)
+      if (regionSearch) {
+        opts.where.region = { $in: regionSearch }
+      }
+    }
     const components = await this.em.find(Component, opts.where, opts.options)
     const count = await this.em.count(Component, opts.where)
     return {

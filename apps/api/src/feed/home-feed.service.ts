@@ -5,19 +5,24 @@ import { Injectable } from '@nestjs/common'
 import { CursorOptions } from '@src/common/transform'
 import { IEntityService, IsEntityService, QueryField } from '@src/db/base.entity'
 import { HomeFeed } from '@src/feed/home-feed.entity'
+import { LocationService } from '@src/geo/location.service'
 
 @Injectable()
 @IsEntityService(HomeFeed)
 export class HomeFeedService implements IEntityService<HomeFeed> {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly locationService: LocationService,
+  ) {}
 
   queryFields(): Record<string, QueryField> {
     return {}
   }
 
   async find(opts: CursorOptions<HomeFeed>, regionId?: string, format?: string) {
+    const regionSearch = await this.locationService.resolveLocation(regionId)
     const where: FilterQuery<HomeFeed> = {
-      ...(regionId ? { region: regionId } : {}),
+      ...(regionSearch ? { region: { $in: regionSearch } } : {}),
       ...(format ? { format } : {}),
     }
     const [items, count] = await this.em.findAndCount(HomeFeed, where, {

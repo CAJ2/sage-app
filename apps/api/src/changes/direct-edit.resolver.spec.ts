@@ -34,6 +34,7 @@ const DirectEditQuery = graphql(`
       id
       createInput
       updateInput
+      copyInput
     }
   }
 `)
@@ -141,6 +142,21 @@ describe('DirectEdit (integration)', () => {
       expect(result?.createInput).toBeNull()
       expect(result?.updateInput).toBeDefined()
       expect(result?.updateInput?.id).toBe(entityID)
+
+      expect(result?.copyInput).toBeDefined()
+      expect(result?.copyInput?.id).toBeUndefined()
+      expect(result?.copyInput?.createdAt).toBeUndefined()
+      expect(result?.copyInput?.updatedAt).toBeUndefined()
+
+      // Ensure other fields are copied correctly (e.g. name if it exists)
+      if (result?.updateInput?.name) {
+        expect(result?.copyInput?.name).toBe(result.updateInput.name)
+      }
+
+      // Check that it's mostly the same as updateInput
+      const { id: _id, createdAt: _c, updatedAt: _u, ...restOfUpdate } = result!.updateInput as any
+      expect(result?.copyInput).toEqual(restOfUpdate)
+
       await expect(
         schemaFor(entityName).parseUpdateInput(result!.updateInput as any),
       ).resolves.toBeDefined()

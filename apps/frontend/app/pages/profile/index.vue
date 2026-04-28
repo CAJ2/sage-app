@@ -16,24 +16,23 @@
           <div v-else class="flex-1">
             <h1 class="text-2xl font-bold tracking-tight">Welcome to Sageleaf</h1>
             <p class="mt-1.5 max-w-xs text-sm leading-relaxed opacity-60">
-              Start contributing to the project and customize your local experience.
+              Explore the project and customize your local experience.
             </p>
           </div>
 
           <div v-if="status !== 'pending'" class="-mr-2 shrink-0">
-            <NuxtLink v-if="!sessionData?.data" to="/profile/sign_in">
+            <NuxtLink v-if="!sessionData?.data" to="/profile/sign_in" aria-label="Sign In">
               <button class="btn gap-2 px-3 opacity-30 btn-ghost btn-sm hover:opacity-100">
                 <LogInIcon class="size-4" />
-                <span class="text-xs font-bold tracking-wide uppercase">Sign In</span>
               </button>
             </NuxtLink>
             <button
               v-else
               class="btn gap-2 px-3 opacity-30 btn-ghost btn-sm hover:opacity-100"
+              aria-label="Sign Out"
               @click="signOut"
             >
               <LogOutIcon class="size-4" />
-              <span class="text-xs font-bold tracking-wide uppercase">Sign Out</span>
             </button>
           </div>
         </div>
@@ -50,11 +49,14 @@
               </div>
               <div class="flex flex-1 flex-col">
                 <span
-                  v-if="region.regionName"
-                  class="text-[10px] font-bold tracking-widest uppercase opacity-60"
+                  v-if="currentRegion?.name"
+                  class="pb-1 text-[10px] font-bold tracking-widest uppercase opacity-60"
                   >Region</span
                 >
-                <h2 class="font-medium">{{ region.regionName || 'Set Region' }}</h2>
+                <h2 class="leading-tight font-medium">{{ currentRegion?.name || 'Set Region' }}</h2>
+                <p v-if="currentRegion?.desc" class="mt-0.5 text-xs opacity-50">
+                  {{ currentRegion.desc }}
+                </p>
               </div>
               <ChevronRightIcon class="size-4 opacity-40" />
             </CardContent>
@@ -105,11 +107,28 @@ import {
   UserIcon,
 } from '@lucide/vue'
 
+import { graphql } from '~/gql'
+
 useTopbar(null)
 
 const { client: auth, sessionData, status, isAuthenticated } = useAuth()
-const region = useRegionStore()
-region.load()
+const regionStore = useRegionStore()
+regionStore.load()
+
+const currentRegionQuery = graphql(`
+  query CurrentRegionProfile {
+    currentRegion {
+      region {
+        id
+        name
+        desc
+      }
+    }
+  }
+`)
+
+const { result: currentRegionData } = useQuery(currentRegionQuery)
+const currentRegion = computed(() => currentRegionData.value?.currentRegion?.region)
 
 const signOut = async () => {
   await auth.signOut()

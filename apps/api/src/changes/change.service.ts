@@ -122,7 +122,17 @@ export class ChangeService {
       if (svcResult1) {
         const [, schemaSvc] = svcResult1
         editModel.createInput = await schemaSvc.createInputModel(changesEntity!)
-        editModel.updateInput = await schemaSvc.updateInputModel(changesEntity!)
+        const updateInput = await schemaSvc.updateInputModel(changesEntity!)
+        editModel.updateInput = updateInput
+        if (updateInput) {
+          const {
+            id: _id,
+            createdAt: _createdAt,
+            updatedAt: _updatedAt,
+            ...copyInput
+          } = updateInput as any
+          editModel.copyInput = copyInput
+        }
       }
       return [editModel]
     }
@@ -142,7 +152,17 @@ export class ChangeService {
         if (svcResult2) {
           const [, schemaSvc] = svcResult2
           editModel.createInput = await schemaSvc.createInputModel(changesEntity!)
-          editModel.updateInput = await schemaSvc.updateInputModel(changesEntity!)
+          const updateInput = await schemaSvc.updateInputModel(changesEntity!)
+          editModel.updateInput = updateInput
+          if (updateInput) {
+            const {
+              id: _id,
+              createdAt: _createdAt,
+              updatedAt: _updatedAt,
+              ...copyInput
+            } = updateInput as any
+            editModel.copyInput = copyInput
+          }
         }
         return editModel
       }),
@@ -197,9 +217,17 @@ export class ChangeService {
         directEdit.entityName = entityName
         directEdit.original = originalModel as typeof EditEnum
         directEdit.changes = changesModel as typeof EditEnum
-        directEdit.updateInput = await schemaService.updateInputModel(
-          changesEntity ?? originalEntity,
-        )
+        const updateInput = await schemaService.updateInputModel(changesEntity ?? originalEntity)
+        directEdit.updateInput = updateInput
+        if (updateInput) {
+          const {
+            id: _id,
+            createdAt: _createdAt,
+            updatedAt: _updatedAt,
+            ...copyInput
+          } = updateInput as any
+          directEdit.copyInput = copyInput
+        }
         return directEdit
       }
     } else if (entityName) {

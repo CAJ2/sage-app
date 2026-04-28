@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common'
 
 import { I18nService } from '@src/common/i18n.service'
 import { LocationService } from '@src/geo/location.service'
-import { Region } from '@src/geo/region.entity'
 import { Component } from '@src/process/component.entity'
 import { ComponentRecycle } from '@src/process/component.model'
 import { Process } from '@src/process/process.entity'
@@ -33,19 +32,9 @@ export class StreamService {
       throw new Error(`Component with ID "${componentId}" not found`)
     }
 
-    let regionSearch: string[]
-    if (regionId) {
-      const region = await this.em.findOne(Region, { id: regionId })
-      if (!region) {
-        throw new Error(`Region with ID "${regionId}" not found`)
-      }
-      regionSearch = region.hierarchyIDs()
-    } else {
-      const ids = await this.locationService.resolveLocation()
-      if (!ids || ids.length === 0) {
-        throw new Error('No region specified and no location resolved')
-      }
-      regionSearch = ids
+    const regionSearch = await this.locationService.resolveLocation(regionId)
+    if (!regionSearch || regionSearch.length === 0) {
+      throw new Error('No region specified and no location resolved')
     }
 
     const materialSearch: string[] = []
