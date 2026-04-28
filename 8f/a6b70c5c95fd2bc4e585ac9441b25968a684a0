@@ -1,0 +1,23 @@
+apps/frontend/app/pages/profile/index.vue
+  a458df84865c5678 24,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "8fa6b70c5c95fd2bc4e585ac9441b25968a684a0",
+  "prompts": {
+    "a458df84865c5678": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ad96bcf2-1ee8-4a34-a386-92d3f296c2b5",
+        "model": "gemini-3-flash-preview"
+      },
+      "human_author": "Christian Johansen",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 9,
+      "accepted_lines": 3,
+      "overriden_lines": 2
+    }
+  }
+}
