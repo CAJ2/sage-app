@@ -21,7 +21,7 @@
           </div>
 
           <div v-if="status !== 'pending'" class="-mr-2 shrink-0">
-            <NuxtLink v-if="!sessionData?.data" to="/profile/sign_in">
+            <NuxtLink v-if="!sessionData?.data" to="/profile/sign_in" aria-label="Sign In">
               <button class="btn gap-2 px-3 opacity-30 btn-ghost btn-sm hover:opacity-100">
                 <LogInIcon class="size-4" />
               </button>
@@ -29,10 +29,10 @@
             <button
               v-else
               class="btn gap-2 px-3 opacity-30 btn-ghost btn-sm hover:opacity-100"
+              aria-label="Sign Out"
               @click="signOut"
             >
               <LogOutIcon class="size-4" />
-              <span class="text-xs font-bold tracking-wide uppercase">Sign Out</span>
             </button>
           </div>
         </div>
