@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 export enum SearchIndex {
   CATEGORIES = 'categories',
   ITEMS = 'items',
@@ -40,13 +42,27 @@ export type SearchBackendGeoFilter =
       }
     }
 
+export type SearchBackendVectorQuery =
+  | {
+      kind: 'embedding'
+      values: number[]
+    }
+  | {
+      kind: 'document'
+      id: string
+    }
+  | {
+      kind: 'query'
+      text: string
+    }
+
 export interface SearchBackendSearchOptions {
   limit?: number
   offset?: number
   filters?: SearchBackendFilter[]
   geo?: SearchBackendGeoFilter
   lang?: string
-  vector?: number[]
+  vector?: SearchBackendVectorQuery
 }
 
 export interface SearchBackendSearchRequest {
@@ -86,3 +102,33 @@ export interface SearchBackend {
 }
 
 export const SEARCH_BACKEND = Symbol('SEARCH_BACKEND')
+
+function normalizeSearchBackendValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => normalizeSearchBackendValue(entry))
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, normalizeSearchBackendValue(entry)]),
+    )
+  }
+
+  return value
+}
+
+export function buildSearchBackendCacheKey(
+  prefix: string,
+  request: SearchBackendSearchRequest | SearchBackendMultiSearchRequest,
+) {
+  const normalized = normalizeSearchBackendValue(request)
+  const hash = createHash('sha256')
+    .update(JSON.stringify(normalized))
+    .digest()
+    .subarray(0, 12)
+    .toString('base64url')
+  return `${prefix}:${hash}`
+}

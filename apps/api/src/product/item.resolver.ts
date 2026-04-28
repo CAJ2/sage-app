@@ -30,6 +30,9 @@ import {
 import { ItemSchemaService } from '@src/product/item.schema'
 import { ItemService } from '@src/product/item.service'
 import { Variant, VariantsPage } from '@src/product/variant.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Item)
@@ -38,6 +41,7 @@ export class ItemResolver {
     private readonly itemService: ItemService,
     private readonly transform: TransformService,
     private readonly itemSchemaService: ItemSchemaService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => ItemsPage, { name: 'items' })
@@ -94,6 +98,19 @@ export class ItemResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ItemVariantsArgs, args)
     const cursor = await this.itemService.variants(item.id, filter)
     return this.transform.entityToPaginated(Variant, VariantsPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => ItemsPage)
+  async related(@Parent() item: Item, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.ITEMS,
+      item.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Item, ItemsPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateItemOutput, { name: 'createItem', nullable: true })

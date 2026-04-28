@@ -41,6 +41,9 @@ import {
 } from '@src/product/variant.model'
 import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Variant)
@@ -49,6 +52,7 @@ export class VariantResolver {
     private readonly variantService: VariantService,
     private readonly transform: TransformService,
     private readonly variantSchemaService: VariantSchemaService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => VariantsPage, { name: 'variants' })
@@ -91,6 +95,19 @@ export class VariantResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantItemsArgs, args)
     const cursor = await this.variantService.items(variant.id, filter)
     return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => VariantsPage)
+  async related(@Parent() variant: Variant, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.VARIANTS,
+      variant.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Variant, VariantsPage, cursor, parsedArgs)
   }
 
   @ResolveField()

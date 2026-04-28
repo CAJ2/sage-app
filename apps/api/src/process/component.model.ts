@@ -95,6 +95,9 @@ export class Component extends IDCreatedUpdated implements Named {
   @Field(() => ImagesPage, { description: 'Images associated with this component' })
   images!: ImagesPage
 
+  @Field(() => ComponentsPage, { description: 'Similar components related to this component' })
+  related!: ComponentsPage & {}
+
   @Field(() => ComponentSourcesPage)
   sources!: ComponentSourcesPage & {}
 

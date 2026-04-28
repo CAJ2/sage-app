@@ -19,6 +19,9 @@ import { PlaceSchemaService } from '@src/geo/place.schema'
 import { PlaceService } from '@src/geo/place.service'
 import { ModelEditSchema } from '@src/graphql/base.model'
 import { Tag } from '@src/process/tag.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { Org } from '@src/users/org.model'
 
 @Resolver(() => Place)
@@ -27,6 +30,7 @@ export class PlaceResolver {
     private readonly placeService: PlaceService,
     private readonly transform: TransformService,
     private readonly placeSchemaService: PlaceSchemaService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => ModelEditSchema, { nullable: true })
@@ -83,6 +87,19 @@ export class PlaceResolver {
       return null
     }
     return this.transform.entityToModel(Org, org)
+  }
+
+  @ResolveField(() => PlacesPage)
+  async related(@Parent() place: Place, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.PLACES,
+      place.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Place, PlacesPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreatePlaceOutput, { nullable: true })

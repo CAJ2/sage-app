@@ -14,12 +14,16 @@ import {
 } from '@src/process/material.model'
 import { MaterialService } from '@src/process/material.service'
 import { Process, ProcessPage } from '@src/process/process.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 
 @Resolver(() => Material)
 export class MaterialResolver {
   constructor(
     private readonly materialService: MaterialService,
     private readonly transform: TransformService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => MaterialsPage, { name: 'materials' })
@@ -99,5 +103,18 @@ export class MaterialResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessesArgs, args)
     const cursor = await this.materialService.processes(material.id, filter)
     return this.transform.entityToPaginated(Process, ProcessPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => MaterialsPage)
+  async related(@Parent() material: Material, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.MATERIALS,
+      material.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Material, MaterialsPage, cursor, parsedArgs)
   }
 }

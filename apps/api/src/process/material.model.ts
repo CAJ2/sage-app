@@ -64,6 +64,9 @@ export class Material extends CreatedUpdated implements Named {
 
   @Field(() => ProcessPage, { description: 'Recycling or disposal processes for this material' })
   processes!: ProcessPage & {}
+
+  @Field(() => MaterialsPage, { description: 'Similar materials related to this material' })
+  related!: MaterialsPage & {}
 }
 registerModel('Material', Material)
 

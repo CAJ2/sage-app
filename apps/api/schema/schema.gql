@@ -84,6 +84,9 @@ type Category implements Named {
 
   """Direct parent categories in the hierarchy"""
   parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
+
+  """Similar categories related to this category"""
+  related(limit: Int, offset: Int, query: String): CategoriesPage!
   updatedAt: DateTime!
 }
 
@@ -224,6 +227,9 @@ type Component implements Named {
 
   """The geographic region this component's recycling data applies to"""
   region: Region
+
+  """Similar components related to this component"""
+  related(limit: Int, offset: Int, query: String): ComponentsPage!
   sources(after: String, before: String, first: Int, last: Int, type: String): ComponentSourcesPage!
   tags(after: String, before: String, first: Int, last: Int): TagPage!
   updatedAt: DateTime!
@@ -836,6 +842,9 @@ type Item implements Named {
   imageURL: String
   name: String
 
+  """Similar items related to this item"""
+  related(limit: Int, offset: Int, query: String): ItemsPage!
+
   """Metadata tags applied to this item"""
   tags(after: String, before: String, first: Int, last: Int): TagPage!
   updatedAt: DateTime!
@@ -953,6 +962,9 @@ type Material implements Named {
   """Recycling or disposal processes for this material"""
   processes(after: String, before: String, first: Int, last: Int): ProcessPage!
 
+  """Similar materials related to this material"""
+  related(limit: Int, offset: Int, query: String): MaterialsPage!
+
   """The physical form or shape of the material (e.g. film, rigid, fibre)"""
   shape: String
   synonyms: [String!]
@@ -1055,6 +1067,9 @@ type Org implements Named {
   id: ID!
   name: String!
 
+  """Similar organizations related to this organization"""
+  related(limit: Int, offset: Int, query: String): OrgsPage!
+
   """URL-friendly unique identifier for this organization"""
   slug: String!
   updatedAt: DateTime!
@@ -1119,6 +1134,9 @@ type Place implements Named {
 
   """The organization associated with this place"""
   org: Org
+
+  """Similar places related to this place"""
+  related(limit: Int, offset: Int, query: String): PlacesPage!
 
   """Metadata tags applied to this place"""
   tags: TagPage!
@@ -2244,6 +2262,9 @@ type Variant implements Named {
 
   """Geographic regions associated with this variant"""
   regions(after: String, before: String, first: Int, last: Int): RegionsPage!
+
+  """Similar variants related to this variant"""
+  related(limit: Int, offset: Int, query: String): VariantsPage!
   sources(after: String, before: String, first: Int, last: Int): VariantSourcesPage!
 
   """Metadata tags applied to this variant"""

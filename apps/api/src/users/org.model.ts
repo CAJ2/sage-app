@@ -35,6 +35,9 @@ export class Org extends IDCreatedUpdated implements Named {
   @Field(() => UserPage, { description: 'Users that are members of this organization' })
   users!: UserPage & {}
 
+  @Field(() => OrgsPage, { description: 'Similar organizations related to this organization' })
+  related!: OrgsPage & {}
+
   @Field(() => OrgHistoryPage)
   history!: OrgHistoryPage & {}
 }

@@ -91,6 +91,8 @@ export type Category = Named & {
   nameTr?: Maybe<Array<TranslatedOutput>>;
   /** Direct parent categories in the hierarchy */
   parents: CategoriesPage;
+  /** Similar categories related to this category */
+  related: CategoriesPage;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -146,6 +148,14 @@ export type CategoryParentsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A hierarchical category for classifying product items */
+export type CategoryRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CategoryEdge = {
@@ -306,6 +316,8 @@ export type Component = Named & {
   recycleScore?: Maybe<StreamScore>;
   /** The geographic region this component's recycling data applies to */
   region?: Maybe<Region>;
+  /** Similar components related to this component */
+  related: ComponentsPage;
   sources: ComponentSourcesPage;
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
@@ -339,6 +351,14 @@ export type ComponentRecycleArgs = {
 /** A physical component of a product variant, made of one or more materials */
 export type ComponentRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -940,6 +960,8 @@ export type Item = Named & {
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** Similar items related to this item */
+  related: ItemsPage;
   /** Metadata tags applied to this item */
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
@@ -963,6 +985,14 @@ export type ItemHistoryArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A product or consumable item that can be categorized and have multiple variants */
+export type ItemRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1090,6 +1120,8 @@ export type Material = Named & {
   primaryComponents: ComponentsPage;
   /** Recycling or disposal processes for this material */
   processes: ProcessPage;
+  /** Similar materials related to this material */
+  related: MaterialsPage;
   /** The physical form or shape of the material (e.g. film, rigid, fibre) */
   shape?: Maybe<Scalars['String']['output']>;
   synonyms?: Maybe<Array<Scalars['String']['output']>>;
@@ -1159,6 +1191,14 @@ export type MaterialProcessesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A raw or processed material that physical components are composed of */
+export type MaterialRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type MaterialEdge = {
@@ -1457,6 +1497,8 @@ export type Org = Named & {
   /** The ID of the model */
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  /** Similar organizations related to this organization */
+  related: OrgsPage;
   /** URL-friendly unique identifier for this organization */
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -1473,6 +1515,14 @@ export type OrgHistoryArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** An organization or company on the platform */
+export type OrgRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1542,9 +1592,19 @@ export type Place = Named & {
   name?: Maybe<Scalars['String']['output']>;
   /** The organization associated with this place */
   org?: Maybe<Org>;
+  /** Similar places related to this place */
+  related: PlacesPage;
   /** Metadata tags applied to this place */
   tags: TagPage;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+
+/** A specific physical location, such as a business or recycling facility */
+export type PlaceRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** A structured postal address */
@@ -2889,6 +2949,8 @@ export type Variant = Named & {
   recycleScore?: Maybe<StreamScore>;
   /** Geographic regions associated with this variant */
   regions: RegionsPage;
+  /** Similar variants related to this variant */
+  related: VariantsPage;
   sources: VariantSourcesPage;
   /** Metadata tags applied to this variant */
   tags: TagPage;
@@ -2953,6 +3015,14 @@ export type VariantRegionsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A specific variant or SKU of a product item, composed of physical components */
+export type VariantRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 

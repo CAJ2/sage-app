@@ -55,6 +55,9 @@ export class Variant extends IDCreatedUpdated implements Named {
   @Field(() => ItemsPage, { description: 'Product items this variant belongs to' })
   items!: ItemsPage
 
+  @Field(() => VariantsPage, { description: 'Similar variants related to this variant' })
+  related!: VariantsPage & {}
+
   @Field(() => VariantOrgsPage, {
     description: 'Organizations associated with this variant (e.g. manufacturer, importer)',
   })

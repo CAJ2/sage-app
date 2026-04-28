@@ -80,6 +80,9 @@ export class Place extends CreatedUpdated implements Named {
 
   @Field(() => Org, { nullable: true, description: 'The organization associated with this place' })
   org?: Org & {}
+
+  @Field(() => PlacesPage, { description: 'Similar places related to this place' })
+  related!: PlacesPage & {}
 }
 registerModel('Place', Place)
 

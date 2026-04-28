@@ -26,6 +26,9 @@ import {
 import { CategorySchemaService } from '@src/product/category.schema'
 import { CategoryService } from '@src/product/category.service'
 import { Item, ItemsPage } from '@src/product/item.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Category)
@@ -34,6 +37,7 @@ export class CategoryResolver {
     private readonly categoryService: CategoryService,
     private readonly categorySchemaService: CategorySchemaService,
     private readonly transform: TransformService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => CategoriesPage, { name: 'categories' })
@@ -115,6 +119,19 @@ export class CategoryResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoryItemsArgs, args)
     const cursor = await this.categoryService.items(category.id, filter)
     return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => CategoriesPage)
+  async related(@Parent() category: Category, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.CATEGORIES,
+      category.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Category, CategoriesPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateCategoryOutput, {

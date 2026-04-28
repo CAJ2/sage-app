@@ -36,6 +36,9 @@ import { Material } from '@src/process/material.model'
 import { MaterialService } from '@src/process/material.service'
 import { Tag, TagPage } from '@src/process/tag.model'
 import { Image, ImagesArgs, ImagesPage } from '@src/product/image.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Component)
@@ -46,6 +49,7 @@ export class ComponentResolver {
     private readonly transform: TransformService,
     private readonly regionService: RegionService,
     private readonly materialService: MaterialService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => ComponentsPage, { name: 'components' })
@@ -192,6 +196,19 @@ export class ComponentResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ImagesArgs, args)
     const cursor = await this.componentService.images(component.id, filter)
     return this.transform.entityToPaginated(Image, ImagesPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => ComponentsPage)
+  async related(@Parent() component: Component, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.COMPONENTS,
+      component.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Component, ComponentsPage, cursor, parsedArgs)
   }
 
   @ResolveField(() => ComponentSourcesPage)

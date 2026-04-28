@@ -76,6 +76,9 @@ export class Category extends CreatedUpdated implements Named {
   @Field(() => ItemsPage, { description: 'Items classified under this category' })
   items!: ItemsPage & {}
 
+  @Field(() => CategoriesPage, { description: 'Similar categories related to this category' })
+  related!: CategoriesPage & {}
+
   @Field(() => CategoryHistoryPage, { description: 'Audit history of changes to this category' })
   history!: CategoryHistoryPage & {}
 }

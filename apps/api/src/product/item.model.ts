@@ -50,6 +50,9 @@ export class Item extends IDCreatedUpdated implements Named {
   })
   variants!: VariantsPage & {}
 
+  @Field(() => ItemsPage, { description: 'Similar items related to this item' })
+  related!: ItemsPage & {}
+
   @Field(() => ItemHistoryPage, { description: 'Audit history of changes to this item' })
   history!: ItemHistoryPage & {}
 }

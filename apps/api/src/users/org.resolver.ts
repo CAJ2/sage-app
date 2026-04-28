@@ -9,6 +9,9 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { Org as OrgEntity } from '@src/users/org.entity'
 import {
   CreateOrgInput,
@@ -33,6 +36,7 @@ export class OrgResolver {
     private readonly orgService: OrgService,
     private readonly transform: TransformService,
     private readonly orgSchemaService: OrgSchemaService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => ModelEditSchema, { nullable: true })
@@ -75,6 +79,19 @@ export class OrgResolver {
     const [parsedArgs, filter] = await this.transform.paginationArgs(OrgUsersArgs, args)
     const cursor = await this.orgService.users(org.id, filter)
     return this.transform.entityToPaginated(User, UserPage, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => OrgsPage)
+  async related(@Parent() org: Org, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.ORGS,
+      org.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Org, OrgsPage, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateOrgOutput, { nullable: true })

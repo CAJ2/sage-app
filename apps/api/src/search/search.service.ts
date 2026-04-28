@@ -10,12 +10,13 @@ import { Material } from '@src/process/material.entity'
 import { Category } from '@src/product/category.entity'
 import { Item } from '@src/product/item.entity'
 import { Variant } from '@src/product/variant.entity'
-import { MistralService } from '@src/search/mistral.service'
+import { DEFAULT_RELATED_LIMIT, RelatedArgs, RelatedArgsSchema } from '@src/search/related.model'
 import {
   SEARCH_BACKEND,
   SearchBackendFilter,
   SearchBackendGeoFilter,
   SearchBackendHit,
+  SearchBackendVectorQuery,
   SearchIndex,
 } from '@src/search/search.backend'
 import type { SearchBackend } from '@src/search/search.backend'
@@ -29,7 +30,6 @@ export class SearchService {
     @Inject(SEARCH_BACKEND) private readonly searchBackend: SearchBackend,
     private readonly i18n: I18nService,
     private readonly metaService: MetaService,
-    private readonly mistralService: MistralService,
   ) {}
 
   typeIndexMap: Record<SearchType, SearchIndex> = {
@@ -153,6 +153,26 @@ export class SearchService {
     return [...hits].sort((a, b) => b.score - a.score)
   }
 
+  private buildExcludeIdFilter(id: string): SearchBackendFilter {
+    return {
+      type: 'raw',
+      expression: `id:!=\`${id.replaceAll('`', '\\`')}\``,
+    }
+  }
+
+  async parseRelatedArgs(args: RelatedArgs) {
+    const result = await RelatedArgsSchema.safeParseAsync(args)
+    if (!result.success) {
+      throw result.error
+    }
+
+    return {
+      query: result.data.query,
+      limit: result.data.limit ?? DEFAULT_RELATED_LIMIT,
+      offset: result.data.offset ?? 0,
+    }
+  }
+
   async searchWithin(
     index: SearchIndex,
     bbox: string | undefined,
@@ -180,13 +200,16 @@ export class SearchService {
     const fetchLimit = (opts.limit ?? 10) + (opts.offset ?? 0)
 
     const words = textQuery.trim().split(/\s+/)
-    let vector: number[] | undefined
+    let vector: SearchBackendVectorQuery | undefined
     if (
       words.length >= 2 &&
       words[0] !== '' &&
       (await this.searchBackend.supportsVectorSearch(index))
     ) {
-      vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
+      vector = {
+        kind: 'query' as const,
+        text: textQuery,
+      }
     }
 
     const result = await this.searchBackend.search({
@@ -244,7 +267,8 @@ export class SearchService {
     }
 
     const words = textQuery.trim().split(/\s+/)
-    let vector: number[] | undefined
+    const fetchLimit = (limit ? limit + 1 : 11) + (offset ?? 0)
+    let vector: SearchBackendVectorQuery | undefined
     const indexesWithSupport = await Promise.all(
       searchableIndexes.map(async (idx) => ({
         idx,
@@ -254,11 +278,13 @@ export class SearchService {
     const hasAnySupport = indexesWithSupport.some((i) => i.supports)
 
     if (words.length >= 2 && words[0] !== '' && hasAnySupport) {
-      vector = (await this.mistralService.getEmbedding(textQuery)) ?? undefined
+      vector = {
+        kind: 'query' as const,
+        text: textQuery,
+      }
     }
 
     const lang = this.i18n.getLang()
-    const fetchLimit = (limit ? limit + 1 : 11) + (offset ?? 0)
     const multiResult = await this.searchBackend.multiSearch({
       searches: indexesWithSupport.map(({ idx, supports }) => ({
         collection: idx,
@@ -299,6 +325,43 @@ export class SearchService {
     return {
       items,
       count,
+    }
+  }
+
+  async searchRelated(
+    index: SearchIndex,
+    sourceID: string,
+    query?: string,
+    limit = DEFAULT_RELATED_LIMIT,
+    offset = 0,
+  ) {
+    if (!(await this.searchBackend.supportsVectorSearch(index))) {
+      return { items: [], count: 0 }
+    }
+
+    const fetchLimit = limit + 1
+    const result = await this.searchBackend.search({
+      collection: index,
+      query: query?.trim() ?? '',
+      options: {
+        lang: this.i18n.getLang(),
+        filters: [this.buildExcludeIdFilter(sourceID)],
+        limit: fetchLimit,
+        offset,
+        vector: {
+          kind: 'document',
+          id: sourceID,
+        },
+      },
+    })
+
+    const items = await this.hydrateHits(
+      result.hits.slice(0, limit),
+      this.mapIndexToEntityClass(index),
+    )
+    return {
+      items,
+      count: result.found,
     }
   }
 }

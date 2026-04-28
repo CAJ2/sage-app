@@ -16,6 +16,7 @@ import { ItemService } from '@src/product/item.service'
 import { VariantHistoryResolver, VariantResolver } from '@src/product/variant.resolver'
 import { VariantSchemaService } from '@src/product/variant.schema'
 import { VariantService } from '@src/product/variant.service'
+import { SearchModule } from '@src/search/search.module'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { VariantService } from '@src/product/variant.service'
     EditsModule,
     GeoModule,
     ProcessModule,
+    SearchModule,
   ],
   providers: [
     CategoryResolver,
