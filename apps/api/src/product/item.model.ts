@@ -16,9 +16,9 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { TagPage } from '@src/process/tag.model'
-import { CategoriesPage } from '@src/product/category.model'
-import { VariantsPage } from '@src/product/variant.model'
+import { TagConnection } from '@src/process/tag.model'
+import { CategoriesConnection } from '@src/product/category.model'
+import { VariantsConnection } from '@src/product/variant.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -39,22 +39,22 @@ export class Item extends IDCreatedUpdated implements Named {
   @IsOptional()
   imageURL?: string
 
-  @Field(() => CategoriesPage, { description: 'Categories this item belongs to' })
-  categories!: CategoriesPage
+  @Field(() => CategoriesConnection, { description: 'Categories this item belongs to' })
+  categories!: CategoriesConnection
 
-  @Field(() => TagPage, { description: 'Metadata tags applied to this item' })
-  tags!: TagPage
+  @Field(() => TagConnection, { description: 'Metadata tags applied to this item' })
+  tags!: TagConnection
 
-  @Field(() => VariantsPage, {
+  @Field(() => VariantsConnection, {
     description: 'Product variants of this item (e.g. specific SKUs or models)',
   })
-  variants!: VariantsPage & {}
+  variants!: VariantsConnection & {}
 
-  @Field(() => ItemsPage, { description: 'Similar items related to this item' })
-  related!: ItemsPage & {}
+  @Field(() => ItemsConnection, { description: 'Similar items related to this item' })
+  related!: ItemsConnection & {}
 
-  @Field(() => ItemHistoryPage, { description: 'Audit history of changes to this item' })
-  history!: ItemHistoryPage & {}
+  @Field(() => ItemHistoryConnection, { description: 'Audit history of changes to this item' })
+  history!: ItemHistoryConnection & {}
 }
 registerModel('Item', Item)
 
@@ -77,10 +77,10 @@ export class ItemHistory extends BaseModel {
 }
 
 @ObjectType()
-export class ItemHistoryPage extends Paginated(ItemHistory) {}
+export class ItemHistoryConnection extends Paginated(ItemHistory) {}
 
 @ObjectType()
-export class ItemsPage extends Paginated(Item) {}
+export class ItemsConnection extends Paginated(Item) {}
 
 @ArgsType()
 export class ItemHistoryArgs extends PaginationBasicArgs {

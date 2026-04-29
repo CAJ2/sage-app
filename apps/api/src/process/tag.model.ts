@@ -57,7 +57,7 @@ export class Tag extends TagDefinition {
 registerModel('Tag', Tag)
 
 @ObjectType()
-export class TagDefinitionPage extends Paginated(TagDefinition) {}
+export class TagDefinitionConnection extends Paginated(TagDefinition) {}
 
 @ArgsType()
 export class TagDefinitionArgs extends PaginationBasicArgs {
@@ -65,7 +65,7 @@ export class TagDefinitionArgs extends PaginationBasicArgs {
 }
 
 @ObjectType()
-export class TagPage extends Paginated(Tag) {}
+export class TagConnection extends Paginated(Tag) {}
 
 @ArgsType()
 export class TagArgs extends PaginationBasicArgs {

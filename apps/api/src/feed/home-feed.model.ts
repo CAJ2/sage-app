@@ -58,7 +58,7 @@ export class FeedItem extends IDCreatedUpdated {
 registerModel('FeedItem', FeedItem)
 
 @ObjectType()
-export class FeedPage extends Paginated(FeedItem) {}
+export class FeedConnection extends Paginated(FeedItem) {}
 
 @ArgsType()
 export class FeedArgs extends PaginationBasicArgs {

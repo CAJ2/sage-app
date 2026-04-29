@@ -41,9 +41,9 @@ enum CacheControlScope {
   PUBLIC
 }
 
-type CategoriesPage {
-  edges: [CategoryEdge!]
-  nodes: [Category!]
+type CategoriesConnection {
+  edges: [CategoryEdge!]!
+  nodes: [Category!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -51,10 +51,10 @@ type CategoriesPage {
 """A hierarchical category for classifying product items"""
 type Category implements Named {
   """All ancestor categories up the hierarchy tree"""
-  ancestors(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  ancestors(after: String, before: String, first: Int, last: Int): CategoriesConnection!
 
   """Direct child categories in the hierarchy"""
-  children(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  children(after: String, before: String, first: Int, last: Int): CategoriesConnection!
   createdAt: DateTime!
   desc: String
 
@@ -68,25 +68,25 @@ type Category implements Named {
   descTr: [TranslatedOutput!]
 
   """All descendant categories down the hierarchy tree"""
-  descendants(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  descendants(after: String, before: String, first: Int, last: Int): CategoriesConnection!
 
   """Audit history of changes to this category"""
-  history(after: String, before: String, first: Int, last: Int): CategoryHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): CategoryHistoryConnection!
   id: ID!
   imageURL: String
 
   """Items classified under this category"""
-  items(after: String, before: String, first: Int, last: Int): ItemsPage!
+  items(after: String, before: String, first: Int, last: Int): ItemsConnection!
   name: String!
 
   """Translated versions of the name"""
   nameTr: [TranslatedOutput!]
 
   """Direct parent categories in the hierarchy"""
-  parents(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  parents(after: String, before: String, first: Int, last: Int): CategoriesConnection!
 
   """Similar categories related to this category"""
-  related(limit: Int, offset: Int, query: String): CategoriesPage!
+  related(limit: Int, offset: Int, query: String): CategoriesConnection!
   updatedAt: DateTime!
 }
 
@@ -103,16 +103,16 @@ type CategoryHistory {
   user: User!
 }
 
+type CategoryHistoryConnection {
+  edges: [CategoryHistoryEdge!]!
+  nodes: [CategoryHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type CategoryHistoryEdge {
   cursor: String!
   node: CategoryHistory!
-}
-
-type CategoryHistoryPage {
-  edges: [CategoryHistoryEdge!]
-  nodes: [CategoryHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 """The severity level of a caveat"""
@@ -128,7 +128,7 @@ type Change {
   description: String
 
   """The individual entity edits included in this change"""
-  edits(after: String, before: String, first: Int, id: ID, last: Int, type: EditModelType): ChangeEditsPage!
+  edits(after: String, before: String, first: Int, id: ID, last: Int, type: EditModelType): ChangeEditsConnection!
   id: ID!
 
   """Active and past jobs for this change"""
@@ -139,10 +139,10 @@ type Change {
     before: String
     first: Int
     last: Int
-  ): JobsPage
+  ): JobsConnection
 
   """Source references supporting this change"""
-  sources(after: String, before: String, first: Int, last: Int): ChangeSourcesPage!
+  sources(after: String, before: String, first: Int, last: Int): ChangeSourcesConnection!
   status: ChangeStatus!
   title: String
   updatedAt: DateTime!
@@ -156,9 +156,9 @@ type ChangeEdge {
   node: Change!
 }
 
-type ChangeEditsPage {
-  edges: [EditEdge!]
-  nodes: [Edit!]
+type ChangeEditsConnection {
+  edges: [EditEdge!]!
+  nodes: [Edit!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -172,9 +172,9 @@ type ChangeSourceEdge {
   node: ChangeSource!
 }
 
-type ChangeSourcesPage {
-  edges: [ChangeSourceEdge!]
-  nodes: [ChangeSource!]
+type ChangeSourcesConnection {
+  edges: [ChangeSourceEdge!]!
+  nodes: [ChangeSource!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -188,9 +188,9 @@ enum ChangeStatus {
   REJECTED
 }
 
-type ChangesPage {
-  edges: [ChangeEdge!]
-  nodes: [Change!]
+type ChangesConnection {
+  edges: [ChangeEdge!]!
+  nodes: [Change!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -203,14 +203,14 @@ type Component implements Named {
   desc: String
 
   """Audit history of changes to this component"""
-  history(after: String, before: String, first: Int, last: Int): ComponentHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): ComponentHistoryConnection!
 
   """The ID of the model"""
   id: ID!
   imageURL: String
 
   """Images associated with this component"""
-  images(after: String, before: String, first: Int, last: Int): ImagesPage!
+  images(after: String, before: String, first: Int, last: Int): ImagesConnection!
 
   """All materials in this component with their fractions"""
   materials: [ComponentMaterial!]!
@@ -229,9 +229,9 @@ type Component implements Named {
   region: Region
 
   """Similar components related to this component"""
-  related(limit: Int, offset: Int, query: String): ComponentsPage!
-  sources(after: String, before: String, first: Int, last: Int, type: String): ComponentSourcesPage!
-  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  related(limit: Int, offset: Int, query: String): ComponentsConnection!
+  sources(after: String, before: String, first: Int, last: Int, type: String): ComponentSourcesConnection!
+  tags(after: String, before: String, first: Int, last: Int): TagConnection!
   updatedAt: DateTime!
 }
 
@@ -248,16 +248,16 @@ type ComponentHistory {
   user: User!
 }
 
+type ComponentHistoryConnection {
+  edges: [ComponentHistoryEdge!]!
+  nodes: [ComponentHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type ComponentHistoryEdge {
   cursor: String!
   node: ComponentHistory!
-}
-
-type ComponentHistoryPage {
-  edges: [ComponentHistoryEdge!]
-  nodes: [ComponentHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 """The fraction of a specific material within a component"""
@@ -277,7 +277,7 @@ input ComponentMaterialInput {
 
 """A recycling option for a component in a specific recycling stream"""
 type ComponentRecycle {
-  context: StreamContext
+  context: [StreamContext!]!
   stream: RecyclingStream
 }
 
@@ -295,9 +295,9 @@ type ComponentSourceEdge {
   node: ComponentSource!
 }
 
-type ComponentSourcesPage {
-  edges: [ComponentSourceEdge!]
-  nodes: [ComponentSource!]
+type ComponentSourcesConnection {
+  edges: [ComponentSourceEdge!]!
+  nodes: [ComponentSource!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -307,9 +307,9 @@ input ComponentTagsInput {
   meta: JSONObject
 }
 
-type ComponentsPage {
-  edges: [ComponentEdge!]
-  nodes: [Component!]
+type ComponentsConnection {
+  edges: [ComponentEdge!]!
+  nodes: [Component!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -756,6 +756,13 @@ enum EditModelType {
   Variant
 }
 
+type FeedConnection {
+  edges: [FeedItemEdge!]!
+  nodes: [FeedItem!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type FeedExternalLink {
   url: String!
 }
@@ -793,13 +800,6 @@ type FeedLink {
   id: ID!
 }
 
-type FeedPage {
-  edges: [FeedItemEdge!]
-  nodes: [FeedItem!]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
 """An image source"""
 type Image {
   createdAt: DateTime!
@@ -818,9 +818,9 @@ type ImageEdge {
   node: Image!
 }
 
-type ImagesPage {
-  edges: [ImageEdge!]
-  nodes: [Image!]
+type ImagesConnection {
+  edges: [ImageEdge!]!
+  nodes: [Image!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -830,12 +830,12 @@ A product or consumable item that can be categorized and have multiple variants
 """
 type Item implements Named {
   """Categories this item belongs to"""
-  categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  categories(after: String, before: String, first: Int, last: Int): CategoriesConnection!
   createdAt: DateTime!
   desc: String
 
   """Audit history of changes to this item"""
-  history(after: String, before: String, first: Int, last: Int): ItemHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): ItemHistoryConnection!
 
   """The ID of the model"""
   id: ID!
@@ -843,14 +843,14 @@ type Item implements Named {
   name: String
 
   """Similar items related to this item"""
-  related(limit: Int, offset: Int, query: String): ItemsPage!
+  related(limit: Int, offset: Int, query: String): ItemsConnection!
 
   """Metadata tags applied to this item"""
-  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  tags(after: String, before: String, first: Int, last: Int): TagConnection!
   updatedAt: DateTime!
 
   """Product variants of this item (e.g. specific SKUs or models)"""
-  variants(after: String, before: String, first: Int, last: Int): VariantsPage!
+  variants(after: String, before: String, first: Int, last: Int): VariantsConnection!
 }
 
 input ItemCategoriesInput {
@@ -870,16 +870,16 @@ type ItemHistory {
   user: User!
 }
 
+type ItemHistoryConnection {
+  edges: [ItemHistoryEdge!]!
+  nodes: [ItemHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type ItemHistoryEdge {
   cursor: String!
   node: ItemHistory!
-}
-
-type ItemHistoryPage {
-  edges: [ItemHistoryEdge!]
-  nodes: [ItemHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 input ItemTagsInput {
@@ -887,9 +887,9 @@ input ItemTagsInput {
   meta: JSONObject
 }
 
-type ItemsPage {
-  edges: [ItemEdge!]
-  nodes: [Item!]
+type ItemsConnection {
+  edges: [ItemEdge!]!
+  nodes: [Item!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -913,9 +913,9 @@ type JobEdge {
   node: Job!
 }
 
-type JobsPage {
-  edges: [JobEdge!]
-  nodes: [Job!]
+type JobsConnection {
+  edges: [JobEdge!]!
+  nodes: [Job!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -938,32 +938,32 @@ type MarkSourceProcessedOutput {
 """A raw or processed material that physical components are composed of"""
 type Material implements Named {
   """All ancestor materials up the hierarchy"""
-  ancestors(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  ancestors(after: String, before: String, first: Int, last: Int): MaterialsConnection!
 
   """Direct child materials in the hierarchy"""
-  children(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  children(after: String, before: String, first: Int, last: Int): MaterialsConnection!
 
   """All components that include this material"""
-  components(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  components(after: String, before: String, first: Int, last: Int): ComponentsConnection!
   createdAt: DateTime!
   desc: String
 
   """All descendant materials down the hierarchy"""
-  descendants(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  descendants(after: String, before: String, first: Int, last: Int): MaterialsConnection!
   id: ID!
   name: String
 
   """Direct parent materials in the hierarchy"""
-  parents(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  parents(after: String, before: String, first: Int, last: Int): MaterialsConnection!
 
   """Components that primarily use this material"""
-  primaryComponents(after: String, before: String, first: Int, last: Int): ComponentsPage!
+  primaryComponents(after: String, before: String, first: Int, last: Int): ComponentsConnection!
 
   """Recycling or disposal processes for this material"""
-  processes(after: String, before: String, first: Int, last: Int): ProcessPage!
+  processes(after: String, before: String, first: Int, last: Int): ProcessConnection!
 
   """Similar materials related to this material"""
-  related(limit: Int, offset: Int, query: String): MaterialsPage!
+  related(limit: Int, offset: Int, query: String): MaterialsConnection!
 
   """The physical form or shape of the material (e.g. film, rigid, fibre)"""
   shape: String
@@ -981,9 +981,9 @@ type MaterialEdge {
   node: Material!
 }
 
-type MaterialsPage {
-  edges: [MaterialEdge!]
-  nodes: [Material!]
+type MaterialsConnection {
+  edges: [MaterialEdge!]!
+  nodes: [Material!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1061,21 +1061,21 @@ type Org implements Named {
   avatarURL: String
   createdAt: DateTime!
   desc: String
-  history(after: String, before: String, first: Int, last: Int): OrgHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): OrgHistoryConnection!
 
   """The ID of the model"""
   id: ID!
   name: String!
 
   """Similar organizations related to this organization"""
-  related(limit: Int, offset: Int, query: String): OrgsPage!
+  related(limit: Int, offset: Int, query: String): OrgsConnection!
 
   """URL-friendly unique identifier for this organization"""
   slug: String!
   updatedAt: DateTime!
 
   """Users that are members of this organization"""
-  users(after: String, before: String, first: Int, last: Int): UserPage!
+  users(after: String, before: String, first: Int, last: Int): UserConnection!
 
   """URL of the organization's website"""
   websiteURL: String
@@ -1094,21 +1094,21 @@ type OrgHistory {
   user: User!
 }
 
+type OrgHistoryConnection {
+  edges: [OrgHistoryEdge!]!
+  nodes: [OrgHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type OrgHistoryEdge {
   cursor: String!
   node: OrgHistory!
 }
 
-type OrgHistoryPage {
-  edges: [OrgHistoryEdge!]
-  nodes: [OrgHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type OrgsPage {
-  edges: [OrgEdge!]
-  nodes: [Org!]
+type OrgsConnection {
+  edges: [OrgEdge!]!
+  nodes: [Org!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1136,10 +1136,10 @@ type Place implements Named {
   org: Org
 
   """Similar places related to this place"""
-  related(limit: Int, offset: Int, query: String): PlacesPage!
+  related(limit: Int, offset: Int, query: String): PlacesConnection!
 
   """Metadata tags applied to this place"""
-  tags: TagPage!
+  tags(after: String, before: String, first: Int, last: Int): TagConnection!
   updatedAt: DateTime!
 }
 
@@ -1178,9 +1178,9 @@ input PlaceTagsInput {
   meta: JSONObject
 }
 
-type PlacesPage {
-  edges: [PlaceEdge!]
-  nodes: [Place!]
+type PlacesConnection {
+  edges: [PlaceEdge!]!
+  nodes: [Place!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1196,7 +1196,7 @@ type Process implements Named {
   efficiency: ProcessEfficiency
 
   """Audit history of changes to this process"""
-  history(after: String, before: String, first: Int, last: Int): ProcessHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): ProcessHistoryConnection!
 
   """The ID of the model"""
   id: ID!
@@ -1216,11 +1216,18 @@ type Process implements Named {
 
   """The geographic region where this process is available"""
   region: Region
-  sources(after: String, before: String, first: Int, last: Int): ProcessSourcesPage!
+  sources(after: String, before: String, first: Int, last: Int): ProcessSourcesConnection!
   updatedAt: DateTime!
 
   """The product variant this process applies to"""
   variant: Variant
+}
+
+type ProcessConnection {
+  edges: [ProcessEdge!]!
+  nodes: [Process!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type ProcessEdge {
@@ -1248,16 +1255,16 @@ type ProcessHistory {
   user: User!
 }
 
+type ProcessHistoryConnection {
+  edges: [ProcessHistoryEdge!]!
+  nodes: [ProcessHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type ProcessHistoryEdge {
   cursor: String!
   node: ProcessHistory!
-}
-
-type ProcessHistoryPage {
-  edges: [ProcessHistoryEdge!]
-  nodes: [ProcessHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 input ProcessMaterialInput {
@@ -1266,13 +1273,6 @@ input ProcessMaterialInput {
 
 input ProcessOrgInput {
   id: ID!
-}
-
-type ProcessPage {
-  edges: [ProcessEdge!]
-  nodes: [Process!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 input ProcessPlaceInput {
@@ -1293,9 +1293,9 @@ type ProcessSourceEdge {
   node: ProcessSource!
 }
 
-type ProcessSourcesPage {
-  edges: [ProcessSourceEdge!]
-  nodes: [ProcessSource!]
+type ProcessSourcesConnection {
+  edges: [ProcessSourceEdge!]!
+  nodes: [ProcessSource!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1310,7 +1310,7 @@ type Program implements Named {
   desc: String
 
   """Audit history of changes to this program"""
-  history(after: String, before: String, first: Int, last: Int): ProgramHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): ProgramHistoryConnection!
 
   """The ID of the model"""
   id: ID!
@@ -1318,16 +1318,16 @@ type Program implements Named {
   name: String!
 
   """Organizations involved in this program"""
-  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): OrgsConnection!
 
   """Processes run by this program"""
-  processes(after: String, before: String, first: Int, last: Int): ProcessPage!
+  processes(after: String, before: String, first: Int, last: Int): ProcessConnection!
   region: Region
   social: JSONObject
   status: String!
 
   """Metadata tags applied to this program"""
-  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  tags(after: String, before: String, first: Int, last: Int): TagConnection!
   updatedAt: DateTime!
 }
 
@@ -1344,16 +1344,16 @@ type ProgramHistory {
   user: User!
 }
 
+type ProgramHistoryConnection {
+  edges: [ProgramHistoryEdge!]!
+  nodes: [ProgramHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type ProgramHistoryEdge {
   cursor: String!
   node: ProgramHistory!
-}
-
-type ProgramHistoryPage {
-  edges: [ProgramHistoryEdge!]
-  nodes: [ProgramHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 input ProgramOrgsInput {
@@ -1370,57 +1370,57 @@ input ProgramTagsInput {
   meta: JSONObject
 }
 
-type ProgramsPage {
-  edges: [ProgramEdge!]
-  nodes: [Program!]
+type ProgramsConnection {
+  edges: [ProgramEdge!]!
+  nodes: [Program!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
 
 type Query {
-  categories(after: String, before: String, first: Int, last: Int): CategoriesPage!
+  categories(after: String, before: String, first: Int, last: Int): CategoriesConnection!
   category(id: ID!): Category
   categoryRoot: Category!
   categorySchema: ModelEditSchema
   change(id: ID!): Change
-  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesPage!
+  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesConnection!
   component(id: ID!): Component
   componentSchema: ModelEditSchema
-  components(after: String, before: String, first: Int, last: Int, query: String): ComponentsPage!
+  components(after: String, before: String, first: Int, last: Int, query: String): ComponentsConnection!
   currentRegion: CurrentRegion
   directEdit(changeID: ID, entityName: String, id: ID): DirectEdit
-  feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, region: ID): FeedPage!
+  feed(after: String, before: String, first: Int, format: FeedFormat, last: Int, region: ID): FeedConnection!
   item(id: ID!): Item
   itemSchema: ModelEditSchema
-  items(after: String, before: String, first: Int, last: Int): ItemsPage!
+  items(after: String, before: String, first: Int, last: Int): ItemsConnection!
   material(id: ID!): Material
   materialRoot: Material!
-  materials(after: String, before: String, first: Int, last: Int): MaterialsPage!
+  materials(after: String, before: String, first: Int, last: Int): MaterialsConnection!
   me: User
   org(id: ID!): Org
   orgSchema: ModelEditSchema
-  orgs(after: String, before: String, first: Int, last: Int): OrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): OrgsConnection!
   place(id: ID!): Place
   placeSchema: ModelEditSchema
-  places(after: String, before: String, first: Int, last: Int, query: String): PlacesPage!
+  places(after: String, before: String, first: Int, last: Int, query: String): PlacesConnection!
   process(id: ID!): Process
   processSchema: ModelEditSchema
-  processes(after: String, before: String, first: Int, last: Int, material: ID, region: ID): ProcessPage!
+  processes(after: String, before: String, first: Int, last: Int, material: ID, region: ID): ProcessConnection!
   program(id: ID!): Program
   programSchema: ModelEditSchema
-  programs(after: String, before: String, first: Int, last: Int): ProgramsPage!
+  programs(after: String, before: String, first: Int, last: Int): ProgramsConnection!
   region(id: ID!): Region
-  regions(after: String, before: String, first: Int, last: Int): RegionsPage!
-  search(latlong: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultPage!
-  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latlong: [Float!]!): RegionsPage!
+  regions(after: String, before: String, first: Int, last: Int): RegionsConnection!
+  search(latlong: [Float!], limit: Int, offset: Int, query: String!, types: [SearchType!]): SearchResultConnection!
+  searchRegionsByPoint(after: String, before: String, first: Int, last: Int, latlong: [Float!]!): RegionsConnection!
   source(id: ID!): Source
-  sources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesPage!
+  sources(after: String, before: String, first: Int, last: Int, type: SourceType): SourcesConnection!
   tag(id: ID!): Tag
-  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  tags(after: String, before: String, first: Int, last: Int): TagConnection!
   user(id: ID!): User
   variant(id: ID!): Variant
   variantSchema: ModelEditSchema
-  variants(after: String, before: String, first: Int, last: Int): VariantsPage!
+  variants(after: String, before: String, first: Int, last: Int): VariantsConnection!
 }
 
 """
@@ -1473,7 +1473,7 @@ type Region {
   """The type of geographic entity (e.g. country, region, locality)"""
   placetype: String!
   province: Region
-  searchWithin(adminLevel: Int, limit: Int, offset: Int, query: String!): RegionsPage!
+  searchWithin(adminLevel: Int, limit: Int, offset: Int, query: String!): RegionsConnection!
   updatedAt: DateTime!
 }
 
@@ -1482,9 +1482,9 @@ type RegionEdge {
   node: Region!
 }
 
-type RegionsPage {
-  edges: [RegionEdge!]
-  nodes: [Region!]
+type RegionsConnection {
+  edges: [RegionEdge!]!
+  nodes: [Region!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1519,18 +1519,18 @@ type RemoveRefOutput {
   model: EditModel
 }
 
+type SearchResultConnection {
+  edges: [SearchResultItemEdge!]!
+  nodes: [SearchResultItem!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 union SearchResultItem = Category | Component | Item | Material | Org | Place | Region | Variant
 
 type SearchResultItemEdge {
   cursor: String!
   node: SearchResultItem!
-}
-
-type SearchResultPage {
-  edges: [SearchResultItemEdge!]
-  nodes: [SearchResultItem!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 """The item type to search"""
@@ -1549,7 +1549,7 @@ enum SearchType {
 A reference source used to support data changes, such as a URL, PDF, or image
 """
 type Source {
-  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesPage!
+  changes(after: String, before: String, first: Int, last: Int, status: ChangeStatus, userID: ID): ChangesConnection!
 
   """Extracted or structured content from the source"""
   content: JSONObject
@@ -1592,9 +1592,9 @@ enum SourceType {
   VIDEO
 }
 
-type SourcesPage {
-  edges: [SourceEdge!]
-  nodes: [Source!]
+type SourcesConnection {
+  edges: [SourceEdge!]!
+  nodes: [Source!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1608,17 +1608,10 @@ type StreamCaveats {
 
 """Additional context about a recycling recommendation for a component"""
 type StreamContext {
-  desc: String
-
   """Identifier key for this context entry"""
   key: String!
+  markdown: String
   name: String
-
-  """Type of contextual information"""
-  type: String
-
-  """Value of this context entry"""
-  value: String
 }
 
 """A recyclability score for a component or variant in a recycling stream"""
@@ -1686,6 +1679,13 @@ type Tag implements Named {
   updatedAt: DateTime!
 }
 
+type TagConnection {
+  edges: [TagEdge!]!
+  nodes: [Tag!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 """A reusable tag definition for classifying models with custom metadata"""
 type TagDefinition implements Named {
   """Hex color code for the tag background (e.g. #FF5733)"""
@@ -1716,13 +1716,6 @@ type TagDefinitionEdge {
 type TagEdge {
   cursor: String!
   node: Tag!
-}
-
-type TagPage {
-  edges: [TagEdge!]
-  nodes: [Tag!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 """The model type of the tag"""
@@ -2176,7 +2169,7 @@ type User {
   avatarURL: String
 
   """Changes this user is involved in"""
-  changes(after: String, before: String, first: Int, last: Int): ChangesPage!
+  changes(after: String, before: String, first: Int, last: Int): ChangesConnection!
   createdAt: DateTime!
   email: String!
   emailVerified: Boolean!
@@ -2185,12 +2178,19 @@ type User {
   name: String
 
   """Organizations this user belongs to"""
-  orgs(after: String, before: String, first: Int, last: Int): UserOrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): UserOrgsConnection!
 
   """Extended profile information for this user"""
   profile: UserProfile
   updatedAt: DateTime!
   username: String!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  nodes: [User!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type UserEdge {
@@ -2211,16 +2211,9 @@ type UserOrgEdge {
   node: UserOrg!
 }
 
-type UserOrgsPage {
-  edges: [UserOrgEdge!]
-  nodes: [UserOrg!]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type UserPage {
-  edges: [UserEdge!]
-  nodes: [User!]
+type UserOrgsConnection {
+  edges: [UserOrgEdge!]!
+  nodes: [UserOrg!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -2234,41 +2227,41 @@ A specific variant or SKU of a product item, composed of physical components
 """
 type Variant implements Named {
   """Physical components that make up this variant"""
-  components(after: String, before: String, first: Int, last: Int): VariantComponentsPage!
+  components(after: String, before: String, first: Int, last: Int): VariantComponentsConnection!
   createdAt: DateTime!
   desc: String
 
   """Audit history of changes to this variant"""
-  history(after: String, before: String, first: Int, last: Int): VariantHistoryPage!
+  history(after: String, before: String, first: Int, last: Int): VariantHistoryConnection!
 
   """The ID of the model"""
   id: ID!
   imageURL: String
 
   """Images associated with this variant"""
-  images(after: String, before: String, first: Int, last: Int): ImagesPage!
+  images(after: String, before: String, first: Int, last: Int): ImagesConnection!
 
   """Product items this variant belongs to"""
-  items(after: String, before: String, first: Int, last: Int): ItemsPage!
+  items(after: String, before: String, first: Int, last: Int): ItemsConnection!
   name: String
 
   """
   Organizations associated with this variant (e.g. manufacturer, importer)
   """
-  orgs(after: String, before: String, first: Int, last: Int): VariantOrgsPage!
+  orgs(after: String, before: String, first: Int, last: Int): VariantOrgsConnection!
 
   """Aggregated recyclability score for this variant"""
   recycleScore(regionID: ID): StreamScore
 
   """Geographic regions associated with this variant"""
-  regions(after: String, before: String, first: Int, last: Int): RegionsPage!
+  regions(after: String, before: String, first: Int, last: Int): RegionsConnection!
 
   """Similar variants related to this variant"""
-  related(limit: Int, offset: Int, query: String): VariantsPage!
-  sources(after: String, before: String, first: Int, last: Int): VariantSourcesPage!
+  related(limit: Int, offset: Int, query: String): VariantsConnection!
+  sources(after: String, before: String, first: Int, last: Int): VariantSourcesConnection!
 
   """Metadata tags applied to this variant"""
-  tags(after: String, before: String, first: Int, last: Int): TagPage!
+  tags(after: String, before: String, first: Int, last: Int): TagConnection!
   updatedAt: DateTime!
 }
 
@@ -2288,6 +2281,13 @@ type VariantComponentEdge {
   node: VariantComponent!
 }
 
+type VariantComponentsConnection {
+  edges: [VariantComponentEdge!]!
+  nodes: [VariantComponent!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 input VariantComponentsInput {
   id: ID!
 
@@ -2296,13 +2296,6 @@ input VariantComponentsInput {
 
   """Unit of measurement for the component quantity"""
   unit: String
-}
-
-type VariantComponentsPage {
-  edges: [VariantComponentEdge!]
-  nodes: [VariantComponent!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 type VariantEdge {
@@ -2318,16 +2311,16 @@ type VariantHistory {
   variant: Variant!
 }
 
+type VariantHistoryConnection {
+  edges: [VariantHistoryEdge!]!
+  nodes: [VariantHistory!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type VariantHistoryEdge {
   cursor: String!
   node: VariantHistory!
-}
-
-type VariantHistoryPage {
-  edges: [VariantHistoryEdge!]
-  nodes: [VariantHistory!]
-  pageInfo: PageInfo!
-  totalCount: Int!
 }
 
 input VariantItemsInput {
@@ -2349,15 +2342,15 @@ type VariantOrgEdge {
   node: VariantOrg!
 }
 
-input VariantOrgsInput {
-  id: ID!
-}
-
-type VariantOrgsPage {
-  edges: [VariantOrgEdge!]
-  nodes: [VariantOrg!]
+type VariantOrgsConnection {
+  edges: [VariantOrgEdge!]!
+  nodes: [VariantOrg!]!
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+input VariantOrgsInput {
+  id: ID!
 }
 
 input VariantRegionsInput {
@@ -2374,9 +2367,9 @@ type VariantSourceEdge {
   node: VariantSource!
 }
 
-type VariantSourcesPage {
-  edges: [VariantSourceEdge!]
-  nodes: [VariantSource!]
+type VariantSourcesConnection {
+  edges: [VariantSourceEdge!]!
+  nodes: [VariantSource!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -2386,9 +2379,9 @@ input VariantTagsInput {
   meta: JSONObject
 }
 
-type VariantsPage {
-  edges: [VariantEdge!]
-  nodes: [Variant!]
+type VariantsConnection {
+  edges: [VariantEdge!]!
+  nodes: [Variant!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }

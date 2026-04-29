@@ -8,7 +8,7 @@ import {
   CreateTagDefinitionOutput,
   Tag,
   TagArgs,
-  TagPage,
+  TagConnection,
   UpdateTagDefinitionInput,
   UpdateTagDefinitionOutput,
 } from '@src/process/tag.model'
@@ -23,12 +23,12 @@ export class TagResolver {
     private readonly tagSchemaService: TagSchemaService,
   ) {}
 
-  @Query(() => TagPage, { name: 'tags' })
+  @Query(() => TagConnection, { name: 'tags' })
   @OptionalAuth()
-  async tags(@Args() args: TagArgs): Promise<TagPage> {
+  async tags(@Args() args: TagArgs): Promise<TagConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(TagArgs, args)
     const cursor = await this.tagService.find(filter)
-    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Tag, TagConnection, cursor, parsedArgs)
   }
 
   @Query(() => Tag, { name: 'tag', nullable: true })

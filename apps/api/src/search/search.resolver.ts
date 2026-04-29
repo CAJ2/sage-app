@@ -3,17 +3,17 @@ import { Args, Query, Resolver } from '@nestjs/graphql'
 import { OptionalAuth } from '@src/auth/decorators'
 import { BadRequestErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { SearchArgs, SearchArgsSchema, SearchResultPage } from '@src/search/search.model'
+import { SearchArgs, SearchArgsSchema, SearchResultConnection } from '@src/search/search.model'
 import { SearchService } from '@src/search/search.service'
 
-@Resolver(() => SearchResultPage)
+@Resolver(() => SearchResultConnection)
 export class SearchResolver {
   constructor(
     private readonly searchService: SearchService,
     private readonly transformService: TransformService,
   ) {}
 
-  @Query(() => SearchResultPage, { name: 'search' })
+  @Query(() => SearchResultConnection, { name: 'search' })
   @OptionalAuth()
   async search(@Args() args: SearchArgs): Promise<any> {
     const result = SearchArgsSchema.safeParse(args)
@@ -38,6 +38,6 @@ export class SearchResolver {
         },
       }
     }
-    return this.transformService.objectsToPaginated(SearchResultPage, cursor)
+    return this.transformService.objectsToPaginated(SearchResultConnection, cursor)
   }
 }

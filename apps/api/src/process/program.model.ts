@@ -16,10 +16,10 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { ProcessPage } from '@src/process/process.model'
+import { ProcessConnection } from '@src/process/process.model'
 import { ProgramStatus } from '@src/process/program.entity'
-import { TagPage } from '@src/process/tag.model'
-import { OrgsPage } from '@src/users/org.model'
+import { TagConnection } from '@src/process/tag.model'
+import { OrgsConnection } from '@src/users/org.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -46,17 +46,19 @@ export class Program extends IDCreatedUpdated implements Named {
   @Field(() => Region, { nullable: true })
   region?: Region & {}
 
-  @Field(() => OrgsPage, { description: 'Organizations involved in this program' })
-  orgs!: OrgsPage & {}
+  @Field(() => OrgsConnection, { description: 'Organizations involved in this program' })
+  orgs!: OrgsConnection & {}
 
-  @Field(() => ProcessPage, { description: 'Processes run by this program' })
-  processes!: ProcessPage & {}
+  @Field(() => ProcessConnection, { description: 'Processes run by this program' })
+  processes!: ProcessConnection & {}
 
-  @Field(() => TagPage, { description: 'Metadata tags applied to this program' })
-  tags!: TagPage & {}
+  @Field(() => TagConnection, { description: 'Metadata tags applied to this program' })
+  tags!: TagConnection & {}
 
-  @Field(() => ProgramHistoryPage, { description: 'Audit history of changes to this program' })
-  history!: ProgramHistoryPage & {}
+  @Field(() => ProgramHistoryConnection, {
+    description: 'Audit history of changes to this program',
+  })
+  history!: ProgramHistoryConnection & {}
 }
 registerModel('Program', Program)
 
@@ -79,10 +81,10 @@ export class ProgramHistory extends BaseModel {
 }
 
 @ObjectType()
-export class ProgramHistoryPage extends Paginated(ProgramHistory) {}
+export class ProgramHistoryConnection extends Paginated(ProgramHistory) {}
 
 @ObjectType()
-export class ProgramsPage extends Paginated(Program) {}
+export class ProgramsConnection extends Paginated(Program) {}
 
 @ArgsType()
 export class ProgramHistoryArgs extends PaginationBasicArgs {

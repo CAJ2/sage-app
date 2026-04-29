@@ -10,7 +10,7 @@ import { Source } from '@src/changes/source.model'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
 import { type JSONObject } from '@src/common/z.schema'
-import { RegionsPage } from '@src/geo/region.model'
+import { RegionsConnection } from '@src/geo/region.model'
 import {
   BaseModel,
   IDCreatedUpdated,
@@ -22,9 +22,9 @@ import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { Component } from '@src/process/component.model'
 import { StreamScore } from '@src/process/stream.model'
-import { TagPage } from '@src/process/tag.model'
-import { ImagesPage } from '@src/product/image.model'
-import { ItemsPage } from '@src/product/item.model'
+import { TagConnection } from '@src/process/tag.model'
+import { ImagesConnection } from '@src/product/image.model'
+import { ItemsConnection } from '@src/product/item.model'
 import { VariantComponentUnitSchema } from '@src/product/variant.entity'
 import { Org } from '@src/users/org.model'
 import { User as UserEntity } from '@src/users/users.entity'
@@ -49,22 +49,22 @@ export class Variant extends IDCreatedUpdated implements Named {
   @IsUrl({ protocols: ['https'] })
   imageURL?: string
 
-  @Field(() => ImagesPage, { description: 'Images associated with this variant' })
-  images!: ImagesPage
+  @Field(() => ImagesConnection, { description: 'Images associated with this variant' })
+  images!: ImagesConnection
 
-  @Field(() => ItemsPage, { description: 'Product items this variant belongs to' })
-  items!: ItemsPage
+  @Field(() => ItemsConnection, { description: 'Product items this variant belongs to' })
+  items!: ItemsConnection
 
-  @Field(() => VariantsPage, { description: 'Similar variants related to this variant' })
-  related!: VariantsPage & {}
+  @Field(() => VariantsConnection, { description: 'Similar variants related to this variant' })
+  related!: VariantsConnection & {}
 
-  @Field(() => VariantOrgsPage, {
+  @Field(() => VariantOrgsConnection, {
     description: 'Organizations associated with this variant (e.g. manufacturer, importer)',
   })
-  orgs!: VariantOrgsPage & {}
+  orgs!: VariantOrgsConnection & {}
 
-  @Field(() => TagPage, { description: 'Metadata tags applied to this variant' })
-  tags!: TagPage
+  @Field(() => TagConnection, { description: 'Metadata tags applied to this variant' })
+  tags!: TagConnection
 
   @Field(() => StreamScore, {
     nullable: true,
@@ -72,21 +72,23 @@ export class Variant extends IDCreatedUpdated implements Named {
   })
   recycleScore?: StreamScore
 
-  @Field(() => RegionsPage, {
+  @Field(() => RegionsConnection, {
     description: 'Geographic regions associated with this variant',
   })
-  regions!: RegionsPage & {}
+  regions!: RegionsConnection & {}
 
-  @Field(() => VariantComponentsPage, {
+  @Field(() => VariantComponentsConnection, {
     description: 'Physical components that make up this variant',
   })
-  components!: VariantComponentsPage & {}
+  components!: VariantComponentsConnection & {}
 
-  @Field(() => VariantSourcesPage)
-  sources!: VariantSourcesPage & {}
+  @Field(() => VariantSourcesConnection)
+  sources!: VariantSourcesConnection & {}
 
-  @Field(() => VariantHistoryPage, { description: 'Audit history of changes to this variant' })
-  history!: VariantHistoryPage & {}
+  @Field(() => VariantHistoryConnection, {
+    description: 'Audit history of changes to this variant',
+  })
+  history!: VariantHistoryConnection & {}
 }
 registerModel('Variant', Variant)
 
@@ -148,19 +150,19 @@ export class VariantSource extends BaseModel {
 }
 
 @ObjectType()
-export class VariantSourcesPage extends Paginated(VariantSource) {}
+export class VariantSourcesConnection extends Paginated(VariantSource) {}
 
 @ObjectType()
-export class VariantHistoryPage extends Paginated(VariantHistory) {}
+export class VariantHistoryConnection extends Paginated(VariantHistory) {}
 
 @ObjectType()
-export class VariantsPage extends Paginated(Variant) {}
+export class VariantsConnection extends Paginated(Variant) {}
 
 @ObjectType()
-export class VariantOrgsPage extends Paginated(VariantOrg) {}
+export class VariantOrgsConnection extends Paginated(VariantOrg) {}
 
 @ObjectType()
-export class VariantComponentsPage extends Paginated(VariantComponent) {}
+export class VariantComponentsConnection extends Paginated(VariantComponent) {}
 
 @ArgsType()
 export class VariantHistoryArgs extends PaginationBasicArgs {

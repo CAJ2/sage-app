@@ -9,8 +9,8 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
-import { Tag, TagPage } from '@src/process/tag.model'
-import { CategoriesPage, Category } from '@src/product/category.model'
+import { Tag, TagConnection } from '@src/process/tag.model'
+import { CategoriesConnection, Category } from '@src/product/category.model'
 import { Item as ItemEntity } from '@src/product/item.entity'
 import {
   CreateItemInput,
@@ -19,9 +19,9 @@ import {
   ItemCategoriesArgs,
   ItemHistory,
   ItemHistoryArgs,
-  ItemHistoryPage,
+  ItemHistoryConnection,
   ItemsArgs,
-  ItemsPage,
+  ItemsConnection,
   ItemTagsArgs,
   ItemVariantsArgs,
   UpdateItemInput,
@@ -29,7 +29,7 @@ import {
 } from '@src/product/item.model'
 import { ItemSchemaService } from '@src/product/item.schema'
 import { ItemService } from '@src/product/item.service'
-import { Variant, VariantsPage } from '@src/product/variant.model'
+import { Variant, VariantsConnection } from '@src/product/variant.model'
 import { RelatedArgs } from '@src/search/related.model'
 import { SearchIndex } from '@src/search/search.backend'
 import { SearchService } from '@src/search/search.service'
@@ -44,12 +44,12 @@ export class ItemResolver {
     private readonly searchService: SearchService,
   ) {}
 
-  @Query(() => ItemsPage, { name: 'items' })
+  @Query(() => ItemsConnection, { name: 'items' })
   @OptionalAuth()
-  async items(@Args() args: ItemsArgs): Promise<ItemsPage> {
+  async items(@Args() args: ItemsArgs): Promise<ItemsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ItemsArgs, args)
     const cursor = await this.itemService.find(filter)
-    return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Item, ItemsConnection, cursor, parsedArgs)
   }
 
   @Query(() => Item, { name: 'item', nullable: true })
@@ -83,24 +83,24 @@ export class ItemResolver {
   async categories(@Parent() item: Item, @Args() args: ItemCategoriesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ItemCategoriesArgs, args)
     const cursor = await this.itemService.categories(item.id, filter)
-    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Category, CategoriesConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async tags(@Parent() item: Item, @Args() args: ItemTagsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ItemTagsArgs, args)
     const cursor = await this.itemService.tags(item.id, filter)
-    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Tag, TagConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async variants(@Parent() item: Item, @Args() args: ItemVariantsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ItemVariantsArgs, args)
     const cursor = await this.itemService.variants(item.id, filter)
-    return this.transform.entityToPaginated(Variant, VariantsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Variant, VariantsConnection, cursor, parsedArgs)
   }
 
-  @ResolveField(() => ItemsPage)
+  @ResolveField(() => ItemsConnection)
   async related(@Parent() item: Item, @Args() args: RelatedArgs) {
     const parsedArgs = await this.searchService.parseRelatedArgs(args)
     const cursor = await this.searchService.searchRelated(
@@ -110,7 +110,7 @@ export class ItemResolver {
       parsedArgs.limit,
       parsedArgs.offset,
     )
-    return this.transform.entitiesToOffsetPaginated(Item, ItemsPage, cursor, parsedArgs)
+    return this.transform.entitiesToOffsetPaginated(Item, ItemsConnection, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateItemOutput, { name: 'createItem', nullable: true })
@@ -156,14 +156,18 @@ export class ItemResolver {
     return { success: true, id: item.id }
   }
 
-  @ResolveField(() => ItemHistoryPage)
+  @ResolveField(() => ItemHistoryConnection)
   async history(@Parent() item: Item, @Args() args: ItemHistoryArgs) {
     const [, filter] = await this.transform.paginationArgs(ItemHistoryArgs, args)
     const cursor = await this.itemService.history(item.id, filter)
     const items = await Promise.all(
       cursor.items.map((h) => this.transform.entityToModel(ItemHistory, h)),
     )
-    return this.transform.objectsToPaginated(ItemHistoryPage, { items, count: cursor.count }, true)
+    return this.transform.objectsToPaginated(
+      ItemHistoryConnection,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 

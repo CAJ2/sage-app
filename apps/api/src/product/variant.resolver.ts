@@ -8,11 +8,11 @@ import { Change } from '@src/changes/change.model'
 import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { Region, RegionsPage } from '@src/geo/region.model'
+import { Region, RegionsConnection } from '@src/geo/region.model'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
-import { Tag, TagPage } from '@src/process/tag.model'
-import { Image, ImagesArgs, ImagesPage } from '@src/product/image.model'
-import { Item, ItemsPage } from '@src/product/item.model'
+import { Tag, TagConnection } from '@src/process/tag.model'
+import { Image, ImagesArgs, ImagesConnection } from '@src/product/image.model'
+import { Item, ItemsConnection } from '@src/product/item.model'
 import { Variant as VariantEntity } from '@src/product/variant.entity'
 import {
   CreateVariantInput,
@@ -22,21 +22,21 @@ import {
   Variant,
   VariantComponent,
   VariantComponentsArgs,
-  VariantComponentsPage,
+  VariantComponentsConnection,
   VariantHistory,
   VariantHistoryArgs,
-  VariantHistoryPage,
+  VariantHistoryConnection,
   VariantItemsArgs,
   VariantOrg,
   VariantOrgsArgs,
-  VariantOrgsPage,
+  VariantOrgsConnection,
   VariantRecycleArgs,
   VariantRegionsArgs,
   VariantsArgs,
+  VariantsConnection,
   VariantSource,
   VariantSourcesArgs,
-  VariantSourcesPage,
-  VariantsPage,
+  VariantSourcesConnection,
   VariantTagsArgs,
 } from '@src/product/variant.model'
 import { VariantSchemaService } from '@src/product/variant.schema'
@@ -55,12 +55,12 @@ export class VariantResolver {
     private readonly searchService: SearchService,
   ) {}
 
-  @Query(() => VariantsPage, { name: 'variants' })
+  @Query(() => VariantsConnection, { name: 'variants' })
   @OptionalAuth()
-  async variants(@Args() args: VariantsArgs): Promise<VariantsPage> {
+  async variants(@Args() args: VariantsArgs): Promise<VariantsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantsArgs, args)
     const cursor = await this.variantService.find(filter)
-    return this.transform.entityToPaginated(Variant, VariantsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Variant, VariantsConnection, cursor, parsedArgs)
   }
 
   @Query(() => Variant, { name: 'variant', nullable: true })
@@ -94,10 +94,10 @@ export class VariantResolver {
   async items(@Parent() variant: Variant, @Args() args: VariantItemsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantItemsArgs, args)
     const cursor = await this.variantService.items(variant.id, filter)
-    return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Item, ItemsConnection, cursor, parsedArgs)
   }
 
-  @ResolveField(() => VariantsPage)
+  @ResolveField(() => VariantsConnection)
   async related(@Parent() variant: Variant, @Args() args: RelatedArgs) {
     const parsedArgs = await this.searchService.parseRelatedArgs(args)
     const cursor = await this.searchService.searchRelated(
@@ -107,21 +107,21 @@ export class VariantResolver {
       parsedArgs.limit,
       parsedArgs.offset,
     )
-    return this.transform.entitiesToOffsetPaginated(Variant, VariantsPage, cursor, parsedArgs)
+    return this.transform.entitiesToOffsetPaginated(Variant, VariantsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async orgs(@Parent() variant: Variant, @Args() args: VariantOrgsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantOrgsArgs, args)
     const cursor = await this.variantService.orgs(variant.id, filter)
-    return this.transform.entityToPaginated(VariantOrg, VariantOrgsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(VariantOrg, VariantOrgsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async tags(@Parent() variant: Variant, @Args() args: VariantTagsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantTagsArgs, args)
     const cursor = await this.variantService.tags(variant.id, filter)
-    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Tag, TagConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
@@ -130,7 +130,7 @@ export class VariantResolver {
     const cursor = await this.variantService.components(variant.id, filter)
     return this.transform.entityToPaginated(
       VariantComponent,
-      VariantComponentsPage,
+      VariantComponentsConnection,
       cursor,
       parsedArgs,
     )
@@ -194,18 +194,18 @@ export class VariantResolver {
     return { success: true, id: variant.id }
   }
 
-  @ResolveField(() => RegionsPage)
+  @ResolveField(() => RegionsConnection)
   async regions(@Parent() variant: Variant, @Args() args: VariantRegionsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantRegionsArgs, args)
     const cursor = await this.variantService.regions(variant.id, filter)
-    return this.transform.entityToPaginated(Region, RegionsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Region, RegionsConnection, cursor, parsedArgs)
   }
 
-  @ResolveField(() => ImagesPage)
+  @ResolveField(() => ImagesConnection)
   async images(@Parent() variant: Variant, @Args() args: ImagesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ImagesArgs, args)
     const cursor = await this.variantService.images(variant.id, filter)
-    return this.transform.entityToPaginated(Image, ImagesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Image, ImagesConnection, cursor, parsedArgs)
   }
 
   @ResolveField(() => String, { nullable: true })
@@ -219,14 +219,19 @@ export class VariantResolver {
     return image.url
   }
 
-  @ResolveField(() => VariantSourcesPage)
+  @ResolveField(() => VariantSourcesConnection)
   async sources(@Parent() variant: Variant, @Args() args: VariantSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(VariantSourcesArgs, args)
     const cursor = await this.variantService.sources(variant.id, filter)
-    return this.transform.entityToPaginated(VariantSource, VariantSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(
+      VariantSource,
+      VariantSourcesConnection,
+      cursor,
+      parsedArgs,
+    )
   }
 
-  @ResolveField(() => VariantHistoryPage)
+  @ResolveField(() => VariantHistoryConnection)
   async history(@Parent() variant: Variant, @Args() args: VariantHistoryArgs) {
     const [, filter] = await this.transform.paginationArgs(VariantHistoryArgs, args)
     const cursor = await this.variantService.history(variant.id, filter)
@@ -234,7 +239,7 @@ export class VariantResolver {
       cursor.items.map((h) => this.transform.entityToModel(VariantHistory, h)),
     )
     return this.transform.objectsToPaginated(
-      VariantHistoryPage,
+      VariantHistoryConnection,
       { items, count: cursor.count },
       true,
     )

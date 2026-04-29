@@ -4,7 +4,7 @@ import { JSONObjectResolver } from 'graphql-scalars'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
-import { ChangesPage } from '@src/changes/change.model'
+import { ChangesConnection } from '@src/changes/change.model'
 import { SourceType } from '@src/changes/source.entity'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
@@ -49,8 +49,8 @@ export class Source extends IDCreatedUpdated {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => ChangesPage)
-  changes!: ChangesPage & {}
+  @Field(() => ChangesConnection)
+  changes!: ChangesConnection & {}
 
   @Field(() => JSONObjectResolver, {
     nullable: true,
@@ -60,7 +60,7 @@ export class Source extends IDCreatedUpdated {
 }
 
 @ObjectType()
-export class SourcesPage extends Paginated(Source) {}
+export class SourcesConnection extends Paginated(Source) {}
 
 @ArgsType()
 export class SourcesArgs extends PaginationBasicArgs {

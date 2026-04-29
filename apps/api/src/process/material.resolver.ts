@@ -3,17 +3,17 @@ import { Args, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql
 import { OptionalAuth } from '@src/auth/decorators'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
-import { Component, ComponentsPage } from '@src/process/component.model'
+import { Component, ComponentsConnection } from '@src/process/component.model'
 import {
   ComponentsArgs,
   Material,
   MaterialsArgs,
-  MaterialsPage,
+  MaterialsConnection,
   PrimaryComponentsArgs,
   ProcessesArgs,
 } from '@src/process/material.model'
 import { MaterialService } from '@src/process/material.service'
-import { Process, ProcessPage } from '@src/process/process.model'
+import { Process, ProcessConnection } from '@src/process/process.model'
 import { RelatedArgs } from '@src/search/related.model'
 import { SearchIndex } from '@src/search/search.backend'
 import { SearchService } from '@src/search/search.service'
@@ -26,12 +26,12 @@ export class MaterialResolver {
     private readonly searchService: SearchService,
   ) {}
 
-  @Query(() => MaterialsPage, { name: 'materials' })
+  @Query(() => MaterialsConnection, { name: 'materials' })
   @OptionalAuth()
-  async materials(@Args() args: MaterialsArgs): Promise<MaterialsPage> {
+  async materials(@Args() args: MaterialsArgs): Promise<MaterialsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(MaterialsArgs, args)
     const cursor = await this.materialService.find(filter)
-    return this.transform.entityToPaginated(Material, MaterialsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Material, MaterialsConnection, cursor, parsedArgs)
   }
 
   @Query(() => Material, { name: 'material', nullable: true })
@@ -60,52 +60,52 @@ export class MaterialResolver {
   async parents(@Parent() material: Material, @Args() args: MaterialsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(MaterialsArgs, args)
     const cursor = await this.materialService.findParents(material.id, filter)
-    return this.transform.entityToPaginated(Material, MaterialsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Material, MaterialsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async children(@Parent() material: Material, @Args() args: MaterialsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(MaterialsArgs, args)
     const cursor = await this.materialService.findChildren(material.id, filter)
-    return this.transform.entityToPaginated(Material, MaterialsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Material, MaterialsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async ancestors(@Parent() material: Material, @Args() args: MaterialsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(MaterialsArgs, args)
     const cursor = await this.materialService.findDirectAncestors(material.id, filter)
-    return this.transform.entityToPaginated(Material, MaterialsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Material, MaterialsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async descendants(@Parent() material: Material, @Args() args: MaterialsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(MaterialsArgs, args)
     const cursor = await this.materialService.findDirectDescendants(material.id, filter)
-    return this.transform.entityToPaginated(Material, MaterialsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Material, MaterialsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async primaryComponents(@Parent() material: Material, @Args() args: PrimaryComponentsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(PrimaryComponentsArgs, args)
     const cursor = await this.materialService.primaryComponents(material.id, filter)
-    return this.transform.entityToPaginated(Component, ComponentsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Component, ComponentsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async components(@Parent() material: Material, @Args() args: ComponentsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentsArgs, args)
     const cursor = await this.materialService.components(material.id, filter)
-    return this.transform.entityToPaginated(Component, ComponentsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Component, ComponentsConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async processes(@Parent() material: Material, @Args() args: ProcessesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessesArgs, args)
     const cursor = await this.materialService.processes(material.id, filter)
-    return this.transform.entityToPaginated(Process, ProcessPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Process, ProcessConnection, cursor, parsedArgs)
   }
 
-  @ResolveField(() => MaterialsPage)
+  @ResolveField(() => MaterialsConnection)
   async related(@Parent() material: Material, @Args() args: RelatedArgs) {
     const parsedArgs = await this.searchService.parseRelatedArgs(args)
     const cursor = await this.searchService.searchRelated(
@@ -115,6 +115,11 @@ export class MaterialResolver {
       parsedArgs.limit,
       parsedArgs.offset,
     )
-    return this.transform.entitiesToOffsetPaginated(Material, MaterialsPage, cursor, parsedArgs)
+    return this.transform.entitiesToOffsetPaginated(
+      Material,
+      MaterialsConnection,
+      cursor,
+      parsedArgs,
+    )
   }
 }

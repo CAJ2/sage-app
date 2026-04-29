@@ -97,11 +97,13 @@ export class Process extends IDCreatedUpdated implements Named {
   })
   place?: Place
 
-  @Field(() => ProcessSourcesPage)
-  sources!: ProcessSourcesPage & {}
+  @Field(() => ProcessSourcesConnection)
+  sources!: ProcessSourcesConnection & {}
 
-  @Field(() => ProcessHistoryPage, { description: 'Audit history of changes to this process' })
-  history!: ProcessHistoryPage & {}
+  @Field(() => ProcessHistoryConnection, {
+    description: 'Audit history of changes to this process',
+  })
+  history!: ProcessHistoryConnection & {}
 }
 registerModel('Process', Process)
 
@@ -133,13 +135,13 @@ export class ProcessSource extends BaseModel {
 }
 
 @ObjectType()
-export class ProcessSourcesPage extends Paginated(ProcessSource) {}
+export class ProcessSourcesConnection extends Paginated(ProcessSource) {}
 
 @ObjectType()
-export class ProcessHistoryPage extends Paginated(ProcessHistory) {}
+export class ProcessHistoryConnection extends Paginated(ProcessHistory) {}
 
 @ObjectType()
-export class ProcessPage extends Paginated(Process) {}
+export class ProcessConnection extends Paginated(Process) {}
 
 @ArgsType()
 export class ProcessHistoryArgs extends PaginationBasicArgs {

@@ -10,7 +10,7 @@ import { BaseModel, IDCreatedUpdated, type ModelRef, registerModel } from '@src/
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { User as UserEntity } from '@src/users/users.entity'
-import { User, UserPage } from '@src/users/users.model'
+import { User, UserConnection } from '@src/users/users.model'
 
 @ObjectType({
   implements: () => [Named],
@@ -32,14 +32,16 @@ export class Org extends IDCreatedUpdated implements Named {
   @Field(() => String, { nullable: true, description: "URL of the organization's website" })
   websiteURL?: string
 
-  @Field(() => UserPage, { description: 'Users that are members of this organization' })
-  users!: UserPage & {}
+  @Field(() => UserConnection, { description: 'Users that are members of this organization' })
+  users!: UserConnection & {}
 
-  @Field(() => OrgsPage, { description: 'Similar organizations related to this organization' })
-  related!: OrgsPage & {}
+  @Field(() => OrgsConnection, {
+    description: 'Similar organizations related to this organization',
+  })
+  related!: OrgsConnection & {}
 
-  @Field(() => OrgHistoryPage)
-  history!: OrgHistoryPage & {}
+  @Field(() => OrgHistoryConnection)
+  history!: OrgHistoryConnection & {}
 }
 registerModel('Org', Org)
 
@@ -62,10 +64,10 @@ export class OrgHistory extends BaseModel {
 }
 
 @ObjectType()
-export class OrgHistoryPage extends Paginated(OrgHistory) {}
+export class OrgHistoryConnection extends Paginated(OrgHistory) {}
 
 @ObjectType()
-export class OrgsPage extends Paginated(Org) {}
+export class OrgsConnection extends Paginated(Org) {}
 
 @ArgsType()
 export class OrgsArgs extends PaginationBasicArgs {
