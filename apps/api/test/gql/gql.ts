@@ -135,6 +135,11 @@ type Documents = {
     "\n        query HomeFeedShareTextExternal($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              format\n              shareText\n              externalLink {\n                url\n              }\n            }\n          }\n        }\n      ": typeof types.HomeFeedShareTextExternalDocument,
     "\n        query HomeFeedExternalOpenGraph($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              format\n              externalLink {\n                url\n                openGraph {\n                  title\n                  description\n                  image\n                  siteName\n                }\n              }\n            }\n          }\n        }\n      ": typeof types.HomeFeedExternalOpenGraphDocument,
     "\n        query HomeFeedMarkdown($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              markdown\n              markdownShort\n            }\n          }\n        }\n      ": typeof types.HomeFeedMarkdownDocument,
+    "\n        mutation FeedbackVote($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      ": typeof types.FeedbackVoteDocument,
+    "\n        mutation FeedbackVoteDown($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      ": typeof types.FeedbackVoteDownDocument,
+    "\n      mutation FeedbackVoteNoop($input: VoteInput!) {\n        vote(input: $input) {\n          success\n        }\n      }\n    ": typeof types.FeedbackVoteNoopDocument,
+    "\n        mutation FeedbackVoteWithData($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      ": typeof types.FeedbackVoteWithDataDocument,
+    "\n        mutation FeedbackVoteNotFound($input: VoteInput!) {\n          vote(input: $input) {\n            success\n          }\n        }\n      ": typeof types.FeedbackVoteNotFoundDocument,
     "\n        query PlaceResolverListPlaces($first: Int) {\n          places(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n            pageInfo {\n              hasNextPage\n              hasPreviousPage\n            }\n          }\n        }\n      ": typeof types.PlaceResolverListPlacesDocument,
     "\n        mutation PlaceResolverCreateOrg($input: CreateOrgInput!) {\n          createOrg(input: $input) {\n            org {\n              id\n              name\n            }\n          }\n        }\n      ": typeof types.PlaceResolverCreateOrgDocument,
     "\n        mutation PlaceResolverCreatePlace($input: CreatePlaceInput!) {\n          createPlace(input: $input) {\n            place {\n              id\n              name\n            }\n          }\n        }\n      ": typeof types.PlaceResolverCreatePlaceDocument,
@@ -508,6 +513,11 @@ const documents: Documents = {
     "\n        query HomeFeedShareTextExternal($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              format\n              shareText\n              externalLink {\n                url\n              }\n            }\n          }\n        }\n      ": types.HomeFeedShareTextExternalDocument,
     "\n        query HomeFeedExternalOpenGraph($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              format\n              externalLink {\n                url\n                openGraph {\n                  title\n                  description\n                  image\n                  siteName\n                }\n              }\n            }\n          }\n        }\n      ": types.HomeFeedExternalOpenGraphDocument,
     "\n        query HomeFeedMarkdown($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              markdown\n              markdownShort\n            }\n          }\n        }\n      ": types.HomeFeedMarkdownDocument,
+    "\n        mutation FeedbackVote($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      ": types.FeedbackVoteDocument,
+    "\n        mutation FeedbackVoteDown($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      ": types.FeedbackVoteDownDocument,
+    "\n      mutation FeedbackVoteNoop($input: VoteInput!) {\n        vote(input: $input) {\n          success\n        }\n      }\n    ": types.FeedbackVoteNoopDocument,
+    "\n        mutation FeedbackVoteWithData($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      ": types.FeedbackVoteWithDataDocument,
+    "\n        mutation FeedbackVoteNotFound($input: VoteInput!) {\n          vote(input: $input) {\n            success\n          }\n        }\n      ": types.FeedbackVoteNotFoundDocument,
     "\n        query PlaceResolverListPlaces($first: Int) {\n          places(first: $first) {\n            nodes {\n              id\n              name\n            }\n            totalCount\n            pageInfo {\n              hasNextPage\n              hasPreviousPage\n            }\n          }\n        }\n      ": types.PlaceResolverListPlacesDocument,
     "\n        mutation PlaceResolverCreateOrg($input: CreateOrgInput!) {\n          createOrg(input: $input) {\n            org {\n              id\n              name\n            }\n          }\n        }\n      ": types.PlaceResolverCreateOrgDocument,
     "\n        mutation PlaceResolverCreatePlace($input: CreatePlaceInput!) {\n          createPlace(input: $input) {\n            place {\n              id\n              name\n            }\n          }\n        }\n      ": types.PlaceResolverCreatePlaceDocument,
@@ -1258,6 +1268,26 @@ export function graphql(source: "\n        query HomeFeedExternalOpenGraph($firs
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        query HomeFeedMarkdown($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              markdown\n              markdownShort\n            }\n          }\n        }\n      "): (typeof documents)["\n        query HomeFeedMarkdown($first: Int) {\n          feed(first: $first) {\n            nodes {\n              id\n              markdown\n              markdownShort\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation FeedbackVote($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      "): (typeof documents)["\n        mutation FeedbackVote($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation FeedbackVoteDown($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      "): (typeof documents)["\n        mutation FeedbackVoteDown($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      mutation FeedbackVoteNoop($input: VoteInput!) {\n        vote(input: $input) {\n          success\n        }\n      }\n    "): (typeof documents)["\n      mutation FeedbackVoteNoop($input: VoteInput!) {\n        vote(input: $input) {\n          success\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation FeedbackVoteWithData($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      "): (typeof documents)["\n        mutation FeedbackVoteWithData($input: VoteInput!) {\n          vote(input: $input) {\n            success\n            schema\n            uischema\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        mutation FeedbackVoteNotFound($input: VoteInput!) {\n          vote(input: $input) {\n            success\n          }\n        }\n      "): (typeof documents)["\n        mutation FeedbackVoteNotFound($input: VoteInput!) {\n          vote(input: $input) {\n            success\n          }\n        }\n      "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

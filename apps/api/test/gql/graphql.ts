@@ -932,6 +932,23 @@ export type FeedOpenGraph = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
+/** Thumbs up or thumbs down vote */
+export enum FeedbackAction {
+  Downvote = 'DOWNVOTE',
+  Upvote = 'UPVOTE'
+}
+
+/** Entity types that support feedback */
+export enum FeedbackEntityName {
+  Component = 'COMPONENT',
+  Item = 'ITEM',
+  Place = 'PLACE',
+  Process = 'PROCESS',
+  Program = 'PROGRAM',
+  Source = 'SOURCE',
+  Variant = 'VARIANT'
+}
+
 /** An image source */
 export type Image = {
   __typename?: 'Image';
@@ -1298,6 +1315,7 @@ export type Mutation = {
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
   uploadSource: UploadSourceOutput;
+  vote: VoteOutput;
 };
 
 
@@ -1493,6 +1511,11 @@ export type MutationUpdateVariantArgs = {
 
 export type MutationUploadSourceArgs = {
   input: UploadSourceInput;
+};
+
+
+export type MutationVoteArgs = {
+  input: VoteInput;
 };
 
 export type Named = {
@@ -3204,6 +3227,20 @@ export type VariantsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type VoteInput = {
+  action: FeedbackAction;
+  data?: InputMaybe<Scalars['JSONObject']['input']>;
+  entityID: Scalars['ID']['input'];
+  entityName: FeedbackEntityName;
+};
+
+export type VoteOutput = {
+  __typename?: 'VoteOutput';
+  schema?: Maybe<Scalars['JSONObject']['output']>;
+  success: Scalars['Boolean']['output'];
+  uischema?: Maybe<Scalars['JSONObject']['output']>;
+};
+
 export type ApiKeyCreateChangeMutationVariables = Exact<{
   input: CreateChangeInput;
 }>;
@@ -4103,6 +4140,41 @@ export type HomeFeedMarkdownQueryVariables = Exact<{
 
 
 export type HomeFeedMarkdownQuery = { __typename?: 'Query', feed: { __typename?: 'FeedConnection', nodes: Array<{ __typename?: 'FeedItem', id: string, markdown?: string | null, markdownShort?: string | null }> } };
+
+export type FeedbackVoteMutationVariables = Exact<{
+  input: VoteInput;
+}>;
+
+
+export type FeedbackVoteMutation = { __typename?: 'Mutation', vote: { __typename?: 'VoteOutput', success: boolean, schema?: any | null, uischema?: any | null } };
+
+export type FeedbackVoteDownMutationVariables = Exact<{
+  input: VoteInput;
+}>;
+
+
+export type FeedbackVoteDownMutation = { __typename?: 'Mutation', vote: { __typename?: 'VoteOutput', success: boolean, schema?: any | null, uischema?: any | null } };
+
+export type FeedbackVoteNoopMutationVariables = Exact<{
+  input: VoteInput;
+}>;
+
+
+export type FeedbackVoteNoopMutation = { __typename?: 'Mutation', vote: { __typename?: 'VoteOutput', success: boolean } };
+
+export type FeedbackVoteWithDataMutationVariables = Exact<{
+  input: VoteInput;
+}>;
+
+
+export type FeedbackVoteWithDataMutation = { __typename?: 'Mutation', vote: { __typename?: 'VoteOutput', success: boolean, schema?: any | null, uischema?: any | null } };
+
+export type FeedbackVoteNotFoundMutationVariables = Exact<{
+  input: VoteInput;
+}>;
+
+
+export type FeedbackVoteNotFoundMutation = { __typename?: 'Mutation', vote: { __typename?: 'VoteOutput', success: boolean } };
 
 export type PlaceResolverListPlacesQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6090,6 +6162,11 @@ export const HomeFeedShareTextAnnouncementDocument = {"kind":"Document","definit
 export const HomeFeedShareTextExternalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HomeFeedShareTextExternal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"feed"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"shareText"}},{"kind":"Field","name":{"kind":"Name","value":"externalLink"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]}}]}}]}}]} as unknown as DocumentNode<HomeFeedShareTextExternalQuery, HomeFeedShareTextExternalQueryVariables>;
 export const HomeFeedExternalOpenGraphDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HomeFeedExternalOpenGraph"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"feed"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"externalLink"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"openGraph"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"siteName"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<HomeFeedExternalOpenGraphQuery, HomeFeedExternalOpenGraphQueryVariables>;
 export const HomeFeedMarkdownDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HomeFeedMarkdown"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"feed"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"markdown"}},{"kind":"Field","name":{"kind":"Name","value":"markdownShort"}}]}}]}}]}}]} as unknown as DocumentNode<HomeFeedMarkdownQuery, HomeFeedMarkdownQueryVariables>;
+export const FeedbackVoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FeedbackVote"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VoteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vote"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"schema"}},{"kind":"Field","name":{"kind":"Name","value":"uischema"}}]}}]}}]} as unknown as DocumentNode<FeedbackVoteMutation, FeedbackVoteMutationVariables>;
+export const FeedbackVoteDownDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FeedbackVoteDown"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VoteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vote"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"schema"}},{"kind":"Field","name":{"kind":"Name","value":"uischema"}}]}}]}}]} as unknown as DocumentNode<FeedbackVoteDownMutation, FeedbackVoteDownMutationVariables>;
+export const FeedbackVoteNoopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FeedbackVoteNoop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VoteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vote"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<FeedbackVoteNoopMutation, FeedbackVoteNoopMutationVariables>;
+export const FeedbackVoteWithDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FeedbackVoteWithData"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VoteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vote"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"schema"}},{"kind":"Field","name":{"kind":"Name","value":"uischema"}}]}}]}}]} as unknown as DocumentNode<FeedbackVoteWithDataMutation, FeedbackVoteWithDataMutationVariables>;
+export const FeedbackVoteNotFoundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FeedbackVoteNotFound"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VoteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vote"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<FeedbackVoteNotFoundMutation, FeedbackVoteNotFoundMutationVariables>;
 export const PlaceResolverListPlacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PlaceResolverListPlaces"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"places"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}}]}}]}}]}}]} as unknown as DocumentNode<PlaceResolverListPlacesQuery, PlaceResolverListPlacesQueryVariables>;
 export const PlaceResolverCreateOrgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PlaceResolverCreateOrg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateOrgInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createOrg"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"org"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<PlaceResolverCreateOrgMutation, PlaceResolverCreateOrgMutationVariables>;
 export const PlaceResolverCreatePlaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PlaceResolverCreatePlace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePlaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPlace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"place"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<PlaceResolverCreatePlaceMutation, PlaceResolverCreatePlaceMutationVariables>;

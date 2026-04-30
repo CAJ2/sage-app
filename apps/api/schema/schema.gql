@@ -808,6 +808,23 @@ type FeedOpenGraph {
   title: String
 }
 
+"""Thumbs up or thumbs down vote"""
+enum FeedbackAction {
+  DOWNVOTE
+  UPVOTE
+}
+
+"""Entity types that support feedback"""
+enum FeedbackEntityName {
+  COMPONENT
+  ITEM
+  PLACE
+  PROCESS
+  PROGRAM
+  SOURCE
+  VARIANT
+}
+
 """An image source"""
 type Image {
   createdAt: DateTime!
@@ -1052,6 +1069,7 @@ type Mutation {
   updateTagDefinition(input: UpdateTagDefinitionInput!): UpdateTagDefinitionOutput
   updateVariant(input: UpdateVariantInput!): UpdateVariantOutput
   uploadSource(input: UploadSourceInput!): UploadSourceOutput!
+  vote(input: VoteInput!): VoteOutput!
 }
 
 interface Named {
@@ -2406,4 +2424,17 @@ type VariantsConnection {
   nodes: [Variant!]!
   pageInfo: PageInfo!
   totalCount: Int!
+}
+
+input VoteInput {
+  action: FeedbackAction!
+  data: JSONObject
+  entityID: ID!
+  entityName: FeedbackEntityName!
+}
+
+type VoteOutput {
+  schema: JSONObject
+  success: Boolean!
+  uischema: JSONObject
 }

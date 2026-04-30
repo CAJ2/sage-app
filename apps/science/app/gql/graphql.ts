@@ -932,6 +932,23 @@ export type FeedOpenGraph = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
+/** Thumbs up or thumbs down vote */
+export enum FeedbackAction {
+  Downvote = 'DOWNVOTE',
+  Upvote = 'UPVOTE'
+}
+
+/** Entity types that support feedback */
+export enum FeedbackEntityName {
+  Component = 'COMPONENT',
+  Item = 'ITEM',
+  Place = 'PLACE',
+  Process = 'PROCESS',
+  Program = 'PROGRAM',
+  Source = 'SOURCE',
+  Variant = 'VARIANT'
+}
+
 /** An image source */
 export type Image = {
   __typename?: 'Image';
@@ -1298,6 +1315,7 @@ export type Mutation = {
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
   uploadSource: UploadSourceOutput;
+  vote: VoteOutput;
 };
 
 
@@ -1493,6 +1511,11 @@ export type MutationUpdateVariantArgs = {
 
 export type MutationUploadSourceArgs = {
   input: UploadSourceInput;
+};
+
+
+export type MutationVoteArgs = {
+  input: VoteInput;
 };
 
 export type Named = {
@@ -3202,6 +3225,20 @@ export type VariantsConnection = {
   nodes: Array<Variant>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type VoteInput = {
+  action: FeedbackAction;
+  data?: InputMaybe<Scalars['JSONObject']['input']>;
+  entityID: Scalars['ID']['input'];
+  entityName: FeedbackEntityName;
+};
+
+export type VoteOutput = {
+  __typename?: 'VoteOutput';
+  schema?: Maybe<Scalars['JSONObject']['output']>;
+  success: Scalars['Boolean']['output'];
+  uischema?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type ScienceSearchQueryVariables = Exact<{

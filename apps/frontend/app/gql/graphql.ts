@@ -932,6 +932,23 @@ export type FeedOpenGraph = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
+/** Thumbs up or thumbs down vote */
+export enum FeedbackAction {
+  Downvote = 'DOWNVOTE',
+  Upvote = 'UPVOTE'
+}
+
+/** Entity types that support feedback */
+export enum FeedbackEntityName {
+  Component = 'COMPONENT',
+  Item = 'ITEM',
+  Place = 'PLACE',
+  Process = 'PROCESS',
+  Program = 'PROGRAM',
+  Source = 'SOURCE',
+  Variant = 'VARIANT'
+}
+
 /** An image source */
 export type Image = {
   __typename?: 'Image';
@@ -1298,6 +1315,7 @@ export type Mutation = {
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
   uploadSource: UploadSourceOutput;
+  vote: VoteOutput;
 };
 
 
@@ -1493,6 +1511,11 @@ export type MutationUpdateVariantArgs = {
 
 export type MutationUploadSourceArgs = {
   input: UploadSourceInput;
+};
+
+
+export type MutationVoteArgs = {
+  input: VoteInput;
 };
 
 export type Named = {
@@ -3202,6 +3225,20 @@ export type VariantsConnection = {
   nodes: Array<Variant>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type VoteInput = {
+  action: FeedbackAction;
+  data?: InputMaybe<Scalars['JSONObject']['input']>;
+  entityID: Scalars['ID']['input'];
+  entityName: FeedbackEntityName;
+};
+
+export type VoteOutput = {
+  __typename?: 'VoteOutput';
+  schema?: Maybe<Scalars['JSONObject']['output']>;
+  success: Scalars['Boolean']['output'];
+  uischema?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type VariantRecycleStreamsFragment = { __typename?: 'VariantComponentsConnection', nodes: Array<{ __typename?: 'VariantComponent', component: { __typename?: 'Component', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, primaryMaterial: { __typename?: 'Material', id: string, name?: string | null }, recycleScore?: { __typename?: 'StreamScore', score?: number | null, rating?: StreamScoreRating | null, ratingF?: string | null } | null, recycle?: Array<{ __typename?: 'ComponentRecycle', context: Array<{ __typename?: 'StreamContext', key: string, markdown?: string | null }>, stream?: { __typename?: 'RecyclingStream', name?: string | null, desc?: string | null, score?: { __typename?: 'StreamScore', score?: number | null, rating?: StreamScoreRating | null, ratingF?: string | null } | null, container?: { __typename?: 'Container', type: string, access?: string | null, color?: string | null, image?: string | null, shape?: { __typename?: 'ContainerShape', width?: number | null, height?: number | null, depth?: number | null } | null, imageEntryPoint?: { __typename?: 'ContainerImageEntryPoint', x: number, y: number, side: string } | null } | null } | null }> | null } }> } & { ' $fragmentName'?: 'VariantRecycleStreamsFragment' };
