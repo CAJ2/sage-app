@@ -48,7 +48,17 @@ export class TestFeedSeeder extends Seeder {
       rank: 3000,
       format: 'EXTERNAL',
       title: { en: 'External Link' },
-      links: { externalLink: { url: 'https://example.com/article' } },
+      links: {
+        externalLink: {
+          url: 'https://example.com/article',
+          openGraph: {
+            title: 'Example Article',
+            description: 'An example description',
+            image: 'https://example.com/og.jpg',
+            siteName: 'Example Site',
+          },
+        },
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
     })

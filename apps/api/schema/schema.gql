@@ -764,6 +764,7 @@ type FeedConnection {
 }
 
 type FeedExternalLink {
+  openGraph: FeedOpenGraph
   url: String!
 }
 
@@ -798,6 +799,13 @@ type FeedItemEdge {
 type FeedLink {
   entityName: String!
   id: ID!
+}
+
+type FeedOpenGraph {
+  description: String
+  image: String
+  siteName: String
+  title: String
 }
 
 """An image source"""

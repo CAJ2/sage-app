@@ -880,6 +880,7 @@ export type FeedConnection = {
 
 export type FeedExternalLink = {
   __typename?: 'FeedExternalLink';
+  openGraph?: Maybe<FeedOpenGraph>;
   url: Scalars['String']['output'];
 };
 
@@ -917,6 +918,14 @@ export type FeedLink = {
   __typename?: 'FeedLink';
   entityName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+};
+
+export type FeedOpenGraph = {
+  __typename?: 'FeedOpenGraph';
+  description?: Maybe<Scalars['String']['output']>;
+  image?: Maybe<Scalars['String']['output']>;
+  siteName?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 /** An image source */
