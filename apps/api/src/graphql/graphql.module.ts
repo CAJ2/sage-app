@@ -9,6 +9,7 @@ import { Int, GraphQLModule as NestGraphQLModule } from '@nestjs/graphql'
 import { DirectiveLocation, GraphQLBoolean, GraphQLDirective } from 'graphql'
 import type { GraphQLFormattedError } from 'graphql'
 import { JSONObjectDefinition, JSONObjectResolver } from 'graphql-scalars'
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
 
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CacheControlScopeEnum } from '@src/graphql/cache-control'
@@ -57,6 +58,9 @@ export class GraphQLModule {
           },
           sortSchema: true,
           playground: false,
+          // Required when using graphql-upload: multipart requests must include
+          // the Apollo-Require-Preflight header or they will be rejected.
+          csrfPrevention: true,
           plugins: [
             ApolloServerPluginLandingPageLocalDefault({
               embed: {
@@ -70,6 +74,7 @@ export class GraphQLModule {
           resolvers: {
             DateTime: LuxonDateTimeResolver,
             JSONObject: JSONObjectResolver,
+            Upload: GraphQLUpload,
           },
           formatError: (err: GraphQLFormattedError) => GraphQLModule.formatError(err),
         }

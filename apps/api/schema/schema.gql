@@ -1043,6 +1043,7 @@ type Mutation {
   updateSource(input: UpdateSourceInput!): UpdateSourceOutput
   updateTagDefinition(input: UpdateTagDefinitionInput!): UpdateTagDefinitionOutput
   updateVariant(input: UpdateVariantInput!): UpdateVariantOutput
+  uploadSource(input: UploadSourceInput!): UploadSourceOutput!
 }
 
 interface Named {
@@ -2162,6 +2163,19 @@ type UpdateVariantOutput {
 
   """The variant including the proposed changes"""
   variant: Variant
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input UploadSourceInput {
+  file: Upload!
+  metadata: JSONObject
+  source: ID!
+}
+
+type UploadSourceOutput {
+  source: Source
 }
 
 """A registered user of the platform"""

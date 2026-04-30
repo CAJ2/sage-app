@@ -1,6 +1,8 @@
 import { ArgsType, Field, ID, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 import { Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
+import type { FileUpload } from 'graphql-upload/processRequest.mjs'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
@@ -153,6 +155,24 @@ export class UnlinkSourceInput {
 export class LinkSourceOutput {
   @Field(() => Source, { nullable: true })
   source?: Source & {}
+}
+
+@ObjectType()
+export class UploadSourceOutput {
+  @Field(() => Source, { nullable: true })
+  source?: Source
+}
+
+@InputType()
+export class UploadSourceInput {
+  @Field(() => ID)
+  source!: string
+
+  @Field(() => GraphQLUpload)
+  file!: Promise<FileUpload>
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  metadata?: JSONObject
 }
 
 @ObjectType()

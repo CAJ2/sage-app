@@ -1,4 +1,5 @@
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
+import type { FileUpload } from 'graphql-upload/processRequest.mjs'
 
 import { AuthUser, type ReqUser } from '@src/auth/auth.guard'
 import { OptionalAuth } from '@src/auth/decorators'
@@ -17,6 +18,8 @@ import {
   UnlinkSourceOutput,
   UpdateSourceInput,
   UpdateSourceOutput,
+  UploadSourceInput,
+  UploadSourceOutput,
 } from '@src/changes/source.model'
 import { SourceSchemaService } from '@src/changes/source.schema'
 import { SourceService } from '@src/changes/source.service'
@@ -87,6 +90,21 @@ export class SourceResolver {
     return {
       success: true,
     }
+  }
+
+  @Mutation(() => UploadSourceOutput)
+  async uploadSource(
+    @Args('input') input: UploadSourceInput,
+    @AuthUser() user: ReqUser,
+  ): Promise<UploadSourceOutput> {
+    const source = await this.sourceService.upload(
+      input.source,
+      input.file as Promise<FileUpload>,
+      user.id,
+      input.metadata,
+    )
+    const model = await this.transform.entityToModel(Source, source)
+    return { source: model }
   }
 
   @Mutation(() => LinkSourceOutput)

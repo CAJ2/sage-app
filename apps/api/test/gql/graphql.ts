@@ -20,6 +20,8 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { input: any; output: any; }
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: { input: any; output: any; }
 };
 
 export type AddRefInput = {
@@ -1286,6 +1288,7 @@ export type Mutation = {
   updateSource?: Maybe<UpdateSourceOutput>;
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
+  uploadSource: UploadSourceOutput;
 };
 
 
@@ -1478,6 +1481,11 @@ export type MutationUpdateVariantArgs = {
   input: UpdateVariantInput;
 };
 
+
+export type MutationUploadSourceArgs = {
+  input: UploadSourceInput;
+};
+
 export type Named = {
   /** The description of the model */
   desc?: Maybe<Scalars['String']['output']>;
@@ -1605,6 +1613,15 @@ export type PlaceRelatedArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** A specific physical location, such as a business or recycling facility */
+export type PlaceTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** A structured postal address */
@@ -2841,6 +2858,17 @@ export type UpdateVariantOutput = {
   currentVariant?: Maybe<Variant>;
   /** The variant including the proposed changes */
   variant?: Maybe<Variant>;
+};
+
+export type UploadSourceInput = {
+  file: Scalars['Upload']['input'];
+  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
+  source: Scalars['ID']['input'];
+};
+
+export type UploadSourceOutput = {
+  __typename?: 'UploadSourceOutput';
+  source?: Maybe<Source>;
 };
 
 /** A registered user of the platform */

@@ -1,5 +1,6 @@
 import { EntityManager, ref } from '@mikro-orm/postgresql'
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
+import type { FileUpload } from 'graphql-upload/processRequest.mjs'
 import jsonld from 'jsonld'
 
 import { Change } from '@src/changes/change.entity'
@@ -13,13 +14,17 @@ import {
 import { JSONLD_CONTEXT } from '@src/changes/source.schema'
 import { shrinkCdnUrl } from '@src/common/cdn'
 import { NotFoundErr } from '@src/common/exceptions'
+import { StorageService } from '@src/common/storage.service'
 import { CursorOptions } from '@src/common/transform'
 import { type JSONObject } from '@src/common/z.schema'
 import { User } from '@src/users/users.entity'
 
 @Injectable()
 export class SourceService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly storageService: StorageService,
+  ) {}
 
   async user(userID: string) {
     return this.em.findOne(User, { id: userID })
@@ -59,6 +64,27 @@ export class SourceService {
     await this.setFields(source, input)
     await this.em.persist(source).flush()
     return source
+  }
+
+  async upload(
+    source: string,
+    fileUpload: Promise<FileUpload>,
+    userID: string,
+    metadata?: JSONObject,
+  ) {
+    const entity = await this.findOneByID(source)
+
+    if (entity.user.id !== userID) {
+      throw new ForbiddenException('You do not have permission to upload to this source')
+    }
+
+    const { cdnUrl, sourceType } = await this.storageService.uploadSource(fileUpload)
+
+    entity.type = sourceType
+    entity.location = cdnUrl
+    if (metadata) entity.metadata = metadata
+    await this.em.flush()
+    return entity
   }
 
   async update(input: UpdateSourceInput) {

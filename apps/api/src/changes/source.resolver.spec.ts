@@ -1,11 +1,14 @@
 import { MikroORM } from '@mikro-orm/postgresql'
-import { INestApplication } from '@nestjs/common'
+import { BadRequestException, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppTestModule } from '@test/app-test.module'
 import { graphql } from '@test/gql'
 import { SourceType } from '@test/gql/graphql'
 import { GraphQLTestClient } from '@test/graphql.utils'
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
+import request from 'supertest'
 
+import { StorageService } from '@src/common/storage.service'
 import { BaseSeeder } from '@src/db/seeds/BaseSeeder'
 import { TestMaterialSeeder } from '@src/db/seeds/TestMaterialSeeder'
 import { SOURCE_IDS, TestVariantSeeder } from '@src/db/seeds/TestVariantSeeder'
@@ -729,5 +732,211 @@ describe('SourceResolver (integration)', () => {
       )
       expect(res.data?.updateSource?.source?.id).toBe(sourceID)
     })
+  })
+})
+
+const UPLOAD_MUTATION = `
+  mutation UploadSourceMutation($input: UploadSourceInput!) {
+    uploadSource(input: $input) {
+      source {
+        id
+        type
+        location
+      }
+    }
+  }
+`
+
+describe('SourceResolver uploadSource (integration)', () => {
+  let app: INestApplication
+  let cookies: string[]
+  let otherUserCookies: string[]
+  let sourceId: string
+  const mockUploadSource = vi.fn()
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestModule],
+    })
+      .overrideProvider(StorageService)
+      .useValue({ uploadSource: mockUploadSource })
+      .compile()
+
+    app = module.createNestApplication()
+    app.use(graphqlUploadExpress({ maxFileSize: 10_000_000, maxFiles: 1 }))
+    await app.init()
+
+    const orm = module.get<MikroORM>(MikroORM)
+    await clearDatabase(orm, 'public', ['users'])
+    await orm.seeder.seed(BaseSeeder, UserSeeder)
+
+    const signInRes = await request(app.getHttpServer())
+      .post('/auth/sign-in/username')
+      .send({ username: 'admin', password: 'password' })
+
+    const setCookie = signInRes.headers['set-cookie']
+    cookies = Array.isArray(setCookie) ? setCookie : [setCookie]
+
+    // Sign in as a different user for ownership tests
+    const otherSignInRes = await request(app.getHttpServer())
+      .post('/auth/sign-in/username')
+      .send({ username: 'user', password: 'password' })
+
+    const otherSetCookie = otherSignInRes.headers['set-cookie']
+    otherUserCookies = Array.isArray(otherSetCookie) ? otherSetCookie : [otherSetCookie]
+
+    // Create a Source owned by admin to use across tests
+    const createRes = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Cookie', cookies.map((c) => c.split(';')[0]).join('; '))
+      .send({
+        query: `
+          mutation {
+            createSource(input: { type: IMAGE }) {
+              source { id }
+            }
+          }
+        `,
+      })
+    sourceId = createRes.body.data?.createSource?.source?.id
+  })
+
+  afterAll(async () => {
+    await app.close()
+  })
+
+  beforeEach(() => {
+    mockUploadSource.mockReset()
+  })
+
+  function cookieStr() {
+    return cookies.map((c) => c.split(';')[0]).join('; ')
+  }
+
+  function otherCookieStr() {
+    return otherUserCookies.map((c) => c.split(';')[0]).join('; ')
+  }
+
+  async function sendUpload(
+    fileBuffer: Buffer,
+    filename: string,
+    mimeType: string,
+    opts: { authenticated?: boolean; sid?: string; cookieOverride?: string } = {},
+  ) {
+    const { authenticated = true, sid = sourceId, cookieOverride } = opts
+    let req = request(app.getHttpServer())
+      .post('/graphql')
+      .set('apollo-require-preflight', '1')
+      .field(
+        'operations',
+        JSON.stringify({
+          query: UPLOAD_MUTATION,
+          variables: { input: { source: sid, file: null } },
+        }),
+      )
+      .field('map', JSON.stringify({ '0': ['variables.input.file'] }))
+      .attach('0', fileBuffer, { filename, contentType: mimeType })
+
+    if (authenticated) {
+      req = req.set('Cookie', cookieOverride ?? cookieStr())
+    }
+
+    return req
+  }
+
+  test('uploads an image and returns a Source with type IMAGE', async () => {
+    mockUploadSource.mockResolvedValue({
+      cdnUrl: 'cdn://sources/uploads/abc123.jpg',
+      sourceType: 'IMAGE',
+    })
+
+    const res = await sendUpload(Buffer.from('fake-image-data'), 'photo.jpg', 'image/jpeg')
+
+    expect(res.body.errors).toBeUndefined()
+    expect(res.body.data?.uploadSource?.source).toBeDefined()
+    expect(res.body.data?.uploadSource?.source?.type).toBe(SourceType.Image)
+    expect(res.body.data?.uploadSource?.source?.location).toBe('cdn://sources/uploads/abc123.jpg')
+    expect(res.body.data?.uploadSource?.source?.id).toBeDefined()
+    expect(mockUploadSource).toHaveBeenCalledOnce()
+  })
+
+  test('uploads a PDF and returns a Source with type PDF', async () => {
+    mockUploadSource.mockResolvedValue({
+      cdnUrl: 'cdn://sources/uploads/abc123.pdf',
+      sourceType: 'PDF',
+    })
+
+    const res = await sendUpload(Buffer.from('fake-pdf-data'), 'document.pdf', 'application/pdf')
+
+    expect(res.body.errors).toBeUndefined()
+    expect(res.body.data?.uploadSource?.source?.type).toBe(SourceType.Pdf)
+    expect(res.body.data?.uploadSource?.source?.location).toBe('cdn://sources/uploads/abc123.pdf')
+  })
+
+  test('rejects a video file', async () => {
+    mockUploadSource.mockRejectedValue(new BadRequestException('Unsupported file type: video/mp4'))
+
+    const res = await sendUpload(Buffer.from('fake-video-data'), 'clip.mp4', 'video/mp4')
+
+    expect(res.body.errors).toBeDefined()
+    expect(res.body.errors[0]?.message).toContain('Unsupported file type')
+  })
+
+  test('passes metadata to the Source', async () => {
+    mockUploadSource.mockResolvedValue({
+      cdnUrl: 'cdn://sources/uploads/meta.jpg',
+      sourceType: 'IMAGE',
+    })
+
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Cookie', cookieStr())
+      .set('apollo-require-preflight', '1')
+      .field(
+        'operations',
+        JSON.stringify({
+          query: `
+            mutation UploadSourceWithMeta($input: UploadSourceInput!) {
+              uploadSource(input: $input) {
+                source { id type metadata }
+              }
+            }
+          `,
+          variables: {
+            input: { source: sourceId, file: null, metadata: { author: 'test-user' } },
+          },
+        }),
+      )
+      .field('map', JSON.stringify({ '0': ['variables.input.file'] }))
+      .attach('0', Buffer.from('fake-image'), 'photo.jpg')
+
+    expect(res.body.errors).toBeUndefined()
+    expect(res.body.data?.uploadSource?.source?.metadata).toMatchObject({ author: 'test-user' })
+  })
+
+  test('returns an error for an unsupported file type', async () => {
+    mockUploadSource.mockRejectedValue(new BadRequestException('Unsupported file type: audio/mpeg'))
+
+    const res = await sendUpload(Buffer.from('fake-audio'), 'track.mp3', 'audio/mpeg')
+
+    expect(res.body.errors).toBeDefined()
+    expect(res.body.errors[0]?.message).toContain('Unsupported file type')
+  })
+
+  test('rejects upload by a non-owner', async () => {
+    const res = await sendUpload(Buffer.from('fake-image-data'), 'photo.jpg', 'image/jpeg', {
+      cookieOverride: otherCookieStr(),
+    })
+
+    expect(res.body.errors).toBeDefined()
+    expect(res.body.errors[0]?.message).toMatch(/permission|forbidden/i)
+  })
+
+  test('requires authentication', async () => {
+    const res = await sendUpload(Buffer.from('fake-image-data'), 'photo.jpg', 'image/jpeg', {
+      authenticated: false,
+    })
+
+    expect(res.body.errors).toBeDefined()
   })
 })

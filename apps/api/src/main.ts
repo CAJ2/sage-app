@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express'
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
 import helmet from 'helmet'
 
 import { AppModule } from '@src/app.module'
@@ -41,6 +42,7 @@ async function bootstrap() {
     }),
   )
   app.enableShutdownHooks()
+  app.use(graphqlUploadExpress({ maxFileSize: 10_000_000, maxFiles: 1 }))
   await app.listen(process.env.PORT || 4444)
   if (process.env.SCHEMA_GEN) {
     await app.close()
