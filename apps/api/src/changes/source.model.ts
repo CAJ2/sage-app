@@ -1,10 +1,12 @@
 import { ArgsType, Field, ID, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 import { Validate } from 'class-validator'
 import { JSONObjectResolver } from 'graphql-scalars'
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
+import type { FileUpload } from 'graphql-upload/processRequest.mjs'
 import { DateTime } from 'luxon'
 import { z } from 'zod/v4'
 
-import { ChangesPage } from '@src/changes/change.model'
+import { ChangesConnection } from '@src/changes/change.model'
 import { SourceType } from '@src/changes/source.entity'
 import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { IsNanoID } from '@src/common/validator.model'
@@ -49,8 +51,8 @@ export class Source extends IDCreatedUpdated {
   @Field(() => User)
   user!: User & {}
 
-  @Field(() => ChangesPage)
-  changes!: ChangesPage & {}
+  @Field(() => ChangesConnection)
+  changes!: ChangesConnection & {}
 
   @Field(() => JSONObjectResolver, {
     nullable: true,
@@ -60,7 +62,7 @@ export class Source extends IDCreatedUpdated {
 }
 
 @ObjectType()
-export class SourcesPage extends Paginated(Source) {}
+export class SourcesConnection extends Paginated(Source) {}
 
 @ArgsType()
 export class SourcesArgs extends PaginationBasicArgs {
@@ -153,6 +155,24 @@ export class UnlinkSourceInput {
 export class LinkSourceOutput {
   @Field(() => Source, { nullable: true })
   source?: Source & {}
+}
+
+@ObjectType()
+export class UploadSourceOutput {
+  @Field(() => Source, { nullable: true })
+  source?: Source
+}
+
+@InputType()
+export class UploadSourceInput {
+  @Field(() => ID)
+  source!: string
+
+  @Field(() => GraphQLUpload)
+  file!: Promise<FileUpload>
+
+  @Field(() => JSONObjectResolver, { nullable: true })
+  metadata?: JSONObject
 }
 
 @ObjectType()

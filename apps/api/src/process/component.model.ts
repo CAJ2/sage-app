@@ -22,8 +22,8 @@ import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
 import { type ComponentPhysical, type ComponentVisual } from '@src/process/component.entity'
 import { Material } from '@src/process/material.model'
 import { RecyclingStream, StreamContext, StreamScore } from '@src/process/stream.model'
-import { TagPage } from '@src/process/tag.model'
-import { ImagesPage } from '@src/product/image.model'
+import { TagConnection } from '@src/process/tag.model'
+import { ImagesConnection } from '@src/product/image.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -44,8 +44,8 @@ export class ComponentRecycle {
   @Field(() => RecyclingStream, { nullable: true })
   stream?: RecyclingStream & {}
 
-  @Field(() => StreamContext, { nullable: true })
-  context?: StreamContext & {}
+  @Field(() => [StreamContext])
+  context: StreamContext[] = []
 }
 
 @ObjectType({
@@ -71,8 +71,8 @@ export class Component extends IDCreatedUpdated implements Named {
   })
   materials: ComponentMaterial[] = []
 
-  @Field(() => TagPage)
-  tags!: TagPage & {}
+  @Field(() => TagConnection)
+  tags!: TagConnection & {}
 
   @Field(() => Region, {
     nullable: true,
@@ -92,14 +92,21 @@ export class Component extends IDCreatedUpdated implements Named {
   })
   recycleScore?: StreamScore
 
-  @Field(() => ImagesPage, { description: 'Images associated with this component' })
-  images!: ImagesPage
+  @Field(() => ImagesConnection, { description: 'Images associated with this component' })
+  images!: ImagesConnection
 
-  @Field(() => ComponentSourcesPage)
-  sources!: ComponentSourcesPage & {}
+  @Field(() => ComponentsConnection, {
+    description: 'Similar components related to this component',
+  })
+  related!: ComponentsConnection & {}
 
-  @Field(() => ComponentHistoryPage, { description: 'Audit history of changes to this component' })
-  history!: ComponentHistoryPage & {}
+  @Field(() => ComponentSourcesConnection)
+  sources!: ComponentSourcesConnection & {}
+
+  @Field(() => ComponentHistoryConnection, {
+    description: 'Audit history of changes to this component',
+  })
+  history!: ComponentHistoryConnection & {}
 }
 registerModel('Component', Component)
 
@@ -131,13 +138,13 @@ export class ComponentSource {
 }
 
 @ObjectType()
-export class ComponentSourcesPage extends Paginated(ComponentSource) {}
+export class ComponentSourcesConnection extends Paginated(ComponentSource) {}
 
 @ObjectType()
-export class ComponentHistoryPage extends Paginated(ComponentHistory) {}
+export class ComponentHistoryConnection extends Paginated(ComponentHistory) {}
 
 @ObjectType()
-export class ComponentsPage extends Paginated(Component) {}
+export class ComponentsConnection extends Paginated(Component) {}
 
 @ArgsType()
 export class ComponentHistoryArgs extends PaginationBasicArgs {

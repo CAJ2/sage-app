@@ -24,9 +24,27 @@ export class FeedLink {
 }
 
 @ObjectType()
+export class FeedOpenGraph {
+  @Field(() => String, { nullable: true })
+  title?: string
+
+  @Field(() => String, { nullable: true })
+  description?: string
+
+  @Field(() => String, { nullable: true })
+  image?: string
+
+  @Field(() => String, { nullable: true })
+  siteName?: string
+}
+
+@ObjectType()
 export class FeedExternalLink {
   @Field(() => String)
   url!: string
+
+  @Field(() => FeedOpenGraph, { nullable: true })
+  openGraph?: FeedOpenGraph
 }
 
 @ObjectType()
@@ -58,7 +76,7 @@ export class FeedItem extends IDCreatedUpdated {
 registerModel('FeedItem', FeedItem)
 
 @ObjectType()
-export class FeedPage extends Paginated(FeedItem) {}
+export class FeedConnection extends Paginated(FeedItem) {}
 
 @ArgsType()
 export class FeedArgs extends PaginationBasicArgs {

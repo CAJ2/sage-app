@@ -16,14 +16,14 @@ import {
   Component,
   ComponentHistory,
   ComponentHistoryArgs,
-  ComponentHistoryPage,
+  ComponentHistoryConnection,
   ComponentMaterial,
   ComponentRecycleArgs,
   ComponentsArgs,
+  ComponentsConnection,
   ComponentSource,
   ComponentSourcesArgs,
-  ComponentSourcesPage,
-  ComponentsPage,
+  ComponentSourcesConnection,
   ComponentTagsArgs,
   CreateComponentInput,
   CreateComponentOutput,
@@ -34,8 +34,11 @@ import { ComponentSchemaService } from '@src/process/component.schema'
 import { ComponentService } from '@src/process/component.service'
 import { Material } from '@src/process/material.model'
 import { MaterialService } from '@src/process/material.service'
-import { Tag, TagPage } from '@src/process/tag.model'
-import { Image, ImagesArgs, ImagesPage } from '@src/product/image.model'
+import { Tag, TagConnection } from '@src/process/tag.model'
+import { Image, ImagesArgs, ImagesConnection } from '@src/product/image.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Component)
@@ -46,11 +49,12 @@ export class ComponentResolver {
     private readonly transform: TransformService,
     private readonly regionService: RegionService,
     private readonly materialService: MaterialService,
+    private readonly searchService: SearchService,
   ) {}
 
-  @Query(() => ComponentsPage, { name: 'components' })
+  @Query(() => ComponentsConnection, { name: 'components' })
   @OptionalAuth()
-  async components(@Args() args: ComponentsArgs): Promise<ComponentsPage> {
+  async components(@Args() args: ComponentsArgs): Promise<ComponentsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentsArgs, args)
     const cursorOpts = await this.transform.applySearchQuery(
       ComponentEntity,
@@ -60,7 +64,7 @@ export class ComponentResolver {
     )
 
     const cursor = await this.componentService.find(cursorOpts)
-    return this.transform.entityToPaginated(Component, ComponentsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Component, ComponentsConnection, cursor, parsedArgs)
   }
 
   @Query(() => Component, { name: 'component', nullable: true })
@@ -116,11 +120,11 @@ export class ComponentResolver {
     })
   }
 
-  @ResolveField(() => TagPage)
+  @ResolveField(() => TagConnection)
   async tags(@Parent() component: Component, @Args() args: ComponentTagsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentTagsArgs, args)
     const cursor = await this.componentService.tags(component.id, filter)
-    return this.transform.entityToPaginated(Tag, TagPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Tag, TagConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
@@ -187,26 +191,44 @@ export class ComponentResolver {
     return { success: true, id: component.id }
   }
 
-  @ResolveField(() => ImagesPage)
+  @ResolveField(() => ImagesConnection)
   async images(@Parent() component: Component, @Args() args: ImagesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ImagesArgs, args)
     const cursor = await this.componentService.images(component.id, filter)
-    return this.transform.entityToPaginated(Image, ImagesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Image, ImagesConnection, cursor, parsedArgs)
   }
 
-  @ResolveField(() => ComponentSourcesPage)
-  async sources(@Parent() component: Component, @Args() args: ComponentSourcesArgs) {
-    const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentSourcesArgs, args)
-    const cursor = await this.componentService.sources(component.id, filter)
-    return this.transform.entityToPaginated(
-      ComponentSource,
-      ComponentSourcesPage,
+  @ResolveField(() => ComponentsConnection)
+  async related(@Parent() component: Component, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.COMPONENTS,
+      component.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(
+      Component,
+      ComponentsConnection,
       cursor,
       parsedArgs,
     )
   }
 
-  @ResolveField(() => ComponentHistoryPage)
+  @ResolveField(() => ComponentSourcesConnection)
+  async sources(@Parent() component: Component, @Args() args: ComponentSourcesArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(ComponentSourcesArgs, args)
+    const cursor = await this.componentService.sources(component.id, filter)
+    return this.transform.entityToPaginated(
+      ComponentSource,
+      ComponentSourcesConnection,
+      cursor,
+      parsedArgs,
+    )
+  }
+
+  @ResolveField(() => ComponentHistoryConnection)
   async history(@Parent() component: Component, @Args() args: ComponentHistoryArgs) {
     const [, filter] = await this.transform.paginationArgs(ComponentHistoryArgs, args)
     const cursor = await this.componentService.history(component.id, filter)
@@ -214,7 +236,7 @@ export class ComponentResolver {
       cursor.items.map((h) => this.transform.entityToModel(ComponentHistory, h)),
     )
     return this.transform.objectsToPaginated(
-      ComponentHistoryPage,
+      ComponentHistoryConnection,
       { items, count: cursor.count },
       true,
     )

@@ -11,6 +11,7 @@ import {
   SearchBackendMultiSearchResult,
   SearchBackendSearchRequest,
   SearchBackendSearchResult,
+  SearchBackendVectorQuery,
 } from '@src/search/search.backend'
 
 type TypesenseDocument = {
@@ -56,6 +57,7 @@ export function resolveTypesenseApiKey(rawValue?: string) {
 
 @Injectable()
 export class TypesenseSearchService implements SearchBackend, OnModuleInit {
+  private static readonly VECTOR_K = 100
   client?: TypesenseClient
 
   private availableCollectionsPromise: Promise<TypesenseCollection[]> | null = null
@@ -259,10 +261,7 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
   ) {
     const filterBy = this.buildFilterBy(request.options?.filters, request.options?.geo)
     const hasVectorField = schema.fields.some((f) => f.name === 'embedding')
-    const vectorQuery =
-      request.options?.vector && hasVectorField
-        ? `embedding:([${request.options.vector.join(',')}])`
-        : undefined
+    const vectorQuery = this.buildVectorQuery(request.options?.vector, hasVectorField)
 
     return {
       ...(includeCollection ? { collection: request.collection } : {}),
@@ -275,6 +274,22 @@ export class TypesenseSearchService implements SearchBackend, OnModuleInit {
       ...(filterBy ? { filter_by: filterBy } : {}),
       ...(vectorQuery ? { vector_query: vectorQuery } : {}),
     }
+  }
+
+  private buildVectorQuery(vector: SearchBackendVectorQuery | undefined, hasVectorField: boolean) {
+    if (!vector || !hasVectorField) {
+      return undefined
+    }
+
+    if (vector.kind === 'embedding') {
+      return `embedding:([${vector.values.join(',')}], k:${TypesenseSearchService.VECTOR_K})`
+    }
+
+    if (vector.kind === 'document') {
+      return `embedding:([], id:${vector.id}, k:${TypesenseSearchService.VECTOR_K})`
+    }
+
+    throw new Error('Query vectors must be materialized before reaching TypesenseSearchService')
   }
 
   private buildQueryBy(schema: TypesenseCollection, lang: string) {

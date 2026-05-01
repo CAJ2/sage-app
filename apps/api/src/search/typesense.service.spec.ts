@@ -292,7 +292,10 @@ describe('TypesenseSearchService', () => {
       collection: 'supported',
       query: 'test',
       options: {
-        vector: [0.1, 0.2, 0.3],
+        vector: {
+          kind: 'embedding',
+          values: [0.1, 0.2, 0.3],
+        },
       },
     })
 
@@ -300,7 +303,42 @@ describe('TypesenseSearchService', () => {
       {
         searches: [
           expect.objectContaining({
-            vector_query: 'embedding:([0.1,0.2,0.3])',
+            vector_query: 'embedding:([0.1,0.2,0.3], k:100)',
+          }),
+        ],
+      },
+      {},
+    )
+  })
+
+  test('includes document-id vector_query when a source document is provided', async () => {
+    const { service, mockCollectionsRetrieve, mockMultiSearch } = makeTypesenseSearchService()
+    mockCollectionsRetrieve.mockResolvedValue([
+      {
+        name: 'supported',
+        fields: [
+          { name: 'embedding', type: 'float[]' },
+          { name: 'name', type: 'string' },
+        ],
+      },
+    ])
+
+    await service.search({
+      collection: 'supported',
+      query: '',
+      options: {
+        vector: {
+          kind: 'document',
+          id: 'source-1',
+        },
+      },
+    })
+
+    expect(mockMultiSearch).toHaveBeenCalledWith(
+      {
+        searches: [
+          expect.objectContaining({
+            vector_query: 'embedding:([], id:source-1, k:100)',
           }),
         ],
       },

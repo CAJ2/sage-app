@@ -18,6 +18,8 @@
     },
     "strict": true,
     "incremental": true,
+    "allowJs": true,
+    "maxNodeModuleJsDepth": 10,
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noImplicitAny": true,

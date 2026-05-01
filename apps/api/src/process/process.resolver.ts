@@ -21,13 +21,13 @@ import {
   CreateProcessOutput,
   Process,
   ProcessArgs,
+  ProcessConnection,
   ProcessHistory,
   ProcessHistoryArgs,
-  ProcessHistoryPage,
-  ProcessPage,
+  ProcessHistoryConnection,
   ProcessSource,
   ProcessSourcesArgs,
-  ProcessSourcesPage,
+  ProcessSourcesConnection,
   UpdateProcessInput,
   UpdateProcessOutput,
 } from '@src/process/process.model'
@@ -52,15 +52,15 @@ export class ProcessResolver {
     private readonly placeService: PlaceService,
   ) {}
 
-  @Query(() => ProcessPage, { name: 'processes' })
+  @Query(() => ProcessConnection, { name: 'processes' })
   @OptionalAuth()
-  async processes(@Args() args: ProcessArgs): Promise<ProcessPage> {
+  async processes(@Args() args: ProcessArgs): Promise<ProcessConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessArgs, args)
     if (args.region) filter.where.region = args.region
     if (args.material) filter.where.material = args.material
 
     const cursor = await this.processService.find(filter)
-    return this.transform.entityToPaginated(Process, ProcessPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Process, ProcessConnection, cursor, parsedArgs)
   }
 
   @Query(() => Process, { name: 'process', nullable: true })
@@ -170,14 +170,19 @@ export class ProcessResolver {
     return entity ? this.transform.entityToModel(Place, entity) : null
   }
 
-  @ResolveField(() => ProcessSourcesPage)
+  @ResolveField(() => ProcessSourcesConnection)
   async sources(@Parent() process: Process, @Args() args: ProcessSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ProcessSourcesArgs, args)
     const cursor = await this.processService.sources(process.id, filter)
-    return this.transform.entityToPaginated(ProcessSource, ProcessSourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(
+      ProcessSource,
+      ProcessSourcesConnection,
+      cursor,
+      parsedArgs,
+    )
   }
 
-  @ResolveField(() => ProcessHistoryPage)
+  @ResolveField(() => ProcessHistoryConnection)
   async history(@Parent() process: Process, @Args() args: ProcessHistoryArgs) {
     const [, filter] = await this.transform.paginationArgs(ProcessHistoryArgs, args)
     const cursor = await this.processService.history(process.id, filter)
@@ -185,7 +190,7 @@ export class ProcessResolver {
       cursor.items.map((h) => this.transform.entityToModel(ProcessHistory, h)),
     )
     return this.transform.objectsToPaginated(
-      ProcessHistoryPage,
+      ProcessHistoryConnection,
       { items, count: cursor.count },
       true,
     )

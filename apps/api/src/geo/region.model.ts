@@ -55,7 +55,7 @@ export class RegionHistory {
 }
 
 @ObjectType()
-export class RegionsPage extends Paginated(Region) {}
+export class RegionsConnection extends Paginated(Region) {}
 
 @ArgsType()
 export class RegionSearchWithinArgs {

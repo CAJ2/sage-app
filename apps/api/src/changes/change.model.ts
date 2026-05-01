@@ -30,7 +30,7 @@ export class Job {
 }
 
 @ObjectType()
-export class JobsPage extends Paginated(Job) {}
+export class JobsConnection extends Paginated(Job) {}
 
 @ObjectType({ description: 'A tracked edit to a single entity within a change' })
 export class Edit extends BaseModel {
@@ -108,7 +108,7 @@ export class DirectEdit {
 }
 
 @ObjectType()
-export class ChangeEditsPage extends Paginated(Edit) {}
+export class ChangeEditsConnection extends Paginated(Edit) {}
 
 @ObjectType({ description: 'A proposed or merged set of edits to one or more data models' })
 export class Change extends IDCreatedUpdated {
@@ -124,19 +124,19 @@ export class Change extends IDCreatedUpdated {
   @Field(() => User, { description: 'The user who created this change' })
   user!: User & {}
 
-  @Field(() => ChangeEditsPage, {
+  @Field(() => ChangeEditsConnection, {
     description: 'The individual entity edits included in this change',
   })
-  edits!: ChangeEditsPage
+  edits!: ChangeEditsConnection
 
-  @Field(() => ChangeSourcesPage, { description: 'Source references supporting this change' })
-  sources!: ChangeSourcesPage & {}
+  @Field(() => ChangeSourcesConnection, { description: 'Source references supporting this change' })
+  sources!: ChangeSourcesConnection & {}
 
-  @Field(() => JobsPage, {
+  @Field(() => JobsConnection, {
     nullable: true,
     description: 'Active and past jobs for this change',
   })
-  jobs?: JobsPage
+  jobs?: JobsConnection
 }
 
 @ObjectType()
@@ -146,10 +146,10 @@ export class ChangeSource {
 }
 
 @ObjectType()
-export class ChangeSourcesPage extends Paginated(ChangeSource) {}
+export class ChangeSourcesConnection extends Paginated(ChangeSource) {}
 
 @ObjectType()
-export class ChangesPage extends Paginated(Change) {}
+export class ChangesConnection extends Paginated(Change) {}
 
 @ArgsType()
 export class ChangesArgs extends PaginationBasicArgs {

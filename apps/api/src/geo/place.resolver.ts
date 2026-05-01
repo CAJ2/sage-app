@@ -11,14 +11,18 @@ import {
   CreatePlaceOutput,
   Place,
   PlacesArgs,
-  PlacesPage,
+  PlacesConnection,
+  PlaceTagsArgs,
   UpdatePlaceInput,
   UpdatePlaceOutput,
 } from '@src/geo/place.model'
 import { PlaceSchemaService } from '@src/geo/place.schema'
 import { PlaceService } from '@src/geo/place.service'
 import { ModelEditSchema } from '@src/graphql/base.model'
-import { Tag } from '@src/process/tag.model'
+import { Tag, TagConnection } from '@src/process/tag.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { Org } from '@src/users/org.model'
 
 @Resolver(() => Place)
@@ -27,6 +31,7 @@ export class PlaceResolver {
     private readonly placeService: PlaceService,
     private readonly transform: TransformService,
     private readonly placeSchemaService: PlaceSchemaService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => ModelEditSchema, { nullable: true })
@@ -45,9 +50,9 @@ export class PlaceResolver {
     }
   }
 
-  @Query(() => PlacesPage, { name: 'places' })
+  @Query(() => PlacesConnection, { name: 'places' })
   @OptionalAuth()
-  async places(@Args() args: PlacesArgs): Promise<PlacesPage> {
+  async places(@Args() args: PlacesArgs): Promise<PlacesConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(PlacesArgs, args)
     const cursorOpts = await this.transform.applySearchQuery(
       PlaceEntity,
@@ -57,7 +62,7 @@ export class PlaceResolver {
     )
 
     const cursor = await this.placeService.find(cursorOpts)
-    return this.transform.entityToPaginated(Place, PlacesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Place, PlacesConnection, cursor, parsedArgs)
   }
 
   @Query(() => Place, { name: 'place', nullable: true })
@@ -70,10 +75,11 @@ export class PlaceResolver {
     return this.transform.entityToModel(Place, place)
   }
 
-  @ResolveField()
-  async tags(@Parent() place: Place) {
-    const tags = await this.placeService.tags(place.id)
-    return this.transform.entitiesToModels(Tag, tags)
+  @ResolveField(() => TagConnection)
+  async tags(@Parent() place: Place, @Args() args: PlaceTagsArgs) {
+    const [parsedArgs, filter] = await this.transform.paginationArgs(PlaceTagsArgs, args)
+    const cursor = await this.placeService.tagsPage(place.id, filter)
+    return this.transform.entityToPaginated(Tag, TagConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
@@ -83,6 +89,19 @@ export class PlaceResolver {
       return null
     }
     return this.transform.entityToModel(Org, org)
+  }
+
+  @ResolveField(() => PlacesConnection)
+  async related(@Parent() place: Place, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.PLACES,
+      place.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Place, PlacesConnection, cursor, parsedArgs)
   }
 
   @Mutation(() => CreatePlaceOutput, { nullable: true })

@@ -15,7 +15,7 @@ import {
 } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { ItemsPage } from '@src/product/item.model'
+import { ItemsConnection } from '@src/product/item.model'
 import { User as UserEntity } from '@src/users/users.entity'
 import { User } from '@src/users/users.model'
 
@@ -61,23 +61,32 @@ export class Category extends CreatedUpdated implements Named {
   @IsOptional()
   imageURL?: string
 
-  @Field(() => CategoriesPage, { description: 'Direct parent categories in the hierarchy' })
-  parents!: CategoriesPage & {}
+  @Field(() => CategoriesConnection, { description: 'Direct parent categories in the hierarchy' })
+  parents!: CategoriesConnection & {}
 
-  @Field(() => CategoriesPage, { description: 'Direct child categories in the hierarchy' })
-  children!: CategoriesPage & {}
+  @Field(() => CategoriesConnection, { description: 'Direct child categories in the hierarchy' })
+  children!: CategoriesConnection & {}
 
-  @Field(() => CategoriesPage, { description: 'All ancestor categories up the hierarchy tree' })
-  ancestors!: CategoriesPage & {}
+  @Field(() => CategoriesConnection, {
+    description: 'All ancestor categories up the hierarchy tree',
+  })
+  ancestors!: CategoriesConnection & {}
 
-  @Field(() => CategoriesPage, { description: 'All descendant categories down the hierarchy tree' })
-  descendants!: CategoriesPage & {}
+  @Field(() => CategoriesConnection, {
+    description: 'All descendant categories down the hierarchy tree',
+  })
+  descendants!: CategoriesConnection & {}
 
-  @Field(() => ItemsPage, { description: 'Items classified under this category' })
-  items!: ItemsPage & {}
+  @Field(() => ItemsConnection, { description: 'Items classified under this category' })
+  items!: ItemsConnection & {}
 
-  @Field(() => CategoryHistoryPage, { description: 'Audit history of changes to this category' })
-  history!: CategoryHistoryPage & {}
+  @Field(() => CategoriesConnection, { description: 'Similar categories related to this category' })
+  related!: CategoriesConnection & {}
+
+  @Field(() => CategoryHistoryConnection, {
+    description: 'Audit history of changes to this category',
+  })
+  history!: CategoryHistoryConnection & {}
 }
 registerModel('Category', Category)
 
@@ -100,10 +109,10 @@ export class CategoryHistory extends BaseModel {
 }
 
 @ObjectType()
-export class CategoryHistoryPage extends Paginated(CategoryHistory) {}
+export class CategoryHistoryConnection extends Paginated(CategoryHistory) {}
 
 @ObjectType()
-export class CategoriesPage extends Paginated(Category) {}
+export class CategoriesConnection extends Paginated(Category) {}
 
 @ArgsType()
 export class CategoryHistoryArgs extends PaginationBasicArgs {

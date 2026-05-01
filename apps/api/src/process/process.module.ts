@@ -24,6 +24,7 @@ import { TagSchemaService } from '@src/process/tag.schema'
 import { TagService } from '@src/process/tag.service'
 import { ImageSchemaService } from '@src/product/image.schema'
 import { VariantService } from '@src/product/variant.service'
+import { SearchModule } from '@src/search/search.module'
 import { UsersModule } from '@src/users/users.module'
 
 @Module({
@@ -34,6 +35,7 @@ import { UsersModule } from '@src/users/users.module'
     ClsModule.forFeature(),
     EditsModule,
     GeoModule,
+    SearchModule,
     UsersModule,
   ],
   providers: [

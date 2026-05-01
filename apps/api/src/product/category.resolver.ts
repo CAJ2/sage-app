@@ -12,11 +12,11 @@ import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
 import { Category as CategoryEntity } from '@src/product/category.entity'
 import {
   CategoriesArgs,
-  CategoriesPage,
+  CategoriesConnection,
   Category,
   CategoryHistory,
   CategoryHistoryArgs,
-  CategoryHistoryPage,
+  CategoryHistoryConnection,
   CategoryItemsArgs,
   CreateCategoryInput,
   CreateCategoryOutput,
@@ -25,7 +25,10 @@ import {
 } from '@src/product/category.model'
 import { CategorySchemaService } from '@src/product/category.schema'
 import { CategoryService } from '@src/product/category.service'
-import { Item, ItemsPage } from '@src/product/item.model'
+import { Item, ItemsConnection } from '@src/product/item.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { User } from '@src/users/users.model'
 
 @Resolver(() => Category)
@@ -34,14 +37,15 @@ export class CategoryResolver {
     private readonly categoryService: CategoryService,
     private readonly categorySchemaService: CategorySchemaService,
     private readonly transform: TransformService,
+    private readonly searchService: SearchService,
   ) {}
 
-  @Query(() => CategoriesPage, { name: 'categories' })
+  @Query(() => CategoriesConnection, { name: 'categories' })
   @OptionalAuth()
-  async categories(@Args() args: CategoriesArgs): Promise<CategoriesPage> {
+  async categories(@Args() args: CategoriesArgs): Promise<CategoriesConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoriesArgs, args)
     const cursor = await this.categoryService.find(filter)
-    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Category, CategoriesConnection, cursor, parsedArgs)
   }
 
   @Query(() => Category, { name: 'category', nullable: true })
@@ -86,35 +90,53 @@ export class CategoryResolver {
   async parents(@Parent() category: Category, @Args() args: CategoriesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoriesArgs, args)
     const cursor = await this.categoryService.findParents(category.id, filter)
-    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Category, CategoriesConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async children(@Parent() category: Category, @Args() args: CategoriesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoriesArgs, args)
     const cursor = await this.categoryService.findChildren(category.id, filter)
-    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Category, CategoriesConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async ancestors(@Parent() category: Category, @Args() args: CategoriesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoriesArgs, args)
     const cursor = await this.categoryService.findDirectAncestors(category.id, filter)
-    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Category, CategoriesConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async descendants(@Parent() category: Category, @Args() args: CategoriesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoriesArgs, args)
     const cursor = await this.categoryService.findDirectDescendants(category.id, filter)
-    return this.transform.entityToPaginated(Category, CategoriesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Category, CategoriesConnection, cursor, parsedArgs)
   }
 
   @ResolveField()
   async items(@Parent() category: Category, @Args() args: CategoryItemsArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(CategoryItemsArgs, args)
     const cursor = await this.categoryService.items(category.id, filter)
-    return this.transform.entityToPaginated(Item, ItemsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Item, ItemsConnection, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => CategoriesConnection)
+  async related(@Parent() category: Category, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.CATEGORIES,
+      category.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(
+      Category,
+      CategoriesConnection,
+      cursor,
+      parsedArgs,
+    )
   }
 
   @Mutation(() => CreateCategoryOutput, {
@@ -166,7 +188,7 @@ export class CategoryResolver {
     return { success: true, id: deleted.id }
   }
 
-  @ResolveField(() => CategoryHistoryPage)
+  @ResolveField(() => CategoryHistoryConnection)
   async history(@Parent() category: Category, @Args() args: CategoryHistoryArgs) {
     const [, filter] = await this.transform.paginationArgs(CategoryHistoryArgs, args)
     const cursor = await this.categoryService.history(category.id, filter)
@@ -174,7 +196,7 @@ export class CategoryResolver {
       cursor.items.map((h) => this.transform.entityToModel(CategoryHistory, h)),
     )
     return this.transform.objectsToPaginated(
-      CategoryHistoryPage,
+      CategoryHistoryConnection,
       { items, count: cursor.count },
       true,
     )

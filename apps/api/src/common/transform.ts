@@ -337,6 +337,64 @@ export class TransformService {
     }
     return page
   }
+
+  async entitiesToOffsetPaginated<
+    T extends BaseEntity,
+    U extends BaseModel,
+    S extends PaginatedType<U>,
+  >(
+    model: new () => U,
+    PageModel: new () => S,
+    cursor: Cursor<T, '*'>,
+    options: { limit?: number; offset?: number },
+  ): Promise<PaginatedType<U>> {
+    const items = await this.entitiesToModels(model, cursor.items)
+    return await this.objectsToOffsetPaginated(
+      PageModel,
+      { items, count: cursor.count },
+      options,
+      true,
+    )
+  }
+
+  async objectsToOffsetPaginated<T, S extends PaginatedType<any>>(
+    PageModel: new () => S,
+    cursor: { items: EntityDTO<T>[]; count: number },
+    options: { limit?: number; offset?: number },
+    skipTransform?: boolean,
+  ): Promise<PaginatedType<any>> {
+    const entities: any[] = []
+    if (skipTransform) {
+      entities.push(...cursor.items)
+    } else {
+      for (const obj of cursor.items) {
+        if (!(obj as any)._type) {
+          continue
+        }
+        const inst = _.isPlainObject(obj)
+          ? await this.zService.objectToModel((obj as any)._type, obj)
+          : await this.zService.entityToModel((obj as any)._type, obj as any)
+        ;(inst as any)._type = (obj as any)._type
+        entities.push(inst)
+      }
+    }
+
+    const offset = options.offset ?? 0
+    const page = new PageModel()
+    page.edges = entities.map((node, index) => ({
+      cursor: Buffer.from(String(offset + index)).toString('base64'),
+      node,
+    }))
+    page.nodes = entities
+    page.totalCount = cursor.count
+    page.pageInfo = {
+      startCursor: page.edges[0]?.cursor,
+      endCursor: page.edges[page.edges.length - 1]?.cursor,
+      hasPreviousPage: offset > 0,
+      hasNextPage: offset + entities.length < cursor.count,
+    }
+    return page
+  }
 }
 
 export function transformUnion(field: string): (params: TransformFnParams) => object {

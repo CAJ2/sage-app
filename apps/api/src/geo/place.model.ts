@@ -12,7 +12,7 @@ import { type JSONObject } from '@src/common/z.schema'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { TagPage } from '@src/process/tag.model'
+import { TagConnection } from '@src/process/tag.model'
 import { Org } from '@src/users/org.model'
 
 @ObjectType({ description: 'Geographic coordinates (latitude and longitude) for a place' })
@@ -75,11 +75,14 @@ export class Place extends CreatedUpdated implements Named {
   })
   location?: PlaceLocation
 
-  @Field(() => TagPage, { description: 'Metadata tags applied to this place' })
-  tags!: TagPage
+  @Field(() => TagConnection, { description: 'Metadata tags applied to this place' })
+  tags!: TagConnection
 
   @Field(() => Org, { nullable: true, description: 'The organization associated with this place' })
   org?: Org & {}
+
+  @Field(() => PlacesConnection, { description: 'Similar places related to this place' })
+  related!: PlacesConnection & {}
 }
 registerModel('Place', Place)
 
@@ -102,7 +105,12 @@ export class PlaceHistory {
 }
 
 @ObjectType()
-export class PlacesPage extends Paginated(Place) {}
+export class PlacesConnection extends Paginated(Place) {}
+
+@ArgsType()
+export class PlaceTagsArgs extends PaginationBasicArgs {
+  static schema = PaginationBasicArgs.schema
+}
 
 @ArgsType()
 export class PlacesArgs extends PaginationBasicArgs {

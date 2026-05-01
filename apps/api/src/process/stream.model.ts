@@ -177,15 +177,9 @@ export class StreamContext {
   @Field(() => String, { description: 'Identifier key for this context entry' })
   key!: string
 
-  @Field(() => String, { nullable: true, description: 'Type of contextual information' })
-  type?: string
-
-  @Field(() => String, { nullable: true, description: 'Value of this context entry' })
-  value?: string
-
   @Field(() => String, { nullable: true })
   name?: string
 
   @Field(() => String, { nullable: true })
-  desc?: string
+  markdown?: string
 }

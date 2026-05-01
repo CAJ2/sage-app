@@ -9,6 +9,9 @@ import { EditService } from '@src/changes/edit.service'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { DeleteOutput, ModelEditSchema } from '@src/graphql/base.model'
+import { RelatedArgs } from '@src/search/related.model'
+import { SearchIndex } from '@src/search/search.backend'
+import { SearchService } from '@src/search/search.service'
 import { Org as OrgEntity } from '@src/users/org.entity'
 import {
   CreateOrgInput,
@@ -16,16 +19,16 @@ import {
   Org,
   OrgHistory,
   OrgHistoryArgs,
-  OrgHistoryPage,
+  OrgHistoryConnection,
   OrgsArgs,
-  OrgsPage,
+  OrgsConnection,
   OrgUsersArgs,
   UpdateOrgInput,
   UpdateOrgOutput,
 } from '@src/users/org.model'
 import { OrgSchemaService } from '@src/users/org.schema'
 import { OrgService } from '@src/users/org.service'
-import { User, UserPage } from '@src/users/users.model'
+import { User, UserConnection } from '@src/users/users.model'
 
 @Resolver(() => Org)
 export class OrgResolver {
@@ -33,6 +36,7 @@ export class OrgResolver {
     private readonly orgService: OrgService,
     private readonly transform: TransformService,
     private readonly orgSchemaService: OrgSchemaService,
+    private readonly searchService: SearchService,
   ) {}
 
   @Query(() => ModelEditSchema, { nullable: true })
@@ -51,12 +55,12 @@ export class OrgResolver {
     }
   }
 
-  @Query(() => OrgsPage, { name: 'orgs' })
+  @Query(() => OrgsConnection, { name: 'orgs' })
   @OptionalAuth()
-  async orgs(@Args() args: OrgsArgs): Promise<OrgsPage> {
+  async orgs(@Args() args: OrgsArgs): Promise<OrgsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(OrgsArgs, args)
     const cursor = await this.orgService.find(filter)
-    return this.transform.entityToPaginated(Org, OrgsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Org, OrgsConnection, cursor, parsedArgs)
   }
 
   @Query(() => Org, { name: 'org', nullable: true })
@@ -74,7 +78,20 @@ export class OrgResolver {
   async users(@Parent() org: Org, @Args() args: OrgUsersArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(OrgUsersArgs, args)
     const cursor = await this.orgService.users(org.id, filter)
-    return this.transform.entityToPaginated(User, UserPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(User, UserConnection, cursor, parsedArgs)
+  }
+
+  @ResolveField(() => OrgsConnection)
+  async related(@Parent() org: Org, @Args() args: RelatedArgs) {
+    const parsedArgs = await this.searchService.parseRelatedArgs(args)
+    const cursor = await this.searchService.searchRelated(
+      SearchIndex.ORGS,
+      org.id,
+      parsedArgs.query,
+      parsedArgs.limit,
+      parsedArgs.offset,
+    )
+    return this.transform.entitiesToOffsetPaginated(Org, OrgsConnection, cursor, parsedArgs)
   }
 
   @Mutation(() => CreateOrgOutput, { nullable: true })
@@ -117,14 +134,18 @@ export class OrgResolver {
     return { success: true, id: deleted.id }
   }
 
-  @ResolveField(() => OrgHistoryPage)
+  @ResolveField(() => OrgHistoryConnection)
   async history(@Parent() org: Org, @Args() args: OrgHistoryArgs) {
     const [, filter] = await this.transform.paginationArgs(OrgHistoryArgs, args)
     const cursor = await this.orgService.history(org.id, filter)
     const items = await Promise.all(
       cursor.items.map((h) => this.transform.entityToModel(OrgHistory, h)),
     )
-    return this.transform.objectsToPaginated(OrgHistoryPage, { items, count: cursor.count }, true)
+    return this.transform.objectsToPaginated(
+      OrgHistoryConnection,
+      { items, count: cursor.count },
+      true,
+    )
   }
 }
 

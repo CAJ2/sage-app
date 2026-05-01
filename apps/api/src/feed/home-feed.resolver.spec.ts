@@ -152,6 +152,38 @@ describe('HomeFeedResolver (integration)', () => {
     expect(externalItem.shareText).toBe('External Link — https://example.com/article')
   })
 
+  test('resolves openGraph fields for EXTERNAL format item', async () => {
+    const res = await gql.send(
+      graphql(`
+        query HomeFeedExternalOpenGraph($first: Int) {
+          feed(first: $first) {
+            nodes {
+              id
+              format
+              externalLink {
+                url
+                openGraph {
+                  title
+                  description
+                  image
+                  siteName
+                }
+              }
+            }
+          }
+        }
+      `),
+      { first: 10 },
+    )
+    expect(res.errors).toBeUndefined()
+    const externalItem = res.data?.feed.nodes!.find((n) => n.format === 'EXTERNAL')!
+    expect(externalItem.externalLink?.url).toBe('https://example.com/article')
+    expect(externalItem.externalLink?.openGraph?.title).toBe('Example Article')
+    expect(externalItem.externalLink?.openGraph?.description).toBe('An example description')
+    expect(externalItem.externalLink?.openGraph?.image).toBe('https://example.com/og.jpg')
+    expect(externalItem.externalLink?.openGraph?.siteName).toBe('Example Site')
+  })
+
   test('resolves markdown and markdownShort from content', async () => {
     const res = await gql.send(
       graphql(`

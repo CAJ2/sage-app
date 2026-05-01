@@ -30,4 +30,8 @@ export default (): Record<string, unknown> => ({
   mistral: {
     apiKey: process.env.MISTRAL_API_KEY,
   },
+  spaces: {
+    key: process.env.DO_SPACES_KEY,
+    secret: process.env.DO_SPACES_SECRET,
+  },
 })

@@ -47,12 +47,12 @@ class SearchResultItemEdge {
 }
 
 @ObjectType()
-export class SearchResultPage implements IPaginatedType<typeof SearchResultItem> {
-  @Field(() => [SearchResultItemEdge], { nullable: true })
-  edges?: SearchResultItemEdge[]
+export class SearchResultConnection implements IPaginatedType<typeof SearchResultItem> {
+  @Field(() => [SearchResultItemEdge])
+  edges: SearchResultItemEdge[] = []
 
-  @Field(() => [SearchResultItem], { nullable: true })
-  nodes?: (typeof SearchResultItem)[]
+  @Field(() => [SearchResultItem])
+  nodes: (typeof SearchResultItem)[] = []
 
   @Field(() => Int)
   totalCount: number = 0

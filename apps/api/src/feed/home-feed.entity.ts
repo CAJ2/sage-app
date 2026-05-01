@@ -29,6 +29,14 @@ export class HomeFeed extends IDCreatedUpdated {
   @Property({ type: 'json', nullable: true })
   links?: {
     link?: { entityName: string; id: string }
-    externalLink?: { url: string }
+    externalLink?: {
+      url: string
+      openGraph?: {
+        title?: string
+        description?: string
+        image?: string
+        siteName?: string
+      }
+    }
   }
 }

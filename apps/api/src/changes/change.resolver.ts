@@ -8,17 +8,17 @@ import {
   AddRefOutput,
   Change,
   ChangeEditsArgs,
-  ChangeEditsPage,
+  ChangeEditsConnection,
   ChangeJobsArgs,
   ChangesArgs,
+  ChangesConnection,
   ChangeSourcesArgs,
-  ChangesPage,
   CreateChangeOutput,
   DeleteChangeOutput,
   DirectEdit,
   DirectEditArgs,
   DiscardEditOutput,
-  JobsPage,
+  JobsConnection,
   MergeChangeOutput,
   RemoveRefOutput,
   UpdateChangeInput,
@@ -29,7 +29,7 @@ import { ChangeService } from '@src/changes/change.service'
 import { EditService } from '@src/changes/edit.service'
 import { AddRefInput, RemoveRefInput } from '@src/changes/ref-edit.model'
 import { RefEditService } from '@src/changes/ref-edit.service'
-import { Source, SourcesPage } from '@src/changes/source.model'
+import { Source, SourcesConnection } from '@src/changes/source.model'
 import { NotFoundErr } from '@src/common/exceptions'
 import { TransformService } from '@src/common/transform'
 import { User } from '@src/users/users.model'
@@ -44,12 +44,12 @@ export class ChangeResolver {
     private readonly refEditService: RefEditService,
   ) {}
 
-  @Query(() => ChangesPage)
+  @Query(() => ChangesConnection)
   @OptionalAuth()
   async changes(@Args() args: ChangesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ChangesArgs, args)
     const cursor = await this.changeService.find(filter)
-    return this.transform.entityToPaginated(Change, ChangesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Change, ChangesConnection, cursor, parsedArgs)
   }
 
   @Query(() => Change, { name: 'change', nullable: true })
@@ -148,21 +148,24 @@ export class ChangeResolver {
     return this.refEditService.removeRef(model, id, input, user.id)
   }
 
-  @ResolveField(() => ChangeEditsPage, { nullable: true })
-  async edits(@Parent() change: Change, @Args() args: ChangeEditsArgs): Promise<ChangeEditsPage> {
+  @ResolveField(() => ChangeEditsConnection, { nullable: true })
+  async edits(
+    @Parent() change: Change,
+    @Args() args: ChangeEditsArgs,
+  ): Promise<ChangeEditsConnection> {
     const edits = await this.changeService.edits(change.id, args.id, args.type)
     return this.transform.objectsToPaginated(
-      ChangeEditsPage,
+      ChangeEditsConnection,
       { items: edits, count: edits.length },
       true,
     )
   }
 
-  @ResolveField(() => SourcesPage, { nullable: true })
+  @ResolveField(() => SourcesConnection, { nullable: true })
   async sources(@Parent() change: Change, @Args() args: ChangeSourcesArgs) {
     const [parsedArgs, filter] = await this.transform.paginationArgs(ChangeSourcesArgs, args)
     const cursor = await this.changeService.sources(change.id, filter)
-    return this.transform.entityToPaginated(Source, SourcesPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Source, SourcesConnection, cursor, parsedArgs)
   }
 
   @ResolveField(() => User, { nullable: true })
@@ -174,9 +177,13 @@ export class ChangeResolver {
     return this.transform.entityToModel(User, user)
   }
 
-  @ResolveField(() => JobsPage, { nullable: true })
-  async jobs(@Parent() change: Change, @Args() args: ChangeJobsArgs): Promise<JobsPage> {
+  @ResolveField(() => JobsConnection, { nullable: true })
+  async jobs(@Parent() change: Change, @Args() args: ChangeJobsArgs): Promise<JobsConnection> {
     const jobs = await this.changeService.jobs(change.id, args.active)
-    return this.transform.objectsToPaginated(JobsPage, { items: jobs, count: jobs.length }, true)
+    return this.transform.objectsToPaginated(
+      JobsConnection,
+      { items: jobs, count: jobs.length },
+      true,
+    )
   }
 }

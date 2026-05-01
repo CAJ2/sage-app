@@ -9,8 +9,8 @@ import {
   CurrentRegion,
   Region,
   RegionsArgs,
+  RegionsConnection,
   RegionSearchWithinArgs,
-  RegionsPage,
   RegionsSearchByPointArgs,
 } from '@src/geo/region.model'
 import { RegionService } from '@src/geo/region.service'
@@ -23,12 +23,12 @@ export class RegionResolver {
     private readonly transform: TransformService,
   ) {}
 
-  @Query(() => RegionsPage, { name: 'regions' })
+  @Query(() => RegionsConnection, { name: 'regions' })
   @OptionalAuth()
-  async regions(@Args() args: RegionsArgs): Promise<RegionsPage> {
+  async regions(@Args() args: RegionsArgs): Promise<RegionsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(RegionsArgs, args)
     const cursor = await this.regionService.find(filter)
-    return this.transform.entityToPaginated(Region, RegionsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Region, RegionsConnection, cursor, parsedArgs)
   }
 
   @Query(() => Region, { name: 'region', nullable: true })
@@ -109,14 +109,14 @@ export class RegionResolver {
     return this.transform.entityToModel(Region, parent)
   }
 
-  @ResolveField(() => RegionsPage)
+  @ResolveField(() => RegionsConnection)
   async searchWithin(
     @Parent() region: Region,
     @Args() args: RegionSearchWithinArgs,
-  ): Promise<RegionsPage> {
+  ): Promise<RegionsConnection> {
     const entity = await this.regionService.findOneByID(region.id)
     if (!entity)
-      return this.transform.objectsToPaginated(RegionsPage, { items: [], count: 0 }, true)
+      return this.transform.objectsToPaginated(RegionsConnection, { items: [], count: 0 }, true)
     const cursor = await this.regionService.searchWithin(entity, args.query, {
       adminLevel: args.adminLevel,
       limit: args.limit,
@@ -126,15 +126,15 @@ export class RegionResolver {
       cursor.items.map((e) => this.transform.entityToModel(Region, e)),
     )
     return this.transform.objectsToPaginated(
-      RegionsPage,
+      RegionsConnection,
       { items: models, count: cursor.count },
       true,
     )
   }
 
-  @Query(() => RegionsPage, { name: 'searchRegionsByPoint' })
+  @Query(() => RegionsConnection, { name: 'searchRegionsByPoint' })
   @OptionalAuth()
-  async searchRegionsByPoint(@Args() args: RegionsSearchByPointArgs): Promise<RegionsPage> {
+  async searchRegionsByPoint(@Args() args: RegionsSearchByPointArgs): Promise<RegionsConnection> {
     const [parsedArgs, filter] = await this.transform.paginationArgs(RegionsSearchByPointArgs, args)
     const cursor = await this.regionService.searchByPoint(
       {
@@ -143,6 +143,6 @@ export class RegionResolver {
       },
       filter,
     )
-    return this.transform.entityToPaginated(Region, RegionsPage, cursor, parsedArgs)
+    return this.transform.entityToPaginated(Region, RegionsConnection, cursor, parsedArgs)
   }
 }

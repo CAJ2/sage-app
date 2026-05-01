@@ -9,8 +9,8 @@ import { LuxonDateTimeResolver } from '@src/common/datetime.model'
 import { CreatedUpdated, registerModel, TranslatedInput } from '@src/graphql/base.model'
 import { Named } from '@src/graphql/interfaces.model'
 import { Paginated, PaginationBasicArgs } from '@src/graphql/paginated'
-import { ComponentsPage } from '@src/process/component.model'
-import { ProcessPage } from '@src/process/process.model'
+import { ComponentsConnection } from '@src/process/component.model'
+import { ProcessConnection } from '@src/process/process.model'
 
 @ObjectType({
   implements: () => [Named],
@@ -44,26 +44,31 @@ export class Material extends CreatedUpdated implements Named {
   })
   shape?: string
 
-  @Field(() => MaterialsPage, { description: 'Direct parent materials in the hierarchy' })
-  parents!: MaterialsPage & {}
+  @Field(() => MaterialsConnection, { description: 'Direct parent materials in the hierarchy' })
+  parents!: MaterialsConnection & {}
 
-  @Field(() => MaterialsPage, { description: 'Direct child materials in the hierarchy' })
-  children!: MaterialsPage & {}
+  @Field(() => MaterialsConnection, { description: 'Direct child materials in the hierarchy' })
+  children!: MaterialsConnection & {}
 
-  @Field(() => MaterialsPage, { description: 'All ancestor materials up the hierarchy' })
-  ancestors!: MaterialsPage & {}
+  @Field(() => MaterialsConnection, { description: 'All ancestor materials up the hierarchy' })
+  ancestors!: MaterialsConnection & {}
 
-  @Field(() => MaterialsPage, { description: 'All descendant materials down the hierarchy' })
-  descendants!: MaterialsPage & {}
+  @Field(() => MaterialsConnection, { description: 'All descendant materials down the hierarchy' })
+  descendants!: MaterialsConnection & {}
 
-  @Field(() => ComponentsPage, { description: 'Components that primarily use this material' })
-  primaryComponents!: ComponentsPage & {}
+  @Field(() => ComponentsConnection, { description: 'Components that primarily use this material' })
+  primaryComponents!: ComponentsConnection & {}
 
-  @Field(() => ComponentsPage, { description: 'All components that include this material' })
-  components!: ComponentsPage & {}
+  @Field(() => ComponentsConnection, { description: 'All components that include this material' })
+  components!: ComponentsConnection & {}
 
-  @Field(() => ProcessPage, { description: 'Recycling or disposal processes for this material' })
-  processes!: ProcessPage & {}
+  @Field(() => ProcessConnection, {
+    description: 'Recycling or disposal processes for this material',
+  })
+  processes!: ProcessConnection & {}
+
+  @Field(() => MaterialsConnection, { description: 'Similar materials related to this material' })
+  related!: MaterialsConnection & {}
 }
 registerModel('Material', Material)
 
@@ -83,7 +88,7 @@ export class MaterialHistory {
 }
 
 @ObjectType()
-export class MaterialsPage extends Paginated(Material) {}
+export class MaterialsConnection extends Paginated(Material) {}
 
 @ArgsType()
 export class MaterialsArgs extends PaginationBasicArgs {

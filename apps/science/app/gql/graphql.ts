@@ -20,6 +20,8 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { input: any; output: any; }
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: { input: any; output: any; }
 };
 
 export type AddRefInput = {
@@ -55,10 +57,10 @@ export enum CacheControlScope {
   Public = 'PUBLIC'
 }
 
-export type CategoriesPage = {
-  __typename?: 'CategoriesPage';
-  edges?: Maybe<Array<CategoryEdge>>;
-  nodes?: Maybe<Array<Category>>;
+export type CategoriesConnection = {
+  __typename?: 'CategoriesConnection';
+  edges: Array<CategoryEdge>;
+  nodes: Array<Category>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -67,9 +69,9 @@ export type CategoriesPage = {
 export type Category = Named & {
   __typename?: 'Category';
   /** All ancestor categories up the hierarchy tree */
-  ancestors: CategoriesPage;
+  ancestors: CategoriesConnection;
   /** Direct child categories in the hierarchy */
-  children: CategoriesPage;
+  children: CategoriesConnection;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** A short summary description */
@@ -79,18 +81,20 @@ export type Category = Named & {
   /** Translated versions of the description */
   descTr?: Maybe<Array<TranslatedOutput>>;
   /** All descendant categories down the hierarchy tree */
-  descendants: CategoriesPage;
+  descendants: CategoriesConnection;
   /** Audit history of changes to this category */
-  history: CategoryHistoryPage;
+  history: CategoryHistoryConnection;
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   /** Items classified under this category */
-  items: ItemsPage;
+  items: ItemsConnection;
   name: Scalars['String']['output'];
   /** Translated versions of the name */
   nameTr?: Maybe<Array<TranslatedOutput>>;
   /** Direct parent categories in the hierarchy */
-  parents: CategoriesPage;
+  parents: CategoriesConnection;
+  /** Similar categories related to this category */
+  related: CategoriesConnection;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -148,6 +152,14 @@ export type CategoryParentsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
+/** A hierarchical category for classifying product items */
+export type CategoryRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CategoryEdge = {
   __typename?: 'CategoryEdge';
   cursor: Scalars['String']['output'];
@@ -163,18 +175,18 @@ export type CategoryHistory = {
   user: User;
 };
 
+export type CategoryHistoryConnection = {
+  __typename?: 'CategoryHistoryConnection';
+  edges: Array<CategoryHistoryEdge>;
+  nodes: Array<CategoryHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type CategoryHistoryEdge = {
   __typename?: 'CategoryHistoryEdge';
   cursor: Scalars['String']['output'];
   node: CategoryHistory;
-};
-
-export type CategoryHistoryPage = {
-  __typename?: 'CategoryHistoryPage';
-  edges?: Maybe<Array<CategoryHistoryEdge>>;
-  nodes?: Maybe<Array<CategoryHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 /** The severity level of a caveat */
@@ -190,12 +202,12 @@ export type Change = {
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   /** The individual entity edits included in this change */
-  edits: ChangeEditsPage;
+  edits: ChangeEditsConnection;
   id: Scalars['ID']['output'];
   /** Active and past jobs for this change */
-  jobs?: Maybe<JobsPage>;
+  jobs?: Maybe<JobsConnection>;
   /** Source references supporting this change */
-  sources: ChangeSourcesPage;
+  sources: ChangeSourcesConnection;
   status: ChangeStatus;
   title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
@@ -239,10 +251,10 @@ export type ChangeEdge = {
   node: Change;
 };
 
-export type ChangeEditsPage = {
-  __typename?: 'ChangeEditsPage';
-  edges?: Maybe<Array<EditEdge>>;
-  nodes?: Maybe<Array<Edit>>;
+export type ChangeEditsConnection = {
+  __typename?: 'ChangeEditsConnection';
+  edges: Array<EditEdge>;
+  nodes: Array<Edit>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -258,10 +270,10 @@ export type ChangeSourceEdge = {
   node: ChangeSource;
 };
 
-export type ChangeSourcesPage = {
-  __typename?: 'ChangeSourcesPage';
-  edges?: Maybe<Array<ChangeSourceEdge>>;
-  nodes?: Maybe<Array<ChangeSource>>;
+export type ChangeSourcesConnection = {
+  __typename?: 'ChangeSourcesConnection';
+  edges: Array<ChangeSourceEdge>;
+  nodes: Array<ChangeSource>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -275,10 +287,10 @@ export enum ChangeStatus {
   Rejected = 'REJECTED'
 }
 
-export type ChangesPage = {
-  __typename?: 'ChangesPage';
-  edges?: Maybe<Array<ChangeEdge>>;
-  nodes?: Maybe<Array<Change>>;
+export type ChangesConnection = {
+  __typename?: 'ChangesConnection';
+  edges: Array<ChangeEdge>;
+  nodes: Array<Change>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -289,12 +301,12 @@ export type Component = Named & {
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this component */
-  history: ComponentHistoryPage;
+  history: ComponentHistoryConnection;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   /** Images associated with this component */
-  images: ImagesPage;
+  images: ImagesConnection;
   /** All materials in this component with their fractions */
   materials: Array<ComponentMaterial>;
   name?: Maybe<Scalars['String']['output']>;
@@ -306,8 +318,10 @@ export type Component = Named & {
   recycleScore?: Maybe<StreamScore>;
   /** The geographic region this component's recycling data applies to */
   region?: Maybe<Region>;
-  sources: ComponentSourcesPage;
-  tags: TagPage;
+  /** Similar components related to this component */
+  related: ComponentsConnection;
+  sources: ComponentSourcesConnection;
+  tags: TagConnection;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -339,6 +353,14 @@ export type ComponentRecycleArgs = {
 /** A physical component of a product variant, made of one or more materials */
 export type ComponentRecycleScoreArgs = {
   regionID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+/** A physical component of a product variant, made of one or more materials */
+export type ComponentRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -375,18 +397,18 @@ export type ComponentHistory = {
   user: User;
 };
 
+export type ComponentHistoryConnection = {
+  __typename?: 'ComponentHistoryConnection';
+  edges: Array<ComponentHistoryEdge>;
+  nodes: Array<ComponentHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type ComponentHistoryEdge = {
   __typename?: 'ComponentHistoryEdge';
   cursor: Scalars['String']['output'];
   node: ComponentHistory;
-};
-
-export type ComponentHistoryPage = {
-  __typename?: 'ComponentHistoryPage';
-  edges?: Maybe<Array<ComponentHistoryEdge>>;
-  nodes?: Maybe<Array<ComponentHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 /** The fraction of a specific material within a component */
@@ -406,7 +428,7 @@ export type ComponentMaterialInput = {
 /** A recycling option for a component in a specific recycling stream */
 export type ComponentRecycle = {
   __typename?: 'ComponentRecycle';
-  context?: Maybe<StreamContext>;
+  context: Array<StreamContext>;
   stream?: Maybe<RecyclingStream>;
 };
 
@@ -426,10 +448,10 @@ export type ComponentSourceEdge = {
   node: ComponentSource;
 };
 
-export type ComponentSourcesPage = {
-  __typename?: 'ComponentSourcesPage';
-  edges?: Maybe<Array<ComponentSourceEdge>>;
-  nodes?: Maybe<Array<ComponentSource>>;
+export type ComponentSourcesConnection = {
+  __typename?: 'ComponentSourcesConnection';
+  edges: Array<ComponentSourceEdge>;
+  nodes: Array<ComponentSource>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -439,10 +461,10 @@ export type ComponentTagsInput = {
   meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
-export type ComponentsPage = {
-  __typename?: 'ComponentsPage';
-  edges?: Maybe<Array<ComponentEdge>>;
-  nodes?: Maybe<Array<Component>>;
+export type ComponentsConnection = {
+  __typename?: 'ComponentsConnection';
+  edges: Array<ComponentEdge>;
+  nodes: Array<Component>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -852,8 +874,17 @@ export enum EditModelType {
   Variant = 'Variant'
 }
 
+export type FeedConnection = {
+  __typename?: 'FeedConnection';
+  edges: Array<FeedItemEdge>;
+  nodes: Array<FeedItem>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type FeedExternalLink = {
   __typename?: 'FeedExternalLink';
+  openGraph?: Maybe<FeedOpenGraph>;
   url: Scalars['String']['output'];
 };
 
@@ -893,13 +924,30 @@ export type FeedLink = {
   id: Scalars['ID']['output'];
 };
 
-export type FeedPage = {
-  __typename?: 'FeedPage';
-  edges?: Maybe<Array<FeedItemEdge>>;
-  nodes?: Maybe<Array<FeedItem>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
+export type FeedOpenGraph = {
+  __typename?: 'FeedOpenGraph';
+  description?: Maybe<Scalars['String']['output']>;
+  image?: Maybe<Scalars['String']['output']>;
+  siteName?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
 };
+
+/** Thumbs up or thumbs down vote */
+export enum FeedbackAction {
+  Downvote = 'DOWNVOTE',
+  Upvote = 'UPVOTE'
+}
+
+/** Entity types that support feedback */
+export enum FeedbackEntityName {
+  Component = 'COMPONENT',
+  Item = 'ITEM',
+  Place = 'PLACE',
+  Process = 'PROCESS',
+  Program = 'PROGRAM',
+  Source = 'SOURCE',
+  Variant = 'VARIANT'
+}
 
 /** An image source */
 export type Image = {
@@ -919,10 +967,10 @@ export type ImageEdge = {
   node: Image;
 };
 
-export type ImagesPage = {
-  __typename?: 'ImagesPage';
-  edges?: Maybe<Array<ImageEdge>>;
-  nodes?: Maybe<Array<Image>>;
+export type ImagesConnection = {
+  __typename?: 'ImagesConnection';
+  edges: Array<ImageEdge>;
+  nodes: Array<Image>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -931,20 +979,22 @@ export type ImagesPage = {
 export type Item = Named & {
   __typename?: 'Item';
   /** Categories this item belongs to */
-  categories: CategoriesPage;
+  categories: CategoriesConnection;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this item */
-  history: ItemHistoryPage;
+  history: ItemHistoryConnection;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  /** Similar items related to this item */
+  related: ItemsConnection;
   /** Metadata tags applied to this item */
-  tags: TagPage;
+  tags: TagConnection;
   updatedAt: Scalars['DateTime']['output'];
   /** Product variants of this item (e.g. specific SKUs or models) */
-  variants: VariantsPage;
+  variants: VariantsConnection;
 };
 
 
@@ -963,6 +1013,14 @@ export type ItemHistoryArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** A product or consumable item that can be categorized and have multiple variants */
+export type ItemRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1002,18 +1060,18 @@ export type ItemHistory = {
   user: User;
 };
 
+export type ItemHistoryConnection = {
+  __typename?: 'ItemHistoryConnection';
+  edges: Array<ItemHistoryEdge>;
+  nodes: Array<ItemHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type ItemHistoryEdge = {
   __typename?: 'ItemHistoryEdge';
   cursor: Scalars['String']['output'];
   node: ItemHistory;
-};
-
-export type ItemHistoryPage = {
-  __typename?: 'ItemHistoryPage';
-  edges?: Maybe<Array<ItemHistoryEdge>>;
-  nodes?: Maybe<Array<ItemHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type ItemTagsInput = {
@@ -1021,10 +1079,10 @@ export type ItemTagsInput = {
   meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
-export type ItemsPage = {
-  __typename?: 'ItemsPage';
-  edges?: Maybe<Array<ItemEdge>>;
-  nodes?: Maybe<Array<Item>>;
+export type ItemsConnection = {
+  __typename?: 'ItemsConnection';
+  edges: Array<ItemEdge>;
+  nodes: Array<Item>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1045,10 +1103,10 @@ export type JobEdge = {
   node: Job;
 };
 
-export type JobsPage = {
-  __typename?: 'JobsPage';
-  edges?: Maybe<Array<JobEdge>>;
-  nodes?: Maybe<Array<Job>>;
+export type JobsConnection = {
+  __typename?: 'JobsConnection';
+  edges: Array<JobEdge>;
+  nodes: Array<Job>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1073,23 +1131,25 @@ export type MarkSourceProcessedOutput = {
 export type Material = Named & {
   __typename?: 'Material';
   /** All ancestor materials up the hierarchy */
-  ancestors: MaterialsPage;
+  ancestors: MaterialsConnection;
   /** Direct child materials in the hierarchy */
-  children: MaterialsPage;
+  children: MaterialsConnection;
   /** All components that include this material */
-  components: ComponentsPage;
+  components: ComponentsConnection;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** All descendant materials down the hierarchy */
-  descendants: MaterialsPage;
+  descendants: MaterialsConnection;
   id: Scalars['ID']['output'];
   name?: Maybe<Scalars['String']['output']>;
   /** Direct parent materials in the hierarchy */
-  parents: MaterialsPage;
+  parents: MaterialsConnection;
   /** Components that primarily use this material */
-  primaryComponents: ComponentsPage;
+  primaryComponents: ComponentsConnection;
   /** Recycling or disposal processes for this material */
-  processes: ProcessPage;
+  processes: ProcessConnection;
+  /** Similar materials related to this material */
+  related: MaterialsConnection;
   /** The physical form or shape of the material (e.g. film, rigid, fibre) */
   shape?: Maybe<Scalars['String']['output']>;
   synonyms?: Maybe<Array<Scalars['String']['output']>>;
@@ -1161,16 +1221,24 @@ export type MaterialProcessesArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
+/** A raw or processed material that physical components are composed of */
+export type MaterialRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type MaterialEdge = {
   __typename?: 'MaterialEdge';
   cursor: Scalars['String']['output'];
   node: Material;
 };
 
-export type MaterialsPage = {
-  __typename?: 'MaterialsPage';
-  edges?: Maybe<Array<MaterialEdge>>;
-  nodes?: Maybe<Array<Material>>;
+export type MaterialsConnection = {
+  __typename?: 'MaterialsConnection';
+  edges: Array<MaterialEdge>;
+  nodes: Array<Material>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1246,6 +1314,8 @@ export type Mutation = {
   updateSource?: Maybe<UpdateSourceOutput>;
   updateTagDefinition?: Maybe<UpdateTagDefinitionOutput>;
   updateVariant?: Maybe<UpdateVariantOutput>;
+  uploadSource: UploadSourceOutput;
+  vote: VoteOutput;
 };
 
 
@@ -1438,6 +1508,16 @@ export type MutationUpdateVariantArgs = {
   input: UpdateVariantInput;
 };
 
+
+export type MutationUploadSourceArgs = {
+  input: UploadSourceInput;
+};
+
+
+export type MutationVoteArgs = {
+  input: VoteInput;
+};
+
 export type Named = {
   /** The description of the model */
   desc?: Maybe<Scalars['String']['output']>;
@@ -1453,15 +1533,17 @@ export type Org = Named & {
   avatarURL?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
-  history: OrgHistoryPage;
+  history: OrgHistoryConnection;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  /** Similar organizations related to this organization */
+  related: OrgsConnection;
   /** URL-friendly unique identifier for this organization */
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   /** Users that are members of this organization */
-  users: UserPage;
+  users: UserConnection;
   /** URL of the organization's website */
   websiteURL?: Maybe<Scalars['String']['output']>;
 };
@@ -1473,6 +1555,14 @@ export type OrgHistoryArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** An organization or company on the platform */
+export type OrgRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1499,24 +1589,24 @@ export type OrgHistory = {
   user: User;
 };
 
+export type OrgHistoryConnection = {
+  __typename?: 'OrgHistoryConnection';
+  edges: Array<OrgHistoryEdge>;
+  nodes: Array<OrgHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type OrgHistoryEdge = {
   __typename?: 'OrgHistoryEdge';
   cursor: Scalars['String']['output'];
   node: OrgHistory;
 };
 
-export type OrgHistoryPage = {
-  __typename?: 'OrgHistoryPage';
-  edges?: Maybe<Array<OrgHistoryEdge>>;
-  nodes?: Maybe<Array<OrgHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type OrgsPage = {
-  __typename?: 'OrgsPage';
-  edges?: Maybe<Array<OrgEdge>>;
-  nodes?: Maybe<Array<Org>>;
+export type OrgsConnection = {
+  __typename?: 'OrgsConnection';
+  edges: Array<OrgEdge>;
+  nodes: Array<Org>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1542,9 +1632,28 @@ export type Place = Named & {
   name?: Maybe<Scalars['String']['output']>;
   /** The organization associated with this place */
   org?: Maybe<Org>;
+  /** Similar places related to this place */
+  related: PlacesConnection;
   /** Metadata tags applied to this place */
-  tags: TagPage;
+  tags: TagConnection;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+
+/** A specific physical location, such as a business or recycling facility */
+export type PlaceRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** A specific physical location, such as a business or recycling facility */
+export type PlaceTagsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** A structured postal address */
@@ -1585,10 +1694,10 @@ export type PlaceTagsInput = {
   meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
-export type PlacesPage = {
-  __typename?: 'PlacesPage';
-  edges?: Maybe<Array<PlaceEdge>>;
-  nodes?: Maybe<Array<Place>>;
+export type PlacesConnection = {
+  __typename?: 'PlacesConnection';
+  edges: Array<PlaceEdge>;
+  nodes: Array<Place>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1601,7 +1710,7 @@ export type Process = Named & {
   /** Efficiency metrics for this process */
   efficiency?: Maybe<ProcessEfficiency>;
   /** Audit history of changes to this process */
-  history: ProcessHistoryPage;
+  history: ProcessHistoryConnection;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   /** The type of circular economy process (e.g. RECYCLE, REUSE, REPAIR) */
@@ -1615,7 +1724,7 @@ export type Process = Named & {
   place?: Maybe<Place>;
   /** The geographic region where this process is available */
   region?: Maybe<Region>;
-  sources: ProcessSourcesPage;
+  sources: ProcessSourcesConnection;
   updatedAt: Scalars['DateTime']['output'];
   /** The product variant this process applies to */
   variant?: Maybe<Variant>;
@@ -1637,6 +1746,14 @@ export type ProcessSourcesArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ProcessConnection = {
+  __typename?: 'ProcessConnection';
+  edges: Array<ProcessEdge>;
+  nodes: Array<Process>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type ProcessEdge = {
@@ -1665,18 +1782,18 @@ export type ProcessHistory = {
   user: User;
 };
 
+export type ProcessHistoryConnection = {
+  __typename?: 'ProcessHistoryConnection';
+  edges: Array<ProcessHistoryEdge>;
+  nodes: Array<ProcessHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type ProcessHistoryEdge = {
   __typename?: 'ProcessHistoryEdge';
   cursor: Scalars['String']['output'];
   node: ProcessHistory;
-};
-
-export type ProcessHistoryPage = {
-  __typename?: 'ProcessHistoryPage';
-  edges?: Maybe<Array<ProcessHistoryEdge>>;
-  nodes?: Maybe<Array<ProcessHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type ProcessMaterialInput = {
@@ -1685,14 +1802,6 @@ export type ProcessMaterialInput = {
 
 export type ProcessOrgInput = {
   id: Scalars['ID']['input'];
-};
-
-export type ProcessPage = {
-  __typename?: 'ProcessPage';
-  edges?: Maybe<Array<ProcessEdge>>;
-  nodes?: Maybe<Array<Process>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type ProcessPlaceInput = {
@@ -1715,10 +1824,10 @@ export type ProcessSourceEdge = {
   node: ProcessSource;
 };
 
-export type ProcessSourcesPage = {
-  __typename?: 'ProcessSourcesPage';
-  edges?: Maybe<Array<ProcessSourceEdge>>;
-  nodes?: Maybe<Array<ProcessSource>>;
+export type ProcessSourcesConnection = {
+  __typename?: 'ProcessSourcesConnection';
+  edges: Array<ProcessSourceEdge>;
+  nodes: Array<ProcessSource>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1733,20 +1842,20 @@ export type Program = Named & {
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this program */
-  history: ProgramHistoryPage;
+  history: ProgramHistoryConnection;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   instructions?: Maybe<Scalars['JSONObject']['output']>;
   name: Scalars['String']['output'];
   /** Organizations involved in this program */
-  orgs: OrgsPage;
+  orgs: OrgsConnection;
   /** Processes run by this program */
-  processes: ProcessPage;
+  processes: ProcessConnection;
   region?: Maybe<Region>;
   social?: Maybe<Scalars['JSONObject']['output']>;
   status: Scalars['String']['output'];
   /** Metadata tags applied to this program */
-  tags: TagPage;
+  tags: TagConnection;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -1801,18 +1910,18 @@ export type ProgramHistory = {
   user: User;
 };
 
+export type ProgramHistoryConnection = {
+  __typename?: 'ProgramHistoryConnection';
+  edges: Array<ProgramHistoryEdge>;
+  nodes: Array<ProgramHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type ProgramHistoryEdge = {
   __typename?: 'ProgramHistoryEdge';
   cursor: Scalars['String']['output'];
   node: ProgramHistory;
-};
-
-export type ProgramHistoryPage = {
-  __typename?: 'ProgramHistoryPage';
-  edges?: Maybe<Array<ProgramHistoryEdge>>;
-  nodes?: Maybe<Array<ProgramHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type ProgramOrgsInput = {
@@ -1829,59 +1938,59 @@ export type ProgramTagsInput = {
   meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
-export type ProgramsPage = {
-  __typename?: 'ProgramsPage';
-  edges?: Maybe<Array<ProgramEdge>>;
-  nodes?: Maybe<Array<Program>>;
+export type ProgramsConnection = {
+  __typename?: 'ProgramsConnection';
+  edges: Array<ProgramEdge>;
+  nodes: Array<Program>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  categories: CategoriesPage;
+  categories: CategoriesConnection;
   category?: Maybe<Category>;
   categoryRoot: Category;
   categorySchema?: Maybe<ModelEditSchema>;
   change?: Maybe<Change>;
-  changes: ChangesPage;
+  changes: ChangesConnection;
   component?: Maybe<Component>;
   componentSchema?: Maybe<ModelEditSchema>;
-  components: ComponentsPage;
+  components: ComponentsConnection;
   currentRegion?: Maybe<CurrentRegion>;
   directEdit?: Maybe<DirectEdit>;
-  feed: FeedPage;
+  feed: FeedConnection;
   item?: Maybe<Item>;
   itemSchema?: Maybe<ModelEditSchema>;
-  items: ItemsPage;
+  items: ItemsConnection;
   material?: Maybe<Material>;
   materialRoot: Material;
-  materials: MaterialsPage;
+  materials: MaterialsConnection;
   me?: Maybe<User>;
   org?: Maybe<Org>;
   orgSchema?: Maybe<ModelEditSchema>;
-  orgs: OrgsPage;
+  orgs: OrgsConnection;
   place?: Maybe<Place>;
   placeSchema?: Maybe<ModelEditSchema>;
-  places: PlacesPage;
+  places: PlacesConnection;
   process?: Maybe<Process>;
   processSchema?: Maybe<ModelEditSchema>;
-  processes: ProcessPage;
+  processes: ProcessConnection;
   program?: Maybe<Program>;
   programSchema?: Maybe<ModelEditSchema>;
-  programs: ProgramsPage;
+  programs: ProgramsConnection;
   region?: Maybe<Region>;
-  regions: RegionsPage;
-  search: SearchResultPage;
-  searchRegionsByPoint: RegionsPage;
+  regions: RegionsConnection;
+  search: SearchResultConnection;
+  searchRegionsByPoint: RegionsConnection;
   source?: Maybe<Source>;
-  sources: SourcesPage;
+  sources: SourcesConnection;
   tag?: Maybe<Tag>;
-  tags: TagPage;
+  tags: TagConnection;
   user?: Maybe<User>;
   variant?: Maybe<Variant>;
   variantSchema?: Maybe<ModelEditSchema>;
-  variants: VariantsPage;
+  variants: VariantsConnection;
 };
 
 
@@ -2145,7 +2254,7 @@ export type Region = {
   /** The type of geographic entity (e.g. country, region, locality) */
   placetype: Scalars['String']['output'];
   province?: Maybe<Region>;
-  searchWithin: RegionsPage;
+  searchWithin: RegionsConnection;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -2164,10 +2273,10 @@ export type RegionEdge = {
   node: Region;
 };
 
-export type RegionsPage = {
-  __typename?: 'RegionsPage';
-  edges?: Maybe<Array<RegionEdge>>;
-  nodes?: Maybe<Array<Region>>;
+export type RegionsConnection = {
+  __typename?: 'RegionsConnection';
+  edges: Array<RegionEdge>;
+  nodes: Array<Region>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -2198,20 +2307,20 @@ export type RemoveRefOutput = {
   model?: Maybe<EditModel>;
 };
 
+export type SearchResultConnection = {
+  __typename?: 'SearchResultConnection';
+  edges: Array<SearchResultItemEdge>;
+  nodes: Array<SearchResultItem>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type SearchResultItem = Category | Component | Item | Material | Org | Place | Region | Variant;
 
 export type SearchResultItemEdge = {
   __typename?: 'SearchResultItemEdge';
   cursor: Scalars['String']['output'];
   node: SearchResultItem;
-};
-
-export type SearchResultPage = {
-  __typename?: 'SearchResultPage';
-  edges?: Maybe<Array<SearchResultItemEdge>>;
-  nodes?: Maybe<Array<SearchResultItem>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 /** The item type to search */
@@ -2229,7 +2338,7 @@ export enum SearchType {
 /** A reference source used to support data changes, such as a URL, PDF, or image */
 export type Source = {
   __typename?: 'Source';
-  changes: ChangesPage;
+  changes: ChangesConnection;
   /** Extracted or structured content from the source */
   content?: Maybe<Scalars['JSONObject']['output']>;
   contentURL?: Maybe<Scalars['String']['output']>;
@@ -2280,10 +2389,10 @@ export enum SourceType {
   Video = 'VIDEO'
 }
 
-export type SourcesPage = {
-  __typename?: 'SourcesPage';
-  edges?: Maybe<Array<SourceEdge>>;
-  nodes?: Maybe<Array<Source>>;
+export type SourcesConnection = {
+  __typename?: 'SourcesConnection';
+  edges: Array<SourceEdge>;
+  nodes: Array<Source>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -2299,14 +2408,10 @@ export type StreamCaveats = {
 /** Additional context about a recycling recommendation for a component */
 export type StreamContext = {
   __typename?: 'StreamContext';
-  desc?: Maybe<Scalars['String']['output']>;
   /** Identifier key for this context entry */
   key: Scalars['String']['output'];
+  markdown?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  /** Type of contextual information */
-  type?: Maybe<Scalars['String']['output']>;
-  /** Value of this context entry */
-  value?: Maybe<Scalars['String']['output']>;
 };
 
 /** A recyclability score for a component or variant in a recycling stream */
@@ -2363,6 +2468,14 @@ export type Tag = Named & {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type TagConnection = {
+  __typename?: 'TagConnection';
+  edges: Array<TagEdge>;
+  nodes: Array<Tag>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** A reusable tag definition for classifying models with custom metadata */
 export type TagDefinition = Named & {
   __typename?: 'TagDefinition';
@@ -2392,14 +2505,6 @@ export type TagEdge = {
   __typename?: 'TagEdge';
   cursor: Scalars['String']['output'];
   node: Tag;
-};
-
-export type TagPage = {
-  __typename?: 'TagPage';
-  edges?: Maybe<Array<TagEdge>>;
-  nodes?: Maybe<Array<Tag>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 /** The model type of the tag */
@@ -2787,12 +2892,23 @@ export type UpdateVariantOutput = {
   variant?: Maybe<Variant>;
 };
 
+export type UploadSourceInput = {
+  file: Scalars['Upload']['input'];
+  metadata?: InputMaybe<Scalars['JSONObject']['input']>;
+  source: Scalars['ID']['input'];
+};
+
+export type UploadSourceOutput = {
+  __typename?: 'UploadSourceOutput';
+  source?: Maybe<Source>;
+};
+
 /** A registered user of the platform */
 export type User = {
   __typename?: 'User';
   avatarURL?: Maybe<Scalars['String']['output']>;
   /** Changes this user is involved in */
-  changes: ChangesPage;
+  changes: ChangesConnection;
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   emailVerified: Scalars['Boolean']['output'];
@@ -2800,7 +2916,7 @@ export type User = {
   lang?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   /** Organizations this user belongs to */
-  orgs: UserOrgsPage;
+  orgs: UserOrgsConnection;
   /** Extended profile information for this user */
   profile?: Maybe<UserProfile>;
   updatedAt: Scalars['DateTime']['output'];
@@ -2825,6 +2941,14 @@ export type UserOrgsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UserConnection = {
+  __typename?: 'UserConnection';
+  edges: Array<UserEdge>;
+  nodes: Array<User>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type UserEdge = {
   __typename?: 'UserEdge';
   cursor: Scalars['String']['output'];
@@ -2845,18 +2969,10 @@ export type UserOrgEdge = {
   node: UserOrg;
 };
 
-export type UserOrgsPage = {
-  __typename?: 'UserOrgsPage';
-  edges?: Maybe<Array<UserOrgEdge>>;
-  nodes?: Maybe<Array<UserOrg>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type UserPage = {
-  __typename?: 'UserPage';
-  edges?: Maybe<Array<UserEdge>>;
-  nodes?: Maybe<Array<User>>;
+export type UserOrgsConnection = {
+  __typename?: 'UserOrgsConnection';
+  edges: Array<UserOrgEdge>;
+  nodes: Array<UserOrg>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -2870,28 +2986,30 @@ export type UserProfile = {
 export type Variant = Named & {
   __typename?: 'Variant';
   /** Physical components that make up this variant */
-  components: VariantComponentsPage;
+  components: VariantComponentsConnection;
   createdAt: Scalars['DateTime']['output'];
   desc?: Maybe<Scalars['String']['output']>;
   /** Audit history of changes to this variant */
-  history: VariantHistoryPage;
+  history: VariantHistoryConnection;
   /** The ID of the model */
   id: Scalars['ID']['output'];
   imageURL?: Maybe<Scalars['String']['output']>;
   /** Images associated with this variant */
-  images: ImagesPage;
+  images: ImagesConnection;
   /** Product items this variant belongs to */
-  items: ItemsPage;
+  items: ItemsConnection;
   name?: Maybe<Scalars['String']['output']>;
   /** Organizations associated with this variant (e.g. manufacturer, importer) */
-  orgs: VariantOrgsPage;
+  orgs: VariantOrgsConnection;
   /** Aggregated recyclability score for this variant */
   recycleScore?: Maybe<StreamScore>;
   /** Geographic regions associated with this variant */
-  regions: RegionsPage;
-  sources: VariantSourcesPage;
+  regions: RegionsConnection;
+  /** Similar variants related to this variant */
+  related: VariantsConnection;
+  sources: VariantSourcesConnection;
   /** Metadata tags applied to this variant */
-  tags: TagPage;
+  tags: TagConnection;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -2957,6 +3075,14 @@ export type VariantRegionsArgs = {
 
 
 /** A specific variant or SKU of a product item, composed of physical components */
+export type VariantRelatedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** A specific variant or SKU of a product item, composed of physical components */
 export type VariantSourcesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -2989,20 +3115,20 @@ export type VariantComponentEdge = {
   node: VariantComponent;
 };
 
+export type VariantComponentsConnection = {
+  __typename?: 'VariantComponentsConnection';
+  edges: Array<VariantComponentEdge>;
+  nodes: Array<VariantComponent>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type VariantComponentsInput = {
   id: Scalars['ID']['input'];
   /** Quantity of this component in the variant */
   quantity?: InputMaybe<Scalars['Float']['input']>;
   /** Unit of measurement for the component quantity */
   unit?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type VariantComponentsPage = {
-  __typename?: 'VariantComponentsPage';
-  edges?: Maybe<Array<VariantComponentEdge>>;
-  nodes?: Maybe<Array<VariantComponent>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type VariantEdge = {
@@ -3020,18 +3146,18 @@ export type VariantHistory = {
   variant: Variant;
 };
 
+export type VariantHistoryConnection = {
+  __typename?: 'VariantHistoryConnection';
+  edges: Array<VariantHistoryEdge>;
+  nodes: Array<VariantHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type VariantHistoryEdge = {
   __typename?: 'VariantHistoryEdge';
   cursor: Scalars['String']['output'];
   node: VariantHistory;
-};
-
-export type VariantHistoryPage = {
-  __typename?: 'VariantHistoryPage';
-  edges?: Maybe<Array<VariantHistoryEdge>>;
-  nodes?: Maybe<Array<VariantHistory>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type VariantItemsInput = {
@@ -3052,16 +3178,16 @@ export type VariantOrgEdge = {
   node: VariantOrg;
 };
 
-export type VariantOrgsInput = {
-  id: Scalars['ID']['input'];
-};
-
-export type VariantOrgsPage = {
-  __typename?: 'VariantOrgsPage';
-  edges?: Maybe<Array<VariantOrgEdge>>;
-  nodes?: Maybe<Array<VariantOrg>>;
+export type VariantOrgsConnection = {
+  __typename?: 'VariantOrgsConnection';
+  edges: Array<VariantOrgEdge>;
+  nodes: Array<VariantOrg>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type VariantOrgsInput = {
+  id: Scalars['ID']['input'];
 };
 
 export type VariantRegionsInput = {
@@ -3080,10 +3206,10 @@ export type VariantSourceEdge = {
   node: VariantSource;
 };
 
-export type VariantSourcesPage = {
-  __typename?: 'VariantSourcesPage';
-  edges?: Maybe<Array<VariantSourceEdge>>;
-  nodes?: Maybe<Array<VariantSource>>;
+export type VariantSourcesConnection = {
+  __typename?: 'VariantSourcesConnection';
+  edges: Array<VariantSourceEdge>;
+  nodes: Array<VariantSource>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -3093,12 +3219,26 @@ export type VariantTagsInput = {
   meta?: InputMaybe<Scalars['JSONObject']['input']>;
 };
 
-export type VariantsPage = {
-  __typename?: 'VariantsPage';
-  edges?: Maybe<Array<VariantEdge>>;
-  nodes?: Maybe<Array<Variant>>;
+export type VariantsConnection = {
+  __typename?: 'VariantsConnection';
+  edges: Array<VariantEdge>;
+  nodes: Array<Variant>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type VoteInput = {
+  action: FeedbackAction;
+  data?: InputMaybe<Scalars['JSONObject']['input']>;
+  entityID: Scalars['ID']['input'];
+  entityName: FeedbackEntityName;
+};
+
+export type VoteOutput = {
+  __typename?: 'VoteOutput';
+  schema?: Maybe<Scalars['JSONObject']['output']>;
+  success: Scalars['Boolean']['output'];
+  uischema?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type ScienceSearchQueryVariables = Exact<{
@@ -3106,7 +3246,7 @@ export type ScienceSearchQueryVariables = Exact<{
 }>;
 
 
-export type ScienceSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+export type ScienceSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultConnection', totalCount: number, nodes: Array<
       | { __typename: 'Category', id: string, name: string, descShort?: string | null, imageURL?: string | null }
       | { __typename: 'Component', id: string, desc?: string | null, name_null?: string | null }
       | { __typename: 'Item', id: string, desc?: string | null, imageURL?: string | null, name_null?: string | null }
@@ -3115,14 +3255,14 @@ export type ScienceSearchQuery = { __typename?: 'Query', search: { __typename?: 
       | { __typename: 'Place', id: string, desc?: string | null, name_place?: string | null }
       | { __typename: 'Region' }
       | { __typename: 'Variant', id: string, desc?: string | null, imageURL?: string | null, name_null?: string | null }
-    > | null } };
+    > } };
 
 export type CategoryTreeNodeChildrenQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type CategoryTreeNodeChildrenQuery = { __typename?: 'Query', category?: { __typename?: 'Category', children: { __typename?: 'CategoriesPage', nodes?: Array<{ __typename?: 'Category', id: string, name: string, children: { __typename?: 'CategoriesPage', totalCount: number } }> | null } } | null };
+export type CategoryTreeNodeChildrenQuery = { __typename?: 'Query', category?: { __typename?: 'Category', children: { __typename?: 'CategoriesConnection', nodes: Array<{ __typename?: 'Category', id: string, name: string, children: { __typename?: 'CategoriesConnection', totalCount: number } }> } } | null };
 
 export type DiscardEditMutationMutationVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3137,14 +3277,14 @@ export type MaterialTreeNodeChildrenQueryVariables = Exact<{
 }>;
 
 
-export type MaterialTreeNodeChildrenQuery = { __typename?: 'Query', material?: { __typename?: 'Material', children: { __typename?: 'MaterialsPage', nodes?: Array<{ __typename?: 'Material', id: string, name?: string | null, children: { __typename?: 'MaterialsPage', totalCount: number } }> | null } } | null };
+export type MaterialTreeNodeChildrenQuery = { __typename?: 'Query', material?: { __typename?: 'Material', children: { __typename?: 'MaterialsConnection', nodes: Array<{ __typename?: 'Material', id: string, name?: string | null, children: { __typename?: 'MaterialsConnection', totalCount: number } }> } } | null };
 
 export type RegionSelectorSearchQueryVariables = Exact<{
   query: Scalars['String']['input'];
 }>;
 
 
-export type RegionSelectorSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', nodes?: Array<
+export type RegionSelectorSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultConnection', nodes: Array<
       | { __typename: 'Category' }
       | { __typename: 'Component' }
       | { __typename: 'Item' }
@@ -3153,7 +3293,7 @@ export type RegionSelectorSearchQuery = { __typename?: 'Query', search: { __type
       | { __typename: 'Place' }
       | { __typename: 'Region', id: string, name?: string | null, placetype: string }
       | { __typename: 'Variant' }
-    > | null } };
+    > } };
 
 export type RegionSelectorCurrentQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3188,16 +3328,16 @@ export type CategoryDetailQueryVariables = Exact<{
 }>;
 
 
-export type CategoryDetailQuery = { __typename?: 'Query', category?: { __typename?: 'Category', id: string, name: string, desc?: string | null, descShort?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, parents: { __typename?: 'CategoriesPage', nodes?: Array<(
+export type CategoryDetailQuery = { __typename?: 'Query', category?: { __typename?: 'Category', id: string, name: string, desc?: string | null, descShort?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, parents: { __typename?: 'CategoriesConnection', nodes: Array<(
         { __typename?: 'Category', id: string }
         & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-      )> | null }, children: { __typename?: 'CategoriesPage', nodes?: Array<(
+      )> }, children: { __typename?: 'CategoriesConnection', nodes: Array<(
         { __typename?: 'Category', id: string }
         & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-      )> | null }, items: { __typename?: 'ItemsPage', nodes?: Array<(
+      )> }, items: { __typename?: 'ItemsConnection', nodes: Array<(
         { __typename?: 'Item', id: string }
         & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
-      )> | null } } | null };
+      )> } } | null };
 
 export type CategoryDetailSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3228,7 +3368,7 @@ export type DeleteCategoryFromDetailMutation = { __typename?: 'Mutation', delete
 export type CategoryTreeRootQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CategoryTreeRootQuery = { __typename?: 'Query', categoryRoot: { __typename?: 'Category', children: { __typename?: 'CategoriesPage', nodes?: Array<{ __typename?: 'Category', id: string, name: string, children: { __typename?: 'CategoriesPage', totalCount: number } }> | null } } };
+export type CategoryTreeRootQuery = { __typename?: 'Query', categoryRoot: { __typename?: 'Category', children: { __typename?: 'CategoriesConnection', nodes: Array<{ __typename?: 'Category', id: string, name: string, children: { __typename?: 'CategoriesConnection', totalCount: number } }> } } };
 
 export type GridCategoriesQueryQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3238,10 +3378,10 @@ export type GridCategoriesQueryQueryVariables = Exact<{
 }>;
 
 
-export type GridCategoriesQueryQuery = { __typename?: 'Query', categories: { __typename?: 'CategoriesPage', nodes?: Array<(
+export type GridCategoriesQueryQuery = { __typename?: 'Query', categories: { __typename?: 'CategoriesConnection', nodes: Array<(
       { __typename?: 'Category' }
       & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type CategoryChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3253,7 +3393,7 @@ export type CategoryChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type CategoryChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type CategoryChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | (
             { __typename?: 'Category' }
             & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
@@ -3266,7 +3406,7 @@ export type CategoryChangesQueryQuery = { __typename?: 'Query', change?: { __typ
           | { __typename?: 'Process' }
           | { __typename?: 'Program' }
           | { __typename?: 'Variant' }
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type CategoriesSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3292,7 +3432,7 @@ export type ChangeDetailQueryVariables = Exact<{
 }>;
 
 
-export type ChangeDetailQuery = { __typename?: 'Query', change?: { __typename?: 'Change', id: string, title?: string | null, description?: string | null, status: ChangeStatus, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name?: string | null }, sources: { __typename?: 'ChangeSourcesPage', nodes?: Array<{ __typename?: 'ChangeSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> | null }, edits: { __typename?: 'ChangeEditsPage', totalCount: number, nodes?: Array<{ __typename?: 'Edit', id?: string | null, entityName: string, updateInput?: any | null, changes?:
+export type ChangeDetailQuery = { __typename?: 'Query', change?: { __typename?: 'Change', id: string, title?: string | null, description?: string | null, status: ChangeStatus, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name?: string | null }, sources: { __typename?: 'ChangeSourcesConnection', nodes: Array<{ __typename?: 'ChangeSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> }, edits: { __typename?: 'ChangeEditsConnection', totalCount: number, nodes: Array<{ __typename?: 'Edit', id?: string | null, entityName: string, updateInput?: any | null, changes?:
           | { __typename: 'Category' }
           | { __typename: 'Component' }
           | { __typename: 'Item' }
@@ -3302,7 +3442,7 @@ export type ChangeDetailQuery = { __typename?: 'Query', change?: { __typename?: 
           | { __typename: 'Process' }
           | { __typename: 'Program' }
           | { __typename: 'Variant' }
-         | null }> | null } } | null };
+         | null }> } } | null };
 
 export type UpdateChangeFromDetailMutationVariables = Exact<{
   input: UpdateChangeInput;
@@ -3326,10 +3466,10 @@ export type ChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ChangesQueryQuery = { __typename?: 'Query', changes: { __typename?: 'ChangesPage', nodes?: Array<(
+export type ChangesQueryQuery = { __typename?: 'Query', changes: { __typename?: 'ChangesConnection', nodes: Array<(
       { __typename?: 'Change' }
       & { ' $fragmentRefs'?: { 'ListChangeFragmentFragment': ListChangeFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type CreateChangeMutationVariables = Exact<{
   input: CreateChangeInput;
@@ -3350,7 +3490,7 @@ export type ComponentDetailQueryVariables = Exact<{
 }>;
 
 
-export type ComponentDetailQuery = { __typename?: 'Query', component?: { __typename?: 'Component', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, primaryMaterial: { __typename?: 'Material', id: string, name?: string | null }, materials: Array<{ __typename?: 'ComponentMaterial', materialFraction?: number | null, material: { __typename?: 'Material', id: string, name?: string | null } }>, recycleScore?: { __typename?: 'StreamScore', score?: number | null, rating?: StreamScoreRating | null, ratingF?: string | null, name?: string | null } | null, sources: { __typename?: 'ComponentSourcesPage', nodes?: Array<{ __typename?: 'ComponentSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> | null } } | null };
+export type ComponentDetailQuery = { __typename?: 'Query', component?: { __typename?: 'Component', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, primaryMaterial: { __typename?: 'Material', id: string, name?: string | null }, materials: Array<{ __typename?: 'ComponentMaterial', materialFraction?: number | null, material: { __typename?: 'Material', id: string, name?: string | null } }>, recycleScore?: { __typename?: 'StreamScore', score?: number | null, rating?: StreamScoreRating | null, ratingF?: string | null, name?: string | null } | null, sources: { __typename?: 'ComponentSourcesConnection', nodes: Array<{ __typename?: 'ComponentSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> } } | null };
 
 export type ComponentDetailSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3386,10 +3526,10 @@ export type ComponentsQueryQueryVariables = Exact<{
 }>;
 
 
-export type ComponentsQueryQuery = { __typename?: 'Query', components: { __typename?: 'ComponentsPage', nodes?: Array<(
+export type ComponentsQueryQuery = { __typename?: 'Query', components: { __typename?: 'ComponentsConnection', nodes: Array<(
       { __typename?: 'Component' }
       & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type ComponentChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3401,7 +3541,7 @@ export type ComponentChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ComponentChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type ComponentChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | { __typename?: 'Category' }
           | (
             { __typename?: 'Component' }
@@ -3414,7 +3554,7 @@ export type ComponentChangesQueryQuery = { __typename?: 'Query', change?: { __ty
           | { __typename?: 'Process' }
           | { __typename?: 'Program' }
           | { __typename?: 'Variant' }
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type ComponentsSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3440,13 +3580,13 @@ export type ItemDetailQueryVariables = Exact<{
 }>;
 
 
-export type ItemDetailQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, categories: { __typename?: 'CategoriesPage', nodes?: Array<(
+export type ItemDetailQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, categories: { __typename?: 'CategoriesConnection', nodes: Array<(
         { __typename?: 'Category', id: string }
         & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
-      )> | null }, variants: { __typename?: 'VariantsPage', nodes?: Array<(
+      )> }, variants: { __typename?: 'VariantsConnection', nodes: Array<(
         { __typename?: 'Variant', id: string }
         & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
-      )> | null } } | null };
+      )> } } | null };
 
 export type ItemDetailSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3482,10 +3622,10 @@ export type ItemsQueryQueryVariables = Exact<{
 }>;
 
 
-export type ItemsQueryQuery = { __typename?: 'Query', items: { __typename?: 'ItemsPage', nodes?: Array<(
+export type ItemsQueryQuery = { __typename?: 'Query', items: { __typename?: 'ItemsConnection', nodes: Array<(
       { __typename?: 'Item' }
       & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type ItemsChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3497,7 +3637,7 @@ export type ItemsChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ItemsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type ItemsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | { __typename?: 'Category' }
           | { __typename?: 'Component' }
           | (
@@ -3510,7 +3650,7 @@ export type ItemsChangesQueryQuery = { __typename?: 'Query', change?: { __typena
           | { __typename?: 'Process' }
           | { __typename?: 'Program' }
           | { __typename?: 'Variant' }
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type ItemsSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3536,19 +3676,19 @@ export type MaterialDetailQueryVariables = Exact<{
 }>;
 
 
-export type MaterialDetailQuery = { __typename?: 'Query', material?: { __typename?: 'Material', id: string, name?: string | null, desc?: string | null, shape?: string | null, technical: boolean, createdAt: any, updatedAt: any, parents: { __typename?: 'MaterialsPage', nodes?: Array<{ __typename?: 'Material', id: string, name?: string | null }> | null }, children: { __typename?: 'MaterialsPage', nodes?: Array<{ __typename?: 'Material', id: string, name?: string | null }> | null } } | null };
+export type MaterialDetailQuery = { __typename?: 'Query', material?: { __typename?: 'Material', id: string, name?: string | null, desc?: string | null, shape?: string | null, technical: boolean, createdAt: any, updatedAt: any, parents: { __typename?: 'MaterialsConnection', nodes: Array<{ __typename?: 'Material', id: string, name?: string | null }> }, children: { __typename?: 'MaterialsConnection', nodes: Array<{ __typename?: 'Material', id: string, name?: string | null }> } } | null };
 
 export type MaterialTreeRootQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MaterialTreeRootQuery = { __typename?: 'Query', materialRoot: { __typename?: 'Material', children: { __typename?: 'MaterialsPage', nodes?: Array<{ __typename?: 'Material', id: string, name?: string | null, children: { __typename?: 'MaterialsPage', totalCount: number } }> | null } } };
+export type MaterialTreeRootQuery = { __typename?: 'Query', materialRoot: { __typename?: 'Material', children: { __typename?: 'MaterialsConnection', nodes: Array<{ __typename?: 'Material', id: string, name?: string | null, children: { __typename?: 'MaterialsConnection', totalCount: number } }> } } };
 
 export type OrgDetailQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type OrgDetailQuery = { __typename?: 'Query', org?: { __typename?: 'Org', id: string, name: string, slug: string, desc?: string | null, avatarURL?: string | null, websiteURL?: string | null, createdAt: any, updatedAt: any, users: { __typename?: 'UserPage', nodes?: Array<{ __typename?: 'User', id: string, name?: string | null, email: string, avatarURL?: string | null }> | null }, history: { __typename?: 'OrgHistoryPage', nodes?: Array<{ __typename?: 'OrgHistory', datetime: any, user: { __typename?: 'User', id: string, name?: string | null }, changes?: { __typename?: 'Org', name: string, desc?: string | null, websiteURL?: string | null } | null }> | null } } | null };
+export type OrgDetailQuery = { __typename?: 'Query', org?: { __typename?: 'Org', id: string, name: string, slug: string, desc?: string | null, avatarURL?: string | null, websiteURL?: string | null, createdAt: any, updatedAt: any, users: { __typename?: 'UserConnection', nodes: Array<{ __typename?: 'User', id: string, name?: string | null, email: string, avatarURL?: string | null }> }, history: { __typename?: 'OrgHistoryConnection', nodes: Array<{ __typename?: 'OrgHistory', datetime: any, user: { __typename?: 'User', id: string, name?: string | null }, changes?: { __typename?: 'Org', name: string, desc?: string | null, websiteURL?: string | null } | null }> } } | null };
 
 export type GridOrgsQueryQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3558,10 +3698,10 @@ export type GridOrgsQueryQueryVariables = Exact<{
 }>;
 
 
-export type GridOrgsQueryQuery = { __typename?: 'Query', orgs: { __typename?: 'OrgsPage', totalCount: number, nodes?: Array<(
+export type GridOrgsQueryQuery = { __typename?: 'Query', orgs: { __typename?: 'OrgsConnection', totalCount: number, nodes: Array<(
       { __typename?: 'Org' }
       & { ' $fragmentRefs'?: { 'ListOrgFragmentFragment': ListOrgFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type GridOrgsSearchQueryQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -3569,7 +3709,7 @@ export type GridOrgsSearchQueryQueryVariables = Exact<{
 }>;
 
 
-export type GridOrgsSearchQueryQuery = { __typename?: 'Query', orgs: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+export type GridOrgsSearchQueryQuery = { __typename?: 'Query', orgs: { __typename?: 'SearchResultConnection', totalCount: number, nodes: Array<
       | { __typename?: 'Category' }
       | { __typename?: 'Component' }
       | { __typename?: 'Item' }
@@ -3581,7 +3721,7 @@ export type GridOrgsSearchQueryQuery = { __typename?: 'Query', orgs: { __typenam
       | { __typename?: 'Place' }
       | { __typename?: 'Region' }
       | { __typename?: 'Variant' }
-    > | null } };
+    > } };
 
 export type OrgsChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3593,7 +3733,7 @@ export type OrgsChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type OrgsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type OrgsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | { __typename?: 'Category' }
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
@@ -3606,7 +3746,7 @@ export type OrgsChangesQueryQuery = { __typename?: 'Query', change?: { __typenam
           | { __typename?: 'Process' }
           | { __typename?: 'Program' }
           | { __typename?: 'Variant' }
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type OrgSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3632,7 +3772,7 @@ export type PlaceDetailQueryVariables = Exact<{
 }>;
 
 
-export type PlaceDetailQuery = { __typename?: 'Query', place?: { __typename?: 'Place', id: string, name?: string | null, desc?: string | null, createdAt: any, updatedAt: any, address?: { __typename?: 'PlaceAddress', street?: string | null, housenumber?: string | null, city?: string | null, postcode?: string | null, region?: string | null, country?: string | null } | null, location?: { __typename?: 'PlaceLocation', latitude: number, longitude: number } | null, org?: { __typename?: 'Org', id: string, name: string, avatarURL?: string | null, desc?: string | null, websiteURL?: string | null } | null, tags: { __typename?: 'TagPage', nodes?: Array<{ __typename?: 'Tag', id: string, name: string }> | null } } | null };
+export type PlaceDetailQuery = { __typename?: 'Query', place?: { __typename?: 'Place', id: string, name?: string | null, desc?: string | null, createdAt: any, updatedAt: any, address?: { __typename?: 'PlaceAddress', street?: string | null, housenumber?: string | null, city?: string | null, postcode?: string | null, region?: string | null, country?: string | null } | null, location?: { __typename?: 'PlaceLocation', latitude: number, longitude: number } | null, org?: { __typename?: 'Org', id: string, name: string, avatarURL?: string | null, desc?: string | null, websiteURL?: string | null } | null, tags: { __typename?: 'TagConnection', nodes: Array<{ __typename?: 'Tag', id: string, name: string }> } } | null };
 
 export type PlacesQueryQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3642,10 +3782,10 @@ export type PlacesQueryQueryVariables = Exact<{
 }>;
 
 
-export type PlacesQueryQuery = { __typename?: 'Query', places: { __typename?: 'PlacesPage', totalCount: number, nodes?: Array<(
+export type PlacesQueryQuery = { __typename?: 'Query', places: { __typename?: 'PlacesConnection', totalCount: number, nodes: Array<(
       { __typename?: 'Place' }
       & { ' $fragmentRefs'?: { 'ListPlaceFragmentFragment': ListPlaceFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type PlacesChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3657,7 +3797,7 @@ export type PlacesChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type PlacesChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type PlacesChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | { __typename?: 'Category' }
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
@@ -3670,7 +3810,7 @@ export type PlacesChangesQueryQuery = { __typename?: 'Query', change?: { __typen
           | { __typename?: 'Process' }
           | { __typename?: 'Program' }
           | { __typename?: 'Variant' }
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type PlaceSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3696,7 +3836,7 @@ export type ProcessDetailQueryVariables = Exact<{
 }>;
 
 
-export type ProcessDetailQuery = { __typename?: 'Query', process?: { __typename?: 'Process', id: string, name?: string | null, desc?: string | null, intent: string, createdAt: any, updatedAt: any, material?: { __typename?: 'Material', id: string, name?: string | null } | null, org?: { __typename?: 'Org', id: string, name: string } | null, place?: { __typename?: 'Place', id: string, name?: string | null } | null, region?: { __typename?: 'Region', id: string, name?: string | null } | null, variant?: { __typename?: 'Variant', id: string, name?: string | null } | null, sources: { __typename?: 'ProcessSourcesPage', nodes?: Array<{ __typename?: 'ProcessSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> | null } } | null };
+export type ProcessDetailQuery = { __typename?: 'Query', process?: { __typename?: 'Process', id: string, name?: string | null, desc?: string | null, intent: string, createdAt: any, updatedAt: any, material?: { __typename?: 'Material', id: string, name?: string | null } | null, org?: { __typename?: 'Org', id: string, name: string } | null, place?: { __typename?: 'Place', id: string, name?: string | null } | null, region?: { __typename?: 'Region', id: string, name?: string | null } | null, variant?: { __typename?: 'Variant', id: string, name?: string | null } | null, sources: { __typename?: 'ProcessSourcesConnection', nodes: Array<{ __typename?: 'ProcessSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> } } | null };
 
 export type ProcessDetailSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3732,10 +3872,10 @@ export type ProcessesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ProcessesQueryQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessPage', nodes?: Array<(
+export type ProcessesQueryQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessConnection', nodes: Array<(
       { __typename?: 'Process' }
       & { ' $fragmentRefs'?: { 'ListProcessFragmentFragment': ListProcessFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type ProcessesChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3747,7 +3887,7 @@ export type ProcessesChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type ProcessesChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type ProcessesChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | { __typename?: 'Category' }
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
@@ -3760,7 +3900,7 @@ export type ProcessesChangesQueryQuery = { __typename?: 'Query', change?: { __ty
           )
           | { __typename?: 'Program' }
           | { __typename?: 'Variant' }
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type ProcessesSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3801,12 +3941,12 @@ export type ProcessesForMaterialDetailsQueryVariables = Exact<{
 }>;
 
 
-export type ProcessesForMaterialDetailsQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessPage', nodes?: Array<{ __typename?: 'Process', id: string, name?: string | null, desc?: string | null, intent: string, region?: { __typename?: 'Region', id: string } | null, org?: { __typename?: 'Org', id: string, name: string } | null }> | null } };
+export type ProcessesForMaterialDetailsQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessConnection', nodes: Array<{ __typename?: 'Process', id: string, name?: string | null, desc?: string | null, intent: string, region?: { __typename?: 'Region', id: string } | null, org?: { __typename?: 'Org', id: string, name: string } | null }> } };
 
 export type CoverageMaterialsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CoverageMaterialsQuery = { __typename?: 'Query', materials: { __typename?: 'MaterialsPage', nodes?: Array<{ __typename?: 'Material', id: string, name?: string | null }> | null } };
+export type CoverageMaterialsQuery = { __typename?: 'Query', materials: { __typename?: 'MaterialsConnection', nodes: Array<{ __typename?: 'Material', id: string, name?: string | null }> } };
 
 export type CoverageRegionHierarchyQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3823,17 +3963,17 @@ export type CoverageProcessesQueryVariables = Exact<{
 }>;
 
 
-export type CoverageProcessesQuery = { __typename?: 'Query', p0: { __typename?: 'ProcessPage', nodes?: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> | null }, p1: { __typename?: 'ProcessPage', nodes?: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> | null }, p2: { __typename?: 'ProcessPage', nodes?: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> | null }, p3: { __typename?: 'ProcessPage', nodes?: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> | null } };
+export type CoverageProcessesQuery = { __typename?: 'Query', p0: { __typename?: 'ProcessConnection', nodes: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> }, p1: { __typename?: 'ProcessConnection', nodes: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> }, p2: { __typename?: 'ProcessConnection', nodes: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> }, p3: { __typename?: 'ProcessConnection', nodes: Array<{ __typename?: 'Process', id: string, material?: { __typename?: 'Material', id: string } | null, region?: { __typename?: 'Region', id: string } | null }> } };
 
 export type SourceDetailQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type SourceDetailQuery = { __typename?: 'Query', source?: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null, metadata?: any | null, content?: any | null, processedAt?: any | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name?: string | null }, changes: { __typename?: 'ChangesPage', nodes?: Array<(
+export type SourceDetailQuery = { __typename?: 'Query', source?: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null, metadata?: any | null, content?: any | null, processedAt?: any | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name?: string | null }, changes: { __typename?: 'ChangesConnection', nodes: Array<(
         { __typename?: 'Change', id: string }
         & { ' $fragmentRefs'?: { 'ListChangeFragmentFragment': ListChangeFragmentFragment } }
-      )> | null } } | null };
+      )> } } | null };
 
 export type DeleteSourceFromDetailMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3850,20 +3990,20 @@ export type SourcesQueryQueryVariables = Exact<{
 }>;
 
 
-export type SourcesQueryQuery = { __typename?: 'Query', sources: { __typename?: 'SourcesPage', nodes?: Array<{ __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null, processedAt?: any | null, createdAt: any }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+export type SourcesQueryQuery = { __typename?: 'Query', sources: { __typename?: 'SourcesConnection', nodes: Array<{ __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null, processedAt?: any | null, createdAt: any }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type VariantDetailQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type VariantDetailQuery = { __typename?: 'Query', variant?: { __typename?: 'Variant', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, items: { __typename?: 'ItemsPage', nodes?: Array<(
+export type VariantDetailQuery = { __typename?: 'Query', variant?: { __typename?: 'Variant', id: string, name?: string | null, desc?: string | null, imageURL?: string | null, createdAt: any, updatedAt: any, items: { __typename?: 'ItemsConnection', nodes: Array<(
         { __typename?: 'Item', id: string }
         & { ' $fragmentRefs'?: { 'ListItemFragmentFragment': ListItemFragmentFragment } }
-      )> | null }, components: { __typename?: 'VariantComponentsPage', nodes?: Array<{ __typename?: 'VariantComponent', quantity?: number | null, unit?: string | null, component: (
+      )> }, components: { __typename?: 'VariantComponentsConnection', nodes: Array<{ __typename?: 'VariantComponent', quantity?: number | null, unit?: string | null, component: (
           { __typename?: 'Component', id: string }
           & { ' $fragmentRefs'?: { 'ListComponentFragmentFragment': ListComponentFragmentFragment } }
-        ) }> | null }, orgs: { __typename?: 'VariantOrgsPage', nodes?: Array<{ __typename?: 'VariantOrg', org: { __typename?: 'Org', id: string, name: string } }> | null }, regions: { __typename?: 'RegionsPage', nodes?: Array<{ __typename?: 'Region', id: string, name?: string | null }> | null }, sources: { __typename?: 'VariantSourcesPage', nodes?: Array<{ __typename?: 'VariantSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> | null } } | null };
+        ) }> }, orgs: { __typename?: 'VariantOrgsConnection', nodes: Array<{ __typename?: 'VariantOrg', org: { __typename?: 'Org', id: string, name: string } }> }, regions: { __typename?: 'RegionsConnection', nodes: Array<{ __typename?: 'Region', id: string, name?: string | null }> }, sources: { __typename?: 'VariantSourcesConnection', nodes: Array<{ __typename?: 'VariantSource', source: { __typename?: 'Source', id: string, type: SourceType, contentURL?: string | null, location?: string | null } }> } } | null };
 
 export type VariantDetailSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3899,10 +4039,10 @@ export type VariantsQueryQueryVariables = Exact<{
 }>;
 
 
-export type VariantsQueryQuery = { __typename?: 'Query', variants: { __typename?: 'VariantsPage', nodes?: Array<(
+export type VariantsQueryQuery = { __typename?: 'Query', variants: { __typename?: 'VariantsConnection', nodes: Array<(
       { __typename?: 'Variant' }
       & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
-    )> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
+    )>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } };
 
 export type VariantsChangesQueryQueryVariables = Exact<{
   changeID: Scalars['ID']['input'];
@@ -3914,7 +4054,7 @@ export type VariantsChangesQueryQueryVariables = Exact<{
 }>;
 
 
-export type VariantsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', changes?:
+export type VariantsChangesQueryQuery = { __typename?: 'Query', change?: { __typename?: 'Change', edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', changes?:
           | { __typename?: 'Category' }
           | { __typename?: 'Component' }
           | { __typename?: 'Item' }
@@ -3927,7 +4067,7 @@ export type VariantsChangesQueryQuery = { __typename?: 'Query', change?: { __typ
             { __typename?: 'Variant' }
             & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
           )
-         | null }> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
+         | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } } | null };
 
 export type VariantsSchemaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3954,7 +4094,7 @@ export type ChangesGetEditQueryVariables = Exact<{
 }>;
 
 
-export type ChangesGetEditQuery = { __typename?: 'Query', change?: { __typename?: 'Change', status: ChangeStatus, edits: { __typename?: 'ChangeEditsPage', nodes?: Array<{ __typename?: 'Edit', updateInput?: any | null }> | null } } | null };
+export type ChangesGetEditQuery = { __typename?: 'Query', change?: { __typename?: 'Change', status: ChangeStatus, edits: { __typename?: 'ChangeEditsConnection', nodes: Array<{ __typename?: 'Edit', updateInput?: any | null }> } } | null };
 
 export type DirectGetEditQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4070,7 +4210,7 @@ export type RefSearchQueryQueryVariables = Exact<{
 }>;
 
 
-export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultPage', totalCount: number, nodes?: Array<
+export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultConnection', totalCount: number, nodes: Array<
       | (
         { __typename?: 'Category' }
         & { ' $fragmentRefs'?: { 'ListCategoryFragmentFragment': ListCategoryFragmentFragment } }
@@ -4103,7 +4243,7 @@ export type RefSearchQueryQuery = { __typename?: 'Query', search: { __typename?:
         { __typename?: 'Variant' }
         & { ' $fragmentRefs'?: { 'ListVariantFragmentFragment': ListVariantFragmentFragment } }
       )
-    > | null } };
+    > } };
 
 export const ListCategoryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListCategoryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Category"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name_req"},"name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"descShort"}},{"kind":"Field","name":{"kind":"Name","value":"imageURL"}}]}}]} as unknown as DocumentNode<ListCategoryFragmentFragment, unknown>;
 export const ListChangeFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListChangeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Change"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<ListChangeFragmentFragment, unknown>;

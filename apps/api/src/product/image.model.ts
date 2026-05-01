@@ -13,7 +13,7 @@ export class Image extends IDCreatedUpdated {
 }
 
 @ObjectType()
-export class ImagesPage extends Paginated(Image) {}
+export class ImagesConnection extends Paginated(Image) {}
 
 @ArgsType()
 export class ImagesArgs extends PaginationBasicArgs {

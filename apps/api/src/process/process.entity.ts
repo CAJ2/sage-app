@@ -2,7 +2,6 @@ import {
   BaseEntity,
   Collection,
   Entity,
-  Enum,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -199,7 +198,7 @@ export const ProcessEfficiencySchema = z.object({
 
 @Entity({ tableName: 'processes', schema: 'public' })
 export class Process extends IDCreatedUpdated {
-  @Enum(() => ProcessIntent)
+  @Property({ type: 'text' })
   intent!: ProcessIntent
 
   @Property({ type: 'json' })

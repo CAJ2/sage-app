@@ -5,7 +5,7 @@ import { graphql } from '~/gql'
 import { useFragment, type FragmentType } from '~/gql/fragment-masking'
 
 const VariantRecycleStreamsFragment = graphql(`
-  fragment VariantRecycleStreams on VariantComponentsPage {
+  fragment VariantRecycleStreams on VariantComponentsConnection {
     nodes {
       component {
         id
@@ -24,7 +24,7 @@ const VariantRecycleStreamsFragment = graphql(`
         recycle {
           context {
             key
-            desc
+            markdown
           }
           stream {
             name
